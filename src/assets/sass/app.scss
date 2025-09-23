@@ -1,0 +1,41 @@
+// Fonts
+// @use u@/assets/sass/rl('https://fonts.googleapis.com/css?family=Nunito');
+@use "@/assets/sass/fonts";
+
+@use '@/assets/sass/default/customReset';
+@use "@/assets/sass/default/bottomFooter"; //set page height to 100% and moves mainFooter to bottom.
+
+// Element UI plugins
+// @use "@/assets/sass/plugins/element-ui/plugin-tags";
+// @use "@/assets/sass/plugins/element-ui/plugin-slider";
+// @use "@/assets/sass/plugins/element-ui/plugin-select";
+// @use "@/assets/sass/plugins/element-ui/plugin-inputs";
+// @use "@/assets/sass/plugins/element-ui/plugin-tables";
+
+/* ----Variables--- */
+// @use "@/assets/sass/plugin_variables";
+// @use "@/assets/sass/variables";
+// @use '@/assets/sass/mixins';
+
+// -----Frames--------
+@use "@/assets/sass/frames/frames_main";
+@use '@/assets/sass/element-ui/elements';
+
+// ----Common-----
+@use '@/assets/sass/common/typography';
+@use '@/assets/sass/common/layout';
+@use '@/assets/sass/common/common';
+@use "@/assets/sass/common/common-blocks";
+@use "@/assets/sass/common/common-content";
+
+
+// ------Components---------
+@use '@/assets/sass/components/sidebar';
+@use '@/assets/sass/components/navbar';
+
+// ------Pages---------
+@use '@/assets/sass/pages/login';
+// @use '@/assets/sass/pages/dashboard';
+
+
+

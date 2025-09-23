@@ -1,0 +1,23 @@
+/* ======= uncomment the module you want to use ======= */
+
+@use "@/assets/sass/frames/grids/form-grid.scss";
+@use "@/assets/sass/frames/grids/page-grid";
+
+@use "@/assets/sass/frames/blocks/pagination";
+// @use "@/assets/sass/frames/blocks/table";
+// @use "@/assets/sass/frames/blocks/selectize";
+// @use "@/assets/sass/frames/blocks/inputTypeFile";
+@use "@/assets/sass/frames/blocks/flex-table";
+@use "@/assets/sass/frames/blocks/triangle";
+// @use "@/assets/sass/frames/blocks/customQuantity";
+// @use "@/assets/sass/frames/blocks/customQuantityHorizontal";
+// @use "@/assets/sass/frames/blocks/customCheckbox";
+@use "@/assets/sass/frames/blocks/modal";
+// @use "@/assets/sass/frames/blocks/notifications";
+// @use "@/assets/sass/frames/blocks/animateBorder";
+// @use "@/assets/sass/frames/blocks/preloader";
+// @use "@/assets/sass/frames/blocks/uiSlider";
+@use "@/assets/sass/frames/blocks/spinners";
+
+
+// @use "@/assets/sass/frames/mobileMenu/mobileMenu";
