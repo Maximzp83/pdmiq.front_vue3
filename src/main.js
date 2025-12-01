@@ -5,6 +5,17 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import HighchartsVue from 'highcharts-vue';
+import Highcharts from "highcharts";
+
+Highcharts.setOptions({
+  lang: {
+    locale: "ru-RU",
+    decimalPoint: ".",
+    thousandsSep: " ",
+  }
+});
+
 // import ElementPlus from 'element-plus'
 
 // import 'element-plus/theme-chalk/el-button.css'
@@ -18,6 +29,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(HighchartsVue);
 // app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
 app.mount('#app')

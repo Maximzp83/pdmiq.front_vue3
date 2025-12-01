@@ -1,0 +1,563 @@
+import { defineStore } from 'pinia';
+import { commonStoreMixin } from './mixins/commonStoreMixin';
+
+const token = localStorage.getItem('access_token');
+// console.log('1', token)
+const user = JSON.parse(localStorage.getItem('authUser'));
+const motorIQLink = localStorage.getItem('motorIQLink');
+const redirectTo = localStorage.getItem('redirectTo');
+
+export const useAuthStore = defineStore('authStore', {
+	state: () => {
+		return {
+			isAuthenticated: true,
+			access_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvYXBpLnBkbW1hdHJpeC5hc3NldG1hdHJpeC5jb21cL2FwaVwvYXV0aFwvbG9naW4iLCJpYXQiOjE3NTg3OTg4MzksIm5iZiI6MTc1ODc5ODgzOSwianRpIjoiQ1dNd0pWNmpudWVRQVNvQyIsInN1YiI6ODQsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.yMGNp5JYwbqSL12bWzy7Ed6-k8gH6RxlKfF1108nC-k",
+			authUser: {
+				"id": 84,
+				"uuid": "8dddfa19-4763-47a7-836d-89e91b5400fe",
+				"type": 1,
+				"role_id": 2,
+				"temp_role_id": null,
+				"temp_type": null,
+				"first_name": "Maxim",
+				"last_name": "Mironov",
+				"full_name": "Maxim Mironov",
+				"email": "maximzp83@gmail.com",
+				"phone_number": "+380500763435",
+				"country_code": null,
+				"language": 1,
+				"timezone": 0,
+				"is_mfa_enabled": false,
+				"is_mfa_verified": false,
+				"mfa_type": null,
+				"work_order_role": 0,
+				"hourly_rate": 0,
+				"is_monitoring_all_notifiable_plants": true,
+				"is_real_time_notify": false,
+				"is_day_summary_notify": false,
+				"is_receive_sensors_anomaly_notification": true,
+				"is_alarms_notes_notification": false,
+				"is_amplitude_alarm_notifiable": false,
+				"is_controller_offline_notification": false,
+				"is_mail_sensor_job_notify": false,
+				"is_sms_sensor_job_notify": false,
+				"is_device_notifiable": false,
+				"daily_summary_notify_at": "00:00",
+				"work_order_requests_count": 0,
+				"location": null,
+				"company_id": null,
+				"plant_id": null,
+				"role": {
+					"id": 2,
+					"type": 1,
+					"name": "Industrial Matrix",
+					"child_role_ids": [
+						2,
+						4,
+						4,
+						4,
+						5,
+						5,
+						5,
+						5,
+						6,
+						6,
+						6,
+						7,
+						7,
+						7,
+						7,
+						8,
+						8,
+						9,
+						9,
+						9,
+						10,
+						10,
+						11,
+						12
+					],
+					"is_requisitioner": true,
+					"is_fab_shop_manager": false,
+					"is_technic": false,
+					"is_forced_mfa": false,
+					"permissions": [
+						{
+							"id": 32,
+							"role_id": 2,
+							"app_section": 1,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 33,
+							"role_id": 2,
+							"app_section": 2,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 34,
+							"role_id": 2,
+							"app_section": 3,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 35,
+							"role_id": 2,
+							"app_section": 4,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 36,
+							"role_id": 2,
+							"app_section": 5,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": true
+						},
+						{
+							"id": 37,
+							"role_id": 2,
+							"app_section": 6,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": true
+						},
+						{
+							"id": 38,
+							"role_id": 2,
+							"app_section": 7,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 39,
+							"role_id": 2,
+							"app_section": 8,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 40,
+							"role_id": 2,
+							"app_section": 9,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 41,
+							"role_id": 2,
+							"app_section": 10,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 42,
+							"role_id": 2,
+							"app_section": 11,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 43,
+							"role_id": 2,
+							"app_section": 12,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 44,
+							"role_id": 2,
+							"app_section": 13,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 45,
+							"role_id": 2,
+							"app_section": 14,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 46,
+							"role_id": 2,
+							"app_section": 15,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 47,
+							"role_id": 2,
+							"app_section": 16,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 48,
+							"role_id": 2,
+							"app_section": 17,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 49,
+							"role_id": 2,
+							"app_section": 18,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 50,
+							"role_id": 2,
+							"app_section": 19,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 51,
+							"role_id": 2,
+							"app_section": 20,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 52,
+							"role_id": 2,
+							"app_section": 21,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 53,
+							"role_id": 2,
+							"app_section": 22,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 54,
+							"role_id": 2,
+							"app_section": 23,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 55,
+							"role_id": 2,
+							"app_section": 24,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 56,
+							"role_id": 2,
+							"app_section": 25,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 57,
+							"role_id": 2,
+							"app_section": 26,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 58,
+							"role_id": 2,
+							"app_section": 27,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 59,
+							"role_id": 2,
+							"app_section": 28,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 60,
+							"role_id": 2,
+							"app_section": 29,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 61,
+							"role_id": 2,
+							"app_section": 30,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 62,
+							"role_id": 2,
+							"app_section": 31,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						},
+						{
+							"id": 343,
+							"role_id": 2,
+							"app_section": 32,
+							"is_viewing": false,
+							"is_creating": false,
+							"is_updating": false,
+							"is_deleting": false,
+							"is_archiving": false
+						},
+						{
+							"id": 345,
+							"role_id": 2,
+							"app_section": 33,
+							"is_viewing": true,
+							"is_creating": true,
+							"is_updating": true,
+							"is_deleting": true,
+							"is_archiving": false
+						}
+					]
+				},
+				"temp_role": null,
+				"company_ids": [],
+				"plants_ids": [],
+				"notifiable_plants": [],
+				"notifiable_production_lines": [],
+				"companies": [],
+				"plants": [],
+				"notification_rules": [
+					{
+						"message_type": 1,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 2,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 3,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 4,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 5,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 6,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 7,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 8,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 9,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 10,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 11,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 12,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 13,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 14,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 15,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 16,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 17,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 18,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					},
+					{
+						"message_type": 19,
+						"is_email": false,
+						"is_sms": false,
+						"is_push": false
+					}
+				]
+			},
+
+			redirectTo: redirectTo || ''
+		}
+	},
+
+	actions: {
+		...commonStoreMixin.actions,
+
+		set_redirect_to(val) {
+			this.redirectTo = val;
+			
+			if (val) {
+				localStorage.setItem('redirectTo', val);
+			} else {
+				localStorage.removeItem('redirectTo');
+			}
+		},
+	},
+
+	getters: {
+		// ...itemsMixin.getters,
+	}
+})

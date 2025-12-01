@@ -35,7 +35,6 @@
 			</RouterView> -->
 
 			<Sidebar
-				@event="handleEvent"
 				:isCollapse="isSidebarCollapse"
 				:isShow="isSidebarShow"
 				:currentPath="currentPath"
@@ -43,7 +42,6 @@
 
 			<div class="main-panel">
 				<TopNavbar
-					@event="handleEvent"
 				/>
 
 				<div class="dashboard-content-wrapper">
@@ -53,7 +51,6 @@
 						<RouterView
 							ref="viewContent"
 							:key="viewContentComponentKey"
-							@event="handleEventNew"
 						/>
 
 						<!-- <RouterView v-slot="{ Component }">
@@ -90,7 +87,10 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, defineAsyncComponent } from 'vue';
+	import { ref, onMounted, defineAsyncComponent, computed, provide, useTemplateRef } from 'vue';
+	import { useRoute } from 'vue-router';
+	import { storeToRefs } from 'pinia';
+
 	const TopNavbar = defineAsyncComponent(() => import('@/components/layout/TopNavbar.vue'))
 	const Sidebar = defineAsyncComponent(() => import('@/components/layout/Sidebar/Sidebar.vue'));
 
@@ -105,18 +105,74 @@ import { getParamsFromUrl } from '@/services/api/api_helpers';
 import IdleTimer from '@/utils/IdleTimer';
 import { LANGUAGE_TYPES } from '@/localization/utils';*/
 
-	const plantItem = null;
-	const isAuthenticated = ref(true);
-	const authIsLoading = ref(false);
-	const isAuthChecking = ref(false);
-	const isSidebarCollapse = false;
-	const isSidebarShow = false;
-	const currentPath = ref('');
-	const viewContentComponentKey = ref(1);
+	// -----Composables-----
+	
+	// import { useHelpers } from "@/composables/mixins/useHelpers";
+	// const { useLoadStore } = useHelpers();
 
+	// ==========Store===========
+	// -----Auth------
+	import { useAuthStore } from "@/stores/AuthStore";
+	// const authStore = useAuthStore();
+	const {
+		authUser,
+		isAuthenticated,
+		authIsLoading,
+		isAuthChecking,
+	} = storeToRefs(useAuthStore());
+	
+	// -----Global------
+	import { useGlobalStore } from "@/stores/GlobalStore";
+	const globalStore = useGlobalStore();
+	const { 
+		viewContentComponentKey, overlayData,	editModal,
+		editModalSecond, editModalClassic, editModalClassicSecond,
+		redirectTo, isSidebarCollapse, mainPreloader,
+		globalFilters,
+	} = storeToRefs(globalStore);
+
+	const { set_value: set_global_store } = globalStore;
+
+	// ========== Data ==========
+	const isSidebarShow = ref(false);
+	
+
+	const plantItem = null;
+
+	const currentPath = useRoute().fullPath;
+	// console.log(currentPath)
+	
 	// ----methods---
-	const handleEvent = (event) => { console.log('Event handled:', event); };
-	const handleEventNew = (event) => {	console.log('New event handled:', event);	};
+	const testEvent = () => {
+		isSidebarShow.value = !isSidebarShow.value;
+	};
+
+	const set_compare_list = (data)=> {
+		set_global_store('compareList', data);
+	};
+
+	const createItem = () => {
+		const inputRef = useTemplateRef('inputElement');
+
+		if (this.$refs.viewContent.handleCreateItem) {
+			this.$refs['viewContent'].handleCreateItem();
+		}
+	};
+
+	const handleLayoutClick = ({ target }) => {
+		// console.log(target)
+		set_global_store('layout_click_target', target);
+		// this.$store.dispatch('set_layout_click', target);
+	};
+
+	provide('DashboardLayout.methods', {
+		testEvent,
+		set_compare_list,
+		createItem,
+	});
+
+
+	
 
 	onMounted(() => {
 	  console.log(`DashboardLayout`)

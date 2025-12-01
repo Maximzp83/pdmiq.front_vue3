@@ -12,29 +12,29 @@
 
 } */
 
-/*@font-face {
+@font-face {
   font-family: 'password';
   font-style: normal;
   font-weight: 400;
   src: url(https://jsbin-user-assets.s3.amazonaws.com/rafaelcastrocouto/password.ttf);
-}*/
+}
 
 .hidePassword  {
   font-family: 'password';
 
   .el-input__inner {font-family: inherit;}
 }
-/*
+
 @font-face {
-	font-family: 'icomoon';
-  src:  url('../fonts/icomoon/icomoon.eot?b3f5tz');
-  src:  url('../fonts/icomoon/icomoon.eot?b3f5tz#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon/icomoon.ttf?b3f5tz') format('truetype'),
-    url('../fonts/icomoon/icomoon.woff?b3f5tz') format('woff'),
-    url('../fonts/icomoon/icomoon.svg?b3f5tz#icomoon') format('svg');
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon/icomoon.eot?xd84fd');
+  src:  url('../fonts/icomoon/icomoon.eot?xd84fd#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?xd84fd') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?xd84fd') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?xd84fd#icomoon') format('svg');
   font-weight: normal; 
   font-style: normal;
-}*/
+}
 
 .icomoon {
   display: inline-block;
@@ -55,6 +55,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-corporate:before {content: "\e986";}
+.icon-lab_panel:before {content: "\e987";}
+.icon-money-insert:before {content: "\e988";}
+
+.icon-fft-wave:before {content: "\e984";}
+.icon-attention2:before {content: "\e985";}
 .icon-wifi:before {content: "\e983";}
 .icon-periodic:before {content: "\e981";}
 .icon-waterfall:before {content: "\e982";}

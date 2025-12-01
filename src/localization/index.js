@@ -37,6 +37,9 @@ const translate = (data, method, currentLangId, settings) => {
 class Lang1 {
 	constructor() {
 		this.currentLangId = 1;
+
+		this.tt = this.tt.bind(this);
+		this.translate = this.translate.bind(this);
 	}
 
 	tt(accessor, currentLangId) {

@@ -6,6 +6,8 @@
 			<div class="section-row">
 				<div class="mrow flex wrap big-padding">
 					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
+						<el-button @click="toggleSearchbar">toggleSearchbar</el-button>
+
 						<el-button label="Confirm" @click="confirm = true">confirm</el-button>
 						<!-- <ItemPDMsStatisticBlock
 							:title="tt('phrases.overall_asset_health')"
@@ -205,11 +207,25 @@
 	</div>
 </template>
 
-<script>
-	import { ref } from 'vue';
-	// import { ElButton, ElInput } from 'element-plus';
+<script setup>
+	import { ref, onMounted, shallowReactive } from 'vue';
 
+	import { Lang } from '@/localization';
+	const { tt, translate } = Lang;
 
+	// -----Store-----
+	import { useAuthStore } from "@/stores/AuthStore";
+	const authStore = useAuthStore();
+	const authUser = authStore.authUser;
+
+	import { useGlobalStore } from "@/stores/GlobalStore";
+	const { set_value: set_global_store } = useGlobalStore();
+	
+	// =========================
+
+	defineOptions({
+	  name: 'PlantDetails'
+	});
 /*import Vue from 'vue';
 import HighchartsVue from 'highcharts-vue';
 Vue.use(HighchartsVue);
@@ -238,91 +254,71 @@ import { mapActions, mapState } from 'vuex';*/
 	  options2.push({label:'Opt ' + i, value: i})
 	}
 
+	const plantItem = true;
+	const name = ref(null);
+	const age = ref(null);
+	const accept = ref(false);
+	const select = ref(null);
+	const select2 = ref(null);
+	const date = ref('');
+	const confirm = ref(false);
+	const text = ref('');
 
-export default {
-	name: 'PlantDetails',
+	const onSubmit = () => {
+		if (accept.value !== true) {
+			ElNotification({
+				title: 'Title',
+				type: 'warning',
+				message: 'You need to accept the license and terms first'
+			})
+		}
+		else {
+			ElNotification({
+				title: 'Title',
+				type: 'success',
+				message: 'Submitted'
+			})
+		}
+	}
+
+	const onReset = () => {
+		console.log(name)
+		name.value = null
+		age.value = null
+		accept.value = false
+		select.value = null
+	}
+
+	const navbarSettings = shallowReactive({
+		showFilter: true,
+		showCompareButton: true,
+		datepickerSettings: {
+			label: `${tt('phrases.statistics_for_period')}:`,
+			storeSettings: {
+				storeName: 'PlantsStore',
+				stateKey: 'statistics_filters',				
+			}
+		},
+
+		// showSearchbar: true
+	});
+
+	const toggleSearchbar = () => {
+		navbarSettings.showSearchbar = !navbarSettings.showSearchbar;
+		set_global_store('navbarSettings', navbarSettings);		
+	};
+
+	// ========== Hooks ==============
+	onMounted(() => {
+		set_global_store('navbarSettings', navbarSettings);
+	});
+
+
+// export default {
+	/*name: 'PlantDetails',
 	setup() {
-		const plantItem = true;
-		const name = ref(null);
-		const age = ref(null);
-		const accept = ref(false);
-		const select = ref(null);
-		const select2 = ref(null);
-
-		const onSubmit = () => {
-			if (accept.value !== true) {
-				ElNotification({
-					title: 'Title',
-					type: 'warning',
-					message: 'You need to accept the license and terms first'
-				})
-			}
-			else {
-				ElNotification({
-					title: 'Title',
-					type: 'success',
-					message: 'Submitted'
-				})
-			}
-		}
-
-		const onReset = () => {
-			console.log(name)
-			name.value = null
-			age.value = null
-			accept.value = false
-			select.value = null
-		}
-
-		return {
-			plantItem,
-			text: ref(''),
-			onSubmit,
-			onReset,
-			age, name, accept,
-			select,
-			select2,
-
-			options,
-			options2,
-			confirm: ref(false),
-			date: ref('')
-
-			/*options: [
-				{
-					label: 'Google',
-					value: 'Google',
-					description: 'Search engine',
-					icon: 'mail'
-				},
-				{
-					label: 'Facebook',
-					value: 'Facebook',
-					description: 'Social media',
-					icon: 'bluetooth'
-				},
-				{
-					label: 'Twitter',
-					value: 'Twitter',
-					description: 'Quick updates',
-					icon: 'map'
-				},
-				{
-					label: 'Apple',
-					value: 'Apple',
-					description: 'iStuff',
-					icon: 'golf_course'
-				},
-				{
-					label: 'Oracle',
-					value: 'Oracle',
-					disable: true,
-					description: 'Databases',
-					icon: 'casino'
-				}
-			]*/
-		}
-	},
+	
+	},*/
 	/*mixins: [
 		// initPageDataMixin,
 		tabsMixin(),
@@ -415,23 +411,7 @@ export default {
 				daterange: that.filters.daterange
 			}),
 
-		navbarSettings() {
-			// const { plantItem } = this;
-			// if (plantItem) {
-			return Object.freeze({
-				// showStandardNavItem: true,
-				showFilter: true,
-				showCompareButton: true,
-				datepickerSettings: {
-					label: `${this.tt('phrases.statistics_for_period')}:`,
-					setFiltersAction: 'plants/set_statistics_filters',
-					filtersState: 'plants.statistics_filters'
-				}
-			});
-			// }
-
-			// return {};
-		},
+		
 
 		tabsList: that =>
 			Object.freeze(
@@ -558,5 +538,5 @@ export default {
 			}
 		}
 	},*/
-};
+// };
 </script>

@@ -1647,34 +1647,65 @@ export const itemSpeedOptionsList = () => Lang.translate(itemSpeedOptionsList1);
 export const userReportTypesList = () => Lang.translate(userReportTypesList1);
 
 // -----------------
+export const logoSrc = 'static/img/top-logo.png';
+import not_wifi_icon from '@/assets/img/icons/not-wifi.svg';
+import wifi_icon from '@/assets/img/icons/wifi.svg';
+import controller_offline_icon from '@/assets/img/icons/controller_offline_icon.svg';
+import rebase_wheel from '@/assets/img/icons/rebase1.svg';
+import rebase_wheel_white from '@/assets/img/icons/rebase1_white.svg';
+import rebase_lines from '@/assets/img/icons/rebase2.svg';
+import one_layout_icon from '@/assets/img/icons/one.svg';
+import sensor_broken_icon from '@/assets/img/icons/sensor-broken.svg';
+import lube_level_empty from '@/assets/img/icons/lube_level_empty.svg';
+import lube_level_low from '@/assets/img/icons/lube_level_low.svg';
+import lube_level_normal from '@/assets/img/icons/lube_level_normal.svg';
+import block_icon from '@/assets/img/icons/block.svg';
+import dashboardPresentation from '@/assets/img/dashboard_presentation.png';
+import factoryWallpaper from '@/assets/img/factory_wallpaper.png';
+import background_img from '@/assets/img/equipment_background.png';
+import main_logo from '@/assets/img/main_logo.png';
+import pdf_icon from '@/assets/img/icons/pdf.svg';
+import images_icon from '@/assets/img/icons/images.svg';
+import signal_icon_0 from '@/assets/img/icons/signal_0.svg';
+import signal_icon_1 from '@/assets/img/icons/signal_1.svg';
+import signal_icon_2 from '@/assets/img/icons/signal_2.svg';
+import signal_icon_3 from '@/assets/img/icons/signal_3.svg';
+import voltage_icon_1 from '@/assets/img/icons/voltage_1.svg';
+import voltage_icon_2 from '@/assets/img/icons/voltage_2.svg';
+import voltage_icon_3 from '@/assets/img/icons/voltage_3.svg';
+import sensor_archive from '@/assets/img/icons/sensor_archive.svg';
+import icon_drag from '@/assets/img/icons/icon_drag.svg';
+import attention_icon_2 from '@/assets/img/icons/attention2.svg';
+import fft_wave from '@/assets/img/icons/fft-wave.svg';
 
-export const not_wifi_icon = require('@/assets/img/icons/not-wifi.svg');
-export const wifi_icon = require('@/assets/img/icons/wifi.svg');
-export const controller_offline_icon = require('@/assets/img/icons/controller_offline_icon.svg');
-export const rebase_wheel = require('@/assets/img/icons/rebase1.svg');
-export const rebase_wheel_white = require('@/assets/img/icons/rebase1_white.svg');
-export const rebase_lines = require('@/assets/img/icons/rebase2.svg');
-export const one_layout_icon = require('@/assets/img/icons/one.svg');
-export const sensor_broken_icon = require('@/assets/img/icons/sensor-broken.svg');
-export const lube_level_empty = require('@/assets/img/icons/lube_level_empty.svg');
-export const lube_level_low = require('@/assets/img/icons/lube_level_low.svg');
-export const lube_level_normal = require('@/assets/img/icons/lube_level_normal.svg');
-export const block_icon = require('@/assets/img/icons/block.svg');
-export const logoSrc = '/static/img/top-logo.png';
-export const dashboardPresentation = require('@/assets/img/dashboard_presentation.png');
-export const factoryWallpaper = require('@/assets/img/factory_wallpaper.png');
-export const background_img = require('@/assets/img/equipment_background.png');
-export const main_logo = require('@/assets/img/main_logo.png');
-export const pdf_icon = require('@/assets/img/icons/pdf.svg');
-export const images_icon = require('@/assets/img/icons/images.svg');
-export const signal_icon_0 = require('@/assets/img/icons/signal_0.svg');
-export const signal_icon_1 = require('@/assets/img/icons/signal_1.svg');
-export const signal_icon_2 = require('@/assets/img/icons/signal_2.svg');
-export const signal_icon_3 = require('@/assets/img/icons/signal_3.svg');
-export const voltage_icon_1 = require('@/assets/img/icons/voltage_1.svg');
-export const voltage_icon_2 = require('@/assets/img/icons/voltage_2.svg');
-export const voltage_icon_3 = require('@/assets/img/icons/voltage_3.svg');
-export const sensor_archive = require('@/assets/img/icons/sensor_archive.svg');
-export const icon_drag = require('@/assets/img/icons/icon_drag.svg');
-export const attention_icon_2 = require('@/assets/img/icons/attention2.svg');
-export const fft_wave = require('@/assets/img/icons/fft-wave.svg');
+export {
+	not_wifi_icon,
+	wifi_icon,
+	controller_offline_icon,
+	rebase_wheel,
+	rebase_wheel_white,
+	rebase_lines,
+	one_layout_icon,
+	sensor_broken_icon,
+	lube_level_empty,
+	lube_level_low,
+	lube_level_normal,
+	block_icon,
+	dashboardPresentation,
+	factoryWallpaper,
+	background_img,
+	main_logo,
+	pdf_icon,
+	images_icon,
+	signal_icon_0,
+	signal_icon_1,
+	signal_icon_2,
+	signal_icon_3,
+	voltage_icon_1,
+	voltage_icon_2,
+	voltage_icon_3,
+	sensor_archive,
+	icon_drag,
+	attention_icon_2,
+	fft_wave
+};

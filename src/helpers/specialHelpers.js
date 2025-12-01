@@ -31,8 +31,8 @@ import {
 	bannerPowerTypesList
 } from '@/constants/global';
 
-import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
-import { storeGetter, dispatchGetter } from '@/store';
+// import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
+// import { storeGetter, dispatchGetter } from '@/store';
 import { Lang } from '@/localization';
 
 const setupSourceData = (propName, dataItem) => {
@@ -406,7 +406,7 @@ const getSensorTitle1 = (sensor, options = {}) => {
 };
 
 // ----------From charts.js----------
-const setupWarningsData1 = data => {
+/*const setupWarningsData1 = data => {
 	const alarms_count = data.alarmsCount;
 	const warnings_count = data.warningsCount;
 	const meta = {
@@ -455,7 +455,7 @@ const setupWarningsData1 = data => {
 		warnings_count: warnings_count,
 		meta: meta
 	};
-};
+};*/
 
 const setupTresholdsOurList1 = dataArray => {
 	let newList = [];
@@ -492,7 +492,7 @@ const setupTresholdsOurList1 = dataArray => {
 	return newList;
 };
 
-const setFiltersViaList1 = ({ filters, value }) => {
+/*const setFiltersViaList1 = ({ filters, value }) => {
 	filters.forEach(fi => {
 		const actionArr = fi.action.split('/');
 		const stateKey = actionArr.length > 1 ? actionArr[0] : 'global';
@@ -517,7 +517,7 @@ const setFiltersViaList1 = ({ filters, value }) => {
 			...newFilters
 		});
 	});
-};
+};*/
 
 const isPasswordStrong1 = password => {
   const minLength = 8;

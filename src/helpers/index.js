@@ -1,12 +1,11 @@
 import isEmpty from 'lodash/isEmpty';
-export const cloneDeep = require('lodash.clonedeep');
+// export { default as cloneDeep } from 'lodash.clonedeep';
 export const cloneDeep2 = item =>
 	item ? JSON.parse(JSON.stringify(item)) : undefined;
 // window.cloneDeep = cloneDeep
-// import cloneDeep from 'lodash/cloneDeep';
-
-// import {store} from '@/store';
-import { storeGetter } from '@/store';
+import { default as cloneDeep1 } from 'lodash.clonedeep';
+export const cloneDeep = cloneDeep1;
+// console.log(cloneDeep1)
 import { hasAccessTo } from '@/utils/hasAccessTo';
 
 import { isEmptyString } from '@/utils/validate';
@@ -236,48 +235,6 @@ const groupBy1 = (array, key, prefix = '') => {
 };
 
 // -----------Routes/paths--------------
-const hasRightsToRoute1 = route => {
-	const { isAuthenticated, authUser /*first_loading_app */ } = storeGetter('auth');
-	try {
-		const { meta } = route;
-
-		if (meta.auth) {
-			if (!isAuthenticated) {
-				return { hasAccess: false, reason: 'not_auth' };
-			}
-		}
-
-		/*if (meta.userTypes) {
-			if (!meta.userTypes.some(type => authUser.type === type)) {
-				return { hasAccess: false, reason: 'limited_access' };
-			}
-		}*/
-
-		if (meta.permissions) {
-			const method = meta.permissionsMethod || undefined;
-			return {
-				hasAccess: hasAccessTo({
-					role: authUser.role,
-					permissionKeys: meta.permissions,
-					method
-				}),
-				reason: 'limited_access',
-				authUser
-			};
-		}
-
-		if (meta.conditionSettings) {
-			if (!validateBySettings({ ...meta.conditionSettings, dataObj: authUser })) {
-				return { hasAccess: false, reason: 'limited_access' };
-			}
-		}
-	} catch (e) {
-		console.log(e);
-	}
-
-	// console.log(result)
-	return { hasAccess: true, reason: '', authUser };
-};
 
 const validateRouteParams1 = id => {
 	if (id) {
@@ -1589,7 +1546,6 @@ export const todayDateRange = () => todayDateRange1();
 export const cloneObj = o => ({ ...o });
 export const cloneArr = arr => arr.slice(0, arr.length);
 // export const removeItemFromArray = (array, index) => array.splice(index, 1);
-export const cloneDeep1 = item => cloneDeep(item);
 export const removeObjProps = (obj, props) => removeObjProps1(obj, props);
 export const cleanObjValues = (obj, settings) => cleanObjValues1(obj, settings);
 export const cleanValuesByList = (array, obj) => cleanValuesByList1(array, obj);

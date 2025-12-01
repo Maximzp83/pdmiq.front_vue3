@@ -36,6 +36,15 @@ const router = createRouter({
 							meta: { auth: true }
 						},
 					]
+				},
+				{
+					path: 'test-chart',
+					name: 'TestChart',
+					meta: {
+						auth: true,
+						permissions: ['view_dashboard']
+					},
+					component: () => import('@/views/Dashboard/TestChart.vue'),
 				}
 			]
 		},

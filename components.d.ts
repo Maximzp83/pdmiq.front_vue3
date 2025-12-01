@@ -8,7 +8,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CustomInput: typeof import('./src/components/form/CustomInput.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
+    Datepicker: typeof import('./src/components/common/Datepicker.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
@@ -22,6 +24,7 @@ declare module 'vue' {
     ElPagination: typeof import('element-plus/es')['ElPagination']
     ElPopover: typeof import('element-plus/es')['ElPopover']
     ElSelectV2: typeof import('element-plus/es')['ElSelectV2']
+    ElSubmenu: typeof import('element-plus/es')['ElSubmenu']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTimeSelect: typeof import('element-plus/es')['ElTimeSelect']
@@ -34,6 +37,7 @@ declare module 'vue' {
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SearchBar: typeof import('./src/components/common/SearchBar.vue')['default']
     Sidebar: typeof import('./src/components/layout/Sidebar/Sidebar.vue')['default']
     SidebarWithSubs: typeof import('./src/components/layout/Sidebar/SidebarWithSubs.vue')['default']
     TopNavbar: typeof import('./src/components/layout/TopNavbar.vue')['default']

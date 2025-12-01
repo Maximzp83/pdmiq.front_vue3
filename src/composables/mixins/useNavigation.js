@@ -1,0 +1,55 @@
+// import { computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { getParentPageRoute } from '@/helpers';
+
+import { useAuthStore } from "@/stores/AuthStore";
+const { set_redirect_to } = useAuthStore();
+
+export function useNavigation() {
+	const currentPath = useRoute().fullPath;
+	const router = useRouter();
+	
+	const changeRoute = ({ addToCurrent, parent, steps, path, history, query }) => {
+	// console.log('go to: ', path)
+
+		if (path === '/logout') {
+			// console.log('logout')
+			set_redirect_to(currentPath);
+			// this.$store.dispatch('auth/sign_out');
+			return;
+		}
+
+		if (parent) {
+			const parentPage = getParentPageRoute(currentPath, steps);
+			let route = parentPage;
+			if (path) {
+				route += `/${path}`;
+			}
+			router.push(route);
+			return;
+		}
+
+		if (history) {
+			router.go(steps);
+			return;
+		}
+
+		if (currentPath !== path) {
+			// console.log(currentPath, path)
+			let route = path;
+
+			if (addToCurrent) {
+				route = currentPath + path;
+			}
+
+			if (query) route += `?${query}`;
+			// console.log('nav: ', route)
+
+			router.push({ path: route });
+
+			return;
+		}
+	}
+
+	return { changeRoute };
+}
