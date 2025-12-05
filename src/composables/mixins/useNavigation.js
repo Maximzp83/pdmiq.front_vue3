@@ -2,15 +2,15 @@
 import { useRoute, useRouter } from 'vue-router';
 import { getParentPageRoute } from '@/helpers';
 
-import { useAuthStore } from "@/stores/AuthStore";
-const { set_redirect_to } = useAuthStore();
+import { useAuthStore } from '@/stores/AuthStore';
 
 export function useNavigation() {
+	const { set_redirect_to } = useAuthStore();
 	const currentPath = useRoute().fullPath;
 	const router = useRouter();
-	
+
 	const changeRoute = ({ addToCurrent, parent, steps, path, history, query }) => {
-	// console.log('go to: ', path)
+		// console.log('go to: ', path)
 
 		if (path === '/logout') {
 			// console.log('logout')
@@ -49,7 +49,7 @@ export function useNavigation() {
 
 			return;
 		}
-	}
+	};
 
 	return { changeRoute };
 }

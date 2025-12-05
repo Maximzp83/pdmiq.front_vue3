@@ -1,7 +1,7 @@
 <template>
 	<div class="plant-details details-page main-instance-item">
 		<div class="view-content-card" v-if="plantItem">
-						equipmentsLayout
+			equipmentsLayout
 
 			<div class="section-row">
 				<div class="mrow flex wrap big-padding">
@@ -21,10 +21,8 @@
 
 					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
 						<!-- <Counters @event="handleEventNew" /> -->
-						<el-form
-							@submit="onSubmit"
-						>
-							<el-input v-model="name"/>
+						<el-form @submit="onSubmit">
+							<el-input v-model="name" />
 							<el-input-number v-model="age" :min="1" :max="10" />
 
 							<el-tooltip
@@ -37,17 +35,17 @@
 							</el-tooltip>
 
 							<el-upload
-							    class="upload-demo"
-							    action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-							    multiple
-							  >
-							    <el-button type="primary">Click to upload</el-button>
-							    <template #tip>
-							      <div class="el-upload__tip">
-							        jpg/png files with a size less than 500KB.
-							      </div>
-							    </template>
-							  </el-upload>
+								class="upload-demo"
+								action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+								multiple
+							>
+								<el-button type="primary">Click to upload</el-button>
+								<template #tip>
+									<div class="el-upload__tip">
+										jpg/png files with a size less than 500KB.
+									</div>
+								</template>
+							</el-upload>
 							<!-- <el-select
 								multiple
 								v-model="select"
@@ -194,12 +192,14 @@
 			<div class="card">
 				<div class="card-content">
 					<div class="row items-center">
-						<span class="q-ml-sm">You are currently not connected to any network.</span>
+						<span class="q-ml-sm"
+							>You are currently not connected to any network.</span
+						>
 					</div>
 
 					<div align="right">
-						<el-button @click="confirm=false" type="primary">Cancel</el-button>
-						<el-button @click="confirm=false">Turn on Wifi</el-button>
+						<el-button @click="confirm = false" type="primary">Cancel</el-button>
+						<el-button @click="confirm = false">Turn on Wifi</el-button>
 					</div>
 				</div>
 			</div>
@@ -208,24 +208,24 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, shallowReactive } from 'vue';
+import { ref, onMounted, shallowReactive } from 'vue';
 
-	import { Lang } from '@/localization';
-	const { tt, translate } = Lang;
+import { Lang } from '@/localization';
+const { tt, translate } = Lang;
 
-	// -----Store-----
-	import { useAuthStore } from "@/stores/AuthStore";
-	const authStore = useAuthStore();
-	const authUser = authStore.authUser;
+// -----Store-----
+import { useAuthStore } from '@/stores/AuthStore';
+const authStore = useAuthStore();
+const authUser = authStore.authUser;
 
-	import { useGlobalStore } from "@/stores/GlobalStore";
-	const { set_value: set_global_store } = useGlobalStore();
-	
-	// =========================
+import { useGlobalStore } from '@/stores/GlobalStore';
+const { set_value: set_global_store } = useGlobalStore();
 
-	defineOptions({
-	  name: 'PlantDetails'
-	});
+// =========================
+
+defineOptions({
+	name: 'PlantDetails',
+});
 /*import Vue from 'vue';
 import HighchartsVue from 'highcharts-vue';
 Vue.use(HighchartsVue);
@@ -243,83 +243,82 @@ import { mapActions, mapState } from 'vuex';*/
 	fetchItemsHelper
 } from '@/mixins';*/
 
-	import { ElNotification } from 'element-plus'
+import { ElNotification } from 'element-plus';
 
-	const options = []
-	for (let i = 0; i <= 10; i++) {
-	  options.push('Opt ' + i)
+const options = [];
+for (let i = 0; i <= 10; i++) {
+	options.push('Opt ' + i);
+}
+const options2 = [];
+for (let i = 0; i <= 100000; i++) {
+	options2.push({ label: 'Opt ' + i, value: i });
+}
+
+const plantItem = true;
+const name = ref(null);
+const age = ref(null);
+const accept = ref(false);
+const select = ref(null);
+const select2 = ref(null);
+const date = ref('');
+const confirm = ref(false);
+const text = ref('');
+
+const onSubmit = () => {
+	if (accept.value !== true) {
+		ElNotification({
+			title: 'Title',
+			type: 'warning',
+			message: 'You need to accept the license and terms first',
+		});
+	} else {
+		ElNotification({
+			title: 'Title',
+			type: 'success',
+			message: 'Submitted',
+		});
 	}
-	const options2 = []
-	for (let i = 0; i <= 100000; i++) {
-	  options2.push({label:'Opt ' + i, value: i})
-	}
+};
 
-	const plantItem = true;
-	const name = ref(null);
-	const age = ref(null);
-	const accept = ref(false);
-	const select = ref(null);
-	const select2 = ref(null);
-	const date = ref('');
-	const confirm = ref(false);
-	const text = ref('');
+const onReset = () => {
+	console.log(name);
+	name.value = null;
+	age.value = null;
+	accept.value = false;
+	select.value = null;
+};
 
-	const onSubmit = () => {
-		if (accept.value !== true) {
-			ElNotification({
-				title: 'Title',
-				type: 'warning',
-				message: 'You need to accept the license and terms first'
-			})
-		}
-		else {
-			ElNotification({
-				title: 'Title',
-				type: 'success',
-				message: 'Submitted'
-			})
-		}
-	}
-
-	const onReset = () => {
-		console.log(name)
-		name.value = null
-		age.value = null
-		accept.value = false
-		select.value = null
-	}
-
-	const navbarSettings = shallowReactive({
-		showFilter: true,
-		showCompareButton: true,
-		datepickerSettings: {
-			label: `${tt('phrases.statistics_for_period')}:`,
-			storeSettings: {
-				storeName: 'PlantsStore',
-				stateKey: 'statistics_filters',				
-			}
+const navbarSettings = shallowReactive({
+	showFilter: true,
+	showCompareButton: true,
+	showSearchbar: true,
+	datepickerSettings: {
+		label: `${tt('phrases.statistics_for_period')}:`,
+		storeSettings: {
+			storeName: 'PlantsStore',
+			stateKey: 'statistics_filters',
 		},
+	},
 
-		// showSearchbar: true
-	});
+	// showSearchbar: true
+});
 
-	const toggleSearchbar = () => {
-		navbarSettings.showSearchbar = !navbarSettings.showSearchbar;
-		set_global_store('navbarSettings', navbarSettings);		
-	};
+const toggleSearchbar = () => {
+	navbarSettings.showSearchbar = !navbarSettings.showSearchbar;
+	set_global_store('navbarSettings', navbarSettings);
+};
 
-	// ========== Hooks ==============
-	onMounted(() => {
-		set_global_store('navbarSettings', navbarSettings);
-	});
-
+// ========== Hooks ==============
+onMounted(() => {
+	set_global_store('navbarSettings', navbarSettings);
+});
 
 // export default {
-	/*name: 'PlantDetails',
+/*name: 'PlantDetails',
 	setup() {
-	
+
 	},*/
-	/*mixins: [
+/*mixins: [
 		// initPageDataMixin,
 		tabsMixin(),
 		eventHandler(),
@@ -327,7 +326,7 @@ import { mapActions, mapState } from 'vuex';*/
 		fetchItemsHelper()
 	],*/
 
-	/*components: {
+/*components: {
 		ItemPDMsStatisticBlock: () =>
 			import('@/components/itemDetails/ItemPDMsStatisticBlock.vue'),
 
@@ -340,12 +339,12 @@ import { mapActions, mapState } from 'vuex';*/
 		Counters: () => import('./Counters.vue')
 	},*/
 
-	/*props: {
+/*props: {
 		plantItem: { type: Object, required: true },
 		additionalModalSettings: Object
 	},*/
 
-	/*data() {
+/*data() {
 		return {
 			meetingTrackerLoading: false,
 			meetingTrackersList: [],
@@ -356,7 +355,7 @@ import { mapActions, mapState } from 'vuex';*/
 		};
 	},*/
 
-	/*computed: {
+/*computed: {
 		...mapState({
 			filters: state => state.plants.statistics_filters,
 			production_linesFilters: state => state.production_lines.filters,
@@ -411,7 +410,7 @@ import { mapActions, mapState } from 'vuex';*/
 				daterange: that.filters.daterange
 			}),
 
-		
+
 
 		tabsList: that =>
 			Object.freeze(
@@ -471,7 +470,7 @@ import { mapActions, mapState } from 'vuex';*/
 		createWOButtonFormSetup: () => Object.freeze([{ formKey: 'plant_id', valKey: 'id' }])
 	},*/
 
-	/*methods: {
+/*methods: {
 		...mapActions({
 			// fetch_item: 'plants/fetch_plant',
 			show_edit_modal: 'show_edit_modal',
@@ -522,14 +521,14 @@ import { mapActions, mapState } from 'vuex';*/
 		}
 	},*/
 
-	/*beforeMount() {
+/*beforeMount() {
 		this.setup_navbar(this.navbarSettings);
 	},
 
 	mounted() {
 		// console.log(document.querySelector('.equipments-layout'))
 		const { query } = this.$route;
-		
+
 		if (query) {
 			if (query.scrollTo) {
 				waitForElement(query.scrollTo, () => {

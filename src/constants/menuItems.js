@@ -36,13 +36,13 @@ export const MENU_TYPES = {
 	APPLICATIONS: 29,
 	STOREROOMS: 30,
 	USER_ROLES: 31,
-	CLIENT_API: 32
+	CLIENT_API: 32,
 };
 
 const menuItems1 = [
 	{
 		name: 'sidebar_menu.predictive_maintenance',
-		category_label: 'predictive_maintenance'
+		category_label: 'predictive_maintenance',
 	},
 	{
 		name: 'sidebar_menu.Dashboard',
@@ -51,7 +51,17 @@ const menuItems1 = [
 		icon: 'icon-dashboard',
 		path: '/dashboard',
 		meta: { permissions: ['view_dashboard'] },
-		enableInCompanyMenuForm: true
+		enableInCompanyMenuForm: true,
+		// roles: ['manager', 'operator']
+	},
+	{
+		name: 'Machines',
+		belongs_to_label: 'predictive_maintenance',
+		id: 8888,
+		icon: 'icon-dashboard',
+		path: '/dashboard/machines',
+		meta: { permissions: ['view_dashboard'] },
+		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
 	},
 	{
@@ -61,7 +71,7 @@ const menuItems1 = [
 		icon: 'icon-graph',
 		path: '/test-chart',
 		meta: { permissions: ['view_dashboard'] },
-		enableInCompanyMenuForm: true
+		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
 	},
 	// {
@@ -457,12 +467,12 @@ const menuSectionsList1 = [
 	{
 		id: MENU_TYPES.MAINTENANCE,
 		name: 'maintenance_logs',
-		name_in_form: 'sidebar_menu.work_orders_maintenance_logs'
+		name_in_form: 'sidebar_menu.work_orders_maintenance_logs',
 	},
 	{ id: MENU_TYPES.REQUISITIONS, name: 'requisitions' },
 	{
 		id: MENU_TYPES.REQUISITIONS_ROI_CALCULATOR,
-		name: 'sidebar_menu.roi_calculator'
+		name: 'sidebar_menu.roi_calculator',
 	},
 	{ id: MENU_TYPES.WORK_ORDER_REQUESTS, name: 'sidebar_menu.work_order_requests' },
 	{ id: MENU_TYPES.TASK_PROCEDURES, name: 'task_Procedures' },
@@ -479,11 +489,11 @@ const menuSectionsList1 = [
 	{ id: MENU_TYPES.EQUIPMENT_TYPES, name: 'item_types' },
 	{
 		id: MENU_TYPES.EQUIPMENT_TYPES_CATEGORIES,
-		name: 'sidebar_menu.item_types_categories'
+		name: 'sidebar_menu.item_types_categories',
 	},
 	{ id: MENU_TYPES.APPLICATIONS, name: 'Applications' },
 	{ id: MENU_TYPES.STOREROOMS, name: 'storerooms' },
-	{ id: MENU_TYPES.CLIENT_API, name: 'API', skipTranslate:true }
+	{ id: MENU_TYPES.CLIENT_API, name: 'API', skipTranslate: true },
 ];
 
 export const menuItems = () => menuItems1;

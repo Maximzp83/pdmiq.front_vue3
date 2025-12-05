@@ -1,6 +1,13 @@
 <template>
 	<div class="view-wrapper view-list-wrapper machines-list">
-		machines list
+		<div class="" v-if="itemsLoading">Loading...</div>
+		<div class="" v-else>
+			<div class="machines-list-container">
+				<div class="machines-list-item" v-for="item in itemsList" :key="item.id">
+					{{ item.name }}
+				</div>
+			</div>
+		</div>
 		<!-- <div :class="['card content-row', { 'view-content-card': !fromDetailsPage }]">
 			<div
 				v-if="showCardHeader"
@@ -196,7 +203,9 @@
 	</div>
 </template>
 
-<script>
+<script setup>
+import { useItemsData } from '@/composables/mixins/useItemsData';
+import { storeToRefs } from 'pinia';
 /*import { mapState, mapActions } from 'vuex';
 import {
 	itemsDataMixin,
@@ -208,18 +217,41 @@ import {
 	dashboardListsReorderMixin
 } from '@/mixins';
 import { standardTableOperations } from '@/constants/table';*/
-
-export default {
+defineOptions({
 	name: 'MachinesList',
-	
-	setup() {
+});
+
+const props = defineProps({
+	hideDropdownFilterbar: Boolean,
+	disableDraggingFeature: Boolean,
+	showCardHeader: Boolean,
+	fromDetailsPage: Boolean,
+	plantId: Number,
+	showToggleListButton: Boolean,
+	fromDashboard: Boolean,
+});
+
+import { useMachinesStore } from '@/stores/MachinesStore';
+const machinesStore = useMachinesStore();
+const { set_value: set_machine_store } = machinesStore;
+const { filters } = storeToRefs(machinesStore);
+
+const { itemsList, itemsLoading, meta, activeGrid } = useItemsData({
+	apiRoute: '/machines',
+	filters: filters.value,
+});
+
+// export default {
+// name: 'MachinesList',
+
+/* setup() {
 		// const plantItem = true
 
 		return {
 			// plantItem,
 		}
-	},
-	/*mixins: [
+	}, */
+/*mixins: [
 		itemsDataMixin(),
 		requestsListMixin(),
 		eventHandler(),
@@ -239,7 +271,7 @@ export default {
 		// FetchByQuerySelect: () => import('@/components/form/FetchByQuerySelect.vue')
 	},*/
 
-	/*props: {
+/*props: {
 		hideDropdownFilterbar: Boolean,
 		disableDraggingFeature: Boolean,
 		showCardHeader: Boolean,
@@ -249,7 +281,7 @@ export default {
 		fromDashboard: Boolean
 	},*/
 
-	/*data: () => ({
+/*data: () => ({
 		showFilterbar: false,
 		initiateRequestsToDoList: false,
 
@@ -264,7 +296,7 @@ export default {
 		applicationsLoading: false
 	}),*/
 
-	/*computed: {
+/*computed: {
 		...mapState({
 			filters: state => state.machines.filters
 			// nextActiveItemsTable: state => state.global.nextActiveItemsTable
@@ -486,7 +518,7 @@ export default {
 		}
 	},*/
 
-	/*methods: {
+/*methods: {
 		...mapActions({
 			fetch_items: 'machines/fetch_machines',
 			fetch_locations: 'plants/fetch_locations',
@@ -509,7 +541,7 @@ export default {
 		}
 	},*/
 
-	/*watch: {
+/*watch: {
 		'globalFilters.plantId'(id) {
 			if (!id) {
 				this.draggingLocked = true;
@@ -517,7 +549,7 @@ export default {
 		}
 	},*/
 
-	/*beforeMount() {
+/*beforeMount() {
 		if (this.filters.isShowList && !this.filters.isShowListRefreshed2) {
 			this.setFilters({ isShowList: false });
 		}
@@ -525,5 +557,5 @@ export default {
 		this.preventFetch = true;
 		this.setFilters({ isShowListRefreshed2: true });
 	}*/
-};
+// };
 </script>

@@ -1,9 +1,5 @@
 <template>
-	<div
-		class="dashboard-layout"
-		tabindex="0"
-		v-if="isAuthenticated"
-	>
+	<div class="dashboard-layout" tabindex="0" v-if="isAuthenticated">
 		<!-- <VueElementLoading
 			:active="authIsLoading || overlayData.show || mainPreloader"
 			:text="overlayData.text"
@@ -41,17 +37,13 @@
 			/>
 
 			<div class="main-panel">
-				<TopNavbar
-				/>
+				<TopNavbar />
 
 				<div class="dashboard-content-wrapper">
 					<div class="dashboard-content-container">
 						<div class="page-top-bg-addition" />
 
-						<RouterView
-							ref="viewContent"
-							:key="viewContentComponentKey"
-						/>
+						<RouterView ref="viewContent" :key="viewContentComponentKey" />
 
 						<!-- <RouterView v-slot="{ Component }">
 							<transition name="component-scale" mode="out-in">
@@ -61,7 +53,7 @@
 									@event="handleEventNew"
 								/>
 							</transition>
-						</RouterView> -->							
+						</RouterView> -->
 					</div>
 				</div>
 			</div>
@@ -87,12 +79,23 @@
 </template>
 
 <script setup>
-	import { ref, onMounted, defineAsyncComponent, computed, provide, useTemplateRef } from 'vue';
-	import { useRoute } from 'vue-router';
-	import { storeToRefs } from 'pinia';
+import {
+	ref,
+	onMounted,
+	defineAsyncComponent,
+	computed,
+	provide,
+	useTemplateRef,
+} from 'vue';
+import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
-	const TopNavbar = defineAsyncComponent(() => import('@/components/layout/TopNavbar.vue'))
-	const Sidebar = defineAsyncComponent(() => import('@/components/layout/Sidebar/Sidebar.vue'));
+const TopNavbar = defineAsyncComponent(
+	() => import('@/components/layout/TopNavbar.vue'),
+);
+const Sidebar = defineAsyncComponent(
+	() => import('@/components/layout/Sidebar/Sidebar.vue'),
+);
 
 // @ is an alias to /src
 /*import langEn from 'element-ui/lib/locale/lang/en';
@@ -105,81 +108,79 @@ import { getParamsFromUrl } from '@/services/api/api_helpers';
 import IdleTimer from '@/utils/IdleTimer';
 import { LANGUAGE_TYPES } from '@/localization/utils';*/
 
-	// -----Composables-----
-	
-	// import { useHelpers } from "@/composables/mixins/useHelpers";
-	// const { useLoadStore } = useHelpers();
+// -----Composables-----
 
-	// ==========Store===========
-	// -----Auth------
-	import { useAuthStore } from "@/stores/AuthStore";
-	// const authStore = useAuthStore();
-	const {
-		authUser,
-		isAuthenticated,
-		authIsLoading,
-		isAuthChecking,
-	} = storeToRefs(useAuthStore());
-	
-	// -----Global------
-	import { useGlobalStore } from "@/stores/GlobalStore";
-	const globalStore = useGlobalStore();
-	const { 
-		viewContentComponentKey, overlayData,	editModal,
-		editModalSecond, editModalClassic, editModalClassicSecond,
-		redirectTo, isSidebarCollapse, mainPreloader,
-		globalFilters,
-	} = storeToRefs(globalStore);
+// import { useHelpers } from "@/composables/mixins/useHelpers";
+// const { useLoadStore } = useHelpers();
 
-	const { set_value: set_global_store } = globalStore;
+// ==========Store===========
+// -----Auth------
+import { useAuthStore } from '@/stores/AuthStore';
+// const authStore = useAuthStore();
+const { authUser, isAuthenticated, authIsLoading, isAuthChecking } =
+	storeToRefs(useAuthStore());
 
-	// ========== Data ==========
-	const isSidebarShow = ref(false);
-	
+// -----Global------
+import { useGlobalStore } from '@/stores/GlobalStore';
+const globalStore = useGlobalStore();
+const {
+	viewContentComponentKey,
+	overlayData,
+	editModal,
+	editModalSecond,
+	editModalClassic,
+	editModalClassicSecond,
+	redirectTo,
+	isSidebarCollapse,
+	mainPreloader,
+	globalFilters,
+} = storeToRefs(globalStore);
 
-	const plantItem = null;
+const { set_value: set_global_store } = globalStore;
 
-	const currentPath = useRoute().fullPath;
-	// console.log(currentPath)
-	
-	// ----methods---
-	const testEvent = () => {
-		isSidebarShow.value = !isSidebarShow.value;
-	};
+// ========== Data ==========
+const isSidebarShow = ref(false);
 
-	const set_compare_list = (data)=> {
-		set_global_store('compareList', data);
-	};
+const plantItem = null;
 
-	const createItem = () => {
-		const inputRef = useTemplateRef('inputElement');
+const currentPath = useRoute().fullPath;
+// console.log(currentPath)
 
-		if (this.$refs.viewContent.handleCreateItem) {
-			this.$refs['viewContent'].handleCreateItem();
-		}
-	};
+// ----methods---
+const testEvent = () => {
+	isSidebarShow.value = !isSidebarShow.value;
+};
 
-	const handleLayoutClick = ({ target }) => {
-		// console.log(target)
-		set_global_store('layout_click_target', target);
-		// this.$store.dispatch('set_layout_click', target);
-	};
+const set_compare_list = (data) => {
+	set_global_store('compareList', data);
+};
 
-	provide('DashboardLayout.methods', {
-		testEvent,
-		set_compare_list,
-		createItem,
-	});
+const createItem = () => {
+	const inputRef = useTemplateRef('inputElement');
 
+	if (this.$refs.viewContent.handleCreateItem) {
+		this.$refs['viewContent'].handleCreateItem();
+	}
+};
 
-	
+const handleLayoutClick = ({ target }) => {
+	// console.log(target)
+	set_global_store('layout_click_target', target);
+	// this.$store.dispatch('set_layout_click', target);
+};
 
-	onMounted(() => {
-	  console.log(`DashboardLayout`)
-	})
+provide('DashboardLayout.methods', {
+	testEvent,
+	set_compare_list,
+	createItem,
+});
+
+onMounted(() => {
+	console.log(`DashboardLayout`);
+});
 
 // export default {
-	/*setup() {
+/*setup() {
 		const plantItem = null;
 		const isAuthenticated = ref(true);
 		const authIsLoading = ref(false);
@@ -213,14 +214,14 @@ import { LANGUAGE_TYPES } from '@/localization/utils';*/
 			handleEventNew,
 		}
 	},*/
-	// mixins: [eventHandler(), navigation()],
-	// name: 'DashboardLayout',
-	/*components: {
+// mixins: [eventHandler(), navigation()],
+// name: 'DashboardLayout',
+/*components: {
 		DynamicFormContainer: () =>
 			import('../components/form/DynamicFormContainer.vue'),
 		ImagePreviewModal: () => import('@/components/common/ImagePreviewModal.vue')
 	},*/
-	/*data() {
+/*data() {
 		return {
 			isSidebarShow: false,
 			isAuthChecking: true,
@@ -237,7 +238,7 @@ import { LANGUAGE_TYPES } from '@/localization/utils';*/
 		};
 	},*/
 
-	/*computed: {
+/*computed: {
 		...mapState({
 			viewContentComponentKey: state => state.global.viewContentComponentKey,
 			// DashboardLayoutComponentKey: state => state.global.DashboardLayoutComponentKey,
@@ -259,7 +260,7 @@ import { LANGUAGE_TYPES } from '@/localization/utils';*/
 		}
 	},*/
 
-	/*methods: {
+/*methods: {
 		...mapActions({
 			get_auth_user: 'auth/get_auth_user',
 			minimizeSidebar: 'minimizeSidebar',
@@ -367,7 +368,7 @@ import { LANGUAGE_TYPES } from '@/localization/utils';*/
 		}
 	},*/
 
-	/*watch: {
+/*watch: {
 		currentPath(path) {
 			if (process.env.NODE_ENV !== 'development') {
 				this.save_visit_analytics({
@@ -378,7 +379,7 @@ import { LANGUAGE_TYPES } from '@/localization/utils';*/
 		}
 	},*/
 
-	/*created() {
+/*created() {
 		this.$store.dispatch('auth/set_data', {
 			stateProp: 'first_loading_app',
 			value: false

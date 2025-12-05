@@ -1,19 +1,19 @@
 // import './assets/main.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 
-import App from './App.vue'
-import router from './router'
+import App from './App.vue';
+import router from './router';
 import HighchartsVue from 'highcharts-vue';
-import Highcharts from "highcharts";
+import Highcharts from 'highcharts';
 
 Highcharts.setOptions({
-  lang: {
-    locale: "ru-RU",
-    decimalPoint: ".",
-    thousandsSep: " ",
-  }
+	lang: {
+		locale: 'ru-RU',
+		decimalPoint: '.',
+		thousandsSep: ' ',
+	},
 });
 
 // import ElementPlus from 'element-plus'
@@ -25,11 +25,11 @@ Highcharts.setOptions({
 
 import './assets/sass/app.scss';
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(createPinia())
-app.use(router)
+app.use(createPinia());
+app.use(router);
 app.use(HighchartsVue);
 // app.use(ElementPlus, { size: 'small', zIndex: 3000 })
 
-app.mount('#app')
+app.mount('#app');

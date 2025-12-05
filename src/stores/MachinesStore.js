@@ -5,9 +5,9 @@ import { /*getObjectVal,*/ getDateRange } from '@/helpers';
 import { resetDaterangeIfExpired } from '@/helpers/specialHelpers';
 import { ITEMS_GRID_TYPES } from '@/constants/table';
 
-const localStorageFilters = JSON.parse(localStorage.getItem('plants_filters'));
+const localStorageFilters = JSON.parse(localStorage.getItem('machines_filters'));
 const localStorageStatisticsFilters = JSON.parse(
-	localStorage.getItem('plants_statistics_filters'),
+	localStorage.getItem('machines_statistics_filters'),
 );
 
 const statistics_filters_init = {
@@ -19,7 +19,7 @@ const statistics_filters_init = {
 	}),
 };
 
-export const usePlantsStore = defineStore('plantsStore', {
+export const useMachinesStore = defineStore('machinesStore', {
 	state: () => {
 		return {
 			...commonStoreMixin.state,

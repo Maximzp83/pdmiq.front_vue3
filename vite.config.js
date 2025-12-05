@@ -1,8 +1,8 @@
-import { fileURLToPath, URL } from 'node:url'
+import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import vueJsx from '@vitejs/plugin-vue-jsx'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import vueJsx from '@vitejs/plugin-vue-jsx';
 // import vueDevTools from 'vite-plugin-vue-devtools'
 
 // Плагины для автоподключения компонентов и API
@@ -34,14 +34,13 @@ export default defineConfig({
 			output: {
 				manualChunks(id) {
 					if (id.includes('node_modules')) {
-							// console.log(id)
-						
-		        // ядро Vue
+						// console.log(id)
+
+						// ядро Vue
 						if (id.includes('vue')) return 'vue';
 						if (id.includes('vue-router')) return 'vue';
 						if (id.includes('pinia')) return 'pinia';
 
-		        // Quasar
 						if (id.includes('element-plus')) {
 							if (id.includes('date-picker')) return 'element-plus-date-picker';
 							if (id.includes('dialog')) return 'element-plus-dialog';
@@ -50,22 +49,22 @@ export default defineConfig({
 							if (id.includes('select')) return 'element-plus-select';
 							if (id.includes('select-v2')) return 'element-plus-select-v2';
 							// console.log(id)
-							return 'element-plus'
-						};
+							return 'element-plus';
+						}
 
-		        // иконки (обычно большие по размеру)
+						// иконки (обычно большие по размеру)
 						if (id.includes('lodash-es')) {
 							// console.log(id)
 
 							return 'lodash-es';
-						};
+						}
 
-		        // оставшиеся библиотеки
+						// оставшиеся библиотеки
 						return 'vendor';
 					}
-				}
-			}
-		}
+				},
+			},
+		},
 	},
 	css: {
 		preprocessorOptions: {
@@ -77,7 +76,7 @@ export default defineConfig({
 			// 		@use "@/assets/sass/mixins" as *;
 			// 	`
 			// }
-		}
+		},
 	},
 	// server: {
 	// 	watch: {
@@ -86,8 +85,7 @@ export default defineConfig({
 	// },
 	resolve: {
 		alias: {
-			'@': fileURLToPath(new URL('./src', import.meta.url))
+			'@': fileURLToPath(new URL('./src', import.meta.url)),
 		},
 	},
-})
-
+});

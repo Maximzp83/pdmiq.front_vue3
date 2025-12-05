@@ -34,7 +34,7 @@
 									@click="
 										handleDisposableHistoryButton(
 											navbarSettings.showStandardNavItem.backButton,
-											navbarSettings.showStandardNavItem
+											navbarSettings.showStandardNavItem,
 										)
 									"
 								>
@@ -98,8 +98,8 @@
 						class="menu-block buttonWrapper flex compareList"
 						v-if="
 							navbarSettings.showCompareButton &&
-								compareList.length &&
-								compareList.length > 1
+							compareList.length &&
+							compareList.length > 1
 						"
 					>
 						<router-link
@@ -187,7 +187,7 @@
 							:options="userRolesList"
 							:placeholder="`${tt('select')} ${tt('role')}`"
 						/>
-						<!-- 
+						<!--
 
 						<el-select
 							filterable
@@ -225,7 +225,7 @@
 						<el-select-v2
 							filterable
 							clearable
-							@change="id => setGlobalFilters({ id: id, filterName: 'plantId' })"
+							@change="(id) => setGlobalFilters({ id: id, filterName: 'plantId' })"
 							:modelValue="globalFilters.plantId"
 							:options="globalPlantsList"
 							:loading="globalPlantsLoading"
@@ -337,51 +337,68 @@
 // import { navigation, fetchItemsHelper } from '@/mixins';
 // import { mapActions, mapState } from 'vuex';
 // import { findItemBy } from '@/helpers';
-import { onMounted, onUpdated, computed, defineAsyncComponent, ref, watchEffect, inject, shallowReactive } from 'vue';
+import {
+	onMounted,
+	onUpdated,
+	computed,
+	defineAsyncComponent,
+	ref,
+	watchEffect,
+	inject,
+	shallowReactive,
+} from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
 const { tt } = Lang;
 import { USER_ROLES_TYPES } from '@/constants/global';
 
-const Datepicker = defineAsyncComponent(() => import('@/components/common/Datepicker.vue'));
-const SearchBar = defineAsyncComponent(() => import('@/components/common/SearchBar.vue'));
+const Datepicker = defineAsyncComponent(
+	() => import('@/components/common/Datepicker.vue'),
+);
+const SearchBar = defineAsyncComponent(
+	() => import('@/components/common/SearchBar.vue'),
+);
 
 // ==========Store===========
 // -----Auth------
-import { useAuthStore } from "@/stores/AuthStore";
-const {
-	authUser,
-} = storeToRefs(useAuthStore());
+import { useAuthStore } from '@/stores/AuthStore';
+const { authUser } = storeToRefs(useAuthStore());
 
 // -----Global------
-import { useGlobalStore } from "@/stores/GlobalStore";
+import { useGlobalStore } from '@/stores/GlobalStore';
 const globalStore = useGlobalStore();
 const {
-	navbarSettings, disposableHistoryButton, compareList,
-	fromDashboard, globalPlantsList, globalFilters, globalPlantsLoading
+	navbarSettings,
+	disposableHistoryButton,
+	compareList,
+	fromDashboard,
+	globalPlantsList,
+	globalFilters,
+	globalPlantsLoading,
 } = storeToRefs(globalStore);
 const { set_value: set_global_store } = globalStore;
 
 const setGlobalFilters = ({ id, filterName }) => {
 	const newFilters = { ...globalFilters, [filterName]: id };
 	set_global_store('globalFilters', newFilters, {
-		toLocalStorage: {prop: 'global_filters'}
+		toLocalStorage: { prop: 'global_filters' },
 	});
 };
 
-const pageTitle = navbarSettings ? (navbarSettings.pageTitle || '') : '';
+const pageTitle = navbarSettings ? navbarSettings.pageTitle || '' : '';
 
 // -----Sensors------
-import { useSensorsStore } from "@/stores/SensorsStore";
+import { useSensorsStore } from '@/stores/SensorsStore';
 const sensorsStore = useSensorsStore();
 const { set_value: set_sensors_store } = sensorsStore;
 const { report_filters } = storeToRefs(sensorsStore);
+// console.log('report_filters', report_filters);
 
 // -----Composables-----
-import { useNavigation } from "@/composables/mixins/useNavigation";
+import { useNavigation } from '@/composables/mixins/useNavigation';
 const { changeRoute } = useNavigation();
-import { useHelpers } from "@/composables/mixins/useHelpers";
+import { useHelpers } from '@/composables/mixins/useHelpers';
 const { useLoadStore } = useHelpers();
 
 // const emit = defineEmits(['event']);
@@ -393,10 +410,10 @@ const { callMethod } = useCallMethod(dashboardLayoutMethods);
 const props = defineProps({
 	currentPath: String,
 	loading: Boolean,
-	saving: Boolean
+	saving: Boolean,
 });
 defineOptions({
-  name: 'TopNavbar'
+	name: 'TopNavbar',
 });
 // ===========================
 const handleDisposableHistoryButton = (settings, additionalSettings) => {
@@ -407,15 +424,31 @@ const handleDisposableHistoryButton = (settings, additionalSettings) => {
 	}
 };
 
-const setFilters = ({storeName, stateKey}, filters, settings={}) => {
+const setFilters = ({ storeName, stateKey }, filters, settings = {}) => {
 	const storePromise = useLoadStore(storeName);
 	if (storePromise) {
-		storePromise.then(store => {store.set_value(stateKey, filters, settings);});
+		console.log('setFilters', storeName, stateKey, filters, settings);
+		storePromise
+			.then((store) => {
+				if (store) {
+					store.set_value(stateKey, filters, settings);
+				}
+			})
+			.catch((err) => {
+				console.error(
+					`[setFilters] Ошибка при работе со store "${storeName}":`,
+					err,
+				);
+			});
 	}
 };
 
-const searchSubmit = payload => {
-	set_sensors_store('report_filters',{...sensorsStore.report_filters, q: payload.q });
+const searchSubmit = (payload) => {
+	// console.log('searchSubmit', sensorsStore.report_filters);
+	set_sensors_store('report_filters', {
+		...report_filters.value,
+		q: payload.q,
+	});
 };
 
 // ========== Datepicker ===========
@@ -424,24 +457,32 @@ const storeRef = ref(null);
 watchEffect(async () => {
 	const settings = navbarSettings.value?.datepickerSettings?.storeSettings;
 	if (settings?.storeName && settings?.stateKey) {
-		const store = await useLoadStore(settings.storeName);
-		// console.log('watchEffect', settings.stateKey, storeRefs[settings.stateKey])
-		storeRef.value = store;
+		try {
+			const store = await useLoadStore(settings.storeName);
+			// console.log('watchEffect', settings.stateKey, storeRefs[settings.stateKey])
+			storeRef.value = store;
+		} catch (err) {
+			console.error('[watchEffect] Ошибка загрузки store для datepicker:', err);
+			storeRef.value = null;
+		}
 	} else {
 		storeRef.value = null;
 	}
 });
 
-const handleDatepickerChange = range => {
+const handleDatepickerChange = (range) => {
 	// console.log('handleDatepickerChange', datepickerFilters.value.daterange)
-	setFilters(navbarSettings.value.datepickerSettings.storeSettings, {
-		...datepickerFilters.value,
-		daterange: range,
-		daterange_setted_at: Date.now()
-	},
-	{
-		toLocalStorage: {prop: 'plants_statistics_filters'}
-	});
+	setFilters(
+		navbarSettings.value.datepickerSettings.storeSettings,
+		{
+			...datepickerFilters.value,
+			daterange: range,
+			daterange_setted_at: Date.now(),
+		},
+		{
+			toLocalStorage: { prop: 'plants_statistics_filters' },
+		},
+	);
 };
 
 const datepickerFilters = computed(() => {
@@ -467,12 +508,12 @@ const factUserRoleType = computed(() => {
 	}
 	return Object.freeze(result);
 });
-const setTempRole = () => {}
+const setTempRole = () => {};
 /*const setTempRole = (role_id) => {
 	// console.log(role_id)
 	userRolesLoading = true;
 	let payload = {};
-	
+
 	if (role_id) {
 		payload.method = 'POST';
 		payload.data = {
@@ -485,7 +526,7 @@ const setTempRole = () => {}
 
 	// if (payload) {
 	// 	console.log(this.$route.path.split('/'))
-	// 	return				
+	// 	return
 	// }
 	set_temp_role(payload)
 		.then(user => {
@@ -523,9 +564,6 @@ const setTempRole = () => {}
 		});
 };*/
 
-
-
-
 // ========== Hooks ==============
 onMounted(() => {
 	console.log('Navbar mounted');
@@ -536,28 +574,28 @@ onUpdated(() => {
 });
 
 // export default {
-	
-	// mixins: [navigation(), fetchItemsHelper()],
 
-	/*components: {
+// mixins: [navigation(), fetchItemsHelper()],
+
+/*components: {
 		Datepicker: () => import('@/components/common/Datepicker.vue')
 	},*/
 
-	/*props: {
+/*props: {
 		currentPath: String,
 		loading: Boolean,
 		saving: Boolean
 		// filters: Object
 	},*/
 
-	/*data: () => ({
+/*data: () => ({
 		userRolesList: [],
 		userRolesLoading: false,
 		showCreationMenu: false,
 		keepGlobalFilters: false
 	}),*/
 
-	/*computed: {
+/*computed: {
 		...mapState({
 			report_filters: state => state.sensors.report_filters,
 			navbarSettings: state => state.global.navbarSettings,
@@ -688,11 +726,11 @@ onUpdated(() => {
 			return null;
 		},
 
-		
+
 		// SCOPES: () => SCOPES,
 	},*/
 
-	/*methods: {
+/*methods: {
 		...mapActions({
 			show_edit_modal: 'show_edit_modal',
 			fetch_user_roles: 'user_roles/fetch_user_roles',
@@ -719,15 +757,15 @@ onUpdated(() => {
 			this.$emit('event', eventName, data);
 		},
 
-		
+
 
 		handleCloseButton() {
 			this.changeRoute({ history: true, steps: -1 });
 		},
 
-		
 
-		
+
+
 
 		createItemByMenu(item) {
 			// console.log(item)
@@ -753,7 +791,7 @@ onUpdated(() => {
 			}
 		},
 
-		
+
 
 		fetchPlants() {
 			this.fetch_global_plants({
@@ -767,7 +805,7 @@ onUpdated(() => {
 		}
 	},*/
 
-	/*watch: {
+/*watch: {
 		$route() {
 			if (this.disposableHistoryButton) {
 				this.set_global_state({
@@ -786,7 +824,7 @@ onUpdated(() => {
 		}
 	},*/
 
-	/*created() {
+/*created() {
 		if (this.isIndustrialMatrix) {
 			this.fetchUserRoles();
 		} else {
@@ -803,7 +841,7 @@ onUpdated(() => {
 		}
 	},*/
 
-	/*beforeDestroy() {
+/*beforeDestroy() {
 		// if (!this.keepGlobalFilters) {
 		this.set_global_filters({ plantId: null, companyId: null });
 		// }
