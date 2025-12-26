@@ -189,7 +189,7 @@ const handleError = (error, options = {}) => {
  * @param {Object} payload.data - Request body
  * @returns {Promise} Promise with response data
  */
-export const api_request = async (url, payload = {}) => {
+const api_request = async (url, payload = {}) => {
 	if (isPrevent()) return Promise.reject(new Error('Request prevented'));
 
 	const { loading, toStore, notify, notifyError } = getOptions(payload);
@@ -314,3 +314,12 @@ export const api_request = async (url, payload = {}) => {
 			});
 	});
 };
+
+api_request.get = (url, payload = {}) => api_request(url, {...payload, method: 'GET' });
+api_request.post = (url, payload = {}) => api_request(url, {...payload, method: 'POST' });
+api_request.put = (url, payload = {}) => api_request(url, {...payload, method: 'PUT' });
+api_request.delete = (url, payload = {}) => api_request(url, {...payload, method: 'DELETE' });
+
+export { api_request };
+
+

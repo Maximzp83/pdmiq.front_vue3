@@ -111,13 +111,12 @@ export function useItemsData({ apiRoute, filters = {}, options = {} }) {
 		// Use api_request if store is provided
 		try {
 			const payload = {
-				method: 'GET',
 				params: preparedFilters,
 				...requestOptions,
 			};
 			// console.log('payload', payload);
 			return new Promise((resolve, reject) => {
-				api_request(apiRoute, payload)
+				api_request.get(apiRoute, payload)
 					.then(({ value }) => {
 						// console.log('response', response);
 						itemsList.value = value;

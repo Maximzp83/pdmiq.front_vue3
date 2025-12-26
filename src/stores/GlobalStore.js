@@ -6,13 +6,13 @@ import { Lang } from '@/localization';
 
 const localStorageFilters = JSON.parse(localStorage.getItem('global_filters'));
 const localStorageItemsActiveGridType = JSON.parse(
-	localStorage.getItem('items_active_grid_type')
+	localStorage.getItem('items_active_grid_type'),
 );
 const localStorageCompareList = JSON.parse(localStorage.getItem('compare_list'));
 
 const globalFiltersInit = {
 	plantId: null,
-	companyId: null
+	companyId: null,
 };
 
 export const useGlobalStore = defineStore('globalStore', {
@@ -21,7 +21,7 @@ export const useGlobalStore = defineStore('globalStore', {
 			overlay: {
 				show: false,
 				text: '',
-				onClick: () => {}
+				onClick: () => {},
 			},
 			mainPreloader: false,
 			editModal: {
@@ -29,7 +29,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null
+				callback: null,
 			},
 
 			editModalSecond: {
@@ -38,7 +38,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null
+				callback: null,
 			},
 
 			editModalClassic: {
@@ -47,7 +47,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null
+				callback: null,
 			},
 
 			editModalClassicSecond: {
@@ -56,7 +56,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null
+				callback: null,
 			},
 
 			navbarSettings: {},
@@ -96,25 +96,93 @@ export const useGlobalStore = defineStore('globalStore', {
 
 			beforeEachHook: null,
 			redirectTo: null,
-			printHTMLWindowIsOpen: false
-		}
+			printHTMLWindowIsOpen: false,
+		};
 	},
 
 	actions: {
 		...commonStoreMixin.actions,
 
+		show_overlay(data) {
+			this.set_value('overlay', data);
+		},
+
+		show_edit_modal(data) {
+			if (data.multiform) {
+				if (!this.globalFilters.plantId) {
+					import('element-plus').then(({ ElNotification }) => {
+						ElNotification.warning({
+							title: '',
+							message: Lang.tt('phrases.Select_Plant_first'),
+						});
+					});
+					return;
+				}
+			}
+
+			const editModalProp = data.editModalProp || 'editModal';
+			this.set_value(editModalProp, data);
+		},
+
+		set_layout_click(target) {
+			this.set_value('layout_click_target', target);
+		},
+
+		setup_navbar(data = {}) {
+			this.set_value('navbarSettings', data);
+		},
+
+		set_global_filters(globFilters) {
+			const filters = globFilters || { ...globalFiltersInit };
+			this.set_value('globalFilters', filters, {
+				toLocalStorage: { prop: 'global_filters' },
+			});
+		},
+
+		set_global_plants(items = []) {
+			this.set_value('globalPlantsList', items);
+		},
+
+		set_compare_list(items = []) {
+			this.set_value('compareList', items, {
+				toLocalStorage: { prop: 'compare_list' },
+			});
+		},
+
+		minimizeSidebar() {
+			this.set_value('isSidebarCollapse', !this.isSidebarCollapse);
+		},
+
+		set_global_state(data) {
+			// Handle nested state updates
+			const { stateProp, value } = data;
+			if (stateProp.includes('.')) {
+				const keys = stateProp.split('.');
+				let current = this;
+				for (let i = 0; i < keys.length - 1; i++) {
+					current = current[keys[i]];
+				}
+				current[keys[keys.length - 1]] = value;
+			} else {
+				this.set_value(stateProp, value);
+			}
+		},
+
 		forceRerender(componentKey) {
 			this[componentKey]++;
 		},
 
+		set_active_grid_type(value) {
+			this.set_value('items_active_grid_type', value, {
+				toLocalStorage: { prop: 'items_active_grid_type' },
+			});
+		},
 	},
 
 	getters: {
 		// ...itemsMixin.getters,
-	}
-})
-
-
+	},
+});
 
 // import { dataState, statusState, filtersState, sortingState } from '../commonState';
 // import { multipurpose_response } from '../commonActions/apiActions';
@@ -127,7 +195,6 @@ export const useGlobalStore = defineStore('globalStore', {
 	{ moduleName: 'controllers', action: 'set_controllers_filters' },
 	{ moduleName: 'sensors', action: 'set_sensors_filters' }
 ];*/
-
 
 /*const mutations = {
 	...dataMutations,
@@ -143,8 +210,8 @@ export const useGlobalStore = defineStore('globalStore', {
 };*/
 // const getters = {};
 
-// actions
-const actions = {
+// Old Vuex actions - kept for reference, not used in Pinia
+/*const actions = {
 	/*show_overlay({ commit }, data) {
 		const payload = { stateProp: 'overlay', value: data };
 		commit('SET_STATE', payload);
@@ -236,7 +303,7 @@ const actions = {
 		commit('SET_COMPARE_LIST', items);
 	},*/
 
-	/*set_global_filters({ commit, dispatch, rootState }, { setForAll, globFilters, itemsFilters }) {
+/*set_global_filters({ commit, dispatch, rootState }, { setForAll, globFilters, itemsFilters }) {
 		const payload = { stateProp: 'globalFilters', value: globFilters };
 		commit('SET_STATE', payload);
 
@@ -249,7 +316,7 @@ const actions = {
 		}
 	},*/
 
-	/*minimizeSidebar({ commit, state }) {
+/*minimizeSidebar({ commit, state }) {
 		const payload = {
 			stateProp: 'isSidebarCollapse',
 			value: !state.isSidebarCollapse
@@ -271,13 +338,13 @@ const actions = {
 
 	set_active_grid_type({ commit }, value) {
 		commit('SET_GRID_VIEW', value);
-	}*/
+	}
 
-	/*emit_submit_item_form({ commit }, data = {}) {
+	emit_submit_item_form({ commit }, data = {}) {
 		const payload = { stateProp: 'navbarSettings', value: data };
 		commit('SET_STATE', payload);
-	}*/
-};
+	}
+};*/
 
 /*export default {
 	state,
