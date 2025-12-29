@@ -125,6 +125,11 @@ await fetchUsers({ page: 1 });
 
 **Already exist in Vue3 (verified ✅):**
 - [x] **AuthStore** - Properly migrated, state-only store
+  - **File:** `src/stores/AuthStore.js`
+  - **Composable:** `src/composables/useAuth.js` (newly created)
+  - **Methods:** 13 API methods (signIn, getAuthUser, signOut, logout, forgotPassword, passwordReset, checkPasswordToken, sendMfaCode, checkMfaCode, fetchQrCode, checkQrCode, setTempRole, clearFilters)
+  - **State:** isAuthenticated, access_token, authUser, motorIQLink, redirectTo, preventRequests, role flags (isIndustrialMatrix, isCustomer, isDeveloper)
+  - **Getters:** hasAccessMap, hasAccessTo (permission checking)
 - [x] **GlobalStore** - Properly migrated, state-only store
   - **Composable:** `src/composables/useGlobal.js` (newly created)
   - **Methods:** `fetchGlobalPlants()`, `fetchGlobalCompanies()`, `saveVisitAnalytics()`
