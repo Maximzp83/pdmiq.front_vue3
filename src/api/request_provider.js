@@ -1,6 +1,7 @@
 import api from './index.js';
 import { Lang } from '@/localization';
 import { useHelpers } from '@/composables/mixins/useHelpers';
+import { prepareDataFunctions } from '@/utils/data-preparers';
 
 import { useNotify } from '@/composables/useNotify';
 const { Notify } = useNotify();
@@ -53,7 +54,7 @@ const isSuccessStatus = (response, statusCheckSettings) => {
  * @returns {*} Response value
  */
 const getResponseValue = (response, payload) => {
-	const { prepareData, dataPath } = payload;
+	const { prepareData, prepareDataSettings, dataPath } = payload;
 
 	if (dataPath) {
 		// Extract data from specific path
@@ -66,22 +67,27 @@ const getResponseValue = (response, payload) => {
 	}
 
 	// Default: return data.items or data
+	let value = response.data;
 	if (response.data?.data?.items) {
-		return response.data.data.items;
-	}
-	if (response.data?.items) {
-		return response.data.items;
-	}
-	if (response.data?.data) {
-		return response.data.data;
+		value = response.data.data.items;
+	} else if (response.data?.items) {
+		value = response.data.items;
+	} else if (response.data?.data) {
+		value = response.data.data;
 	}
 
-	// If prepareData function exists, use it
-	if (prepareData && typeof prepareData === 'function') {
-		return prepareData(response.data);
+	// Handle prepareData - supports both function and string (legacy compatibility)
+	if (prepareData) {
+		if (typeof prepareData === 'function') {
+			// Direct function
+			return prepareData(value, prepareDataSettings);
+		} else if (typeof prepareData === 'string' && prepareDataFunctions[prepareData]) {
+			// String lookup from registry (legacy compatibility)
+			return prepareDataFunctions[prepareData](value, prepareDataSettings);
+		}
 	}
 
-	return response.data;
+	return value;
 };
 
 /**
@@ -189,8 +195,10 @@ const handleError = (error, options = {}) => {
  * @param {Object} payload.data - Request body
  * @returns {Promise} Promise with response data
  */
-const api_request = async (url, payload = {}) => {
-	if (isPrevent()) return Promise.reject(new Error('Request prevented'));
+const api_request = (url, payload = {}) => {
+	if (isPrevent()) {
+		return Promise.reject(new Error('Request prevented'));
+	}
 
 	const { loading, toStore, notify, notifyError } = getOptions(payload);
 	const {
@@ -199,125 +207,142 @@ const api_request = async (url, payload = {}) => {
 		statusCheckSettings,
 		errorMessageSettings,
 	} = payload;
-	// console.log('payload', payload);
+
 	// Get useLoadStore function
 	const { useLoadStore } = useHelpers();
-	let store = null;
 
-	// Set loading state
-	if (toStore || loading) {
-		store = await useLoadStore(payload.storeName);
-		if (loading && store) {
-			store.set_value(loadingProp, true);
-		}
-	}
+	// Create store loading promise
+	const storePromise = (toStore || loading) && payload.storeName
+		? useLoadStore(payload.storeName)
+		: Promise.resolve(null);
 
 	return new Promise((resolve, reject) => {
-		api(method, url, payload)
-			.then((response) => {
-				if (isSuccessStatus(response, statusCheckSettings)) {
-					try {
-						const {
-							stateProp,
-							nestedStateProp,
-							action,
-							resultMessage,
-							concatData,
-							returnResponse,
-							returnResponseOnly,
-						} = payload;
+		// Load store first if needed, then execute API request
+		storePromise
+			.then((store) => {
+				// Set loading state
+				if (loading && store && loadingProp) {
+					store.set_value(loadingProp, true);
+				}
 
-						const value = returnResponseOnly
-							? response
-							: getResponseValue(response, payload);
-
-						// Save to store
-						if (toStore && store.set_value) {
-							if (nestedStateProp) {
-								// Handle nested state (if store supports it)
-								const currentValue = store[nestedStateProp] || {};
-								store.set_value(nestedStateProp, {
-									...currentValue,
-									...(concatData ? { ...currentValue, ...value } : value),
-								});
-							} else if (stateProp) {
-								const currentValue = store[stateProp];
-								store.set_value(
+				// Execute API request
+				return api(method, url, payload)
+					.then((response) => {
+						if (isSuccessStatus(response, statusCheckSettings)) {
+							try {
+								const {
 									stateProp,
-									concatData && Array.isArray(currentValue) && Array.isArray(value)
-										? [...currentValue, ...value]
-										: value,
-								);
+									nestedStateProp,
+									action,
+									resultMessage,
+									concatData,
+									returnResponse,
+									returnResponseOnly,
+								} = payload;
+
+								const value = returnResponseOnly
+									? response
+									: getResponseValue(response, payload);
+
+								// Save to store
+								if (toStore && store && store.set_value) {
+									if (nestedStateProp) {
+										// Handle nested state (if store supports it)
+										const currentValue = store[nestedStateProp] || {};
+										store.set_value(nestedStateProp, {
+											...currentValue,
+											...(concatData ? { ...currentValue, ...value } : value),
+										});
+									} else if (stateProp) {
+										const currentValue = store[stateProp];
+										store.set_value(
+											stateProp,
+											concatData && Array.isArray(currentValue) && Array.isArray(value)
+												? [...currentValue, ...value]
+												: value,
+										);
+									}
+								}
+
+								// Dispatch action if provided
+								if (action && store && typeof store[action] === 'function') {
+									store[action]();
+								}
+
+								const payloadResolve = {
+									value: value,
+									request_payload: payload,
+								};
+
+								if (returnResponse) {
+									payloadResolve.response = response;
+								}
+
+								resolve(payloadResolve);
+
+								// Show success notification
+								const message = getResultMessage(resultMessage, response.data?.data);
+								if (notify) {
+									Notify({
+										type: 'success',
+										title: Lang.tt('Success'),
+										message: message,
+										duration: 3500,
+									});
+								}
+							} catch (e) {
+								console.warn('[api_request] Error processing response:', e);
+								reject(e);
+							}
+						} else {
+							const message = getResponseMessage(response, errorMessageSettings);
+							reject(response);
+
+							if (Notify) {
+								Notify({
+									type: 'error',
+									title: Lang.tt('Error'),
+									message: message || Lang.tt('phrases.wrong_response_status'),
+									duration: 0,
+								});
 							}
 						}
 
-						// Dispatch action if provided
-						if (action && typeof store[action] === 'function') {
-							store[action]();
+						// Clear loading state
+						if (loading && store && loadingProp && store.set_value) {
+							store.set_value(loadingProp, false);
 						}
-
-						const payloadResolve = {
-							value: value,
-							request_payload: payload,
-						};
-
-						if (returnResponse) {
-							payloadResolve.response = response;
-						}
-
-						resolve(payloadResolve);
-
-						// Show success notification
-						const message = getResultMessage(resultMessage, response.data?.data);
-						if (notify) {
-							Notify({
-								type: 'success',
-								title: Lang.tt('Success'),
-								message: message,
-								duration: 3500,
-							});
-						}
-					} catch (e) {
-						console.warn('[api_request] Error processing response:', e);
-						reject(e);
-					}
-				} else {
-					const message = getResponseMessage(response, errorMessageSettings);
-					reject(response);
-
-					if (Notify) {
-						Notify({
-							type: 'error',
-							title: Lang.tt('Error'),
-							message: message || Lang.tt('phrases.wrong_response_status'),
-							duration: 0,
+					})
+					.catch((error) => {
+						handleError(error, {
+							store,
+							reject,
+							loading,
+							loadingProp,
+							notify: notifyError,
+							errorMessageSettings,
 						});
-					}
-				}
-
-				// Clear loading state
-				if (loading) {
-					if (loadingProp && store.set_value) {
-						store.set_value(loadingProp, false);
-					}
-				}
+					});
 			})
 			.catch((error) => {
-				handleError(error, {
-					store,
-					reject,
-					loading,
-					loadingProp,
-					notify: notifyError,
-					errorMessageSettings,
-				});
+				// Handle store loading error
+				console.warn('[api_request] Error loading store:', error);
+				reject(error);
 			});
 	});
 };
 
+/**
+ * Convenience methods for cleaner syntax
+ * @example
+ *   api_request.get('/users', { params: { page: 1 } })
+ *   api_request.post('/users', { data: { name: 'John' } })
+ *   api_request.post('/upload', { data: { file }, withFile: true })
+ */
 api_request.get = (url, payload = {}) => api_request(url, {...payload, method: 'GET' });
 api_request.post = (url, payload = {}) => api_request(url, {...payload, method: 'POST' });
 api_request.put = (url, payload = {}) => api_request(url, {...payload, method: 'PUT' });
+api_request.patch = (url, payload = {}) => api_request(url, {...payload, method: 'PATCH' });
 api_request.delete = (url, payload = {}) => api_request(url, {...payload, method: 'DELETE' });
 
 export { api_request };
