@@ -127,8 +127,7 @@ import { getParamsFromUrl } from '@/utils/url-helpers';
 import { getYmdDateString } from '@/helpers';
 import { Lang } from '@/localization';
 import TabsBar from '@/components/common/TabsBar.vue';
-
-const azureLogo = new URL('@/assets/img/azure.svg', import.meta.url).href;
+import azureLogo from '@/assets/img/azure.svg';
 
 const route = useRoute();
 const router = useRouter();

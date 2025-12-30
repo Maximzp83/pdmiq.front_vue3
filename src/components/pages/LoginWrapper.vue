@@ -5,11 +5,11 @@
 
 		<div
 			class="wrapper wrapper-full-page inlineImg"
-			style="background-image: url(/static/img/background/background_login.png)"
+			:style="{ backgroundImage: `url(${backgroundImage})` }"
 		>
 			<div class="logo">
 				<div class="logo-img">
-					<img src="/static/img/top-logo-white.png" alt="logo" />
+					<img :src="logoImage" alt="logo" />
 				</div>
 				<div class="description">
 					<div class="title common-title semi-bold">
@@ -35,6 +35,8 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useAuthStore } from '@/stores/AuthStore';
+import backgroundImage from '@/assets/img/background/background_login.png';
+import logoImage from '@/assets/img/top-logo-white.png';
 
 const authStore = useAuthStore();
 
