@@ -33,12 +33,12 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import { useAuth } from '@/composables/useAuth';
+import { useAuthStore } from '@/stores/AuthStore';
 import { Lang } from '@/localization';
 
-const { forgotPassword } = useAuth();
+const authStore = useAuthStore();
 
-const tt = (key) => Lang.tt(key);
+const { tt } = Lang;
 
 // Data
 const isLoading = ref(false);
@@ -48,17 +48,20 @@ const formData = reactive({
 });
 
 // Methods
-const handleSubmit = async () => {
+const handleSubmit = () => {
 	const data = { ...formData };
 
 	isLoading.value = true;
 
-	try {
-		await forgotPassword(data);
-	} catch (error) {
-		// Error handling is done in the composable
-	} finally {
-		isLoading.value = false;
-	}
+	authStore.forgotPassword(data)
+		.then(() => {
+			// Success handling is done in the store
+		})
+		.catch((error) => {
+			// Error handling is done in the store
+		})
+		.finally(() => {
+			isLoading.value = false;
+		});
 };
 </script>

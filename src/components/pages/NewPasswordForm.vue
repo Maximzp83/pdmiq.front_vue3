@@ -65,7 +65,7 @@
 import { ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElNotification } from 'element-plus';
-import { useAuth } from '@/composables/useAuth';
+import { useAuthStore } from '@/stores/AuthStore';
 import { isPasswordStrong } from '@/helpers/specialHelpers';
 import { getParamsFromUrl } from '@/utils/url-helpers';
 import { Lang } from '@/localization';
@@ -74,9 +74,9 @@ import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { passwordReset, checkPasswordToken } = useAuth();
+const authStore = useAuthStore();
 
-const tt = (key) => Lang.tt(key);
+const { tt } = Lang;
 
 // Data
 const isLoading = ref(false);
@@ -90,24 +90,23 @@ const formData = reactive({
 });
 
 // Computed
-const equalsToAccountName = computed(() => {
-	return email.value === formData.password;
-});
+const equalsToAccountName = computed(() => email.value === formData.password);
 
 // Methods
-const handleSubmit = async () => {
+const handleSubmit = () => {
 	let data = { ...formData };
 	data.password = data.password.trim();
 	data.password_confirmation = data.password_confirmation.trim();
 
 	if (isPasswordStrong(data.password).isStrong && !equalsToAccountName.value) {
 		if (data.password === data.password_confirmation) {
-			try {
-				await passwordReset(data);
-				router.push('/login');
-			} catch (error) {
-				// Error handling is done in the composable
-			}
+			authStore.passwordReset(data)
+				.then(() => {
+					router.push('/login');
+				})
+				.catch((error) => {
+					// Error handling is done in the store
+				});
 		} else {
 			ElNotification({
 				type: 'warning',
@@ -128,28 +127,30 @@ const handleSubmit = async () => {
 	}
 };
 
-const checkToken = async ({ token, email: emailParam }) => {
+const checkToken = ({ token, email: emailParam }) => {
 	const data = { token };
 	isLoading.value = true;
 
-	try {
-		await checkPasswordToken(data);
-		formData.token = token;
-		email.value = emailParam;
-	} catch (error) {
-		if (error.response?.status === 422) {
-			ElNotification({
-				type: 'warning',
-				title: Lang.t('Warning'),
-				message: Lang.t('aliases.creation_link_exp'),
-				dangerouslyUseHTMLString: true,
-				duration: 0
-			});
-			router.push('/login/password/forgot');
-		}
-	} finally {
-		isLoading.value = false;
-	}
+	authStore.checkPasswordToken(data)
+		.then(() => {
+			formData.token = token;
+			email.value = emailParam;
+		})
+		.catch((error) => {
+			if (error.response?.status === 422) {
+				ElNotification({
+					type: 'warning',
+					title: Lang.t('Warning'),
+					message: Lang.t('aliases.creation_link_exp'),
+					dangerouslyUseHTMLString: true,
+					duration: 0
+				});
+				router.push('/login/password/forgot');
+			}
+		})
+		.finally(() => {
+			isLoading.value = false;
+		});
 };
 
 // Lifecycle

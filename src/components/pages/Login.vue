@@ -52,11 +52,7 @@
 				</div>
 
 				<div class="form-row" v-show="isVerification">
-					<el-checkbox
-						v-model="formData.is_mfa_muted"
-						:true-label="1"
-						:false-label="0"
-					>
+					<el-checkbox v-model="formData.is_mfa_muted">
 						{{ tt('aliases.skip_mfa_check') }}
 					</el-checkbox>
 				</div>
@@ -120,20 +116,24 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onBeforeMount } from 'vue';
+import { ref, reactive, computed, onBeforeMount, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useAuth } from '@/composables/useAuth';
+import { useAuthStore } from '@/stores/AuthStore';
 import { getParamsFromUrl } from '@/utils/url-helpers';
 import { getYmdDateString } from '@/helpers';
 import { Lang } from '@/localization';
-import TabsBar from '@/components/common/TabsBar.vue';
+// import TabsBar from '@/components/common/TabsBar.vue';
 import azureLogo from '@/assets/img/azure.svg';
+
+const TabsBar = defineAsyncComponent(() =>
+	import('@/components/common/TabsBar.vue')
+);
 
 const route = useRoute();
 const router = useRouter();
-const { authStore, signIn } = useAuth();
+const authStore = useAuthStore();
 
-const tt = (key) => Lang.tt(key);
+const { tt } = Lang;
 
 // Data
 const alternateForm = ref(false);
@@ -148,17 +148,11 @@ const formData = reactive({
 });
 
 // Computed
-const pageTitle = computed(() => {
-	return isVerification.value ? tt('phrases.Enter_MFA_Code') : 'Login';
-});
+const pageTitle = computed(() => isVerification.value ? tt('phrases.Enter_MFA_Code') : 'Login');
 
-const hideTabsBar = computed(() => {
-	return route.path !== '/kruger';
-});
+const hideTabsBar = computed(() => route.path !== '/kruger');
 
-const isLoading = computed(() => {
-	return authStore.isLoading;
-});
+const isLoading = computed(() => authStore.isLoading);
 
 const authApiUrl = computed(() => {
 	if (import.meta.env.VITE_API_URL) {
@@ -172,13 +166,9 @@ const authApiUrl = computed(() => {
 	return 'https://api.testmatrix.assetmatrix.com/api';
 });
 
-const googleAuthUrl = computed(() => {
-	return `${authApiUrl.value}/auth/google/redirect`;
-});
+const googleAuthUrl = computed(() => `${authApiUrl.value}/auth/google/redirect`);
 
-const microsoftAuthUrl = computed(() => {
-	return `${authApiUrl.value}/auth/microsoft/redirect`;
-});
+const microsoftAuthUrl = computed(() => `${authApiUrl.value}/auth/microsoft/redirect`);
 
 const ssoLink = computed(() => {
 	if (window.location.origin === 'https://testmatrix.assetmatrix.com') {
@@ -200,7 +190,7 @@ const switchTab = (tab) => {
 	activeTab.value = tab;
 };
 
-const handleSubmit = async () => {
+const handleSubmit = () => {
 	let data = { ...formData };
 
 	if (alternateForm.value) {
@@ -213,20 +203,20 @@ const handleSubmit = async () => {
 		delete data.is_mfa_muted;
 	}
 
-	try {
-		const responseData = await signIn(data);
-		const { access_token, status } = responseData;
+	authStore.signIn(data)
+		.then((responseData) => {
+			const { access_token, status } = responseData;
 
-		if (status && status == 'verification') {
-			isVerification.value = true;
-		} else if (access_token) {
-			authStore.set_access_token(access_token);
-			isVerification.value = false;
-			router.push('/');
-		}
-	} catch (error) {
-		// Error handling is done in the composable
-	}
+			if (status && status == 'verification') {
+				isVerification.value = true;
+			} else if (access_token) {
+				isVerification.value = false;
+				router.push('/');
+			}
+		})
+		.catch((error) => {
+			// Error handling is done in the store
+		});
 };
 
 // Lifecycle

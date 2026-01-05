@@ -53,12 +53,10 @@ const props = defineProps({
 	equalsToAccountName: Boolean
 });
 
-const tt = (key) => Lang.tt(key);
+const { tt } = Lang;
 
-const passCheckList = computed(() => {
-	return {
-		...isPasswordStrong(props.password),
-		equalsToAccountName: props.equalsToAccountName
-	};
-});
+const passCheckList = computed(() => ({
+	...isPasswordStrong(props.password),
+	equalsToAccountName: props.equalsToAccountName
+}));
 </script>
