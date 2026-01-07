@@ -210,10 +210,10 @@ a:focus {
 	outline: none;
 }
 
-input:focus,
+.el-input__wrapper:focus,
 select:focus,
 textarea:focus {
-	border: 1px solid $formElementsFocusBorderColor;
+	// border: 1px solid $formElementsFocusBorderColor;
 	outline: none;
 	// border-style: solid;
 	// border-radius: 0;

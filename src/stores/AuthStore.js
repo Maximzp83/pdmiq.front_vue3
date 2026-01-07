@@ -393,6 +393,15 @@ export const useAuthStore = defineStore('authStore', {
 				console.warn('Error clearing filters:', error);
 			}
 		},
+
+		set_value(key, value, settings = {}) {
+		  this[key] = value;
+		  // console.log('set_value', value, this[key])
+		  if (settings.toLocalStorage) {
+		    const { prop } = settings.toLocalStorage;
+		    localStorage.setItem(prop, JSON.stringify(value));
+		  }
+		},
 	},
 
 	getters: {

@@ -125,15 +125,20 @@
 		}
 	}
 
-	.el-input__inner {
+	.el-input__wrapper {
 		border-color: transparent !important;
-		box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+		box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1) !important;
+		background-color: #e8f0fe;
+	}
+
+	/*.el-input__inner {
+		border-color: transparent !important;
 
 		&:focus {
 			border-color: transparent !important;
 		}
 
-	}
+	}*/
 
 	.form-row {
 		& + .form-row {margin-top: 24px;}		

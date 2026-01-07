@@ -23,9 +23,11 @@
 
 			<div class="login-content">
 				<div class="card">
-					<transition name="standard-fade" mode="out-in">
-						<router-view />
-					</transition>
+					<router-view v-slot="{ Component }">
+						<transition name="standard-fade" mode="out-in">
+							<component :is="Component" />
+						</transition>
+					</router-view>
 				</div>
 			</div>
 		</div>
