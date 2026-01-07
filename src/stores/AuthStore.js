@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { commonStoreMixin } from './mixins/commonStoreMixin';
+// import { commonStoreMixin } from './mixins/commonStoreMixin';
 import { USER_ROLES_TYPES } from '@/constants/global';
 import { hasAccessTo, setupPermissionsMap } from '@/utils/hasAccessTo';
 import { api_request } from '@/api/request_provider';
@@ -19,7 +19,9 @@ const redirectTo = localStorage.getItem('redirectTo');
 export const useAuthStore = defineStore('authStore', {
 	state: () => {
 		return {
-			...commonStoreMixin.state,
+			// ...commonStoreMixin.state,
+
+			isLoading: false,
 
 			isAuthenticated: !!user || false,
 			access_token: token || null,
@@ -36,7 +38,7 @@ export const useAuthStore = defineStore('authStore', {
 	},
 
 	actions: {
-		...commonStoreMixin.actions,
+		// ...commonStoreMixin.actions,
 
 		/**
 		 * Set authentication user and update role flags
@@ -117,11 +119,11 @@ export const useAuthStore = defineStore('authStore', {
 		 * @param {Object} data - Login credentials (email, password, etc.)
 		 * @returns {Promise} Resolves with user data or verification status
 		 */
-		signIn(data) {
+		sign_in(data) {
+			this.isLoading = true;
+
 			return api_request.post('/auth/login', {
-				data,
-				loading: true,
-				notNotify: true,
+				data
 			}).then(response => {
 				// Handle MFA verification status
 				if (response.status === 'verification') {
@@ -137,8 +139,11 @@ export const useAuthStore = defineStore('authStore', {
 						this.set_motor_iq_link(response.motorIQ.baseUri);
 					}
 				}
-
+				this.isLoading = false;
 				return response;
+			}).catch(error => {
+				this.isLoading = false;
+				return Promise.reject(error);
 			});
 		},
 
@@ -147,7 +152,7 @@ export const useAuthStore = defineStore('authStore', {
 		 * @param {string|null} token - Optional token for token-based auth
 		 * @returns {Promise} Resolves with user data
 		 */
-		getAuthUser(token = null) {
+		get_auth_user(token = null) {
 			let url = '/auth/user';
 			const headers = {};
 
@@ -155,9 +160,10 @@ export const useAuthStore = defineStore('authStore', {
 			if (token) {
 				headers.Authorization = `Bearer ${token}`;
 				this.set_access_token(token);
-				localStorage.setItem('access_token', token);
 				url += '?refresh_token=true';
 			}
+
+			this.isLoading = true;
 
 			return api_request.get(url, {
 				headers,
@@ -178,8 +184,12 @@ export const useAuthStore = defineStore('authStore', {
 					this.set_auth_user(user);
 				}
 
+				this.isLoading = false;
 				return response;
-			});
+			}).catch(error => {
+				this.isLoading = false;
+				return Promise.reject(error);
+			})
 		},
 
 		/**
@@ -187,7 +197,7 @@ export const useAuthStore = defineStore('authStore', {
 		 * @param {Object} options - Logout options (message, type, duration)
 		 * @returns {Promise}
 		 */
-		signOut(options = {}) {
+		sign_out(options = {}) {
 			const { message, type = 'success', duration } = options;
 
 			// Call server-side logout in production

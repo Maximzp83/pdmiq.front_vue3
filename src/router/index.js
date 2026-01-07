@@ -2,7 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { hasAccessTo as hasAccessToUtil } from '@/utils/hasAccessTo';
-import { validateBySettings, getParamsFromUrl } from '@/helpers';
+import { validateBySettings } from '@/helpers';
+import { getParamsFromUrl } from '@/utils/url-helpers';
+
 import { useNotify } from '@/composables/useNotify';
 
 const LoginWrapper = () => import('@/components/pages/LoginWrapper.vue');
@@ -61,7 +63,7 @@ const routes = [
 					},
 				],
 			},
-			{
+			/*{
 				path: 'companies',
 				name: 'Companies',
 				component: () => import('@/views/Companies/ItemsList.vue'),
@@ -481,9 +483,9 @@ const routes = [
 			{
 				path: 'plants/details/:id',
 				redirect: '/plants/:id/details',
-			},
+			},*/
 			// -----------------------
-			{
+			/*{
 				path: 'requisitions',
 				name: 'Requisitions',
 				component: () => import('@/views/Requisitions/RequisitionsDashboard.vue'),
@@ -706,10 +708,10 @@ const routes = [
 				name: 'StatisticsExport',
 				component: () => import('@/views/Settings/Statistics/ExportPage.vue'),
 				meta: { auth: true, permissions: ['view_settings'] },
-			},
+			},*/
 		],
 	},
-	{ path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/components/pages/NotFoundPage.vue') },
+	// { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/components/pages/NotFoundPage.vue') },
 ];
 
 const router = createRouter({

@@ -203,7 +203,7 @@ const handleSubmit = () => {
 		delete data.is_mfa_muted;
 	}
 
-	authStore.signIn(data)
+	authStore.sign_in(data)
 		.then((responseData) => {
 			const { access_token, status } = responseData;
 
