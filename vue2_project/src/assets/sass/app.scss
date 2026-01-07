@@ -1,0 +1,44 @@
+// Fonts
+// @import url('https://fonts.googleapis.com/css?family=Nunito');
+@import "fonts";
+
+@import 'default/customReset';
+@import "default/bottomFooter"; //set page height to 100% and moves mainFooter to bottom.
+
+// Bootstrap
+// @import '~bootstrap/scss/bootstrap';
+
+// Element UI plugins
+// @import "plugins/element-ui/plugin-tags";
+// @import "plugins/element-ui/plugin-slider";
+// @import "plugins/element-ui/plugin-select";
+// @import "plugins/element-ui/plugin-inputs";
+// @import "plugins/element-ui/plugin-tables";
+
+/* ----Variables--- */
+// @import "plugin_variables";
+@import "variables";
+@import 'mixins';
+
+// -----Frames--------
+@import "frames/frames_main";
+@import 'element-ui/elements';
+
+// ----Common-----
+@import 'common/typography';
+@import 'common/layout';
+@import 'common/common';
+@import "common/common-blocks";
+@import "common/common-content";
+
+
+// ------Components---------
+@import 'components/sidebar';
+@import 'components/navbar';
+
+// ------Pages---------
+@import 'pages/login';
+// @import 'pages/dashboard';
+
+
+

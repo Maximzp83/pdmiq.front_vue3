@@ -1,0 +1,56 @@
+<template>
+	<div>
+		<VueElementLoadingWrapper
+			:isLoading="itemLoading"
+			:isSaving="itemSaving"
+			:itemsName="itemsName.one"
+		/>
+
+		<div class="view-wrapper item-page-wrapper">
+			<div class="mcontainer">
+				<!-- <h1 class="title page-title">{{ pageTitle }}</h1> -->
+				<div class="view-content-card card">
+					<div class="form-wrapper card-content" v-if="loadContent">
+						<ItemForm
+							ref="ItemFormComponent"
+							@submit="handleSubmitForm"
+							@onCancel="handleCloseButton"
+							:itemData="itemData"
+							:itemsName="itemsName"
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+import { mapActions } from 'vuex';
+import { navigation, itemPageMixin, initPageDataMixin } from '@/mixins';
+
+export default {
+	mixins: [navigation(), itemPageMixin(), initPageDataMixin()],
+	name: 'ApplicationPage',
+
+	components: {
+		ItemForm: () => import('./ItemForm.vue')
+	},
+
+	computed: {
+		itemsName() {
+			return {
+				one: this.$t('Application'),
+				mult: this.$t('Applications')
+			};
+		}
+	},
+
+	methods: {
+		...mapActions({
+			fetch_item: 'applications/fetch_application',
+			save_item: 'applications/save_application'
+		})
+	}
+};
+</script>

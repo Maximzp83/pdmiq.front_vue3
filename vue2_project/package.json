@@ -1,0 +1,60 @@
+{
+  "name": "Industrial_Matrix_2",
+  "version": "0.2.1133",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "build:pdmmatrix": "cross-env DOTENV_PATH=.env.pdmmatrix vue-cli-service build",
+    "build:testmatrix": "cross-env DOTENV_PATH=.env.testmatrix vue-cli-service build",
+    "build:container": "cross-env DOTENV_PATH=.env.testmatrix vue-cli-service build",
+    "serve:pdmmatrix": "cross-env DOTENV_PATH=.env.pdmmatrix vue-cli-service serve",
+    "serve:testmatrix": "cross-env DOTENV_PATH=.env.testmatrix vue-cli-service serve"
+  },
+  "dependencies": {
+    "@shopify/draggable": "1.0.0-beta.12",
+    "@tinymce/tinymce-vue": "^3.2.8",
+    "axios": "^1.4.0",
+    "core-js": "^3.23.3",
+    "element-ui": "^2.14.1",
+    "highcharts": "^11.4.8",
+    "highcharts-vue": "^1.4.0",
+    "highcharts_old": "npm:highcharts@11.3.0",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.isempty": "^4.4.0",
+    "pusher-js": "^7.1.1-beta",
+    "spa-reloader-vue": "0.0.12",
+    "uniqid": "^5.2.0",
+    "vue": "^2.6.12",
+    "vue-element-loading": "^1.1.6",
+    "vue-router": "3.4.9",
+    "vue2-transitions": "^0.3.0",
+    "vuex": "^3.6.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.3.0",
+    "@vue/cli-plugin-eslint": "~4.3.0",
+    "@vue/cli-plugin-router": "~4.3.0",
+    "@vue/cli-plugin-vuex": "~4.3.0",
+    "@vue/cli-service": "~4.3.0",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "babel-eslint": "^10.1.0",
+    "babel-plugin-component": "^1.1.1",
+    "cross-env": "^7.0.3",
+    "dotenv": "^17.2.0",
+    "dotenv-webpack": "^8.1.1",
+    "eslint": "^6.7.2",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-plugin-vue": "^6.2.2",
+    "node-sass": "^4.14.1",
+    "prettier": "^1.19.1",
+    "sass-loader": "^8.0.2",
+    "vue-cli-plugin-webpack-bundle-analyzer": "~2.0.0",
+    "vue-template-compiler": "^2.6.14"
+  },
+
+  "gitHooks": {
+    "pre-push": "bash ./.git/scripts/pre-push-confirm.sh"
+  }
+}

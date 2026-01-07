@@ -1,0 +1,47 @@
+.flex-table {
+	overflow-x: auto;
+	
+	.table-row {
+		// flex-flow: row wrap;
+
+		// display: table-row;
+		// width: fit-content;
+
+		// border-bottom: 1px solid $borderColor;
+
+		.additionalBlock {
+			
+		}
+	}
+
+	// .table-column {
+
+		.table-cell {
+			// flex: 0 0.1 20%;
+			display: flex;
+			align-items: center;
+			flex-basis: 100%;
+			// display: table-cell;
+			box-sizing: border-box;
+			padding: 15px 10px;
+			line-height: 20px;
+			word-break: normal;
+			overflow: hidden;
+
+			&:not(.operations-column) > div {width: 100%;}
+			// flex-grow: 1;
+		}
+	// }	
+
+	&.full-width-background {
+		// padding: 0;
+		padding-left: 0;
+		padding-right: 0;
+		width: auto;
+
+		.table-row {
+			// width: 100%;
+			padding: 0 5px;
+		}
+	}
+}

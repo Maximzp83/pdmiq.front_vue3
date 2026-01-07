@@ -1,0 +1,46 @@
+.pagination {
+	text-align: center;
+	
+	&.card {
+		padding-top: 10px;
+		padding-bottom: 10px;		
+	}
+}
+
+.el-pagination {
+	padding: 0;
+	margin: 0 -5px;
+
+	button,
+	.el-pager > li {
+		border-radius: 50% !important;
+		height: 35px !important;
+		width: 35px !important;
+		line-height: 35px !important;
+
+		&:hover {
+			&:not(.disabled):not(.active) {color: $primary-color !important;	}
+		}
+	  
+	  &:not(.disabled).active {
+	  	background-color: $primary-color !important;
+	  }
+	}
+
+	button {
+		> i {
+			line-height: 35px;
+			transition: none !important;
+		}
+		&[disabled="disabled"] {pointer-events: none;}
+
+		&.btn-next {margin-right: 0 !important;}
+	}
+
+}
+
+@media (min-width: 768px) {
+	text-align: unset;
+
+	.el-pagination {text-align: right;}
+}

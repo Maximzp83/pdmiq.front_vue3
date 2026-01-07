@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+// --------Icons--------
+/* @font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon/icomoon.eot?kc2gjq');
+  src:  url('../fonts/icomoon/icomoon.eot?kc2gjq#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?kc2gjq') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?kc2gjq') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?kc2gjq#icomoon') format('svg');
+  font-weight: normal; 
+  font-style: normal; 
+
+} */
+
+@font-face {
+  font-family: 'password';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://jsbin-user-assets.s3.amazonaws.com/rafaelcastrocouto/password.ttf);
+}
+
+.hidePassword  {
+  font-family: 'password';
+
+  .el-input__inner {font-family: inherit;}
+}
+
+@font-face {
+	font-family: 'icomoon';
+  src:  url('../fonts/icomoon/icomoon.eot?xd84fd');
+  src:  url('../fonts/icomoon/icomoon.eot?xd84fd#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon/icomoon.ttf?xd84fd') format('truetype'),
+    url('../fonts/icomoon/icomoon.woff?xd84fd') format('woff'),
+    url('../fonts/icomoon/icomoon.svg?xd84fd#icomoon') format('svg');
+  font-weight: normal; 
+  font-style: normal;
+}
+
+.icomoon {
+  display: inline-block;
+  font: normal normal normal 14px/1 'icomoon';
+  speak: none;
+  font-size: inherit;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  &:before { 
+    // transition: all 0.4s;
+  }
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-corporate:before {content: "\e986";}
+.icon-lab_panel:before {content: "\e987";}
+.icon-money-insert:before {content: "\e988";}
+
+.icon-fft-wave:before {content: "\e984";}
+.icon-attention2:before {content: "\e985";}
+.icon-wifi:before {content: "\e983";}
+.icon-periodic:before {content: "\e981";}
+.icon-waterfall:before {content: "\e982";}
+.icon-cursor:before {content: "\e97f";}
+.icon-peaks:before {content: "\e980";}
+.icon-fft:before { content: "\e97e"; }
+.icon-eye-slash:before {content: "\e97c";}
+.icon-symbol1:before {content: "\e97d";}
+.icon-task_procedures:before { content: "\e971";}
+.icon-printer:before { content: "\e972";}
+.icon-machines2:before { content: "\e973";}
+.icon-import-export:before { content: "\e974";}
+.icon-grid2:before { content: "\e975";}
+.icon-edit3:before { content: "\e976";}
+.icon-drag:before { content: "\e977";}
+.icon-doc_xls:before { content: "\e978";}
+.icon-doc_pdf:before { content: "\e979";}
+.icon-doc3:before { content: "\e97a";}
+.icon-dashboard2:before { content: "\e97b";}
+
+.icon-money:before {content: "\e967";}
+.icon-factory:before {content: "\e969";}
+.icon-clock_2:before {content: "\e96c";}
+.icon-work_type:before {content: "\e96e";}
+.icon-category:before {content: "\e965";}
+.icon-clip:before {content: "\e966";}
+.icon-doc_2:before {content: "\e968";}
+.icon-jam_tools:before {content: "\e96a";}
+.icon-maintenance:before {content: "\e96b";}
+.icon-requisitions:before {content: "\e96d";}
+.icon-work_stations:before {content: "\e96f";}
+.icon-world:before {content: "\e970";}
+
+.icon-current:before {content: "\e961";}
+.icon-humidity:before {content: "\e962";}
+.icon-ultrasound:before {content: "\e963";}
+.icon-vibration:before {content: "\e964";}
+
+.icon-rotate:before { content: "\e960";}
+.icon-bell:before { content: "\e95e";}
+.icon-chart3:before { content: "\e95f";}
+.icon-attention:before { content: "\e95d";}
+.icon-processes:before { content: "\e959";}
+.icon-kitchen:before { content: "\e95a";}
+.icon-edit2:before { content: "\e95b";}
+.icon-chart2:before { content: "\e95c";}
+
+.icon-applications2:before { content: "\e94f";}
+.icon-assets:before { content: "\e950";}
+.icon-egg:before { content: "\e951";}
+.icon-equipments:before { content: "\e952";}
+.icon-item-types2:before { content: "\e953";}
+.icon-part-numbers2:before { content: "\e954";}
+.icon-production_lines:before { content: "\e955";}
+.icon-shopping-cart:before { content: "\e956";}
+.icon-store-room:before { content: "\e957";}
+.icon-vendors:before { content: "\e958";}
+
+.icon-dots {font-size: 3px !important;}
+.icon-dots:before { content: "\e94e";}
+
+.icon-pdf:before { content: "\e94a";}
+.icon-compare:before { content: "\e949";}
+.icon-upload:before {content: "\e948";}
+.icon-graph:before {content: "\e947";}
+.icon-application:before {content: "\e93f";}
+.icon-assets1:before {content: "\e940";}
+.icon-brand_models:before {content: "\e941";}
+.icon-brands:before {content: "\e942";}
+.icon-equipments1:before {content: "\e943";}
+.icon-equipment_types:before {content: "\e944";}
+.icon-machine:before {content: "\e945";}
+.icon-production_lines1:before {content: "\e946";}
+.icon-machines:before {content: "\e93d";}
+.icon-site-areas:before {content: "\e93e";}
+.icon-copy:before {content: "\e93c";}
+.icon-lock2:before {content: "\e939";}
+.icon-unlock:before {content: "\e93a";}
+.icon-move-arrows:before {content: "\e93b";}
+.icon-vfd:before {content: "\e938";}
+
+.icon-pillow_block:before {content: "\e937";}
+.icon-high-speed:before {content: "\e936";}
+.icon-bearing:before {content: "\e932";}
+.icon-fill:before {content: "\e933";}
+.icon-airseal:before {content: "\e934";}
+.icon-distributors:before {content: "\e935";}
+.icon-zoom-in:before {content: "\e930";}
+.icon-zoom-out:before {content: "\e931";}
+.icon-buttons:before {content: "\e92b";}
+.icon-graphs:before {content: "\e92c";}
+.icon-register:before {content: "\e92d";}
+.icon-sites:before {content: "\e92e";}
+.icon-statistics:before {content: "\e92f";}
+.icon-overlay:before {content: "\e92a";}
+.icon-reboot:before {content: "\e929";}
+.icon-oil-drum:before {content: "\e928";}
+.icon-docs:before {content: "\e926";}
+.icon-fix:before {content: "\e927";}
+.icon-grid:before {content: "\e924";}
+.icon-lists:before {content: "\e925";}
+.icon-settings:before {content: "\e923";}
+.icon-eye:before {content: "\e921";}
+.icon-graphic:before {content: "\e922";}
+.icon-arrow:before {content: "\e91e";}
+.icon-gearbox:before {content: "\e91f";}
+.icon-gearbox_helical_inline:before {content: "\e91f";}
+.icon-gearbox_helical_bevel:before {content: "\e91f";}
+.icon-gearbox_helical_warm_gear:before {content: "\e91f";}
+.icon-pump:before {content: "\e920";}
+.icon-path_2:before {content: "\e91d";}
+.icon-plus:before {content: "\e91c";}
+.icon-motor:before {content: "\e918";}
+.icon-idea:before {content: "\e919";}
+.icon-check:before {content: "\e91a";}
+.icon-stop:before {content: "\e91b";}
+.icon-acceleration:before {content: "\e90e";}
+.icon-acute:before {content: "\e90f";}
+.icon-alarm:before {content: "\e910";}
+.icon-chronic:before {content: "\e911";}
+.icon-clean:before {content: "\e912";}
+.icon-mix:before {content: "\e913";}
+.icon-temperature:before {content: "\e914";}
+.icon-testing:before {content: "\e915";}
+.icon-velocity:before {content: "\e916";}
+.icon-warning:before {content: "\e917";}
+.icon-users:before {content: "\e90d";}
+.icon-dashboard:before {content: "\e90c";}
+.icon-lock:before {content: "\e90a";}
+.icon-envelope:before {content: "\e90b";}
+.icon-sign-out:before {content: "\e909";}
+.icon-sensor:before {content: "\e900";}
+.icon-search:before {content: "\e901";}
+.icon-plant:before {content: "\e902";}
+.icon-pencil:before {content: "\e903";}
+.icon-path:before {content: "\e904";}
+.icon-menu:before {content: "\e905";}
+.icon-cross:before {content: "\e906";}
+.icon-controllers:before {content: "\e907";}
+.icon-companies:before {content: "\e908";}
+
+
+
+/*.icon-upload:before { content: "\e92e";}
+.icon-airseal:before { content: "\e92d";}
+.icon-distributors:before { content: "\e92c";}
+.icon-fill:before { content: "\e930";}
+.icon-pillow_block:before {content: "\e900";}
+
+.icon-overlay:before {content: "\e92a";}
+.icon-reboot:before {content: "\e929";}
+.icon-oil-drum:before {content: "\e928";}
+.icon-docs:before {content: "\e926";}
+.icon-fix:before {content: "\e927";}
+.icon-grid:before {content: "\e924";}
+.icon-lists:before {content: "\e925";}
+.icon-settings:before {content: "\e923";}
+.icon-eye:before {content: "\e921";}
+.icon-graphic:before {content: "\e922";}
+.icon-arrow:before {content: "\e91e";}
+.icon-gearbox:before {content: "\e91f";}
+.icon-gearbox_helical_inline:before {content: "\e91f";}
+.icon-pump:before {content: "\e920";}
+.icon-path_2:before { content: "\e91d";}
+.icon-plus:before {content: "\e91c";}
+.icon-motor:before {content: "\e918";}
+.icon-idea:before {content: "\e919";}
+.icon-check:before {content: "\e91a";}
+.icon-stop:before {content: "\e91b";}
+.icon-acceleration:before {content: "\e90e";}
+.icon-acute:before {content: "\e90f";}
+.icon-alarm:before {content: "\e910";}
+.icon-chronic:before {content: "\e911";}
+.icon-clean:before {content: "\e912";}
+.icon-mix:before {content: "\e913";}
+.icon-temperature:before {content: "\e914";}
+.icon-testing:before {content: "\e915";}
+.icon-velocity:before {content: "\e916";}
+.icon-warning:before {content: "\e917";}
+.icon-users:before {content: "\e90d";}
+.icon-dashboard:before {content: "\e90c";}
+.icon-lock:before {content: "\e90a";}
+.icon-envelope:before {content: "\e90b";}
+.icon-sign-out:before {content: "\e909";}
+.icon-sensor:before {content: "\e901";}
+.icon-search:before {content: "\e902";}
+.icon-plant:before {content: "\e903";}
+.icon-pencil:before {content: "\e904";}
+.icon-path:before {content: "\e905";}
+.icon-menu:before { content: "\e906";}
+.icon-cross:before {content: "\e907";}
+.icon-controllers:before {content: "\e908";}
+.icon-companies:before {content: "\e92b";}*/

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.6 (67491) - http://www.bohemiancoding.com/sketch -->
+    <title>block</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="industrialmatrix_dashboard_new_2021" transform="translate(-773.000000, -470.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="block" transform="translate(773.000000, 470.000000)">
+                <path d="M0,10 C0,15.5140541 4.48594595,20 10,20 C15.5140541,20 20,15.5140541 20,10 C20,4.48594595 15.5140541,0 10,0 C4.48594595,0 0,4.48594595 0,10 Z M18.3783784,10 C18.3783784,14.6197838 14.6197838,18.3783784 10,18.3783784 C7.98151351,18.3783784 6.12745946,17.6606486 4.67945946,16.4672432 L16.4672432,4.67935135 C17.6606486,6.12745946 18.3783784,7.98140541 18.3783784,10 Z M10,1.62162162 C12.0184865,1.62162162 13.8725405,2.33935135 15.3205405,3.53275676 L3.53275676,15.3206486 C2.33935135,13.8725405 1.62162162,12.0185946 1.62162162,10 C1.62162162,5.38021622 5.38021622,1.62162162 10,1.62162162 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

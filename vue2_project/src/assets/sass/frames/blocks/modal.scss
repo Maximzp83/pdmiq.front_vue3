@@ -1,0 +1,331 @@
+.custom-dialog-wrapper {
+	position: fixed;
+	// visibility: hidden;
+	top: 0;
+	// opacity: 0;
+	z-index: 1800;
+	transition: transform 0.3s cubic-bezier(0.39, 0.58, 0.57, 1);
+
+
+	a:not(.standardButton):hover { text-decoration: underline;}
+
+	.popupContentWrapper {
+	  background-color: #fff;
+	  box-sizing: border-box;
+    position: relative;
+	}
+
+	.dialog-header {
+	  // & + .popUpContainer {margin-top: 20px;}
+    background-color: #EEF0F3;
+    min-height: 40px;
+    padding: 25px 30px;
+
+		.modal-title {
+			// color: $primary-color;
+			font-size: 20px;
+      font-weight: 500;
+      line-height: 38px;
+			
+			// text-align: center;
+			// line-height: 40px;
+		}
+
+    .header-actions {
+      display: flex;
+      position: absolute;
+      left: 0;
+      top: 7px;
+      padding: 25px 30px;
+
+      .table-action-container + .table-action-container {margin-left: 5px;}
+
+      .el-button {
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
+      .icomoon {
+        font-size: 18px;
+      }
+    }
+	}
+
+  /*&.auth-dialog {
+  	top: 58px;
+    // left: 50%;
+    // transform: translate(-50%, -50%);
+  	display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+  	opacity: 0;
+  	visibility: hidden;
+  	z-index: 1800;
+  	transition: all 0.3s ease;
+    // transform: translateX(100%);
+    .dialog-header {
+    
+      padding: 10px;
+      background-color: #cdcdcd;
+      justify-content: center;
+      
+      .modal-title {
+        font-size: 16px !important;
+        color: #000;
+      }
+    }
+
+    &.active {
+    	opacity: 1;
+    	visibility: visible;
+    }
+
+    & > .popupContentWrapper{
+    	width: 90%;
+    	max-width: 380px;
+    	margin: 0 auto;
+    }
+
+    .popUpContainer {
+    	max-height: 80vh;
+    	overflow: auto;
+    }
+
+    .profileTabsNavBar {
+      margin-top: 25px;
+    	.tabButton {
+    		width: 50%;
+    		max-width: 50%;
+    		box-sizing: border-box;
+    	}
+    }
+
+
+    .auth-sub-menu {
+    	display: block;
+    }
+
+    .formRow {
+      .buttonWrapper {
+
+        max-width: 100%;
+        // min-width: 250px;
+        width: 100%;
+      }
+    }
+  }*/
+
+  &.dynamic-form-modal {
+    width: 100%;
+    overflow-x: hidden;
+
+    &.moderate-paddings {
+      .dialog-content {
+        padding: 20px;        
+      }
+    }
+
+    .dialog-content {
+      padding: 30px;
+      height: 100%;
+    }
+
+    .popupContentWrapper {
+      min-height: inherit;
+      max-height: inherit;
+
+      .half-width {
+        max-width: none;
+        width: 100%;
+      }
+    }
+  }
+
+  .card-tabs {
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  &.classic-modal {
+    left: 50%;
+    transform: translateX(-50%);
+    top: 15px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease-out, visibility 0.2s ease-out ;
+    max-height: 97vh;
+
+    & > .popupContentWrapper {
+      border-radius: 6px;
+      overflow: hidden;      
+    }
+
+    &.mini {
+      max-width: 362px;
+    }
+
+    &.small {
+      max-width: 562px;
+    }
+
+    &.standard {
+      max-width: 862px;
+    }
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .dialog-header {
+      justify-content: center;
+      border-bottom: 3px solid $primary-color;
+      text-transform: uppercase;
+
+      .modal-title {
+        padding: 0 74px;
+      }
+    }
+
+    .dialog-footer {
+      padding: 20px;
+      background-color: #EEF0F3;
+      text-align: center;
+
+      .el-button {
+        position: relative;
+        min-width: 174px;
+        z-index: 100;
+      }
+    }
+  }
+
+
+	&.editItem-dialog {
+    transform: translateX(100%);
+    right: 0;
+    // height: 100vh;
+    min-height: 100vh;
+    height: 100vh;
+    // max-height: 90vh;
+    max-width: 578px;
+    // overflow-y: auto;
+
+		&.active {
+			transform: translateX(0);
+		}
+
+    .dialog-footer {
+      padding: 0 30px 80px;
+      padding-bottom: 80px !important;
+      text-align: right;
+
+      .el-button {
+        min-width: 135px;
+        min-height: 45px;  
+      }
+    }
+
+    &.multiform {
+      .dialog-content {
+        padding: 0;
+      }
+    }
+	}
+
+  &.fixed-header-footer {
+    /*.dialog-header, .dialog-footer {
+      text-align: center;
+    }*/
+    top: 0;
+    bottom: 0;
+    max-height: 100vh;
+
+    & > .popupContentWrapper {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    .dialog-content {
+      max-height: calc(100vh - 63px - 119px);
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .popupContentWrapper {
+      height: 100%;
+    }
+
+  }
+
+  &.small-header {
+    .dialog-header {
+      padding: 10px 30px;
+
+      .header-actions {
+        padding: 10px 30px;        
+      }      
+    }
+  }
+
+  &.small-footer {
+    .dialog-footer {
+      padding-top: 11px;
+      padding-bottom: 11px;
+    }
+  }
+
+  @media (min-width: 991px) {
+    &.fixed-header-footer {
+      .dialog-content {
+        max-height: calc(100vh - 63px - 64px);
+      }
+    }
+
+  	.dialog-header {
+  		.modal-title {
+				font-size: 24px;
+  		}
+  	}
+
+    &.reviews-dialog {
+    	.popupContentWrapper {
+    		padding: 25px 35px 35px;
+    	}
+    }
+
+    &.dynamic-form-modal {
+      .popupContentWrapper {
+        height: auto;
+      }
+    }
+  }
+}
+
+button.popupCloseButton {
+  z-index: 1;
+  position: absolute;
+  border: none;
+    // width: 40px;
+    padding: 10px;
+    cursor: pointer;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    i:before {
+      transition: color ease 0.2s;
+    }
+
+    &:hover > i:before {
+      color: $primary-color;
+    }
+
+    .icon-plus {
+      transform: rotate(45deg);
+      font-weight: 700;
+      font-size: 20px;
+    }
+  }
