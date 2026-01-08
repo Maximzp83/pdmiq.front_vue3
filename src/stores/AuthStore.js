@@ -124,23 +124,24 @@ export const useAuthStore = defineStore('authStore', {
 
 			return api_request.post('/auth/login', {
 				data
-			}).then(response => {
+			}).then(({value}) => {
+				// console.log(value)
 				// Handle MFA verification status
-				if (response.status === 'verification') {
-					return response;
+				if (value.status === 'verification') {
+					return value;
 				}
 
 				// Handle successful login with token
-				if (response.access_token) {
-					this.set_access_token(response.access_token);
+				if (value.access_token) {
+					this.set_access_token(value.access_token);
 
 					// Set motorIQ link if provided
-					if (response.motorIQ?.baseUri) {
-						this.set_motor_iq_link(response.motorIQ.baseUri);
+					if (value.motorIQ?.baseUri) {
+						this.set_motor_iq_link(value.motorIQ.baseUri);
 					}
 				}
 				this.isLoading = false;
-				return response;
+				return value;
 			}).catch(error => {
 				this.isLoading = false;
 				return Promise.reject(error);
@@ -169,12 +170,12 @@ export const useAuthStore = defineStore('authStore', {
 				headers,
 				loading: true,
 				notNotify: true,
-			}).then(response => {
-				if (response.user) {
+			}).then(({value}) => {
+				if (value.user) {
 					// Use temp_role if available, otherwise use regular role
 					const user = {
-						...response.user,
-						role: response.user.temp_role || response.user.role
+						...value.user,
+						role: value.user.temp_role || value.user.role
 					};
 
 					// Set user language
@@ -185,7 +186,7 @@ export const useAuthStore = defineStore('authStore', {
 				}
 
 				this.isLoading = false;
-				return response;
+				return value;
 			}).catch(error => {
 				this.isLoading = false;
 				return Promise.reject(error);

@@ -1,18 +1,21 @@
 import api from './index.js';
 import { Lang } from '@/localization';
 import { useHelpers } from '@/composables/mixins/useHelpers';
+const { useLoadStore } = useHelpers();
 import { prepareDataFunctions } from '@/utils/data-preparers';
 
 import { useNotify } from '@/composables/useNotify';
 const { Notify } = useNotify();
+
+import { useAuthStore } from '@/stores/AuthStore';
 
 /**
  * Check if request should be prevented
  * @returns {boolean}
  */
 const isPrevent = () => {
-	// Add logic to prevent requests if needed
-	return false;
+	const authStore = useAuthStore();
+	return authStore.preventRequests;
 };
 
 /**
@@ -196,9 +199,7 @@ const handleError = (error, options = {}) => {
  * @returns {Promise} Promise with response data
  */
 const api_request = (url, payload = {}) => {
-	if (isPrevent()) {
-		return Promise.reject(new Error('Request prevented'));
-	}
+	if (isPrevent()) return;
 
 	const { loading, toStore, notify, notifyError } = getOptions(payload);
 	const {
@@ -209,7 +210,6 @@ const api_request = (url, payload = {}) => {
 	} = payload;
 
 	// Get useLoadStore function
-	const { useLoadStore } = useHelpers();
 
 	// Create store loading promise
 	const storePromise = (toStore || loading) && payload.storeName
