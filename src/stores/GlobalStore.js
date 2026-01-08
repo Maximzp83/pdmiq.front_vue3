@@ -18,7 +18,7 @@ const globalFiltersInit = {
 export const useGlobalStore = defineStore('globalStore', {
 	state: () => {
 		return {
-			overlay: {
+			overlayData: {
 				show: false,
 				text: '',
 				onClick: () => {},

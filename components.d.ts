@@ -8,14 +8,18 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CoverOverlay: typeof import('./src/components/common/CoverOverlay.vue')['default']
     CustomInput: typeof import('./src/components/form/CustomInput.vue')['default']
+    CustomModal: typeof import('./src/components/common/CustomModal.vue')['default']
     DashboardLayout: typeof import('./src/components/layout/DashboardLayout.vue')['default']
     Datepicker: typeof import('./src/components/common/Datepicker.vue')['default']
+    DynamicFormContainer: typeof import('./src/components/form/DynamicFormContainer.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElForm: typeof import('element-plus/es')['ElForm']
+    ElIcon: typeof import('element-plus/es')['ElIcon']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElMenu: typeof import('element-plus/es')['ElMenu']
@@ -36,6 +40,7 @@ declare module 'vue' {
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
+    ImagePreviewModal: typeof import('./src/components/common/ImagePreviewModal.vue')['default']
     Login: typeof import('./src/components/pages/Login.vue')['default']
     LoginWrapper: typeof import('./src/components/pages/LoginWrapper.vue')['default']
     NewPasswordForm: typeof import('./src/components/pages/NewPasswordForm.vue')['default']
@@ -46,7 +51,10 @@ declare module 'vue' {
     Sidebar: typeof import('./src/components/layout/Sidebar/Sidebar.vue')['default']
     SidebarWithSubs: typeof import('./src/components/layout/Sidebar/SidebarWithSubs.vue')['default']
     SimpleSpinner: typeof import('./src/components/common/SimpleSpinner.vue')['default']
+    TableAction: typeof import('./src/components/table/TableAction.vue')['default']
     TabsBar: typeof import('./src/components/common/TabsBar.vue')['default']
     TopNavbar: typeof import('./src/components/layout/TopNavbar.vue')['default']
+    VueElementLoading: typeof import('./src/components/common/VueElementLoading.vue')['default']
+    VueElementLoadingWrapper: typeof import('./src/components/common/VueElementLoadingWrapper.vue')['default']
   }
 }
