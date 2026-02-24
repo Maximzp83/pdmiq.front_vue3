@@ -75,7 +75,7 @@ export default {
 	data() {
 		return {
 			hasError: false,
-			errorText: ''
+			errorText: '',		
 		};
 	},
 
@@ -160,8 +160,10 @@ export default {
 				payload.country_code = phone_number ? code : null;
 				// console.log(payload.country_code, phone_number, code)
 			}
+			this.phone_number = phone_number;
+
 			this.$emit('input', { ...this.value, ...payload });
-		}
+		},
 	}
 };
 </script>

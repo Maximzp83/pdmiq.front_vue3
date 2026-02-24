@@ -57,13 +57,16 @@
 					<div class="dashboard-content-container">
 						<div class="page-top-bg-addition" />
 
-						<Transition name="component-scale" mode="out-in">
-							<RouterView
-								ref="viewContent"
-								:key="viewContentComponentKey"
-								@event="handleEventNew"
-							/>
-						</Transition>
+						<router-view v-slot="{ Component }">
+							<transition name="fade" mode="out-in">
+						    <component
+						    	:is="Component"
+						    	ref="viewContent"
+									:key="viewContentComponentKey"
+									@event="handleEventNew"
+						    />
+						  </transition>
+						</router-view>
 					</div>
 				</div>
 			</div>
@@ -170,16 +173,17 @@ const timer = ref(null);
 const currentPath = computed(() => route.fullPath);
 
 const enableMfaWarning = computed(() => {
-	if (authUser.value && !authUser.value.is_mfa_enabled) {
+	/*if (authUser.value && !authUser.value.is_mfa_enabled) {
 		const plantAdminsIds = [4, 5, 6, 12];
 		return plantAdminsIds.some((id) => id === authUser.value.role_id);
-	}
+	}*/
 	return false;
 });
 
 // ========== Methods ==========
-const testEvent = () => {
-	isSidebarShow.value = !isSidebarShow.value;
+const testEvent = (payload) => {
+	console.log('testEvent:', payload)
+	// isSidebarShow.value = !isSidebarShow.value;
 };
 
 const toggleSidebar = () => {

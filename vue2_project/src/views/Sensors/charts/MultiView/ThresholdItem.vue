@@ -6,6 +6,7 @@
 		:model="formData"
 		label-position="left"
 	>	
+		<div class="text-center bold title article-title">{{ title }}</div>
 		<div class="flex mrow">
 			<div class="mcol-xs-11">
 				<div class="el-form-item">
@@ -58,7 +59,7 @@
 					</div>	
 				</div>
 				
-				<div class="el-form-item">
+				<div class="el-form-item" v-if="enableTimeDelta">
 					<div class="flex mrow wrap align-center">
 						<el-form-item 
 							required prop="time_delta"
@@ -81,11 +82,11 @@
 					</div>
 				</div>
 
-				<el-form-item :label="tt('constants.Alarm_Zone')" required prop="alarm_level">
+				<el-form-item :label="isLowHighType ? tt('constants.high_zone') : tt('constants.Alarm_Zone')" required prop="alarm_level">
 					<el-input-number v-model="formData.alarm_level" :precision="3"/>
 				</el-form-item>
 
-				<el-form-item :label="tt('constants.Warning_Zone')" required prop="warning_level">
+				<el-form-item :label="isLowHighType ? tt('constants.low_zone') : tt('constants.Warning_Zone')" required prop="warning_level">
 					<el-input-number v-model="formData.warning_level" :precision="3"/>
 				</el-form-item>
 			</div>
@@ -100,15 +101,14 @@
 				/>
 			</div>
 		</div>
-		
 	</el-form>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+// import { mapState } from 'vuex';
 // import { required } from '@/constants/validation';
 import { findItemBy } from '@/helpers';
-import { metricUnitTypesList } from '@/constants/global';
+import { metricUnitTypesList, MULTIVIEW_ALARM_TYPES, multiviewAlarmTypesList } from '@/constants/global';
 
 import { subItemMixin } from '@/mixins';
 
@@ -134,19 +134,31 @@ export default {
 				time_delta: null,
 				time_delta_unit: null,
 				warning_level: null,
-				alarm_level: null
+				alarm_level: null,
+				type: null
 			},
 
 		};
 	},
 
 	computed: {
-		...mapState({
-			// sensorJobSaving: state => state.sensors.sensorJobSaving
-		}),
+		isLowHighType() {
+			return this.formData.type === MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH;
+		},
+		title() {
+			// console.log(this.itemData.type, )
+			const alarmType = findItemBy('id', this.itemData.type, multiviewAlarmTypesList());
+			return alarmType ? alarmType.name : '';
+		},
 
 		deleteNewId: () => true,
 		metricUnitTypesList: () => metricUnitTypesList(),
+
+		enableTimeDelta() {
+			// console.log(this.formData.type)
+			return this.formData.type === MULTIVIEW_ALARM_TYPES.COMPARE;
+		}
+
 	},
 
 	methods: {

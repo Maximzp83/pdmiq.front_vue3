@@ -425,6 +425,22 @@ const actions = {
 		);
 	},
 
+	unlock_fft(storeArgs, payload) {
+		const extendedPayload = {
+			method: 'POST',
+			...payload
+			/*resultMessage: {
+				text: 'Request FFT Success'
+			}*/
+		};
+
+		return multipurpose_response(
+			storeArgs,
+			`/sensors/${payload.sensorId}/fft/unlock`,
+			extendedPayload
+		);
+	},
+
 	request_ncd_config(storeArgs, payload) {
 		const extendedPayload = {
 			method: 'PUT',
@@ -506,6 +522,36 @@ const actions = {
 		return multipurpose_response(
 			storeArgs,
 			`/sensors/rebaseline`,
+			extendedPayload
+		);
+	},
+
+	set_sensor_chart_color_scheme(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			notNotify: true,
+			method: 'POST',
+			/*resultMessage: {
+				text: 'Request FFT Success'
+			}*/
+		};
+
+		return multipurpose_response(
+			storeArgs,
+			`/sensors/${extendedPayload.itemId}/metric-threshold-levels-color-schemes/`,
+			extendedPayload
+		);
+	},
+
+	set_fft_rpm_params(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'PUT',
+			// notNotify: true
+		};
+		return multipurpose_response(
+			storeArgs,
+			`/sensors/${payload.sensorId}/ncd/fft/${payload.fftId}/rpm-params`,
 			extendedPayload
 		);
 	},

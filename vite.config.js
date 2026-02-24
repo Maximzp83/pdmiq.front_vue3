@@ -22,7 +22,11 @@ export default defineConfig({
 			// dts: false
 		}),
 		Components({
-			resolvers: [ElementPlusResolver()],
+			resolvers: [
+				ElementPlusResolver({
+					importStyle: 'css'
+				}),
+			],
 			// dts: false
 		}),
 	],

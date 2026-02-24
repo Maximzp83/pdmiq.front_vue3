@@ -14,6 +14,7 @@
 			>
 				<label>{{ `${tt('Type')} ${tt('Category')}` }}</label>
 				<CustomSelect
+					className="mini"
 					multiple
 					collapse-tags
 					:optionsList="typesCategoriesList"
@@ -132,6 +133,16 @@
 				/>
 			</el-form-item>
 
+			<el-form-item prop="is_visible_in_vibration_analysis" class="mcol-xs-1 switchers-block">
+				<label class="small-lh">{{ `${tt('phrases.show_in_Analysis')}` }}</label>
+				<el-switch
+					class="without-margin"
+					v-model="formData.is_visible_in_vibration_analysis"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<el-form-item
 				prop="convert_to_predefined_values"
 				class="mcol-xs-1 switchers-block "
@@ -209,6 +220,7 @@ export default {
 				value_plus: '',
 				is_in_dashboard_view: false,
 				is_in_equipment_card: false,
+				is_visible_in_vibration_analysis: false,
 				is_rpm: false,
 				is_fla: false,
 				convert_to_predefined_values: false

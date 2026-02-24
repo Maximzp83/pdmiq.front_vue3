@@ -44,7 +44,9 @@
 						</div>
 
 						<!-- v-if="currentSensorType.isBanner" -->
-						<div class="mcol-xs-auto legend-container">
+						<div class="mcol-xs-auto legend-container"
+							v-if="!currentSensorType.isBannerV2Generic"
+						>
 							<div class="legend-list">
 								<div
 									class="item"
@@ -478,7 +480,7 @@ export default {
 					currentSensorType.isNCDEnv ||
 					currentSensorType.isBannerTempVibe2 ||
 					currentSensorType.isBannerV2_1 ||
-					currentSensorType.isBannerS22UVT,
+					currentSensorType.isBannerM25,
 				ultrasound:
 					currentSensorType.isUltrasound ||
 					currentSensorType.isSDTsensor ||
@@ -495,10 +497,13 @@ export default {
 
 		enableFFT() {
 			const {enableAxisSelector, $hasAccessTo} = this;
-			const { isBannerV2_1, isBannerS22UVT } = this.currentSensorType;
+			const { bannerV2Subtype } = this.sensorData;
+			// console.log(this.sensorData)
+			const { isBannerV2_1, isBannerV2Generic, isBannerM25 } = this.currentSensorType;
 
 			if ($hasAccessTo(['view_dashboard'])) {
-				return enableAxisSelector || isBannerV2_1 || isBannerS22UVT;
+				return enableAxisSelector || isBannerV2_1 || isBannerM25 ||
+						(isBannerV2Generic && (bannerV2Subtype && bannerV2Subtype.is_fft_allowed));
 			}
 			return false;
 		},
@@ -612,7 +617,7 @@ export default {
 					rpm_source_item, rpmSources,
 					// rpm_external_source_type, rpm_external_value,
 					rpm_external_node_parameter, rpm_external_node_id,
-					rpm_unit_expression, is_rpm_visible
+					rpm_formula, is_rpm_visible
 				} = this.equipmentData;
 				let data = { is_rpm_visible };
 
@@ -669,12 +674,12 @@ export default {
 					break;
 				}
 
-				if (rpm_unit_expression && data.rpm_request) {
+				if (rpm_formula && data.rpm_request) {
 					data.rpm_request.get_params = {
-						unitExpression: rpm_unit_expression
+						unitExpression: rpm_formula
 					}
 				}
-				// console.log(rpm_unit_expression, data.rpm_request)
+				// console.log(rpm_formula, data.rpm_request)
 				return data;				
 			}
 
@@ -1302,8 +1307,8 @@ export default {
 		// --------
 		openFFTCharts({ payload, sensorType }) {
 			const { id, sensor_id } = payload;
-			const { isBannerTempVibe2, isBannerV2_1, isBannerS22UVT } = sensorType;
-			const type = (isBannerTempVibe2 || isBannerV2_1 || isBannerS22UVT) ? 'banner' : 'ncd';
+			const { isBannerTempVibe2, isBannerV2_1, isBannerM25 } = sensorType;
+			const type = (isBannerTempVibe2 || isBannerV2_1 || isBannerM25) ? 'banner' : 'ncd';
 			// const { baseURL } = axios.defaults;
 			let url = `${window.location.origin}/${type}/${sensor_id}/fft/${id}`;
 			// url = setupGetParamsStr(url, params);
@@ -1313,6 +1318,16 @@ export default {
 			// console.log(url)
 
 			link.click();
+		},
+
+		handleUnlockFFTSuccess(fft_lock_item) {
+			this.sensors[0].last_fft_lock = fft_lock_item;
+			this.dropdownFilterbarUpdated++;
+			// this.callMethodInCharts({
+			// 	methodName: 'addUnlFFT',
+			// 	fromInstance: true,
+			// 	payload: y_filters
+			// });
 		}
 
 		/*updateChartsByYfilters(y_filters) {

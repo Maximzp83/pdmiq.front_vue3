@@ -3,17 +3,33 @@
 		<el-form-item :label="`MFA ${tt('type')}`" prop="mfa_type"
 			required
 		>
-			<CustomSelect
+			<!-- <CustomSelect
 				:disabled="disabled"
 				:optionsLoading="mfaTypeSelectBusy"
 				:optionsList="mfaTypesList"
 				:placeholder="`${tt('Select')} ${tt('type')}`"
 				:value="mfa_type"
 				@change="handleMfaTypeChange"
-			/>
+			/> -->
+			<SimpleSpinner :active="mfaTypeSelectBusy" />
+			<el-select
+				:disabled="disabled"
+				@change="handleMfaTypeChange"
+				:value="mfa_type"
+				:placeholder="`${tt('Select')} ${tt('type')}`"
+			>
+				<el-option
+					v-for="item in mfaTypesList"
+					:disabled="item.id === MFA_TYPES.SMS && !isPhoneVerified"
+					:key="'mfa_id-' + item.id"
+					:label="item.name"
+					:value="item.id"
+				/>
+			</el-select>
 		</el-form-item>
 
 		<div class="el-form-item"
+			v-if="isPhoneVerified"
 			v-show="mfa_type === MFA_TYPES.SMS"
 		>
 			<div class="mcol-xs-6" v-show="!mfaCodeReceived">
@@ -130,7 +146,8 @@ export default {
 			default: ''
 		},
 		value: null,
-		disabled: Boolean
+		disabled: Boolean,
+		isPhoneVerified: Boolean
 	},
 
 	data() {
@@ -145,7 +162,6 @@ export default {
 
 			mfa_code: '',
 			code_from_qr: '',
-
 		};
 	},
 
@@ -191,13 +207,13 @@ export default {
 			if (this.disabled) return;
 
 			// this.mfaCodeReceived = true;
-			if (this.phone_number) {
+			/*if (this.phone_number) {
 				const payload = {
 					data: {	phone_number: this.phone_number }
-				}
+				}*/
 
 				this.mfaCodeSending = true;
-				this.send_mfa_code(payload).then(({value}) => {
+				this.send_mfa_code().then(({value}) => {
 					if (value) {
 						const { status } = value.data;
 						// this.mfa_phone = '';
@@ -209,13 +225,13 @@ export default {
 				}).catch(() => {
 					this.mfaCodeSending = false;
 				})
-			} else {
+			/*} else {
 				this.$notify({
 					type: 'warning',
 					message: this.$t(`phrases.phone_is_required`),
 				});
 				return false;
-			}
+			}*/
 		},
 
 		checkMfaCode() {

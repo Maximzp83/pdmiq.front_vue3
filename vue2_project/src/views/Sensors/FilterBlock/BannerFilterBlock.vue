@@ -41,7 +41,7 @@
 			:sensorData="sensorData"
 			:currentSensorType="currentSensorType"
 			:sensors="sensors"
-			:equipmentData="equipmentData"			
+			:equipmentData="equipmentData"
 			class=""
 			:rootFilters="filters"
 			enableRpmBlock
@@ -97,7 +97,7 @@
 
 		<div
 			class="button-item"
-			v-if="!isCompare && !isHumiditySensor && !isBannerExtraVibration && !isBannerV2_1 && !isBannerS22UVT"
+			v-if="!isCompare && !isHumiditySensor && !isBannerExtraVibration && !isBannerV2_1 && !isBannerM25"
 		>
 			<el-button-group>
 				<el-button
@@ -138,7 +138,7 @@
 		<div
 			class="button-item ChartsFilterBar"
 			v-if="
-				!isCompare && !isHumiditySensor && !isBannerExtraVibration && !isNCDSensor && !isBannerV2_1 && !isBannerS22UVT
+				!isCompare && !isHumiditySensor && !isBannerExtraVibration && !isNCDSensor && !isBannerV2_1 && !isBannerM25
 			"
 		>
 			<!-- :isLoading="itemsLoading || someChartLoading" -->
@@ -161,33 +161,9 @@
 					$hasAccessTo(['edit_dashboard'])
 			"
 		>
-			<el-popover
-				placement="bottom"
-				popper-class="button-popover"
-				:title="tt('phrases.thresholds_re_baseline')"
-				width="180"
-				trigger="hover"
-			>
-				<el-button
-					@click="click_re_baseline"
-					slot="reference"
-					type="primary"
-					native-type="button"
-					class="ml-auto inverted re-baseline-button"
-					:class="{ loading: rebaselineLoading }"
-				>
-					<div class="relative img-container">
-						<img
-							:class="[`suffix-icon`, 'img rebase-wheel-img']"
-							:src="rebase_wheel"
-						/>
-						<img
-							:class="[`suffix-icon`, 'img rebase-lines-img']"
-							:src="rebase_lines"
-						/>
-					</div>
-				</el-button>
-			</el-popover>
+			<RebaselineBlock
+				:sensorData="sensorData"
+			/>
 		</div>
 
 		<div class="button-item chart-switcher text-right">
@@ -217,10 +193,7 @@
 
 import { mapActions, mapState } from 'vuex';
 // import { prepareRangeParams } from '@/helpers';
-import {
-	rebase_lines,
-	rebase_wheel,
-} from '@/constants/global';
+
 
 import {
 	sensorParametersList,
@@ -230,13 +203,14 @@ import {
 
 import { LANGUAGE_TYPES } from '@/localization/utils';
 
-import { actionButtonsMixin, eventHandler, RebaselineRequestMixin } from '@/mixins';
+import { actionButtonsMixin, eventHandler } from '@/mixins';
 
 export default {
-	mixins: [actionButtonsMixin(), eventHandler(), RebaselineRequestMixin()],
+	mixins: [actionButtonsMixin(), eventHandler()],
 	components: {
 		ChartsFilterBar: () => import('../charts/ChartsFilterBar.vue'),
-		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue')
+		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue'),
+		RebaselineBlock: () => import('./RebaselineBlock.vue')
 	},
 	props: {
 		sensorData: {
@@ -276,7 +250,6 @@ export default {
 		return {
 			// pdf_socket: null,
 			// pdf_socket_ready: false,
-			rebaselineLoading: false,
 			sendingFFTRequest: false,
 			levelZonesSaving: false,
 		};
@@ -298,7 +271,7 @@ export default {
 		isBanner: that => that.currentSensorType.isBanner,
 		isBannerTempVibe2: that => that.currentSensorType.isBannerTempVibe2,
 		isBannerV2_1: that => that.currentSensorType.isBannerV2_1,
-		isBannerS22UVT: that => that.currentSensorType.isBannerS22UVT,
+		isBannerM25: that => that.currentSensorType.isBannerM25,
 
 		splitChartsButtonEnabled: that =>
 			that.currentSensorType.isNCDTempVibe ||
@@ -333,15 +306,12 @@ export default {
 
 		hasOffAlarm: that => that.chartsWithOffAlarm.length,
 
-		rebase_wheel: () => rebase_wheel,
-		rebase_lines: () => rebase_lines,
-
 		// CONTROLLER_TYPES: () => CONTROLLER_TYPES
 	},
 
 	methods: {
 		...mapActions({
-			sensor_rebase_line: 'sensors/sensor_rebase_line',
+			// sensor_rebase_line: 'sensors/sensor_rebase_line',
 			set_filters: 'sensors/set_statistics_filters',
 			set_global_state: 'set_global_state'
 		}),

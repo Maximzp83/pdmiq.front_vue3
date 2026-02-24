@@ -69,6 +69,7 @@ class FFTChartBase extends ChartBase {
 
 	handleChartInitiatedEvent({ target }) {
 		this.ChartAPI = target;
+		// console.log('handleChartInitiatedEvent', this.ChartAPI);
 	}
 
 	setupUnitTypeName(payload) {
@@ -103,6 +104,7 @@ class FFTChartBase extends ChartBase {
 				let axis = {
 					max: 1,
 					// min: 0,
+					softMin: 0,
 					softMax: 1,
 					title: {
 						text: unit_type_name || '-'
@@ -186,7 +188,25 @@ class FFTChart extends FFTChartBase {
 			},
 			plotOptions: {
 				stickyTracking: true
-			}
+			},
+			xAxis: {min: 0},
+			annotations: [
+				{
+					events: {},
+					draggable: '',
+					labelOptions: {
+						// backgroundColor: 'gray',
+						// verticalAlign: 'top',
+						// y: 3,
+						// x: 3,
+						borderWidth: 1,
+						allowOverlap: true,
+						className: 'fft-analysis-annotation'
+					},
+					zIndex: 50,
+					labels: []
+				}
+			],
 		};
 		// this.seriesConfig = this.getSeriesConfig();
 
@@ -231,6 +251,14 @@ class FFTChart extends FFTChartBase {
 			periodicCursorDragEvent: {
 				name: 'drag',
 				event: e => this.handlePeriodicCursorDrag(e)
+			},
+			rpmCursorDragEvent: {
+				name: 'drag',
+				event: e => this.handleRpmCursorDrag(e)
+			},
+			rpmCursorDropEvent: {
+				name: 'drop',
+				event: e => this.handleRpmCursorDrag(e, {isDrop:1})
 			}
 		};
 	}
@@ -285,6 +313,15 @@ class FFTChart extends FFTChartBase {
 
 	chartDataReadyCallback() {
 		this.generatePeaks();
+
+		if (this.rpmValue != null) {
+			this.addRpmCursor(this.rpmValue);
+		}
+	}
+
+	hasCursorFlagConfig() {
+		const seriesConfigIncludes = this.resources?.chart_config?.seriesConfigIncludes;
+		return seriesConfigIncludes && seriesConfigIncludes.includes('cursor_flag');
 	}
 
 	toggleChart(chartIsHidden) {
@@ -602,6 +639,75 @@ class FFTChart extends FFTChartBase {
 		// this.emitChartOptionsUpdate();
 	}
 
+	// ------------ RPM Cursor ---------------
+	/*handleFFTRpmUpdated(fftItem) {
+		if (!this.hasCursorFlagConfig()) {
+			return;
+		}
+
+		console.log('handleFFTRpmUpdated', fftItem)
+	}*/
+
+	addRpmCursor(rpmValue) {
+		if (!this.hasCursorFlagConfig()) {
+			return;
+		}
+
+		const serieId = 'rpm-cursor-flag-serie';
+		const { index } = findItemBy('id', serieId, this.options.series, {
+			returnIndex: true
+		});
+
+		if (index !== undefined) {
+			// console.log('addRpmCursor', this.ChartAPI)
+			
+			if (!rpmValue) {
+				this.options.series[index].data = [];
+				// this.ChartAPI.series[index].setData([], false);
+				this.emitChartOptionsUpdate();
+				return;
+			}
+
+			this.options.series[index].data = this.options.series[index].data || [];
+
+			const cursor_item = setupFFTCursorItem({
+				x: rpmValue,
+				id: 'rpm-cursor',
+				serie_idx: index,
+				point_idx: 0,
+				units_x: this.options.xAxis.title.text,
+				isRpmCursor: true
+			});
+			// console.log('cursor_item',cursor_item)
+			this.options.series[index].data = [cursor_item];
+			// this.ChartAPI.series[index].setData([cursor_item], false);
+			this.emitChartOptionsUpdate();
+		}
+	}
+
+	handleRpmCursorDrag({ target }, settings = {}) {
+		try {
+			const { x, point_idx, serie_idx } = target;
+			// console.log(target, x, point_idx, serie_idx, this.options.series[serie_idx].data);
+			let newData = this.options.series[serie_idx].data || [];
+
+			newData[point_idx] = setupFFTCursorItem({ ...newData[point_idx], x });
+			this.ChartAPI.series[serie_idx].setData(newData, false);
+
+			if (this.events.rpmCursorDrag) {
+				this.events.rpmCursorDrag({ x });
+			}
+
+			if (settings.isDrop) {
+				if (this.events.rpmCursorDrop) {
+					this.events.rpmCursorDrop({ x });
+				}
+			}
+		} catch (error) {
+			console.warn(error);
+		}
+	}
+
 	handlePeriodicCursorDrag({ target }) {
 		//odd - не четные
 		const { step_idx, point_idx, x, isOdd } = target;
@@ -672,6 +778,68 @@ class FFTChart extends FFTChartBase {
 				this.redrawScheduled = false;
 			}, 0);
 		}*/
+	}
+
+	generateAnnotationsFromFFTAnalysisRules(selectedAnalysisRules) {
+		this.options.annotations[0].labels = [];
+		// this.options.xAxis.minRange = 0.1;
+		// this.options.xAxis.startOnTick = false;
+		// console.log(this.options.xAxis)
+		selectedAnalysisRules.forEach((rule_item) => {
+		// console.log('generateAnnotationsFromFFTAnalysisRules', rule_item)
+			const { harmonics, name } = rule_item.original_rule;
+			let start = rule_item.vibration_analysis_value || rule_item.option_value || rule_item.custom_value;
+			start = +start;
+			const step = +start;
+
+			const isValidData = !isNaN(start) && !isNaN(step) && /*start > 0 &&*/ step > 0;	
+
+			if (isValidData) {
+				const baseStatistics = this.getTransformedStatistics({
+					data_key: 'pointsData'
+				}).base;
+
+				const lastPointXvalue = baseStatistics[baseStatistics.length - 1][0];
+				
+				// this.options.series[evenIdx].data = [];
+
+				let x_value = start;
+				const max_steps = +harmonics;
+				let step_pos = 1;
+				// const y = -(250 - ruleIdx * 20);
+				// console.log(x_value, lastPointXvalue)
+				if (lastPointXvalue) {
+
+					while (x_value < lastPointXvalue && step_pos <= max_steps) {
+						this.options.annotations[0].labels.push({
+							shape: 'connector',
+							borderColor: rule_item.color || '#000',
+							point: {
+								// step_pos,
+								// step_idx: step_pos - 1,
+								x: x_value,
+								y: 0,
+								xAxis: 0,
+								yAxis: 0,
+								// yAxis: 'pixel',
+							},
+							y: rule_item.y_position,
+							useHTML: true,
+							text: `
+			          <div class="fft-analysis-annotation-label" style="borderColor:${rule_item.color||'#000'}">
+			              <div class="title">${name}</div>
+			          </div>
+								`
+						});
+
+						x_value += step;
+						step_pos++;
+					}
+				}
+			}
+		})
+		// console.log(this.options.annotations[0].labels)
+		this.emitChartOptionsUpdate();
 	}
 }
 
@@ -782,6 +950,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 		this.chartsDisplayQuantity = chartsDisplayQuantity;
 		this.zoom_timer = null;
 		this.measurement = resources.filters.measurement;
+		this.initialZoomData = {};
 
 		/*this.localChartEvents = {
 			click: e => this.handleChartClick(e)
@@ -904,7 +1073,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 			return idx < this.chartsDisplayQuantity ? serie : { ...serie, data: [] };
 		});
 
-		this.initialZoomData = {};
+		// this.initialZoomData = {};
 		this.emitChartOptionsReady();
 	}
 	// --------- Series -------------
@@ -937,7 +1106,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 				}
 			];
 		});
-
+		//test
 		seriesConfig.flagsData = [];
 		// console.log('seriesConfig', seriesConfig)
 		return seriesConfig;
@@ -996,7 +1165,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 	}
 
 	// ----------Sliders Handler----------
-	setValueFromSlider({key, val, redraw}) {
+	setValueFromSlider({key, val, redraw}) {		
 		if (key == 'alpha' || key == 'beta') {
 			this.ChartAPI.options.chart.options3d[key] = val;
 			this.ChartAPI.redraw(false);
@@ -1152,7 +1321,6 @@ class FFTWaterfall3DChart extends FFTChartBase {
 				[`min_${axis_key}`]: initial_min,
 				[`max_${axis_key}`]: initial_max,
 			} = this.initialZoomData;
-			// console.log(axis_key, zoom_val)
 			if (drag_pos !== undefined) {
 				actual_range_start = drag_pos / 100 * initial_max;
 				this.initialZoomData[`actual_range_start_${axis_key}`] = actual_range_start;
@@ -1176,7 +1344,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 				}
 			}
 			
-			// console.log(`ZF: ${zoomFactor}, Range: ${range}, Min: ${min}, Max: ${max}`);
+			// console.log(`ZF: ${actualZoomFactor}, Range: ${range}, Min: ${min}, Max: ${max}`);
 			if (min < max) {
 				if (actualZoomFactor == 1) {
 					min = initial_min;

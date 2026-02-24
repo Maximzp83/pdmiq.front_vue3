@@ -17,14 +17,38 @@
 				/>
 			</div>
 
-			<div class="margin-top-row">
+			<div class="margin-top-row flex">
 				<el-button
-					class="create-button content-row with-text inverted small"
+					class="div-block create-button with-text inverted small"
 					type="primary"
-					@click="addFormItem('graphThresholdsItemsList', 't_i-')"
+					@click="addFormItem('graphThresholdsItemsList', 't_i-', {
+						formData: {type:MULTIVIEW_ALARM_TYPES.COMPARE}
+					})"
 				>
-					<span class="span-block capitalize" v-text="`${tt('Add')} ${tt('Threshold')}`"></span>
-					<i class="span-block icomoon icon-plus"></i>
+					<span class="span-block capitalize text-middle" v-text="`${tt('Add')} ${tt('Compare')}`"></span>
+					<i class="span-block icomoon icon-plus text-middle"></i>
+				</el-button>
+
+				<el-button
+					class="div-block create-button with-text inverted small"
+					type="primary"
+					@click="addFormItem('graphThresholdsItemsList', 't_i-', {
+						formData: {type: MULTIVIEW_ALARM_TYPES.STANDARD_WARNING_ALARM}
+					})"
+				>
+					<span class="span-block capitalize text-middle" v-text="`${tt('Add')} ${tt('Alarm')}/${tt('Warning')}`"></span>
+					<i class="span-block icomoon icon-plus text-middle"></i>
+				</el-button>
+
+				<el-button
+					class="div-block create-button with-text inverted small"
+					type="primary"
+					@click="addFormItem('graphThresholdsItemsList', 't_i-', {
+						formData: {type: MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH}
+					})"
+				>
+					<span class="span-block capitalize text-middle" v-text="`${tt('Add')} ${tt('Low')}/${tt('High')}`"></span>
+					<i class="span-block icomoon icon-plus text-middle"></i>
 				</el-button>
 			</div>
 		</div>
@@ -45,6 +69,9 @@
 <script>
 import { mapActions, mapState } from 'vuex';
 // import { required } from '@/constants/validation';
+import {
+	MULTIVIEW_ALARM_TYPES
+} from '@/constants/global';
 
 import { subItemsListMixin } from '@/mixins';
 
@@ -74,7 +101,8 @@ export default {
 
 		graphItemData: that => that.thresholdsSetupData.graphItemData,
 		requestsList: that => that.thresholdsSetupData.requestsList,
-
+		MULTIVIEW_ALARM_TYPES: () => Object.freeze(MULTIVIEW_ALARM_TYPES),
+		
 		metricItemsList() {
 			if (this.graphItemData) {
 				return this.graphItemData.graph_items;

@@ -40,6 +40,16 @@
 				/>
 			</el-form-item>
 
+			<el-form-item prop="is_editable" class="mcol-xs-1 switchers-block">
+				<label class="small-lh">{{ tt('editable') }}</label>
+				<el-switch
+					class="without-margin"
+					v-model="formData.is_editable"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<div>
 				<el-button
 					class="action-button remove-button"
@@ -66,6 +76,7 @@ export default {
 				unit: '',
 				crossover_tags: '',
 				is_visible: 0,
+				is_editable: 0,
 
 				formula: '',
 				harmonics: 5

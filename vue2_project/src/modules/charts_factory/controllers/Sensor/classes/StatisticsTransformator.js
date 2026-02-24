@@ -10,7 +10,8 @@ import {
 	setupLubeLockLogStatistics,
 	setupNotesStatistics,
 	setupFlagsFFTStatistics,
-	setupRuntimeTrackersStatistics
+	setupRuntimeTrackersStatistics,
+	setupFFTLockStatistics
 	// pointsDataMethodSelector
 } from '../methods';
 
@@ -135,6 +136,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				lube,
 				crashes,
 				fft,
+				fft_locks,
 				notes,
 				sensor,
 				problems,
@@ -234,9 +236,8 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				}
 				// --------------------
 				if (actualSpecification.setupPointsData) {
-					let zonesList;
-
 					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
+					let zonesList;
 
 					if (enableZones) {
 						zonesList = setupZonesList({
@@ -261,11 +262,6 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						...settings,
 						...actualSpecification.setupPointsData,
 					});
-					/*console.log(parameter_item.id, {
-						...settings,
-						...actualSpecification.setupPointsData,						
-					})*/
-
 
 					// statistics_result.pointsData.statsData = statistics_result.pointsData.statsData || {};
 
@@ -338,6 +334,12 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.flagsData.completed_fft_statistics = setupFlagsFFTStatistics(
 							fft,
 							[BANNER_FFT_STATUSES_TYPES.COMPLETED]
+						);
+					}
+
+					if (enable_fft && fft_locks.length) {
+						statistics_result.flagsData.fft_lock_statistics = setupFFTLockStatistics(
+							fft_locks
 						);
 					}
 

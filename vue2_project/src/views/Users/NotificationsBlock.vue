@@ -27,6 +27,7 @@
 
 			<div class="cell-item">
 				<el-checkbox
+					:disabled="!isPhoneVerified"
 					@change="handleCheckAllChange('is_sms', 'smsChecksCount')"
 					:value="all_sms_checked"
 					:indeterminate="sms_is_indeterminate"
@@ -42,6 +43,7 @@
 			v-for="row in rows"
 			:key="row.id"
 			:rowData="row"
+			:isPhoneVerified="isPhoneVerified"
 		/>
 	</div>
 </template>
@@ -55,7 +57,8 @@ export default {
 
 	props: {
 		title: String,
-		rows: Array
+		rows: Array,
+		isPhoneVerified: Boolean
 	},
 
 	data() {

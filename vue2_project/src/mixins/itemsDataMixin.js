@@ -210,7 +210,6 @@ const itemsDataMixin = {
 		},
 
 		fetchItems(filters) {
-			// console.log(filters, this.filters)
 			if (this.showToggleListButton ? this.filters.isShowList : true) {
 				this.itemsLoading = true;
 
@@ -485,7 +484,6 @@ const itemsDataMixin = {
 				if (this.preventFetch) {
 					this.preventFetch = false;
 				} else {
-					// console.log('watch')
 					this.fetchItems({
 						...this.globalFilters,
 						...filters,
@@ -532,7 +530,11 @@ const itemsDataMixin = {
 
 		propsFilters() {
 			// console.log('propsFilters')
-			this.refetchItemsList();
+			if (this.preventFetch) {
+				this.preventFetch = false;
+			} else {
+				this.refetchItemsList();
+			}
 		}
 	},
 

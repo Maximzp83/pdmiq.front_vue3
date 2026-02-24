@@ -47,6 +47,18 @@
 				:sensorParametersList="sensorParametersListVFDPressureRPMAmps"
 			/>
 		</div>
+
+		<div
+			class="button-item"
+			v-if="
+					!isCompare &&
+					isBannerV2Generic &&
+					$hasAccessTo(['edit_dashboard'])"
+		>
+			<RebaselineBlock
+				:sensorData="sensorData"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -66,7 +78,8 @@ export default {
 	// mixins: [chartsCompareExportMixin()],
 	components: {
 		ChartsFilterBar: () => import('../charts/ChartsFilterBar.vue'),
-		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue')
+		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue'),
+		RebaselineBlock: () => import('./RebaselineBlock.vue')
 		// AcknowledgeForm: () => import('../Dashboard/AcknowledgeForm.vue')
 	},
 	props: {
@@ -109,7 +122,7 @@ export default {
 			authUser: state => state.auth.authUser
 			// levelZonesSaving: state => state.sensors.levelZonesSaving
 		}),
-
+		isBannerV2Generic: that => that.currentSensorType.isBannerV2Generic,
 		metricSystemsList: () => Object.freeze(metricSystemsList()),
 		sensorParametersListVFDPressureRPMAmps: () =>
 			Object.freeze(sensorParametersListVFDPressureRPMAmps())

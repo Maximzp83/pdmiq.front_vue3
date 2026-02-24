@@ -540,6 +540,10 @@
 	&.mini {
 		.el-form-item__content {
 			line-height: 30px;
+
+			.el-select__caret {
+				line-height: 30px;
+			}
 		}
 
 		.el-input, .el-select {height: 30px !important; min-height: 30px !important;}

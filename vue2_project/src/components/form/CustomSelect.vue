@@ -26,6 +26,8 @@
 			@focus="handleFocus"
 			@blur="handleBlur"
 			:collapse-tags="collapseTags"
+			:allowCreate="allowCreate"
+			:default-first-option="defaultFirstOption"
 		>
 			<el-option
 				:class="optionClassName"
@@ -70,6 +72,8 @@ export default {
 		setupLabelMethod: { type: Function, default: undefined },
 		useHtml: Boolean,
 		multipleLimit: { type: Number, default: undefined },
+		allowCreate: Boolean,
+		defaultFirstOption: Boolean,
 
 		optionsList: {
 			type: Array,

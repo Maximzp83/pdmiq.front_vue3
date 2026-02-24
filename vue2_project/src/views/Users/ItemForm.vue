@@ -104,9 +104,21 @@
 						<el-input v-model="formData.email" type="email" autocomplete="new-email" />
 					</el-form-item>
 
-					<el-form-item :label="tt('Phone')" prop="phone_number">
+					<el-form-item :label="tt('Phone')" prop="phone_number"
+						v-if="itemId"
+					>
 						<PhoneInput ref="PhoneInput" v-model="formData" />
 					</el-form-item>
+
+					<PhoneVerificationBlock
+						class="el-form-item"
+						v-if="itemId && 
+							(isPhoneVerified || !formData.is_mfa_enabled || formData.mfa_type !== MFA_TYPES.SMS)
+						"
+						@phoneVerified="handlePhoneVerified"
+						:isPhoneVerified="isPhoneVerified"
+						:phone_number="formData.phone_number"
+					/>
 
 					<!-- <input autocomplete="false" name="hidden" type="text" style="display: none;" > -->
 
@@ -142,8 +154,8 @@
 								show-password
 								name="new-password"
 			  				autocomplete="new-password"
-			  			/>
-			  		</PasswordCheckList>
+				  			/>
+				  		</PasswordCheckList>
 					</el-form-item>
 
 					<el-form-item 
@@ -253,6 +265,7 @@
 						v-if="formData.is_mfa_enabled && itemId"
 						v-model="formData.mfa_type"
 						:phone_number="formData.phone_number"
+						:isPhoneVerified="isPhoneVerified"
 					/>
 
 					<div class="el-form-item daily-summary-form-item">
@@ -290,6 +303,7 @@
 					</div>
 				</div>
 
+				<!-- ----------------------- -->
 				<div
 					v-show="activeTab.prop == 'notificationsTab'"
 					:class="['tab-container', { 'half-width': !fromAnotherInstance && !isMobile }]"
@@ -301,6 +315,7 @@
 							class="notifications-block"
 							ref="NotificationsBlock"
 							:rows="userNotificationItemsList"
+							:isPhoneVerified="isPhoneVerified"
 						/>
 					</div>
 
@@ -310,19 +325,22 @@
 							class="notifications-block"
 							ref="NotificationsBlockRT"
 							:rows="userRealTimeNotificationItemsList"
+							:isPhoneVerified="isPhoneVerified"
 						/>
 					</div>
 
-					<!-- <div class="el-form-item notifications-block">
+					<div class="el-form-item notifications-block">
 						<NotificationsBlock
 							:title="tt('phrases.Requisitions_Notifications')"
 							class="notifications-block"
 							ref="NotificationsBlockRequisitions"
 							:rows="userRequisitionNotificationItemsList"
+							:isPhoneVerified="isPhoneVerified"
 						/>
-					</div> -->
+					</div>
 				</div>
 
+				<!-- ----------------------- -->
 				<div
 					v-if="itemId"
 					v-show="activeTab.prop == 'reportsTab'"
@@ -360,7 +378,8 @@ import {
 	PLANT_WORK_ORDER_TYPES,
 	userNotificationTypesList,
 	userRealTimeNotificationTypesList,
-	userRequisitionNotificationTypesList
+	userRequisitionNotificationTypesList,
+	MFA_TYPES
 } from '@/constants/global';
 
 import { LANGUAGE_TYPES, languagesList } from '@/localization/utils';
@@ -390,9 +409,11 @@ export default {
 	components: {
 		PhoneInput: () => import('@/components/form/PhoneInput.vue'),
 		NotificationsBlock: () => import('./NotificationsBlock.vue'),
-		ReportsList: () => import('../UserReports/ItemsList.vue'),
 		MFABlock: () => import('./MFABlock.vue'),
+		PhoneVerificationBlock: () =>	import('./PhoneVerificationBlock.vue'),
+
 		PasswordCheckList: () => import('@/components/pages/PasswordCheckList.vue'),
+		ReportsList: () => import('../UserReports/ItemsList.vue'),
 		ProdlinesSelectItem: () => import('./ProdlinesSelectItem.vue'),
 	},
 
@@ -418,6 +439,8 @@ export default {
 			showPassTooltip: false,
 			country_code_item: null,
 			daily_summary_notify_enabled: false,
+			
+			confirmedPhoneNumber: '',
 
 			userRolesList: [],
 			userRolesLoading: false,
@@ -433,6 +456,7 @@ export default {
 
 			userNotificationItemsList: [],
 			userRealTimeNotificationItemsList: [],
+			userRequisitionNotificationItemsList: [],
 
 			formData: {
 				role_id: null,
@@ -472,7 +496,7 @@ export default {
 				notifiable_production_lines: []
 				// is_amplitude_alarm_notifiable: false,
 			},
-
+			
 			submitUserFormData: {},
 
 			rules: {
@@ -511,6 +535,7 @@ export default {
 			{ ref: 'ProdlinesSelectItem', targetProp: 'notifiable_production_lines' }
 		]),
 		timeZonesList: () => Object.freeze(timeZonesList()),
+		MFA_TYPES: () => Object.freeze(MFA_TYPES),
 
 		userNotificationTypesList: () => Object.freeze(userNotificationTypesList()),
 		userRealTimeNotificationTypesList: () =>
@@ -529,6 +554,16 @@ export default {
 		disableMfaBlock() {
 			return (
 				!this.itemId || this.disableMfaSwitcher || (this.authUser &&	this.authUser.id !== this.itemId)
+			);
+		},
+
+		isPhoneVerified() {
+			const { itemId, itemData, formData, confirmedPhoneNumber } = this;
+			return (
+				itemId && (
+					(itemData.phone_number && itemData.phone_number == formData.phone_number) ||
+					confirmedPhoneNumber == formData.phone_number
+				)
 			);
 		},
 
@@ -707,6 +742,10 @@ export default {
 			save_item: 'users/save_user',
 		}),
 
+		handlePhoneVerified() {
+			this.confirmedPhoneNumber = this.formData.phone_number;
+		},
+
 		handlePlantsChange(ids) {
 			if (ids && ids.length) {
 				if (this.itemId) {
@@ -722,10 +761,6 @@ export default {
 
 			this.doFetchAction('fetch_sensors', 'sensorsList', 'sensorsLoading', payload);
 		},
-
-		/*handlePlantsChange(ids) {
-			this.formData.notifiable_plants = ids;
-		},*/
 
 		validatePassword(rule, value, callback) {
 			// console.log('validatePassword', rule)
@@ -788,6 +823,7 @@ export default {
 			}*/
 
 			if (itemData) {
+				this.confirmedPhoneNumber = itemData.phone_number;
 				/*this.formData.phone_number = this.setupPhone(
 					this.country_code_item,
 					this.formData.phone_number
@@ -807,6 +843,10 @@ export default {
 				// this.rules.password.push(required)
 			}
 
+			if (!this.confirmedPhoneNumber) {
+				this.formData.mfa_type = null;
+			}
+
 			this.userNotificationItemsList = this.setupNotificationsBlockList({
 				list: this.userNotificationTypesList,
 				itemData
@@ -815,10 +855,10 @@ export default {
 				list: this.userRealTimeNotificationTypesList,
 				itemData
 			});
-			/*this.userRequisitionNotificationItemsList = this.setupNotificationsBlockList({
+			this.userRequisitionNotificationItemsList = this.setupNotificationsBlockList({
 				list: this.userRequisitionNotificationTypesList,
 				itemData
-			});*/
+			});
 		},
 
 		handleUserRoleChange() {
@@ -831,15 +871,27 @@ export default {
 
 		localValidationHook() {
 			if (!this.isIndustrialMatrix &&
-					(
-						!this.formData.is_monitoring_all_notifiable_plants && 
-						!this.formData.notifiable_production_lines.length
-					)
+				!this.formData.is_monitoring_all_notifiable_plants && 
+				!this.formData.notifiable_production_lines.length
 			) {
 				this.$notify({
 					type: 'warning',
 					title: this.$t('phrases.form_isnt_ready'),
 					message: this.$t(`aliases.prodline_warn_1`)
+				});
+				return false;
+			}
+
+			if (
+				!this.isPhoneVerified && (
+					this.formData.is_mfa_enabled && 
+					this.formData.mfa_type === MFA_TYPES.SMS
+				)
+			) {
+				this.$notify({
+					type: 'warning',
+					title: this.$t('phrases.form_isnt_ready'),
+					message: this.$t(`aliases.mfa_warn_3`)
 				});
 				return false;
 			}
@@ -907,13 +959,14 @@ export default {
 		},
 
 		localSubmit(data) {
-			if (this.$refs['PhoneInput']._data.hasError) {
+			if (this.$refs['PhoneInput'] && this.$refs['PhoneInput']._data.hasError) {
 				this.$notify({
 					type: 'warning',
 					title: this.$t('phrases.form_isnt_ready'),
 					message: this.$t(`phrases.please_check_phone_number_form_field_first`)
 				});
 			} else {
+				// console.log('submit', data)
 				this.$emit('submit', data);					
 			}
 		},

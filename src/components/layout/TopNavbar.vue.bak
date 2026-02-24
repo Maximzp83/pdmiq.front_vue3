@@ -12,13 +12,13 @@
 					</button>
 				</div>
 
-				<!-- <button
+				<button
 					type="button"
 					class="navbar-toggle"
 					@click="callMethod('testEvent', 'hello from navbar')"
 				>
 					<i class="icomoon icon-lists" />
-				</button> -->
+				</button>
 
 				<TransitionGroup name="standard-fade">
 					<div
@@ -112,8 +112,9 @@
 
 						<el-button
 							@click="callMethod('set_compare_list', [])"
-							class="el-button--secondary clear-compare-button" native-type="button"
-							
+							type="default"
+							native-type="button"
+							:class="'clear-compare-button'"
 							>{{ `${tt('clear')} ${tt('compare')}` }}</el-button
 						>
 					</div>
@@ -125,8 +126,9 @@
 						>
 							<el-button
 								@click="callMethod('createItem')"
-								class="el-button--secondary shadow" native-type="button"
-								
+								type="default"
+								native-type="button"
+								:class="'shadow'"
 							>
 								<i class="icomoon icon-plus"></i>
 							</el-button>
@@ -138,7 +140,8 @@
 						>
 							<el-button
 								@click="changeRoute(navbarSettings.navigateButton)"
-								class="el-button--secondary shadow save-button" 
+								:class="'shadow save-button'"
+								type="default"
 								native-type="button"
 							>
 								<i class="icomoon icon-path_2"></i>
@@ -148,7 +151,8 @@
 						<div class="menu-block buttonWrapper" v-if="navbarSettings.editButton">
 							<el-button
 								@click="changeRoute(navbarSettings.editButton)"
-								class="el-button--secondary shadow save-button" 
+								:class="'shadow save-button'"
+								type="default"
 								native-type="button"
 							>
 								<i class="icomoon icon-pencil"></i>
@@ -161,9 +165,10 @@
 						>
 							<el-button
 								@click="callMethod('cleanForm')"
-								class="el-button--secondary shadow clean-button" native-type="button"
+								type="default"
+								native-type="button"
 								plain
-								
+								:class="'shadow clean-button'"
 							>
 								<i class="icomoon icon-clean"></i>
 							</el-button>
@@ -185,8 +190,6 @@
 							:value="authUser.temp_role_id"
 							:options="userRolesList"
 							:placeholder="`${tt('select')} ${tt('role')}`"
-							:props="{ value: 'id', label: 'name' }"
-							popper-class="plant-select-dropdown"							
 						/>
 					</div>
 
@@ -197,18 +200,11 @@
 						<el-select-v2
 							filterable
 							clearable
-							:class="
-								globalPlantsList.length < 2 && (isCustomer || navbarSettings.infoOnly)
-									? 'isClient'
-									: ''
-							"
 							@change="(id) => setGlobalFilters({ id: id, filterName: 'plantId' })"
 							:modelValue="globalFilters.plantId"
 							:options="globalPlantsList"
 							:loading="globalPlantsLoading"
 							:placeholder="`${tt('select')} ${tt('plant')}`"
-							:props="{ value: 'id', label: 'name' }"
-							popper-class="plant-select-dropdown"
 						/>
 					</div>
 
@@ -229,8 +225,6 @@
 							:options="companiesList"
 							:loading="companiesLoading"
 							:placeholder="`${tt('select')} ${tt('company')}`"
-							:props="{ value: 'id', label: 'name' }"
-							popper-class="plant-select-dropdown"
 						/>
 					</div>
 
@@ -247,9 +241,9 @@
 					>
 						<el-button
 							@click="callMethod('printHTML', navbarSettings.printButtonSettings)"
-							class="el-button--secondary"
+							type="default"
 							native-type="button"
-
+							:class="''"
 						>
 							<i :class="navbarSettings.printButtonSettings.icon || 'el-icon-printer'"></i>
 						</el-button>
@@ -273,8 +267,9 @@
 								<template #reference>
 									<el-button
 										@click="showCreationMenu = !showCreationMenu"
-										class="el-button--secondary creation-menu-button" native-type="button"
-										
+										type="default"
+										native-type="button"
+										:class="'creation-menu-button'"
 									>
 										<i class="icomoon icon-plus"></i>
 									</el-button>
@@ -337,9 +332,9 @@
 					>
 						<el-button
 							@click="callMethod('printHTML', navbarSettings.printButtonSettings)"
-							class="el-button--secondary"
+							type="default"
 							native-type="button"
-
+							:class="''"
 							icon="el-icon-printer"
 						/>
 					</div>
@@ -364,8 +359,9 @@
 								<el-button
 									slot="reference"
 									@click="showCreationMenu = !showCreationMenu"
-									class="el-button--secondary creation-menu-button" native-type="button"
-									
+									type="default"
+									native-type="button"
+									:class="'creation-menu-button'"
 								>
 									<i class="icomoon icon-plus"></i>
 								</el-button>
@@ -446,16 +442,7 @@ const {
 	globalCompaniesList: companiesList,
 	globalCompaniesLoading: companiesLoading,
 } = storeToRefs(globalStore);
-// const { set_value: set_global_store } = globalStore;
-
-watch(
-	() => globalPlantsLoading.value,
-	(loading) => {
-		console.log('Global plant loading:', loading);
-	},
-);
-
-
+const { set_value: set_global_store } = globalStore;
 
 const setGlobalFilters = ({ id, filterName }) => {
 	const newFilters = { ...globalFilters.value, [filterName]: id };
@@ -498,11 +485,6 @@ const { useLoadStore } = useHelpers();
 import { useCallMethod } from '@/composables/mixins/useEmitter';
 const dashboardLayoutMethods = inject('DashboardLayout.methods');
 const { callMethod } = useCallMethod(dashboardLayoutMethods);
-
-import { useFetchAction } from '@/composables/mixins/useFetchAction';
-const { doFetchAction } = useFetchAction();
-
-import { api_request } from '@/api/request_provider';
 
 // =========================
 const props = defineProps({
@@ -593,14 +575,6 @@ const datepickerFilters = computed(() => {
 const userRolesLoading = ref(false);
 const userRolesList = shallowReactive([]);
 
-const fetchUserRoles = () => {
-	doFetchAction('/roles', {
-		toList: userRolesList,
-		loadingRef: userRolesLoading,
-		isShallowRef: true,
-	});
-};
-
 const factUserRoleType = computed(() => {
 	const user = authUser.value;
 	let result = {};
@@ -618,61 +592,61 @@ const factUserRoleType = computed(() => {
 const isCustomer = computed(() => factUserRoleType.value.isCustomer);
 const isIndustrialMatrix = computed(() => factUserRoleType.value.isIndustrialMatrix);
 
-const setTempRole = async (role_id) => {
-	const authStore = useAuthStore();
-	userRolesLoading.value = true;
+const setTempRole = () => {};
+/*const setTempRole = (role_id) => {
+	// console.log(role_id)
+	userRolesLoading = true;
+	let payload = {};
 
-	try {
-		const method = role_id ? 'post' : 'delete';
-		const payload = role_id
-			? {
-					data: {
-						plant_id: globalFilters.value.plantId,
-						role_id,
-					},
-			  }
-			: {};
+	if (role_id) {
+		payload.method = 'POST';
+		payload.data = {
+			plant_id: globalFilters.plantId,
+			role_id
+		};
+	} else {
+		payload.method = 'DELETE';
+	}
 
-		const response = await api_request[method]('/auth/temp-role', payload);
-
-		if (response?.value?.user) {
-			const user = response.value.user;
-
-			// Если у temp_role нет permissions, находим их в userRolesList
+	// if (payload) {
+	// 	console.log(this.$route.path.split('/'))
+	// 	return
+	// }
+	set_temp_role(payload)
+		.then(user => {
+			const userRolesToStorage =
+				payload.method == 'POST' ? userRolesList : [];
+			this.set_user_roles(userRolesToStorage);
+			// console.log(user)
 			if (user.temp_role && !user.temp_role.permissions) {
-				const roleInList = userRolesList.find((r) => r.id === user.temp_role_id);
-				if (roleInList?.permissions) {
-					const newUser = {
-						...user,
-						temp_role: {
-							...user.temp_role,
-							permissions: roleInList.permissions,
-						},
-					};
-					authStore.set_auth_user(newUser);
-				} else {
-					authStore.set_auth_user(user);
-				}
-			} else {
-				authStore.set_auth_user(user);
-			}
+				const permissions = findItemBy(
+					'id',
+					user.temp_role_id,
+					userRolesList
+				).permissions;
+				// console.log(permissions)
+				let newUser = { ...user, role: { ...user.role, permissions } };
+				this.set_auth_user(newUser);
 
-			// Обновляем plantId filter если есть plant_id у пользователя
-			if (user.plant_id) {
-				globalStore.set_global_filters({
-					stateProp: 'plantId',
-					value: user.plant_id,
-				});
+				if (user && user.plant_id) {
+					setGlobalFilters({
+						id: user.plant_id,
+						filterName: 'plantId'
+					});
+				}
 			}
 
 			fetchPlants();
-		}
-	} catch (error) {
-		console.error('[setTempRole] Error:', error);
-	} finally {
-		userRolesLoading.value = false;
-	}
-};
+
+			// const primaryRoute = this.$route.path.split('/')[1];
+			// let path = '';
+
+			userRolesLoading = false;
+		})
+		.catch(() => {
+			userRolesLoading = false;
+		});
+};*/
 
 // ===================
 const showCreationMenu = ref(false);
@@ -777,10 +751,8 @@ const fetchCompanies = () => {
 };
 
 // ========== Watchers ==============
-const route = useRoute();
-
 watch(
-	() => route.path,
+	() => useRoute().path,
 	() => {
 		if (disposableHistoryButton.value) {
 			globalStore.set_global_state({
@@ -815,13 +787,11 @@ onMounted(() => {
 
 	// Fetch user roles if Industrial Matrix user
 	if (isIndustrialMatrix.value) {
-		fetchUserRoles();
+		// fetchUserRoles();
 	}
 
 	// Fetch plants
 	fetchPlants();
-		console.log('Global plant loading:', globalStore.globalPlantsLoading);
-
 
 	// Set globalFilters from authUser if customer
 	if (authUser.value && authUser.value.plant_id && isCustomer.value) {

@@ -1,14 +1,13 @@
 <template>
 	<div class="plant-details details-page main-instance-item">
 		<div class="view-content-card" v-if="plantItem">
-			equipmentsLayout
 
 			<div class="section-row">
 				<div class="mrow flex wrap big-padding">
 					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-						<el-button @click="toggleSearchbar">toggleSearchbar</el-button>
+						<!-- <el-button @click="toggleSearchbar">toggleSearchbar</el-button> -->
 
-						<el-button label="Confirm" @click="confirm = true">confirm</el-button>
+						<!-- <el-button label="Confirm" @click="confirm = true">confirm</el-button> -->
 						<!-- <ItemPDMsStatisticBlock
 							:title="tt('phrases.overall_asset_health')"
 							@event="handleEventNew"
@@ -19,8 +18,7 @@
 						/> -->
 					</div>
 
-					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-						<!-- <Counters @event="handleEventNew" /> -->
+					<!-- <div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
 						<el-form @submit="onSubmit">
 							<el-input v-model="name" />
 							<el-input-number v-model="age" :min="1" :max="10" />
@@ -46,17 +44,6 @@
 									</div>
 								</template>
 							</el-upload>
-							<!-- <el-select
-								multiple
-								v-model="select"
-							>
-								<el-option
-									v-for="item in options"
-									:key="`opt-${item}`"
-									:label="item"
-									:value="item"
-								/>
-							</el-select> -->
 
 							<el-select-v2
 								v-model="select2"
@@ -99,7 +86,7 @@
 								<el-button @click="onReset">Reset</el-button>
 							</div>
 						</el-form>
-					</div>
+					</div> -->
 
 					<div class="mcol-xs-12">
 						<!-- <EquipmentsLayout
@@ -188,7 +175,7 @@
 			</div>
 		</div>
 
-		<el-dialog v-model="confirm">
+		<!-- <el-dialog v-model="confirm">
 			<div class="card">
 				<div class="card-content">
 					<div class="row items-center">
@@ -203,7 +190,7 @@
 					</div>
 				</div>
 			</div>
-		</el-dialog>
+		</el-dialog> -->
 	</div>
 </template>
 
@@ -291,7 +278,7 @@ const onReset = () => {
 const navbarSettings = shallowReactive({
 	showFilter: true,
 	showCompareButton: true,
-	showSearchbar: true,
+	// showSearchbar: true,
 	datepickerSettings: {
 		label: `${tt('phrases.statistics_for_period')}:`,
 		storeSettings: {

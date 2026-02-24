@@ -1,6 +1,9 @@
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { api_request } from '@/api/request_provider.js';
 import { prepareRangeParams } from '@/helpers';
+import { useGlobalStore } from '@/stores/GlobalStore';
 
 /**
  * Composable for managing items data with API calls
@@ -8,33 +11,66 @@ import { prepareRangeParams } from '@/helpers';
  *
  * @param {Object} config - Configuration object
  * @param {string} config.apiRoute - API endpoint route
- * @param {Object} config.filters - Initial filters
+ * @param {Object} config.filters - Reactive filters ref
  * @param {Object} config.options - Additional options
  * @param {boolean} config.options.manual - Don't fetch on mount
+ * @param {boolean} config.options.stopFetch - Don't fetch on beforeMount
+ * @param {boolean} config.options.watchPropsFiltersOnly - Only watch propsFilters
  * @param {Array} config.options.excludeGetParams - Params to exclude from query
  * @param {Array} config.options.acceptedFilters - Only these filters will be sent
  * @param {Object} config.options.predefinedFilters - Filters to always include
- * @param {Object} config.options.propsFilters - Filters from props
+ * @param {Object} config.options.propsFilters - Filters from props (reactive ref)
  * @param {Function} config.options.localPrepareFilters - Custom filter preparation function
- * @param {Object} config.options.store - Pinia store instance (for api_request)
- * @param {boolean} config.options. - Use api_request instead of direct API call
+ * @param {Object} config.options.fetchItemsPayload - Additional payload for fetch
+ * @param {boolean} config.options.showToggleListButton - Check isShowList before fetch
+ * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, filters = {}, options = {} }) {
+export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
+	const route = useRoute();
+	const router = useRouter();
+	const globalStore = useGlobalStore();
+	const { globalFilters } = storeToRefs(globalStore);
+
+	// ========== State ==========
 	const itemsList = ref([]);
 	const itemsLoading = ref(false);
 	const meta = ref({});
 	const itemData = ref(null);
+	const preventFetch = ref(false);
 
 	const {
 		manual = false,
+		stopFetch = false,
+		watchPropsFiltersOnly = false,
 		excludeGetParams,
 		acceptedFilters,
 		predefinedFilters = {},
-		propsFilters = {},
+		propsFilters,
 		localPrepareFilters,
+		fetchItemsPayload = {},
+		showToggleListButton = false,
+		excludeGlobFilters = [],
 		requestOptions = {},
 	} = options;
+
+	// ========== Computed-like ==========
+	const getRouteMeta = () => route.meta;
+	const getRouteQuery = () => {
+		const { query } = route;
+		return Object.keys(query).length ? query : null;
+	};
+
+	const getPreventedFilters = () => {
+		let filters = {};
+		const routeMeta = getRouteMeta();
+		if (routeMeta?.preventFilterBy) {
+			routeMeta.preventFilterBy.forEach(f => (filters[f] = null));
+		}
+		return filters;
+	};
+
+	// ========== Methods ==========
 
 	/**
 	 * Prepare filters for API request
@@ -43,7 +79,7 @@ export function useItemsData({ apiRoute, filters = {}, options = {} }) {
 	 */
 	const prepareFilters = (filters) => {
 		let newFilters = {};
-		// console.log('filters', filters);
+
 		// Filter by excludeGetParams
 		if (excludeGetParams && Array.isArray(excludeGetParams)) {
 			for (let key in filters) {
@@ -71,8 +107,9 @@ export function useItemsData({ apiRoute, filters = {}, options = {} }) {
 		}
 
 		// Add props filters
-		if (propsFilters && Object.keys(propsFilters).length > 0) {
-			newFilters = { ...newFilters, ...propsFilters };
+		const propsFiltersValue = propsFilters?.value || propsFilters;
+		if (propsFiltersValue && Object.keys(propsFiltersValue).length > 0) {
+			newFilters = { ...newFilters, ...propsFiltersValue };
 		}
 
 		// Apply custom filter preparation
@@ -102,49 +139,188 @@ export function useItemsData({ apiRoute, filters = {}, options = {} }) {
 	/**
 	 * Fetch items list from API
 	 * @param {Object} filters - Filters to apply
-	 * @param {Object} requestOptions - Additional request options
+	 * @param {Object} additionalOptions - Additional request options
 	 * @returns {Promise} API response
 	 */
-	const fetchItemsList = async (filters = {}, requestOptions = {}) => {
+	const fetchItems = async (filters = {}, additionalOptions = {}) => {
+		// Check showToggleListButton condition
+		if (showToggleListButton && filtersRef?.value && !filtersRef.value.isShowList) {
+			return Promise.resolve([]);
+		}
+
+		itemsLoading.value = true;
 		const preparedFilters = prepareFilters(filters);
 
-		// Use api_request if store is provided
+		let payload = {
+			params: preparedFilters,
+			...fetchItemsPayload,
+			...requestOptions,
+			...additionalOptions,
+		};
+
 		try {
-			const payload = {
-				params: preparedFilters,
-				...requestOptions,
-			};
-			// console.log('payload', payload);
 			return new Promise((resolve, reject) => {
 				api_request.get(apiRoute, payload)
-					.then(({ value }) => {
-						// console.log('response', response);
+					.then(({ value, fetchedMeta }) => {
 						itemsList.value = value;
-						resolve(itemsList.value);
+						if (fetchedMeta) meta.value = fetchedMeta;
+						itemsLoading.value = false;
+						resolve({ value, meta: fetchedMeta });
 					})
 					.catch((error) => {
+						itemsLoading.value = false;
 						reject(error);
 					});
 			});
 		} catch (error) {
+			itemsLoading.value = false;
 			console.error(`[useItemsData] fetch error:`, error);
 			throw error;
 		}
 	};
 
-	// Fetch on mount if not manual
-	onMounted(() => {
-		if (!manual) {
-			fetchItemsList(filters, requestOptions);
+	/**
+	 * Refetch items list with current filters
+	 */
+	const refetchItemsList = () => {
+		const filters = filtersRef?.value || {};
+		fetchItems({
+			...globalFilters.value,
+			...filters,
+			...getPreventedFilters()
+		});
+	};
+
+	/**
+	 * Set filters with optional page reset
+	 * @param {Object} newFiltersValues - New filter values
+	 * @param {Object} settings - Settings
+	 * @param {boolean} settings.preventResetPage - Don't reset page to 1
+	 */
+	const setFilters = (newFiltersValues, settings = {}) => {
+		if (!filtersRef) return;
+
+		let newFilters = { ...filtersRef.value, ...newFiltersValues };
+
+		if (!settings.preventResetPage) {
+			newFilters.page = 1;
+		}
+
+		filtersRef.value = newFilters;
+	};
+
+	/**
+	 * Set preventFetch flag and update filters
+	 * Useful when you need to update filters without triggering fetch
+	 * @param {Object} newFiltersValues - New filter values
+	 * @param {Object} settings - Settings
+	 */
+	const setFiltersWithoutFetch = (newFiltersValues, settings = {}) => {
+		preventFetch.value = true;
+		setFilters(newFiltersValues, settings);
+	};
+
+	// ========== Watchers ==========
+
+	// Watch filters
+	if (filtersRef && !watchPropsFiltersOnly) {
+		watch(filtersRef, (filters) => {
+			if (preventFetch.value) {
+				preventFetch.value = false;
+			} else {
+				fetchItems({
+					...globalFilters.value,
+					...filters,
+					...getPreventedFilters()
+				});
+			}
+		}, { deep: true });
+	}
+
+	// Watch globalFilters
+	watch(globalFilters, (newGlobalFilters, oldGlobalFilters) => {
+		let nextStep = true;
+
+		// Check excluded global filters
+		if (excludeGlobFilters.length) {
+			excludeGlobFilters.forEach(gf => {
+				if (newGlobalFilters[gf] !== oldGlobalFilters[gf]) {
+					nextStep = false;
+				}
+			});
+		}
+
+		if (!nextStep) return;
+
+		preventFetch.value = true;
+		setFilters({ page: 1 });
+
+		const filters = filtersRef?.value || {};
+		fetchItems({
+			...filters,
+			...newGlobalFilters,
+			...getPreventedFilters()
+		});
+	}, { deep: true });
+
+	// Watch propsFilters if provided
+	if (propsFilters) {
+		watch(propsFilters, () => {
+			if (preventFetch.value) {
+				preventFetch.value = false;
+			} else {
+				refetchItemsList();
+			}
+		}, { deep: true });
+	}
+
+	// ========== Lifecycle ==========
+	onBeforeMount(() => {
+		const routeMeta = getRouteMeta();
+		const routeQuery = getRouteQuery();
+
+		// Handle route meta filters
+		if (routeMeta?.filtersSettings) {
+			preventFetch.value = true;
+			setFilters(routeMeta.filtersSettings);
+		}
+
+		// Handle route query
+		if (routeQuery) {
+			preventFetch.value = true;
+			setFilters(routeQuery);
+		}
+
+		// Initial fetch
+		if (!stopFetch && !manual) {
+			if (watchPropsFiltersOnly) {
+				const propsFiltersValue = propsFilters?.value || propsFilters || {};
+				fetchItems({ ...propsFiltersValue });
+			} else {
+				const filters = filtersRef?.value || {};
+				fetchItems({
+					...filters,
+					...globalFilters.value,
+					...getPreventedFilters()
+				});
+			}
 		}
 	});
 
 	return {
+		// State
 		itemsList,
 		itemsLoading,
 		meta,
 		itemData,
-		fetchItemsList,
+		preventFetch,
+
+		// Methods
+		fetchItems,
+		fetchItemsList: fetchItems, // alias
+		refetchItemsList,
 		prepareFilters,
+		setFilters,
+		setFiltersWithoutFetch,
 	};
 }

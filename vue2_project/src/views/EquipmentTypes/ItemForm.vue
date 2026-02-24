@@ -21,9 +21,9 @@
 				<CustomInput v-model="formData.name" :placeholder="tt('name')" />
 			</el-form-item>
 
-			<el-form-item
-				:label="`${tt('Parent')} ${tt('Item_type')}`"
-				prop="parent_id"
+			<!-- <el-form-item
+				:label="`${tt('Childs')} ${tt('Item_type')}`"
+				prop="child_ids"
 				:class="{
 					'half-width': !fromAnotherInstance && !isMobile && !fromModal,
 					'showJustInfo': newOptionsOnly
@@ -32,12 +32,13 @@
 				<CustomSelect
 					clearable
 					filterable
+					multiple
 					:optionsLoading="equipmentTypesLoading"
 					:optionsList="filteredEquipmentTypesList"
 					:placeholder="`${tt('Select')} ${tt('type')}`"
-					v-model="formData.parent_id"
+					v-model="formData.child_ids"
 				/>
-			</el-form-item>
+			</el-form-item> -->
 
 			<el-form-item
 				prop="without_brand"
@@ -51,6 +52,81 @@
 					:inactive-value="0"
 				/>
 				<!-- <el-checkbox v-model="formData.is_in_dashboard_view" /> -->
+			</el-form-item>
+
+			<el-form-item :label="`${tt('Default')} ${tt('Brand')}`" prop="default_brand_id"
+				:class="{
+					'half-width': !fromAnotherInstance && !isMobile && !fromModal,
+					'showJustInfo': newOptionsOnly
+				}"
+			>
+				<!-- :loadmoreIsActive="assetsLoadmoreIsActive" -->
+				<FetchByQuerySelect
+					clearable
+					enableLoadmore
+					v-model="formData.default_brand_id"
+					:optionsLoading.sync="brandsLoading"
+					:optionsList.sync="brandsList"
+					:settings="brandQueryOptions"
+					:placeholder="`${tt('select')} ${tt('brand')}`"
+				/>
+			</el-form-item>
+
+			<el-form-item :label="`${tt('Default')} ${tt('part_number')}`" prop="default_brand_model_id"
+				:class="{
+					'half-width': !fromAnotherInstance && !isMobile && !fromModal,
+					'showJustInfo': newOptionsOnly
+				}"
+			>
+				<!-- :loadmoreIsActive="assetsLoadmoreIsActive" -->
+				<FetchByQuerySelect
+					clearable
+					enableLoadmore
+					v-model="formData.default_brand_model_id"
+					:optionsLoading.sync="brandModelsLoading"
+					:optionsList.sync="brandModelsList"
+					:settings="brandModelsQueryOptions"
+					:placeholder="`${tt('select')} ${tt('part_number')}`"
+				/>
+			</el-form-item>
+
+			<el-form-item prop="child_components">
+				<div class="semi-bold article-title uppercase">
+					{{ tt('Components') }}:
+				</div>
+				<div class="options-container  wrapperBlock">
+					<div
+						v-if="childComponentsList.length"
+						:class="['content-row', { fluid: fromModal }]"
+					>
+						<ComponentItem
+							v-show="newOptionsOnly ? item.new : true"
+							ref="ComponentItem"
+							v-for="(item, idx) in childComponentsList"
+							:key="`ci-${item.id}`"
+							:item-data="item"
+							:item-index="idx"
+							:showLabelsIndex="showLabelsIndex"
+							:equipmentTypesList="filteredEquipmentTypesList"
+							:equipmentTypesLoading="equipmentTypesLoading"
+							@onRemove="id => removeFormItem(id, 'childComponentsList')"
+						/>
+					</div>
+
+					<div class="margin-top-row button-row">
+						<el-button
+							class="action-button create-button small with-text"
+							size="mini"
+							type="success"
+							@click="addFormItem('childComponentsList', 'c_i-')"
+						>
+							<span class="capitalize">{{
+								`${tt('add')} ${tt('component')}`
+							}}</span>
+							<i class="suffix-icon icomoon icon-cross"></i>
+						</el-button>
+					</div>
+				</div>
 			</el-form-item>
 
 			<el-form-item
@@ -125,7 +201,10 @@
 				key="mediaTab"
 				class="content-row tab-container"
 			>
-				<el-form-item :label="`${tt('Type')} ${tt('media')}`" prop="type_medias">
+				<el-form-item prop="type_medias">
+					<div class="semi-bold article-title uppercase">
+						{{ `${tt('Type')} ${tt('media')}` }}
+					</div>
 					<div class="options-container wrapperBlock">
 						<div
 							v-if="typesMediaList.length"
@@ -163,7 +242,10 @@
 				key="drivesTab"
 				class="content-row tab-container"
 			>
-				<el-form-item :label="`${tt('Drive')} ${tt('Type')}`" prop="drives">
+				<el-form-item prop="drives">
+					<div class="semi-bold article-title uppercase">
+						{{ `${tt('Drive')} ${tt('Type')}` }}
+					</div>
 					<div class="options-container  wrapperBlock">
 						<div
 							v-if="drivesList.length"
@@ -198,6 +280,54 @@
 				</el-form-item>
 			</div>
 
+			<div
+				v-show="activeTab.prop == 'analysisTab'"
+				key="analysisTab"
+				class="content-row tab-container"
+			>
+				<VibrationAnalysisItemsBlock
+					ref="VibrationAnalysisItemsBlock"
+					v-if="itemId"
+					:equipmentTypeId="itemId"
+				/>
+				<!-- <el-form-item prop="vibration_analysis">
+					<div class="semi-bold article-title uppercase">
+						{{ `${tt('Analysis')} ${tt('Item')}` }}
+					</div>
+					<div class="options-container  wrapperBlock">
+						<div
+							v-if="vibrationAnalysisList.length"
+							:class="['content-row', { fluid: fromModal }]"
+						>
+							<AnalysisItem
+								v-show="newOptionsOnly ? item.new : true"
+								ref="AnalysisItem"
+								v-for="(item, idx) in vibrationAnalysisList"
+								:key="`va-${item.id}`"
+								:item-data="item"
+								:item-index="idx"
+								:showLabelsIndex="showLabelsIndex"
+								@onRemove="id => removeFormItem(id, 'vibrationAnalysisList')"
+							/>
+						</div>
+
+						<div class="margin-top-row button-row">
+							<el-button
+								class="action-button create-button small with-text"
+								size="mini"
+								type="success"
+								@click="addFormItem('vibrationAnalysisList', 'va_i-')"
+							>
+								<span class="capitalize">{{
+									`${tt('add')} ${tt('Analysis')}`
+								}}</span>
+								<i class="suffix-icon icomoon icon-cross"></i>
+							</el-button>
+						</div>
+					</div>
+				</el-form-item> -->
+			</div>
+
 			<FormOperationsButtons
 				v-if="!fromModal"
 				@onCancel="handleCancel"
@@ -228,10 +358,13 @@ export default {
 		TypeOptionItem: () => import('./TypeOptionItem.vue'),
 		TypeMediaItem: () => import('./TypeMediaItem.vue'),
 		DriveItem: () => import('./DriveItem.vue'),
+		VibrationAnalysisItemsBlock: () => import('./VibrationAnalysisItemsBlock.vue'),
+		// AnalysisItem: () => import('./AnalysisItem.vue'),
+		ComponentItem: () => import('./ComponentItem.vue'),
 		TabsBar: () => import('@/components/common/TabsBar.vue'),
 
 		FileUploadBlock: () => import('@/components/form/uploadBlock/FileUploadBlock.vue'),
-
+		FetchByQuerySelect: () => import('@/components/form/FetchByQuerySelect.vue')
 	},
 
 	data() {
@@ -241,8 +374,14 @@ export default {
 			typesItemsList: [],
 			typesMediaList: [],
 			drivesList: [],
+			
+			childComponentsList: [],
 			typesCategoriesList: [],
 			typesCategoriesLoading: false,
+			brandsList: [],
+			brandsLoading: false,
+			brandModelsList: [],
+			brandModelsLoading: false,
 
 			formData: {
 				name: '',
@@ -251,8 +390,13 @@ export default {
 				type_options: [],
 				type_medias: [],
 				drives: [],
+				child_components: [],
+				// vibration_analysis: [],
 				without_brand: 0,
-				parent_id: null
+				parent_id: null,
+
+				default_brand_id: null,
+				default_brand_model_id: null
 			},
 
 			rules: {
@@ -267,6 +411,11 @@ export default {
 			{ ref: 'TypeOptionItem', targetProp: 'type_options' },			
 			{ ref: 'TypeMediaItem', targetProp: 'type_medias' },			
 			{ ref: 'DriveItem', targetProp: 'drives' },			
+			{ ref: 'VibrationAnalysisItemsBlock',
+				skipReturnData:1,
+				// callMethod: { name: '' }
+			},			
+			{ ref: 'ComponentItem', targetProp: 'child_components' },			
 		]),
 
 		itemPictures() {
@@ -292,7 +441,8 @@ export default {
 				that.$translate([
 					{ title: 'options', prop: 'optionsTab' },
 					{ title: 'media', prop: 'mediaTab' },
-					{ title: 'Drive_Type', prop: 'drivesTab' }
+					{ title: 'Drive_Type', prop: 'drivesTab' },
+					{ title: 'Vibration_Analysis', prop: 'analysisTab' }
 				])
 			),
 
@@ -301,12 +451,33 @@ export default {
 			// multiple: true
 		}),
 
+		brandQueryOptions() {
+			return Object.freeze({
+				fetchAction: 'brands/fetch_brands',
+				params: {
+					orderByColumn: 'name',
+					orderByMethod: 'asc',
+					equipmentTypeId: this.itemData && this.itemData.id,
+				}
+			});
+		},
+
+		brandModelsQueryOptions() {
+			return Object.freeze({
+				fetchAction: 'brand_models/fetch_brand_models',
+				params: {
+					equipmentTypeId: this.itemData && this.itemData.id,
+					brandId: this.formData.default_brand_id
+				}
+			});
+		},
+
 		filteredEquipmentTypesList: that =>
 			that.itemData
 				? that.equipmentTypesList.filter(it => it.id != that.itemData.id)
 				: that.equipmentTypesList,
 
-		requestsToDoList: () => [
+		requestsToDoList: that => [
 			{
 				action: 'fetch_equipment_types_categories',
 				localProp: 'typesCategoriesList',
@@ -316,7 +487,37 @@ export default {
 				action: 'fetch_equipment_types',
 				localProp: 'equipmentTypesList',
 				localLoadProp: 'equipmentTypesLoading'
-			}
+			},
+			{
+				action: 'fetch_brands',
+				bindTo: [],
+				initialSetup:
+					that.itemData && that.itemData.default_brand_id
+						? {
+								fetchById: {
+									action: 'brands/fetch_brand',
+									itemId: that.itemData.default_brand_id
+								}
+						  }
+						: null,
+				localProp: 'brandsList',
+				localLoadProp: 'brandsLoading'
+			},
+			{
+				action: 'fetch_brand_models',
+				bindTo: [],
+				initialSetup:
+					that.itemData && that.itemData.default_brand_model_id
+						? {
+								fetchById: {
+									action: 'brand_models/fetch_brand_model',
+									itemId: that.itemData.default_brand_model_id
+								}
+						  }
+						: null,
+				localProp: 'brandModelsList',
+				localLoadProp: 'brandModelsLoading'
+			},
 		]
 	},
 
@@ -333,6 +534,9 @@ export default {
 				this.typesItemsList = this.setupFormSubItemsList(item.type_options, 'to_i');
 				this.typesMediaList = this.setupFormSubItemsList(item.type_medias, 'tm_i');
 				this.drivesList = this.setupFormSubItemsList(item.drives, 'd_i');
+				// this.vibrationAnalysisList = this.setupFormSubItemsList(item.vibration_analysis, 'va_i');
+				this.childComponentsList = this.setupFormSubItemsList(item.child_components, 'c_i');
+
 			}
 		}
 

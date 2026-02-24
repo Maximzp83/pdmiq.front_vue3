@@ -47,19 +47,63 @@
 			:title="`${tt('Vibration_Analysis')}`"
 			:visible.sync="showAnalisysRulesDialog"
 		>	
-			<AnalysisRuleItem
-				:crossoverRulesList="crossoverRulesStore[rule.original_rule_id]"
-				class="inside-child-component"
-				ref="AnalysisRuleItem"
-				v-for="(rule, idx) in preparedVibrationAnalysisItems"
-				:key="`va-${rule.original_rule_id}`"
-				:item-data="rule"
-				:item-index="idx"
-				:equipmentTypeId="formData.child_equipment_type_id"
-				:rpm_source_value="rpm_source_value"
-				:brandModelId="formData.brand_model_id"
-				:savingInProgress="savingInProgress"
-			/>
+			<div class="content-row brands-form-block">
+				<div class="label">{{tt('Brand')}}</div>
+				<div class="form-item">
+					<FetchByQuerySelect
+						class="mcol-xs-8"
+						@change="handleChangeBrand"
+						clearable
+						enableLoadmore
+						v-model="formData.brand_id"
+						:optionsLoading.sync="brandsLoading"
+						:optionsList.sync="brandsList"
+						:settings="brandQueryOptions"
+						:placeholder="`${tt('select')} ${tt('brand')}`"
+					/>
+				</div>
+			</div>
+
+			<div class="section-row content-row brands-form-block">
+				<div class="label">{{tt('part_number')}}</div>
+
+				<div class="form-item">
+					<FetchByQuerySelect
+						class="mcol-xs-8"
+						clearable
+						enableLoadmore
+						v-model="formData.brand_model_id"
+						:optionsLoading.sync="brandModelsLoading"
+						:optionsList.sync="brandModelsList"
+						:settings="brandModelsQueryOptions"
+						:placeholder="`${tt('select')} ${tt('part_number')}`"
+					/>
+
+					<a v-if="selectedBrandModel"
+						class="absolute primary-color line-height-normal"
+						:href="`/brand-models/${selectedBrandModel.id}`"
+						target="_blank"
+					>
+						{{ tt('phrases.Open_in_new_window')}}
+					</a>
+				</div>
+			</div>
+
+			<div class="section-row" v-if="preparedVibrationAnalysisItems.length && formData.brand_model_id">
+				<AnalysisRuleItem
+					:crossoverRulesList="crossoverRulesStore[rule.original_rule_id]"
+					class="inside-child-component"
+					ref="AnalysisRuleItem"
+					v-for="(rule, idx) in preparedVibrationAnalysisItems"
+					:key="`va-${rule.original_rule_id}`"
+					:item-data="rule"
+					:item-index="idx"
+					:equipmentTypeId="formData.child_equipment_type_id"
+					:rpm_source_value="rpm_source_value"
+					:brandModelId="formData.brand_model_id"
+					:savingInProgress="savingInProgress"
+				/>
+			</div>
 
 			<div class="dialog-footer dialog-decorate-footer text-center">
 				<el-button
@@ -127,7 +171,7 @@
 				<el-form-item
 					:label="`${tt('Part')} ${tt('Number')}`"
 					prop="brand_model_id"
-					class="half-width"
+					class="half-width relative"
 				>
 						<!-- :loadmoreIsActive="!formData.brand_id" -->
 					<FetchByQuerySelect
@@ -139,6 +183,14 @@
 						:settings="brandModelsQueryOptions"
 						:placeholder="`${tt('select')} ${tt('part_number')}`"
 					/>
+
+					<a v-if="selectedBrandModel"
+						class="absolute primary-color line-height-normal"
+						:href="`/brand-models/${selectedBrandModel.id}`"
+						target="_blank"
+					>
+						{{ tt('phrases.Open_in_new_window')}}
+					</a>
 				</el-form-item>
 
 				<div class="el-form-item"
@@ -257,6 +309,10 @@ export default {
 					equipmentTypeId: this.formData.child_equipment_type_id || this.itemData.original_component_id,
 				}
 			});
+		},
+
+		selectedBrandModel() {
+			return findItemBy('id', this.formData.brand_model_id, this.brandModelsList);
 		},
 
 		/*requestsToDoList() {

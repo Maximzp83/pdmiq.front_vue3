@@ -661,6 +661,14 @@ const chartSeriesTemplates1 = {
 			height: 22,
 			borderRadius: 6,
 			lineWidth: 1
+		},
+
+		rpm_cursor_flag: {
+			...cursor_flag_template,
+			lineColor: '#FF6B00',
+			height: 14,
+			y: -155,
+			className: 'cursor-flag-serie rpm-cursor-flag'
 		}
 
 		// ---------

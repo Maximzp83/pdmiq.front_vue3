@@ -341,6 +341,12 @@ export default class ChartsListFactoryBase {
 		);
 	}
 
+	callChartsMethod({ name, payload }) {
+		this.chartsInstancesList.forEach(ChartInstance => {
+			ChartInstance[name] ? ChartInstance[name](payload) : null
+		});
+	}
+
 	setFiltersToCharts(filters, settings) {
 		// this.filters = { ...this.filters, ...filters };
 		this.chartsInstancesList.forEach(Chart => Chart.setFilters(filters, settings));

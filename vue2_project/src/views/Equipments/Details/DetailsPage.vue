@@ -87,6 +87,18 @@
 					</div>
 				</div>
 
+				<!-- <FileUploadBlock
+					ref="ItemImagesBlock"
+					multiple
+					rotate
+					showDeleteButton
+					enableReorderFiles
+					:pictures="itemImagesList"
+					imgItemClass="drag-n-drop-item"
+					:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.EQUIPMENT }"
+					:blockId="EQUIPMENT_IMG_TYPES.EQUIPMENT"
+				/> -->
+
 				<div class="equipment-types-row content-row">
 					<!-- <div class="title-block section-row">
 						<h1 class="title page-title outside-bg-addition">
@@ -166,6 +178,10 @@ import {
 	eventHandler
 } from '@/mixins';
 
+import { 
+ EQUIPMENT_IMG_TYPES
+} from '@/constants/global';
+
 export default {
 	mixins: [
 		initPageDataMixin(),
@@ -179,7 +195,9 @@ export default {
 	components: {
 		ButtonsNavbar: () => import('@/components/common/ButtonsNavbar.vue'),
 		TabsBar: () => import('@/components/common/TabsBar.vue'),
-		PdmButton: () => import('./PdmButton.vue')
+		PdmButton: () => import('./PdmButton.vue'),
+		// FileUploadBlock: () => import('@/components/form/uploadBlock/FileUploadBlock.vue'),
+
 	},
 
 	data() {
@@ -375,6 +393,14 @@ export default {
 			return Object.keys(query).length ? query : null;
 		},
 
+		EQUIPMENT_IMG_TYPES() {
+			return EQUIPMENT_IMG_TYPES;
+		},
+
+		itemImagesList() {
+			return this.getPicturesByType(EQUIPMENT_IMG_TYPES.EQUIPMENT);
+		},
+
 		/*isFetchAnalogues() {
 			return (
 				this.$route.name !== 'DetailsStatPage' &&
@@ -396,6 +422,12 @@ export default {
 
 			fetch_metric_multi_views: 'equipments/fetch_metric_multi_views',
 		}),
+
+		getPicturesByType(type) {
+			if (this.itemData && this.itemData.pictures) {
+				return this.itemData.pictures.filter(p => p.type === type);
+			}
+		},
 
 		handleShareLinkClick() {
 			// const statisticsPage = this.$refs.nestedViewContent;

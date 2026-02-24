@@ -138,6 +138,7 @@ const requestsListMixin = {
 			});
 
 			if (this.requestsListInitialSetup && initialSetup) {
+				// console.log('initialSetup', localProp)
 				const { fetchById } = initialSetup;
 				if (fetchById) {
 					this.fetchById({ ...fetchById, localLoadProp, localProp });
@@ -164,12 +165,24 @@ const requestsListMixin = {
 
 			if (clean_prop && !this.requestsListInitialSetup) {
 				// console.log(getObjectVal(this, clean_prop, { withoutDeep: true }))
+				// console.log('watchHandler', this.skipBindingCleanProp, clean_prop)
+				if (this.skipBindingCleanProp && this.skipBindingCleanProp[clean_prop]) {
+					this.skipBindingCleanProp[clean_prop] = null;
+				} else {
 				getObjectVal(this, clean_prop, { withoutDeep: true }) instanceof Array
 					? setObjectVal(this, clean_prop, [])
 					: setObjectVal(this, clean_prop, null);
+				}
 			}
 
-			if (!withoutClean) this[localProp] = [];
+			if (!withoutClean) {
+				// console.log()
+				if (this.skipListCleanProp && this.skipListCleanProp[localProp]) {
+					this.skipListCleanProp[localProp] = null;
+				} else {
+					this[localProp] = [];					
+				}
+			}
 			if (disableFetch) return;
 
 			let newPayload = {

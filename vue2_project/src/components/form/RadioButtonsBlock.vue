@@ -51,10 +51,24 @@
 					</el-button>
 
 					<span
-						v-if="settings.additionalInfoKey"
+						v-if="item.hasInput && settings.valueAsObject"
 						class="additional-info-cell"
-						v-html="item[settings.additionalInfoKey]"></span>
-					
+					>
+						<CustomInput 
+							class="mini additional-input-cell"
+							v-if="isActive(item)"
+							v-model="value[settings.valueAsObject.valueKey]"
+						/>
+						<span
+							v-else
+							class="additional-info-cell"
+							v-html="item[settings.valueAsObject.valueKey]"></span>					
+					</span>
+
+					<span
+						v-else-if="settings.additionalInfoKey"
+						class="additional-info-cell"
+						v-html="item[settings.additionalInfoKey]"></span>					
 				</div>
 			</div>
 		</div>
@@ -86,6 +100,10 @@ export default {
 	methods: {
 		isActive(item) {
 			if (this.valueAsObject) {
+				if (this.valueAsObject.isActiveKey) {
+					return this.value[this.valueAsObject.isActiveKey] == item[this.valueAsObject.isActiveKey];
+				}
+
 				let value = {};
 				this.valueAsObject.props.forEach(prop => {
 					value[prop] = item[prop];
@@ -143,6 +161,10 @@ export default {
 				this.$emit('input', selected_id);
 				this.$emit('onChange', selected_id);
 			}
+		},
+
+		setupAdditionalInput() {
+
 		}
 	}
 };

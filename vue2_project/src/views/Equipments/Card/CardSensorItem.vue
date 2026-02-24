@@ -1,5 +1,6 @@
 <template>
 	<div
+		data-id="sensor-item"
 		:class="[
 			'sensor-item',
 			{ 'has-problem': lube_blocked },
@@ -187,6 +188,17 @@
 					</div>
 					<!-- </div> -->
 				</div>
+
+				<div class="counters-part"
+					v-else-if="showBannerV2_1counters"
+				>
+					<PercentageAlertItem
+						v-for="(item) in itemData.alert_time_duration_percentage"
+						v-show="item.total_percent"
+						:key="`alert-${item.parameter}`"
+						:itemData="item"
+					/>
+				</div>
 			</div>
 
 			<div
@@ -248,7 +260,8 @@ import { sensorTypeMixin, eventHandler } from '@/mixins';
 export default {
 	mixins: [sensorTypeMixin(), eventHandler()],
 	components: {
-		TableCell: () => import('@/components/table/TableCell.vue')
+		TableCell: () => import('@/components/table/TableCell.vue'),
+		PercentageAlertItem: () => import('@/views/Equipments/Card/PercentageAlertItem.vue')
 	},
 
 	props: {
@@ -333,7 +346,9 @@ export default {
 		currentSensorTypeDataKey: () => 'itemData',
 
 		currentFaultsType() {
-			const { isSDTsensor, isUltrasound, isNCDSDT } = this.currentSensorType;
+			const { isSDTsensor, isUltrasound, isNCDSDT, isBannerV2_1 } = this.currentSensorType;
+
+			if (isBannerV2_1) return 'banner_V2_1';
 
 			if (isUltrasound || this.isLubeMatrixV3) return 'lubematrix';
 			if (isSDTsensor || isNCDSDT) return 'ultrasoundSDT';
@@ -470,6 +485,11 @@ export default {
 				<img src="${rebase_lines}" />
 			</span>`,
 
+		showBannerV2_1counters() {
+			const { currentSensorType, itemData } = this;
+			return currentSensorType.isBannerV2_1 && itemData.alert_time_duration_percentage.some(i => i.total_percent);
+		},
+		
 		// ==================
 		lubeImg() {
 			const { itemData } = this;
@@ -766,7 +786,7 @@ export default {
 		if (this.itemData.has_crash_process) {
 			this.emitEvent('sensorHasCrashProcess');
 		}
-		// console.log(this.itemData.has_crash_process)
+		// console.log(this.itemData.id, this.currentChartSettingsKey, )
 	}
 };
 </script>

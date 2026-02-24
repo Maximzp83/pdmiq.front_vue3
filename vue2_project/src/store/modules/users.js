@@ -6,6 +6,7 @@ import {
 	delete_item
 } from '../commonActions/apiActions';
 import { dataMutations, statusMutations } from '../commonMutations';
+import { Lang } from '@/localization';
 
 const localStorageFilters = JSON.parse(localStorage.getItem('users_filters'));
 const localStorageReportsFilters = JSON.parse(
@@ -104,6 +105,35 @@ const actions = {
 	},
 
 	// --------------------
+	get_phone_number_verification_code(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'POST',
+			resultMessage: Lang.tt('aliases.mfa_code_send_msg'),
+			returnResponseOnly: 1
+		};
+
+		return multipurpose_response(
+			storeArgs,
+			`users/phone-number/code`,
+			extendedPayload
+		);
+	},
+
+	verify_phone_number_code(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'POST',
+			resultMessage: Lang.tt('aliases.verification_ok'),
+			returnResponseOnly: 1	
+		};
+
+		return multipurpose_response(
+			storeArgs,
+			`users/phone-number/verify`,
+			extendedPayload
+		);
+	},
 
 	set_users({ commit }, items = []) {
 		const payload = { stateProp: 'itemsList', value: items };

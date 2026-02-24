@@ -130,7 +130,7 @@ export default {
 				chartSettingsKey,
 				// isBanner,	isBannerCM1L, isBannerTempVibe2,
 				// isBannerV2_1,
-				// isBannerS22UVT,
+				// isBannerM25,
 				isBannerV2Generic,
 			} = this.currentSensorType;
 

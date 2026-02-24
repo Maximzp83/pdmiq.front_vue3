@@ -73,7 +73,7 @@ import { getItemValue, prepareRangeParams } from '@/helpers';
 import {
 	alertRulesList,
 	rebase_wheel,
-	rebase_lines
+	rebase_lines,
 	// equipmentTypesList
 } from '@/constants/global';
 
@@ -91,7 +91,7 @@ export default {
 		showToggleNavigator: Boolean,
 		toggleNavigatorButtonActive: Boolean,
 		rootFilters: Object,
-		sensorId: Number
+		sensorId: Number,
 		// ChartInstance: Object
 	},
 
@@ -122,7 +122,7 @@ export default {
 				return `animate-${this.parameterTypeItems[0].axis}`;
 			}
 			return '';
-		}
+		},
 	},
 
 	methods: {

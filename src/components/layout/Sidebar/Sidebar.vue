@@ -249,9 +249,11 @@ const isLabelHasChildren = (label) => {
 };
 
 const isActiveItem = (itemPath) => {
+	console.log('itemPath',itemPath)
 	const parts = props.currentPath.split('/');
 	if (parts.length) {
 		const categoryPath = '/' + parts[1];
+		console.log('categoryPath',categoryPath)
 		if (categoryPath === itemPath) {
 			return true;
 		}

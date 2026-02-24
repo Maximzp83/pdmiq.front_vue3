@@ -24,7 +24,7 @@
 					}}
 				</div>
 
-				<div class="content-row flex align-center" v-if="!isBannerS22UVT">
+				<div class="content-row flex align-center" v-if="!isBannerM25">
 					<div class="div-block">{{ tt('phrases.request_type') }}</div>
 					<div class="div-block">
 						<el-select
@@ -116,8 +116,9 @@ import {
 	bannerRequestTypesList,
 	bannerRequestFmaxTypesList,
 	FFT_SOURCE_TYPES,
-	BANNER_REQUEST_FMAX_TYPES,
-	BANNER_REQUEST_TYPES
+	// BANNER_REQUEST_FMAX_TYPES,
+	BANNER_REQUEST_TYPES,
+	FFT_LOCK_STATUSES
 } from '@/constants/global';
 import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
@@ -125,11 +126,12 @@ import { LANGUAGE_TYPES } from '@/localization/utils';
 
 import {
 	webSocketMixin,
-	sensorTypeMixin
+	sensorTypeMixin,
+	actionButtonsMixin
 } from '@/mixins';
 
 export default {
-	mixins: [webSocketMixin(), sensorTypeMixin()],
+	mixins: [webSocketMixin(), sensorTypeMixin(), actionButtonsMixin()],
 
 	props: {
 		sensorData: {
@@ -171,8 +173,8 @@ export default {
 		currentSensorTypeDataKey: () => 'sensorData',
 
 		isBannerTempVibe2: that =>
-			that.currentSensorType && (that.currentSensorType.isBannerTempVibe2 || that.currentSensorType.isBannerV2_1),
-		isBannerS22UVT: that =>	that.currentSensorType && that.currentSensorType.isBannerS22UVT,
+			that.currentSensorType && (that.currentSensorType.isBannerTempVibe2 || that.currentSensorType.isBannerV2_1 || that.currentSensorType.isBannerV2Generic ),
+		isBannerS22UVT: that =>	that.currentSensorType && that.currentSensorType.isBannerM25,
 
 		LANGUAGE_TYPES: () => LANGUAGE_TYPES,
 
@@ -198,9 +200,9 @@ export default {
 		bannerRequestFmaxTypesList() {
 			let list = bannerRequestFmaxTypesList();
 			
-			if (!this.isBannerS22UVT) {
+			/*if (!this.isBannerM25) {
 				list = list.filter(li => li.id !== BANNER_REQUEST_FMAX_TYPES.HZ_10600);
-			}
+			}*/
 
 			if (this.rootFilters.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 				return list.map(type => ({
@@ -218,13 +220,14 @@ export default {
 			set_global_state: 'set_global_state',
 			fetch_ncd_fft: 'sensors/fetch_ncd_fft',
 			request_ncd_fft: 'sensors/request_ncd_fft',
+			unlock_fft: 'sensors/unlock_fft',
 		}),
 		// -----------------
 
 		confirmFFTRequest(settings = {}) {
 			const { forController } = settings;
 			// console.log('confirmFFTRequest', this.sensorData)
-			if (this.isBannerTempVibe2 || this.isBannerS22UVT || forController) {
+			if (this.isBannerTempVibe2 || this.isBannerM25 || forController) {
 				this.forController = forController;
 				this.initiatedFFTDialog = true;
 				this.fftRequestDialogOpen = true;
@@ -243,13 +246,13 @@ export default {
 		},
 
 		sendRequestFFT() {
-			const { isBannerTempVibe2, isBannerS22UVT, forController } = this;
+			const { isBannerTempVibe2, isBannerM25, forController } = this;
 
 			const payload = { sensorId: this.sensorData.id, data: {} };
 			let next = true;
 
-			if (isBannerTempVibe2 || isBannerS22UVT || forController) {
-				if (isBannerS22UVT) {
+			if (isBannerTempVibe2 || isBannerM25 || forController) {
+				if (isBannerM25) {
 					this.banner_request_type = BANNER_REQUEST_TYPES.STANDARD;
 				}
 				if (this.banner_request_type != null && this.banner_request_fmax != null) {
@@ -300,7 +303,7 @@ export default {
 		},
 
 		handleFFTRequest(response) {
-			if (this.isBannerTempVibe2 || this.isBannerS22UVT) {
+			if (this.isBannerTempVibe2 || this.isBannerM25) {
 				this.processingFFTRequest = true;
 			} else {
 				this.toggleMainPreloader(true, `${this.tt('Working')} FFT...`);
@@ -324,8 +327,8 @@ export default {
 
 		fftRequest_socketCallback({ type, data }, settings = {}) {
 			const { fft_request_id } = settings;
-			const { tt, isBannerTempVibe2, isBannerS22UVT } = this;
-			const waitingType = (isBannerTempVibe2 || isBannerS22UVT) ? 'dxm.command' : 'ncd.command';
+			const { tt, isBannerTempVibe2, isBannerM25 } = this;
+			const waitingType = (isBannerTempVibe2 || isBannerM25) ? 'dxm.command' : 'ncd.command';
 
 			// console.log(fft_request_id, type, data, waitingType)
 			if (
@@ -339,7 +342,7 @@ export default {
 						title: tt('constants.Success'),
 						message: `FFT ${tt('requesting')} ${tt('Successfully')}`
 					});*/
-					this.$emit('onSocketSuccess', true);				
+					this.$emit('onSocketSuccess', true);
 
 					this.fft_request_result = {
 						isSuccess: true,
@@ -393,6 +396,56 @@ export default {
 				})
 				.catch(() => {
 					this.$emit('update:isLoading', false);
+				});
+		},
+
+		handleUnlockFFT() {
+			const { tt } = this;
+			this.confirmHelper({
+				insertToMessage: `<b>${tt('unlock')} FFT</b>`
+			})
+				.then(() => {
+					const payload = {
+						sensorId: this.sensorData.id,
+						notNotify: true
+					};
+
+					// if (payload) {
+					// 	console.log('payload', payload);
+						
+					// 	this.$emit('event', {
+					// 		eventName: 'handleUnlockFFTSuccess',
+					// 		data: {},
+					// 		onward: true
+					// 	});
+					// 	return
+					// }
+
+					this.$emit('update:isLoading', true);
+
+					this.unlock_fft(payload)
+						.then(({ value }) => {
+							this.$emit('update:isLoading', false);
+
+							if (value.status === FFT_LOCK_STATUSES.UNLOCKED) {
+								this.$notify({
+									type: 'success',
+									title: tt('constants.Success'),
+									message: `${tt('phrases.FFT_successfully_unlocked')}`
+								});
+
+								this.$emit('event', {
+									eventName: 'handleUnlockFFTSuccess',
+									data: value,
+									onward: true
+								});
+							}
+						})
+						.catch(() => {
+							this.$emit('update:isLoading', false);
+						});
+				}).catch(() => {
+					// Cancelled
 				});
 		},
 

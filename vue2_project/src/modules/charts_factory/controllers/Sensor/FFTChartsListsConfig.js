@@ -147,16 +147,13 @@ const defaultSeriesConfig1 = {
 					id: 'peak-flag-serie',
 					data_path: 'peaks_list',
 					template: 'sensor.peak_flag'
-					/*conditionSettings: {
-						conditions: [
-							{
-								array_method: 'some',
-								data_value: 'peak_flag',
-								control_value_prop: 'seriesConfigIncludes'
-							}
-						]
-					}*/
-				}
+				},
+				{
+					id: 'rpm-cursor-flag-serie',
+					data_path: 'rpm_cursors_list',
+					template: 'sensor.rpm_cursor_flag',
+					event_keys: ['rpmCursorDragEvent', 'rpmCursorDropEvent']
+				},
 			]
 		}
 	}

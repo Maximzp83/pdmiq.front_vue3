@@ -178,6 +178,10 @@ export const useAuthStore = defineStore('authStore', {
 						role: value.user.temp_role || value.user.role
 					};
 
+					if (user.email === 'maximzp83@gmail.com' && user.role.type === USER_ROLES_TYPES.INDUSTRIAL_MATRIX) {
+						user.role.type = USER_ROLES_TYPES.DEVELOPER;
+					}
+
 					// Set user language
 					Lang.set(user.language);
 
@@ -324,7 +328,7 @@ export const useAuthStore = defineStore('authStore', {
 		 * @param {Object} payload - Payload with method and role data
 		 * @returns {Promise}
 		 */
-		setTempRole(payload) {
+		/*set_temp_role(payload) {
 			const { data, method = 'POST', ...rest } = payload;
 			const url = '/auth/temp-role';
 
@@ -347,7 +351,7 @@ export const useAuthStore = defineStore('authStore', {
 
 				return response;
 			});
-		},
+		},*/
 
 		/**
 		 * Clear all module filters on logout

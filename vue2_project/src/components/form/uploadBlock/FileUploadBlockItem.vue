@@ -22,6 +22,10 @@
 			<div v-else-if="!hidePreview && fileType == 'image'">
 				<!-- v-else-if="!hidePreview && fileType == 'image'" -->
 				<div class="relative imgWrapper">
+					<div class="reorder-button can-dragging" v-if="enableReorderFiles">
+						<img class="can-dragging" :src="icon_drag" alt="" />
+					</div>
+
 					<div
 						class="images-part-overlay dark-overlay pointer"
 						v-if="showImageClickOverlay"
@@ -116,6 +120,7 @@
 </template>
 
 <script>
+import {icon_drag } from '@/constants/global';
 import { getFileType, getFileName } from '@/helpers';
 import { subItemMixin } from '@/mixins';
 
@@ -144,6 +149,8 @@ export default {
 		enableLinkToFile: Boolean,
 		showLinkToFileButton: Boolean,
 		additionalFormData: Object,
+		enableReorderFiles: { type: Object, default: () => null },
+		itemIndex: Number,
 		// uploadBlockType: String,
 
 		itemData: {
@@ -174,6 +181,8 @@ export default {
 	},
 
 	computed: {
+		icon_drag: () => icon_drag,
+
 		updateFormDataSettings: () => Object.freeze({ skipDeepCopy: true }),
 		// getFileType: () => getFileType,
 		fileType() {

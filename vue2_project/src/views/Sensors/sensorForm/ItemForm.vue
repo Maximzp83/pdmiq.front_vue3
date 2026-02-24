@@ -158,7 +158,7 @@
 				v-else
 			>
 				<el-form-item :label="tt('Node')" prop="port_number"
-					v-if="!currentSensorType.isBannerTempVibe2 && !currentSensorType.isBannerV2Generic && !currentSensorType.isBannerV2_1 && !currentSensorType.isBannerS22UVT"
+					v-if="!currentSensorType.isBannerTempVibe2 && !currentSensorType.isBannerV2Generic && !currentSensorType.isBannerV2_1 && !currentSensorType.isBannerM25"
 				>
 					<el-select
 						v-model="formData.port_number"
@@ -333,7 +333,7 @@
 				<el-form-item
 					:label="`${tt('Device')} ${tt('address')} id`"
 					prop="device_address_id"
-					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerS22UVT"
+					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
 					required
 				>
 					<CustomInput v-model="formData.device_address_id" />
@@ -342,7 +342,7 @@
 				<el-form-item
 					:label="`${tt('Sensor')} Id`"
 					prop="fft_sensor_id"
-					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerS22UVT"
+					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
 					required
 				>
 					<CustomInput v-model="formData.fft_sensor_id" />
@@ -800,10 +800,10 @@ export default {
 		}),
 
 		showDeviceDataRegisters() {
-			const { isBannerTempVibe2, isBannerV2_1, isBannerV2Generic, isBannerS22UVT } = this.currentSensorType;
+			const { isBannerTempVibe2, isBannerV2_1, isBannerV2Generic, isBannerM25 } = this.currentSensorType;
 			if (
 				(this.itemData && this.itemData.device_data) &&
-				(isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic || this.isLubeMatrixV3 || isBannerS22UVT)
+				(isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic || this.isLubeMatrixV3 || isBannerM25)
 			) {
 				return true;
 			}
@@ -981,6 +981,7 @@ export default {
 								name: subItem.name,
 								units: item.units,
 								formula: subItem.formula,
+								graph_type: subItem.graph_type,
 								title: `${subItem.name}: ${item.formula} ${item.units}`,
 								is_line_speed: subItem.is_line_speed,
 								is_signed: subItem.is_signed,
@@ -1009,21 +1010,22 @@ export default {
 		showRunningThresholds() {
 			const {	
 				isBanner, isBannerCM1L,
-				isBannerTempVibe2, isBannerV2_1
+				isBannerTempVibe2, isBannerV2_1,
+				isBannerM25
 			} = this.currentSensorType;
 
-			return isBanner || isBannerCM1L || isBannerTempVibe2 || isBannerV2_1;
+			return isBanner || isBannerCM1L || isBannerTempVibe2 || isBannerV2_1 || isBannerM25;
 		},
 
 		runningThresholdParametersList() {
 			const {	
 				chartSettingsKey, isBanner,
 				isBannerCM1L, isBannerTempVibe2,
-				isBannerV2_1
+				isBannerV2_1, isBannerM25
 			} = this.currentSensorType;
 
 			if (
-				(isBanner || isBannerCM1L || isBannerTempVibe2 ||	isBannerV2_1) &&
+				(isBanner || isBannerCM1L || isBannerTempVibe2 ||	isBannerV2_1 || isBannerM25) &&
 					chartSettingsKey
 			) {
 				const configsList = chartsListsConfig(chartSettingsKey);
@@ -1179,7 +1181,7 @@ export default {
 				isBannerTempVibe2,
 				isBannerV2Generic,
 				isBannerV2_1,
-				isBannerS22UVT
+				isBannerM25
 			} = this.currentSensorType;
 
 			if (isSDTsensorDB || isSDTsensorDB420) {
@@ -1229,7 +1231,7 @@ export default {
 				}
 			}
 
-			if (!isBannerTempVibe2 && !isBannerV2Generic && !isBannerV2_1 && !isBannerS22UVT) {
+			if (!isBannerTempVibe2 && !isBannerV2Generic && !isBannerV2_1 && !isBannerM25) {
 				delete data.device_address_id;
 				delete data.fft_sensor_id;
 			} else {

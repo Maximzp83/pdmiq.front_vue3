@@ -1,6 +1,7 @@
 // console.log('global.js')
 import { cloneDeep } from '@/helpers';
 import { Lang } from '@/localization';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums.js';
 
 export const USER_ROLES_TYPES = {
 	DEVELOPER: 0,
@@ -72,12 +73,14 @@ export const ncdUltrasoundPositionsList = [
 export const FFT_REQUEST_STATUSES = {
 	PENDING: 1,
 	APPROVED: 2,
-	COMPLETED: 3
+	COMPLETED: 3,
+	UNDEFINED: 4
 };
 const fftRequestStatusesList1 = [
 	{ id: FFT_REQUEST_STATUSES.PENDING, name: 'constants.pending' },
 	{ id: FFT_REQUEST_STATUSES.APPROVED, name: 'constants.approved' },
-	{ id: FFT_REQUEST_STATUSES.COMPLETED, name: 'constants.completed' }
+	{ id: FFT_REQUEST_STATUSES.COMPLETED, name: 'constants.completed' },
+	{ id: FFT_REQUEST_STATUSES.UNDEFINED, name: 'constants.undefined' }
 ];
 
 export const NCD_REQUEST_STATUSES = {
@@ -354,7 +357,8 @@ export const DATASET = {
 	NCD_4_20MA: 22,
 	BANNER_V2_GENERIC: 23,
 	BANNER_TEMP_VIBE_V2_1: 24,
-	BANNER_S22UVT: 26,
+	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25, // lubematrix v3
+	BANNER_M25: 26,
 
 	LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
 };
@@ -482,9 +486,10 @@ const dataSetsList1 = [
 		// alt_label: 'constants.NCD_Custom_4_20',
 		controller_type: CONTROLLER_TYPES.BANNER
 	},
+	// --------Lube V3-------
 	{
-		id: DATASET.BANNER_S22UVT,
-		label: 'constants.banner_s22uvt',
+		id: DATASET.BANNER_M25,
+		label: 'constants.banner_m25',
 		// alt_label: 'constants.NCD_Custom_4_20',
 		controller_type: CONTROLLER_TYPES.BANNER
 	},
@@ -493,6 +498,12 @@ const dataSetsList1 = [
 		label: 'constants.lube_v3',
 		// alt_label: 'constants.NCD_Custom_4_20',
 		// controller_type: CONTROLLER_TYPES.ULTRA_SOUND
+	},
+	{
+		id: DATASET.LUBE_MATRIX_SDT_FULL_SPECTRUM,
+		label: 'constants.sdt_sensor_full_spectrum',
+		// alt_label: 'constants.NCD_Custom_4_20',
+		isLubeV3: true,
 	},
 ];
 
@@ -505,13 +516,26 @@ const ncdAlarmTypesList1 = [
 	{ id: NCD_ALARM_TYPES.LOW_HIGH_ALARM, name: 'constants.LOW_HIGH_ALARMs' }
 ];
 
+export const SENSOR_THRESHOLD_TYPES = {
+	BASELINE: 1,
+	WARNING: 2,
+	ALARM: 3,
+};
+const sensorThresholdsTypesList1 = [
+	{ id: SENSOR_THRESHOLD_TYPES.BASELINE, name: 'constants.good' },
+	{ id: SENSOR_THRESHOLD_TYPES.WARNING, name: 'constants.warning' },
+	{ id: SENSOR_THRESHOLD_TYPES.ALARM, name: 'constants.alarm' }
+];
+
 export const CHART_TYPES = {
 	COLUMN: 1,
-	LINE: 2
+	LINE: 2,
+	AREASPLINE: 3
 };
 const chartTypesList1 = [
-	{ id: CHART_TYPES.COLUMN, name: 'COLUMN' },
-	{ id: CHART_TYPES.LINE, name: 'LINE' }
+	{ id: CHART_TYPES.COLUMN, name: 'COLUMN', chart_type: 'column' },
+	{ id: CHART_TYPES.LINE, name: 'LINE', chart_type: 'spline' },
+	{ id: CHART_TYPES.AREASPLINE, name: 'AREASPLINE', chart_type: 'areaspline' }
 ];
 
 export const SENSOR_SETUP_TYPES = {
@@ -675,17 +699,26 @@ const sensorTypesList1 = {
 			filters_group: 'vibration_temperature',
 			group_technology: 'constants.vibration_temperature'
 		},
-		[DATASET.BANNER_S22UVT]: {
+		[DATASET.BANNER_M25]: {
 			technology: 'constants.vibration_temperature',
 			technology_abbr: 'constants.vibe_temp',
 			icons: ['vibration', 'temperature'],
-			isBannerS22UVT: true,
-			chartSettingsKey: 'banner_s22UVT',
+			isBannerM25: true,
+			chartSettingsKey: 'banner_m25',
 			filters_group: 'vibration_temperature',
 			group_technology: 'constants.vibration_temperature'
 		},
 
 		[DATASET.LUBEMATRIX_V3]: { // для работы в форме banner сенсора
+			technology: 'constants.ultrasound_sdt',
+			technology_abbr: 'constants.usound',
+			// icons: ['ultrasound'],
+			// isUltrasound: true,
+			// chartSettingsKey: 'banner_sdt_decibell',
+			filters_group: 'ultrasound',
+			group_technology: 'constants.ultrasound'
+		},
+		[DATASET.LUBE_MATRIX_SDT_FULL_SPECTRUM]: { // для работы в форме banner сенсора
 			technology: 'constants.ultrasound_sdt',
 			technology_abbr: 'constants.usound',
 			// icons: ['ultrasound'],
@@ -757,6 +790,15 @@ const sensorTypesList1 = {
 			group_technology: 'constants.LubeMatrix'
 		},
 		[DATASET.LUBEMATRIX_V3]: { // для работы в форме banner сенсора
+			technology: 'constants.ultrasound_sdt',
+			technology_abbr: 'constants.usound',
+			// icons: ['ultrasound'],
+			// isUltrasound: true,
+			// chartSettingsKey: 'banner_sdt_decibell',
+			filters_group: 'ultrasound',
+			group_technology: 'constants.ultrasound'
+		},
+		[DATASET.LUBE_MATRIX_SDT_FULL_SPECTRUM]: { // для работы в форме banner сенсора
 			technology: 'constants.ultrasound_sdt',
 			technology_abbr: 'constants.usound',
 			// icons: ['ultrasound'],
@@ -1572,9 +1614,19 @@ export const ITEM_SPEED_OPTIONS = {
 const itemSpeedOptionsList1 = [
 	{ id: ITEM_SPEED_OPTIONS.LINESPEED_RPM, name: 'constants.linespeed_rpm', source_key: 'line_speed_rpm_evaluated' },
 	{ id: ITEM_SPEED_OPTIONS.SPECIFICATION_RPM, name: 'constants.specification_rpm', source_key: 'specification_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', source_key: 'max_peak_frequency_evaluated' },
+	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated', hasInput: true },
+	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', [`source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`]: 'max_peak_frequency_at_imperial_evaluated', [`source_key_${METRIC_SYSTEM_TYPES.METRIC}`]: 'max_peak_frequency_at_metric_evaluated' },
 	{ id: ITEM_SPEED_OPTIONS.EXTERNAL, name: 'constants.external_input', source_key: 'external_rpm_evaluated' },
+];
+
+export const USER_REPORT_TYPES = {
+	COMPARE: 1,
+	BASELINING: 2,
+};
+
+const userReportTypesList1 = [
+	{	id: USER_REPORT_TYPES.COMPARE, name: 'compare' },
+	{	id: USER_REPORT_TYPES.BASELINING, name: 'Baselining' },
 ];
 
 export const METRIC_UNIT_TYPES = {
@@ -1587,16 +1639,6 @@ const metricUnitTypesList1 = [
 	{ id: METRIC_UNIT_TYPES.SECONDS, name: 'Seconds' },
 	{ id: METRIC_UNIT_TYPES.MINUTES, name: 'Minutes' },
 	{ id: METRIC_UNIT_TYPES.HOURS, name: 'Hours' },
-];
-
-export const USER_REPORT_TYPES = {
-	COMPARE: 1,
-	BASELINING: 2,
-};
-
-const userReportTypesList1 = [
-	{	id: USER_REPORT_TYPES.COMPARE, name: 'compare' },
-	{	id: USER_REPORT_TYPES.BASELINING, name: 'Baselining' },
 ];
 
 export const CONTROLLER_TOPIC_TYPES = {
@@ -1649,6 +1691,32 @@ const sensorAlarmTypesList1 = [
 	{ id: SENSOR_ALARM_TYPES.LOW_ALARM, name: 'constants.low_alarm' },
 	{ id: SENSOR_ALARM_TYPES.HIGH_ALARM, name: 'constants.high_alarm' },
 	{ id: SENSOR_ALARM_TYPES.AMPLITUDE_ALARM, name: 'constants.amplitude_alarm' }
+];
+
+export const MULTIVIEW_ALARM_TYPES = {
+	COMPARE: 1,
+	STANDARD_WARNING_ALARM: 2,
+	STANDARD_LOW_HIGH: 3,
+};
+
+const multiviewAlarmTypesList1 = [
+	{ id: MULTIVIEW_ALARM_TYPES.COMPARE, name: 'constants.compare' },
+	{ id: MULTIVIEW_ALARM_TYPES.STANDARD_WARNING_ALARM, name: 'constants.standard_warning_alarm' },
+	{ id: MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH, name: 'constants.standard_low_high' },
+];
+
+export const FFT_LOCK_STATUSES = {
+	UNLOCKED: 0,
+	NO_FFT_RESPONSE: 1,
+	NODE_OFFLINE: 2,
+	UNCONFIRMED_FFT_REQUEST: 3
+};
+
+const fftLockStatusesList1 = [
+	{ id: FFT_LOCK_STATUSES.UNLOCKED, name: 'constants.unlocked', color: '#059966', },
+	{ id: FFT_LOCK_STATUSES.NO_FFT_RESPONSE, name: 'constants.no_fft_response', color: '#ffde32', },
+	{ id: FFT_LOCK_STATUSES.NODE_OFFLINE, name: 'constants.node_offline', color: '#c21405', },
+	{ id: FFT_LOCK_STATUSES.UNCONFIRMED_FFT_REQUEST, name: 'constants.unconfirmed_fft_request', color: '#ffde32', },
 ];
 
 export const userTypesList = () => Lang.translate(userTypesList1);
@@ -1727,12 +1795,14 @@ export const userRequisitionNotificationTypesList = () =>
 	Lang.translate(userRequisitionNotificationTypesList1);
 export const rpmSourcesTypesList = () => Lang.translate(rpmSourcesTypesList1);
 export const itemSpeedOptionsList = () => Lang.translate(itemSpeedOptionsList1);
-export const metricUnitTypesList = () => Lang.translate(metricUnitTypesList1);
 export const userReportTypesList = () => Lang.translate(userReportTypesList1);
+export const metricUnitTypesList = () => Lang.translate(metricUnitTypesList1);
 export const controllerTopicTypesList = () => controllerTopicTypesList1;
 export const sensorClassesList = () => Lang.translate(sensorClassesList1);
 export const sensorAlarmTypesList = () => Lang.translate(sensorAlarmTypesList1);
-
+export const sensorThresholdsTypesList = () => Lang.translate(sensorThresholdsTypesList1);
+export const multiviewAlarmTypesList = () => Lang.translate(multiviewAlarmTypesList1);
+export const fftLockStatusesList = () => Lang.translate(fftLockStatusesList1);
 // -----------------
 
 export const not_wifi_icon = require('@/assets/img/icons/not-wifi.svg');

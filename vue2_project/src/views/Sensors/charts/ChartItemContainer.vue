@@ -1,5 +1,15 @@
 <template>
 	<div class="card">
+		<div class="one-chart-page-legend" v-if="oneChartPageLegend">
+			<div class="article-title">{{ ChartInstance.chartTitle }}</div>
+			<div class="item flex align-center"
+				v-for="(item, index) in oneChartPageLegend"
+				:key="index"
+			>
+				<div class="color-block" :style="`backgroundColor: ${item.color}`"></div>
+				<div class="label">{{ item.name }}</div>
+			</div>
+		</div>
 		<!-- <button @click="show = !show">test</button> -->
 		<!-- <button @click="resetNavigator">reset</button> -->
 
@@ -15,7 +25,7 @@
 			v-show="hasStatistics"
 		>
 			<!-- <button @click="zoomYAxis">+</button> -->
-			<div class="mcol-xs-10 mcol-sm-9 flex mrow wrap align-center left-part">
+			<div class="mcol-xs-10 mcol-sm-9 mcol-lg-7 flex mrow wrap align-center left-part">
 				<div class="title-block ellipsis" v-text="chartTitle"></div>
 				<div
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto"
@@ -86,8 +96,17 @@
 				</div>
 			</div>
 
+			<ChartColorShemeBlock
+				class="mcol-xs-2 mcol-sm-auto ml-auto align-center buttons-container"
+				v-if="enableColorPickerBlock && ChartAPI"
+				:ChartInstance="ChartInstance"
+				:sensorId="sensorData.id"				
+				:hasStatistics="hasStatistics"
+			/>
+				<!-- :ChartAPI="ChartAPI" -->
+
 			<HeaderRightPart
-				class="mcol-xs-2 mcol-sm-auto ml-auto"
+				class="mcol-xs-2 mcol-sm-auto ml-auto align-center"
 				v-if="!additionalProps.hideChartHeaderRightPart"
 				@event="handleEventNew"
 				:isRebaseline="isRebaseline"
@@ -110,7 +129,7 @@
 				{ 'edit-plotlines': editPlotlines },
 				{ 'show-navigator': showNavigator }
 			]"
-		>	
+		>
 			<div class="flex mrow wrap">
 				<div class="mcol-xs-12 mcol-sm-8 fluid">
 					<ChartWrapper
@@ -189,6 +208,7 @@ export default {
 		LubeBlock: () => import('./LubeBlock.vue'),
 		ChartThresholdsOperations: () => import('./ChartThresholdsOperations.vue'),
 		HeaderRightPart: () => import('./HeaderRightPart.vue'),
+		ChartColorShemeBlock: () => import('./ChartColorShemeBlock.vue'),
 		UpdateThresholdsDialog: () => import('./UpdateThresholdsDialog.vue'),
 		StatsTable: () => import('./StatsTable.vue'),
 	},
@@ -233,6 +253,7 @@ export default {
 
 		hasStatistics: false,
 		statisticsResponsesReady: false,
+		chartDataReady: false,
 
 		editPlotlines: false,
 		calculateThresholdsIsActive: false,
@@ -246,7 +267,23 @@ export default {
 	computed: {
 		// hcInstance: that => that.additionalProps.hcInstance,		
 		// hcInstanceNew: that => that.additionalProps.hcInstanceNew,
-		chartIsHidden: that => that.chartToggled && that.ChartInstance.chartIsHidden,
+		chartIsHidden: that => that.chartToggled && that.ChartInstance.chartIsHidden && !that.oneChartOnly,
+
+		oneChartPageLegend() {
+			const { oneChartOnly, ChartInstance } = this;
+
+			if (oneChartOnly && ChartInstance) {
+				if (
+					ChartInstance.requestsList.length > 1 && (
+						ChartInstance.options.chart.type == 'spline' ||
+						ChartInstance.options.chart.type == 'line'
+					)
+				) {
+					return ChartInstance.options.series.filter(si => si.custom_id == 'base_series')
+				}
+			}
+			return null;
+		},
 
 		HCInstance() {
 			const { higchartInstances } = this.additionalProps;
@@ -316,6 +353,7 @@ export default {
 		disableAnimationAndSpinner: that =>	that.additionalProps.disableAnimationAndSpinner,
 		
 		statsThresholdsActive: that => that.additionalProps.statsThresholdsActive,
+		oneChartOnly: that => that.additionalProps.oneChartOnly,
 
 		enableThresholdsOperations() {
 			const { additionalProps, ChartInstance, parameterTypeItems } = this;
@@ -380,6 +418,7 @@ export default {
 				statisticsResponsesReady: ready =>
 					this.handleStatisticsResponsesReady(ready),
 				hasStatistics: this.handleHasStatisticsChange,
+				chartDataReady: value => (this.chartDataReady = value),
 				chartOptionsReady: () => this.chartOptionsUpdate++,
 				chartOptionsUpdate: () => this.chartOptionsUpdate++,
 				chartThresholdsUpdate: options => this.handleChartThresholdsUpdate(options),
@@ -424,6 +463,8 @@ export default {
 			}
 			return [];
 		},
+
+		enableColorPickerBlock: that => that.currentSensorType.isBannerV2Generic,
 
 		// -------------------
 		updateThresholdsData: that =>
@@ -601,6 +642,12 @@ export default {
 	},
 
 	watch: {
+		ChartAPI(api) {
+			if (api) {
+				window['ChartAPI'] = api;
+			}
+		},
+
 		rootFilters() {
 			// console.log('rootFilters')
 			this.refetchChartData = true;
@@ -652,6 +699,7 @@ export default {
 		// this.ChartInstance.events.onEvent = this.handleChartEvent;
 		// this.ChartInstance.assignChartEvents(this.chartEventsList);
 		// this.ChartInstance.assignSeriesEvents('seriesEvents', this.chartPointsEventsList);
+
 		if (!this.chartIsHidden) {
 			this.fetchChartData();
 		}

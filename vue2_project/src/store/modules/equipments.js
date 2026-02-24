@@ -192,6 +192,48 @@ const actions = {
 		return multipurpose_response(storeArgs, `/equipments/${payload.itemId}/rpm-params`, extendedPayload);
 	},
 
+	// -------------------------
+
+	fetch_vibration_analysis_rules(storeArgs, payload = {}) {
+		const extendedPayload = {
+			...payload,
+			notNotify: true
+		};
+		return multipurpose_response(
+			storeArgs,
+			`/equipments/types/${payload.equipmentTypeId}/vibration-analysis-rules`,
+			extendedPayload
+		);
+	},
+
+	update_vibration_analysis_rules(storeArgs, payload = {}) {
+		const extendedPayload = {
+			...payload,
+			resultMessage: 'Vibration Analysis Rules Saved',
+			method: 'POST',
+		};
+		return multipurpose_response(
+			storeArgs,
+			`/equipments/types/${payload.equipmentTypeId}/vibration-analysis-rules`,
+			extendedPayload
+		);
+	},
+
+	fetch_vibration_analysis_rule_crossover_options(storeArgs, payload = {}) {
+		const extendedPayload = {
+			...payload,
+			notNotify: true
+		};
+		const {equipmentTypeId, ruleId } = extendedPayload;
+
+		return multipurpose_response(
+			storeArgs,
+			`/equipments/types/${equipmentTypeId}/vibration-analysis-rules/${ruleId}/crossover-options-values`,
+			extendedPayload
+		);
+	},
+
+
 	//-------------
 	fetch_metric_multi_views(storeArgs, payload) {
 		const extendedPayload = {
@@ -267,7 +309,7 @@ const actions = {
 		};
 		return multipurpose_response(
 			storeArgs,
-			`/equipments/${extendedPayload.itemId}/sensors/positions`,
+			`/equipments/${extendedPayload.itemId}/card-items-order`,
 			extendedPayload
 		);
 	},
@@ -281,6 +323,25 @@ const actions = {
 		return multipurpose_response(
 			storeArgs,
 			`/equipments/move/${extendedPayload.itemId}`,
+			extendedPayload
+		);
+	},
+
+	add_to_favorites_equipment(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			alternateResponseProp: 'data'			
+			// notNotify: true
+		};
+
+		/*if (extendedPayload) {
+			console.log(extendedPayload)
+			return
+		}*/
+
+		return multipurpose_response(
+			storeArgs,
+			`/equipments/${extendedPayload.itemId}/favorite`,
 			extendedPayload
 		);
 	},

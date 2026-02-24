@@ -146,7 +146,8 @@
 	&.small, &.mini {
 		.el-input {
 			height: 30px !important;
-			min-height: 30px;			
+			min-height: 30px !important;
+			line-height: 30px !important;
 
 			.el-select__caret {
 				line-height: 30px;
@@ -674,6 +675,44 @@
 	.el-picker-panel__shortcut {
 		white-space: nowrap;
 	}
+}
+
+.el-color-dropdown {
+	width: 230px !important;
+
+	.el-color-predefine {
+		width: 100%;
+		max-width: 240px;
+
+		.el-color-predefine__colors {
+			justify-content: center;
+			margin: -4px -4px 0;
+			.el-color-predefine__color-selector {
+				margin: 4px;
+			}
+		}
+
+	}
+
+	&.el-color-picker__panel {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+
+		.el-color-dropdown__main-wrapper {
+			display: none;
+		}
+	}
+
+	.el-color-dropdown__btns {
+		margin-top: 15px;
+		width: 94%;
+
+		.el-color-dropdown__value {
+			width: 120px;
+		}
+	}
+	
 }
 
 @media (max-width: 767px) {

@@ -95,23 +95,36 @@
 		>
 			<div
 				class="sensors-list drag-n-drop-list"
-				v-if="dashboardSensors && dashboardSensors.length"
+				v-if="sensorsAndMultiviewsList && sensorsAndMultiviewsList.length"
+				:key="resetReorder"
 			>
-				<CardSensorItem
+				<div
+					v-for="(item, idx) in sensorsAndMultiviewsList"
+					:key="`sensor-${item.id}_idx-${idx}`"
 					class="drag-n-drop-item"
-					v-show="!item.is_archived || filters.archivedNodes"
-					@event="handleEventNew"
-					v-for="item in dashboardSensors"
-					:key="`sensor-${item.id}`"
-					:itemData="item"
-					:data-id="item.id"
-					:enableReorder="enableReorder"
-					:enableResetRuntime="isIndustrialMatrix"
-				/>
+					:data-card_item_order="item.equipment_card_item_order"
+				>
+					<CardSensorItem
+						v-if="item.data_set"
+						v-show="!item.is_archived || filters.archivedNodes"
+						@event="handleEventNew"
+						:itemData="item"
+						:enableReorder="enableReorder"
+						:enableResetRuntime="isIndustrialMatrix"
+					/>
+
+					<CardMultiViewItem
+						v-else
+						@event="handleEventNew"
+						:enableReorder="enableReorder"
+						:itemData="item"
+					/>
+					
+				</div>
 			</div>
 		</div>
 
-		<div class="sensors-block multiviews-block" v-if="multiViewsList.length">
+		<!-- <div class="sensors-block multiviews-block" v-if="multiViewsList.length">
 			<CardMultiViewItem
 				@event="handleEventNew"
 				v-for="item in multiViewsList"
@@ -119,7 +132,7 @@
 				:itemData="item"
 				:data-id="item.id"
 			/>
-		</div>
+		</div> -->
 
 		<!-- <CardDroppedSection
 			:route="`/equipments/${cardData.id}/details`"
@@ -129,7 +142,7 @@
 </template>
 
 <script>
-import { findItemBy } from '@/helpers';
+import { findItemBy, sortArrayByKeyNumber } from '@/helpers';
 import { SENSOR_ALARM_TYPES } from '@/constants/global';
 
 import {
@@ -165,6 +178,7 @@ export default {
 	data: () => ({
 		crash_processes: [],
 		draggingLocked: false,
+		resetReorder: 1,
 
 		activeEquipmentTypeTab: '',
 
@@ -178,8 +192,8 @@ export default {
 			);
 		},
 
-		enableReorder: that =>
-			that.dashboardSensors.length > 1 && that.isIndustrialMatrix,
+		enableReorder: that => that.dashboardSensors.length > 1 && that.isIndustrialMatrix,
+		// enableReorder: () => false,
 		drag_n_drop_wrapper_selector: that =>
 			`.equipment_${that.cardData.id}-sensors-drag-n-drop-wrapper`,
 		// reorderAction: () => 'reorder_sensor',
@@ -237,6 +251,15 @@ export default {
 		// pictures: that => that.cardData.pictures,
 		// equipment_type_img: that => that.cardData.equipment_type_img,
 		dashboardSensors: that => that.cardData.dashboardSensors,
+		sensorsAndMultiviewsList() {
+			return sortArrayByKeyNumber(
+				// this.multiViewsList.concat(this.dashboardSensors),
+				this.dashboardSensors.concat(this.multiViewsList),
+				'equipment_card_item_order',
+				// 'desc'
+			);
+		},
+
 		has_breakdown: that => that.cardData.has_breakdown,
 
 		equipment_picture() {
@@ -330,27 +353,44 @@ export default {
 
 		reorderHandler(event) {
 			const { oldIndex, newIndex } = event;
-
-			if (oldIndex !== newIndex) {
-				const allContainers = document.querySelectorAll(
-					`${this.drag_n_drop_wrapper_selector} .drag-n-drop-list > .drag-n-drop-item`
-				);
+			const { card_item_order} = event.data.dragEvent.data.originalSource.dataset;
+			// console.log(event.data.dragEvent.data.originalSource.dataset);
+			if (oldIndex !== newIndex && card_item_order != null) {
 				const payload = {
 					itemId: this.cardData.id,
 					data: {
-						positions: []
+						current_display_order: +card_item_order,
+						desired_display_order: newIndex
 					}
-				};
+				}
 
-				allContainers.forEach((sensorCard, idx) => {
-					payload.data.positions.push({
-						sensor_id: +sensorCard.dataset.id,
-						position: idx
-					});
-				});
+				/*if (process.env.NODE_ENV === 'development') {
+					if (payload) {
+						console.log('reorderHandler', payload.data);
+						this.resetReorder++;
+						this.destroySortable();
+						
+						setTimeout(() => {
+							this.setupDraggable();
+						}, 0)
 
-				// console.log(payload);
-				this.$store.dispatch('equipments/reorder_sensors', payload);
+						return;
+					}
+				}*/
+
+				this.$store.dispatch('equipments/reorder_sensors', payload)
+					.then(() => {;
+						//
+					})
+					.catch(err => {
+						console.log(err);
+						this.resetReorder++;
+						this.destroySortable();
+						
+						setTimeout(() => {
+							this.setupDraggable();
+						}, 0);
+					})
 			}
 		},
 
@@ -366,21 +406,21 @@ export default {
 		this.draggingLocked = !this.enableReorder;
 		this.activeEquipmentTypeTab = this.currentEquipmentTypesList[0].id;
 
-		/*if (this.dashboardSensors.length) {
-			if (this.dashboardSensors.some(sensor=>{
+		if (this.dashboardSensors.length) {
+			/*if (this.dashboardSensors.some(sensor=>{
 				const type = this.getType(sensor);
-				return type.isBannerS22UVT
+				return type.isBannerM25
 			})) {
-				console.log('isBannerS22UVT', this.cardData.machine_name, this.cardData.asset_name);
+				console.log('isBannerM25', this.cardData.machine_name, this.cardData.asset_name);
 			}
 
-			if (this.dashboardSensors.some(sensor=>{
+			/*if (this.dashboardSensors.some(sensor=>{
 				const type = this.getType(sensor);
 				return type.isBannerV2Generic
 			})) {
 				console.log('isBannerV2Generic', this.cardData.machine_name, this.cardData.asset_name);
-			}
-		}*/
+			}*/
+		}
 
 		// this.fetchMultiViews(this.cardData.id);
 

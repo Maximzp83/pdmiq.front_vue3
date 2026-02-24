@@ -187,6 +187,10 @@ export default class ChartBase {
 				seriesEvents: this.seriesEvents,
 				chart_id: this.chart_id
 			});
+			
+			if (this.seriesCreatedCallback) {
+				this.seriesCreatedCallback(this.options.series);
+			}
 		}
 
 		if (this.transformator_settings.name) {
@@ -401,6 +405,7 @@ export default class ChartBase {
 						if (methodName) {
 							serie[key] = executeMethodFromList(methodName)({
 								statistics: resultData.statistics_result[responseDataKey],
+								resources: this.resources,
 								payload
 							});
 						} else {
@@ -432,6 +437,9 @@ export default class ChartBase {
 
 			// this.options.series = this.options.series.filter(serie => serie.data);
 			// console.log('assignDataToSeries end')
+			if (this.assignDataToSeriesReadyCallback) {
+				this.assignDataToSeriesReadyCallback(this.options.series);
+			}
 		} catch (e) {
 			console.warn(e);
 		}
@@ -473,6 +481,10 @@ export default class ChartBase {
 		this.responseCounter++;
 		// console.log('checkStatisticsResponses', this.chart_id, this.responseCounter, 'requestsQuantity', requestsQuantity, 'settings', settings.requestsQuantity, 'this.requestsList: ', this.requestsList.length)
 		if (this.responseCounter === requestsQuantity) {
+			if (this.onStatisticsResponsesReady) {
+				this.onStatisticsResponsesReady();
+			}
+			// console.log('3', this.responseCounter, requestsQuantity)
 			this.setValue('statisticsResponsesReady', true);
 			this.setValue('hasStatistics', this.checkIsHasStatistics());
 

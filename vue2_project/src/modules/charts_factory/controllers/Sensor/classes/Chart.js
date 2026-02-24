@@ -22,7 +22,7 @@ import {
 	removeDuplicatesObjectsArray
 } from '@/helpers';
 
-// import { ncdAxisList } from '@/constants/global';
+import { sensorThresholdsTypesList } from '@/constants/global';
 import { Lang } from '@/localization';
 
 import {
@@ -569,6 +569,15 @@ class SensorChartBase extends ChartBase {
 	setupAdditionalOptionsForSeries() {
 		return {};
 	}
+
+	assignDataToSeriesReadyCallback() {
+		// console.log('assignDataToSeriesReadyCallback', this.resources.chart_config, this.fetched_statistics_data)
+		const { applyColorSchemeOnSeriesReady, applyColorSchemeToSeriesZones } = this.resources.chart_config;
+		
+		if (applyColorSchemeOnSeriesReady) {
+			this.applyColorScheme({ applyColorSchemeToSeriesZones	});
+		}
+	}
 	// -----------------
 
 	fetchChartDataAction(settings = {}) {
@@ -739,6 +748,77 @@ class SensorChartBase extends ChartBase {
 				this.ChartAPI.xAxis[0].setExtremes(null, null);	//todo Cannot read properties of undefined (reading '0')
 			}
 		}
+
+		if (this.events.chartDataReady) {
+			this.events.chartDataReady(true);
+		}
+	}
+
+	// -----------------
+	updateFetchedColorSchemes(value) {
+		if (this.fetched_statistics_data[`parameter_${this.chart_parameter_id}`]) {
+			this.fetched_statistics_data[`parameter_${this.chart_parameter_id}`].metric_threshold_levels_color_schemes =
+				value;
+
+				const { applyColorSchemeToSeriesZones } = this.resources.chart_config;			
+
+			this.applyColorScheme({redraw:true, applyColorSchemeToSeriesZones });
+		}
+	}
+
+	getColorSchemesList() {
+		if (this.fetched_statistics_data[`parameter_${this.chart_parameter_id}`]) {
+			try {
+				let list = this.fetched_statistics_data[`parameter_${this.chart_parameter_id}`].metric_threshold_levels_color_schemes;
+
+				if (list) {
+					return list.map(item => ({
+						...item,
+						label: findItemBy('id', item.threshold_level, sensorThresholdsTypesList()).name,
+					}))
+				}
+			} catch (e) {
+				console.warn(e);
+			}
+		}
+		return [];
+	}
+
+	getSeriesIndexes(series, threshold_level) {
+		let indexes = [];
+		series.forEach((si, idx) => {
+			if (si.customSettings && (si.customSettings.threshold_level === threshold_level || si.customSettings.thresholdLevelsInZones)) {
+				indexes.push(idx);
+			}
+		});
+		return indexes;
+	}
+
+	applyColorScheme(settings={}) {
+		if (this.hasStatistics && this.options.series.length) {
+			this.getColorSchemesList().forEach(li => {
+				const chart_serie_indexes = this.getSeriesIndexes(this.options.series, li.threshold_level);
+
+				chart_serie_indexes.forEach(idx => {
+					if (this.options.series[idx]) {
+						this.options.series[idx].color = li.color_scheme;
+						// console.log('applyColorScheme', idx, this.options.series[idx].id, li);
+						
+						if (settings.applyColorSchemeToSeriesZones && this.options.series[idx].zones) {
+							this.options.series[idx].zones.forEach(zone => {
+								if (zone.threshold_level === li.threshold_level) {
+									zone.color = li.color_scheme;
+								}
+							});							
+						}
+					}
+				});
+			});
+
+			if (settings.redraw) {
+				this.emitChartOptionsUpdate();
+			}
+		}
 	}
 }
 
@@ -883,7 +963,7 @@ class SensorChart extends SensorChartBase {
 			resources.chart_config.YAxisList = [ this.requestsList[0], rpmYAxis ];
 		}
 	}
-
+	
 	finalSetupReadyCallback() {
 		var { transformator_settings } = this;
 		if (transformator_settings) {
@@ -924,7 +1004,7 @@ class SensorChart extends SensorChartBase {
 					this.generateSeriesByStatistics.seriesConfigMethod
 				]({
 					statistics: Object.values(resultData.statistics_result)[0].pointsData,
-					seriesConfig: cloneDeep(this.seriesConfig)
+					seriesConfig: cloneDeep(this.seriesConfig),
 				});
 			}
 
@@ -937,6 +1017,7 @@ class SensorChart extends SensorChartBase {
 					this.options.series
 				);
 			}
+			// console.log('call generateSeries')
 			this.options.series = this.generateSeries({
 				seriesConfig: updatedSeriesConfig,
 				seriesEvents: this.seriesEvents,
@@ -971,12 +1052,12 @@ class SensorChart extends SensorChartBase {
 			'transparent-serie',
 			seriesConfig.pointsData.seriesConfigsList[0]
 		);
-		// console.log(seriesConfig.pointsData.seriesConfigsList[0])
-		const baseSerie = findItemBy(
+		let baseSerie = findItemBy(
 			'id',
 			'base-serie',
 			seriesConfig.pointsData.seriesConfigsList[0]
 		);
+
 		let newSeriesConfigsList = [transparentSerie];
 		// console.log('statistics', statistics)
 		if (statistics.history.length) {
@@ -986,10 +1067,12 @@ class SensorChart extends SensorChartBase {
 					id: `base-serie-${idx}`,
 					data_path: `history.${idx}.base`,
 					customSettings: {
+						threshold_level: null,
+						thresholdLevelsInZones: true,
 						setupSeriePropValue: [
 							{
 								key: 'zones',
-								methodName: 'setupSerieLowHighZones',
+								methodName: 'setupLineSerieZones',
 								payload: { levelZoneData: hi.levelZoneData }
 							}
 						]
@@ -1782,6 +1865,7 @@ class SensorChart extends SensorChartBase {
 		});
 	}
 
+	// ------------------
 	/*updateChartByYfilters(y_filters) {
 		if (y_filters[this.chart_id] && y_filters[this.chart_id].y_min) {
 			// console.log(
@@ -2106,7 +2190,7 @@ class SensorOverlayChart extends SensorChartBase {
 					setupPointsData: { 
 						method: 'line_charts_datetime',
 						enableZones: false,
-						y_formula: payload_1.isMaxPeakFrequency ? y => y * 60 : null
+						// y_formula: payload_1.isMaxPeakFrequency ? y => y * 60 : null
 					}
 				}
 			}
@@ -2150,8 +2234,11 @@ class SensorOverlayChart extends SensorChartBase {
 			showLastLabel: true,
 			opposite: true,
 			alignTicks: false,
-			title: { text: 'RPM' },
 		};
+
+		if (this.resources.filters.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+			yAxis.title = {text: ' RPM'};
+		}
 		// console.log(this.sensorItem.min_ncd_custom_formula_result, this.sensorItem.value_20ma)
 		if (this.isNCDSensor) {
 			if (
@@ -2196,7 +2283,11 @@ class SensorOverlayChart extends SensorChartBase {
 					si.id == 'base-serie'
 					// (si.responseDataKey == `parameter_${requestsList[0].id}`
 				) {
+					let valueSuffix = ' Hertz';
 					newSeriesConfig.pointsData.seriesConfigsList[key] = newSeriesConfig.pointsData.seriesConfigsList[key] || [];
+					if (this.resources.filters.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+						valueSuffix = ' RPM';
+					}
 
 					newSeriesConfig.pointsData.seriesConfigsList[key].push({
 						...si,
@@ -2217,7 +2308,7 @@ class SensorOverlayChart extends SensorChartBase {
 							gapUnit: 'value',
 							showInNavigator: false,
 							name: this.chartTitle,
-							tooltip: {valueSuffix: ' RPM'}
+							tooltip: {valueSuffix}
 							// enableMouseTracking: false
 						},
 
@@ -2369,6 +2460,7 @@ class MultiViewChart extends ChartBase {
 	}
 
 	setupUnitTypeName(payload) {
+		// console.log('setupUnitTypeName', payload)
 		return getUnitType(payload);
 	}
 

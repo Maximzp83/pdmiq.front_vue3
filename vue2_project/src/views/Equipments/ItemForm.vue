@@ -73,7 +73,7 @@
 					:optionsList="equipmentTypesList"
 					:placeholder="`${tt('Select')} ${tt('type')}`"
 					v-model="formData.equipment_type_id"
-					@change="formData.equipment_subtype_id = null"
+					@change="handleEquipmentTypeChange"
 				/>
 			</el-form-item>
 
@@ -118,11 +118,12 @@
 				prop="brand_model_id"
 				class="half-width content-row"
 			>
+					<!-- :loadmoreIsActive="!formData.brand_id || brandModelsList.length < 2" -->
 				<FetchByQuerySelect
 					@change="handleChangeBrandModel"
 					clearable
 					enableLoadmore
-					:loadmoreIsActive="!formData.brand_id || brandModelsList.length < 2"
+					loadmoreIsActive
 					v-model="formData.brand_model_id"
 					:optionsLoading.sync="brandModelsLoading"
 					:optionsList.sync="brandModelsList"
@@ -131,50 +132,48 @@
 				/>
 			</el-form-item>
 
+			<div class="content-row" v-if="selectedEquipmentType && formData.brand_model_id && preparedVibrationAnalysisItems.length">
+				<b>{{tt('Vibration_Analysis')}}:</b>
+			</div>
+
+			<div class="form-section paint_v2 type_2 content-row"
+				v-if="selectedEquipmentType && formData.brand_model_id && preparedVibrationAnalysisItems.length"
+			>
+				<AnalysisRuleItem
+					class="el-form-item"
+					ref="AnalysisRuleItem"
+					v-for="(rule, idx) in preparedVibrationAnalysisItems"
+					:key="`va-${rule.original_rule_id}`"
+					:item-data="rule"
+					:item-index="idx"
+					:equipmentTypeId="selectedEquipmentType.id"
+					:brandModelId="formData.brand_model_id"
+					:rpm_source_value="rpm_source_value"
+				/>
+				<!-- <div class="text-center"></div> -->
+			</div>
+
+			<!-- --------------- -->
+			<div class="content-row" v-if="preparedChildComponentsItems.length">
+				<b>{{`${tt('Child')} ${tt('Components')}`}}:</b>
+			</div>
+
 			<div
 				class="content-row paint"
-				v-if="selectedEquipmentType && childEquipmentType"
+				v-if="preparedChildComponentsItems.length"
 			>
-				<div class="content-row">
-					<b class="uppercase">{{ childEquipmentType.name }}</b>
-				</div>
-
-				<div class="form-section type_2 paint_v2 content-row ">
-					<el-form-item
-						:label="`${tt('Brand')}`"
-						prop="subtype_brand_id"
-						class="half-width"
-					>
-						<!-- :loadmoreIsActive="assetsLoadmoreIsActive" -->
-						<FetchByQuerySelect
-							clearable
-							enableLoadmore
-							v-model="formData.subtype_brand_id"
-							:optionsLoading.sync="subBrandsLoading"
-							:optionsList.sync="subBrandsList"
-							:settings="subBrandQueryOptions"
-							:placeholder="`${tt('select')} ${tt('brand')}`"
-						/>
-					</el-form-item>
-
-					<el-form-item
-						:label="`${tt('Part')} ${tt('Number')}`"
-						prop="subtype_brand_model_id"
-						class="half-width"
-					>
-						<FetchByQuerySelect
-							clearable
-							enableLoadmore
-							:loadmoreIsActive="!formData.subtype_brand_id"
-							v-model="formData.subtype_brand_model_id"
-							:optionsLoading.sync="subBrandModelsLoading"
-							:optionsList.sync="subBrandModelsList"
-							:settings="subBrandModelsQueryOptions"
-							:placeholder="`${tt('select')} ${tt('part_number')}`"
-						/>
-					</el-form-item>
-				</div>
+				<ChildComponentItem
+					ref="ChildComponentItem"
+					v-for="(child, idx) in preparedChildComponentsItems"
+					:key="`child_component-${child.id ? child.id : idx}`"
+					:item-data="child"
+					:item-index="idx"
+					:equipmentTypesList="equipmentTypesList"
+					:rpm_source_value="rpm_source_value"
+				/>
 			</div>
+
+			<!-- --------------- -->
 
 			<div class="content-row">
 				<b>RPM</b>
@@ -305,9 +304,13 @@
 						multiple
 						rotate
 						showDeleteButton
+						:enableReorderFiles="{appendTo:'body', formKey:'display_order'}"
 						:pictures="itemImagesList"
 						:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.EQUIPMENT }"
+						:blockId="EQUIPMENT_IMG_TYPES.EQUIPMENT"
 					/>
+						<!-- @onUploadListRefLoaded="<tt></tt>" -->
+						<!-- uploadListWapperClass="el-upload-list-wrapper drag-n-drop-list" -->
 				</el-form-item>
 
 				<el-form-item
@@ -321,7 +324,9 @@
 						rotate
 						showDeleteButton
 						:pictures="nameplateImagesList"
+						:enableReorderFiles="{appendTo:'body', formKey:'display_order'}"
 						:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.NAMEPLATE }"
+						:blockId="EQUIPMENT_IMG_TYPES.NAMEPLATE"
 					/>
 						<!-- :pictures="getPicturesByType(type.id)" -->
 				</el-form-item>
@@ -438,7 +443,9 @@ export default {
 		FileUploadBlock: () => import('@/components/form/uploadBlock/FileUploadBlock.vue'),
 		// ImgUploadBlock: () => import('@/components/form/ImgUploadBlock.vue'),
 		AttachmentItem: () => import('../ProductionLines/AttachmentItem.vue'),
-		FetchByQuerySelect: () => import('@/components/form/FetchByQuerySelect.vue')
+		AnalysisRuleItem: () => import('./AnalysisRuleItem.vue'),
+		ChildComponentItem: () => import('./ChildComponentItem.vue'),
+		FetchByQuerySelect: () => import('@/components/form/FetchByQuerySelect.vue'),
 	},
 
 	props: {
@@ -456,6 +463,7 @@ export default {
 
 	data() {
 		return {
+			draggingLocked: false,
 			isMobile: false,
 
 			analoguesDialogVisible: false,
@@ -468,6 +476,8 @@ export default {
 			// assetsList: [],
 			assetFetchedById: null,
 			// firstEquipmentTypesFetch: true,
+			skipBindingCleanProp: {},
+			skipListCleanProp: {},
 
 			brandsLoading: false,
 			brandsList: [],
@@ -487,6 +497,11 @@ export default {
 			equipmentsList: [],
 			rpmOptionsLoading: false,
 			rpmOptionsList: [],
+
+			// equipmentTypeHasChanged: false,
+			childComponentsList: [],
+			vibrationAnalysisLoading: false,
+			vibrationAnalysisList: [],
 
 			bannerV2GenericParametersList: [],
 			bannerV2GenericParametersLoading: false,
@@ -527,6 +542,9 @@ export default {
 				rpm_external_node_parameter: null,
 				rpm_external_source_type: RPM_SOURCES_TYPES.EXTERNAL_INPUT,
 				rpm_source_item: null,
+
+				vibration_analysis_rules: [],
+				child_components: []
 
 			},
 
@@ -598,7 +616,7 @@ export default {
 			});
 		},
 
-		subBrandQueryOptions() {
+		/*subBrandQueryOptions() {
 			if (this.childEquipmentType) {
 				return Object.freeze({
 					fetchAction: 'brands/fetch_brands',
@@ -612,6 +630,7 @@ export default {
 			}
 			return null;
 		},
+		*/
 
 		brandModelsQueryOptions() {
 			return Object.freeze({
@@ -690,6 +709,8 @@ export default {
 				},
 				{
 					action: 'fetch_brand_models',
+					payload: { params: { max: 30 } },
+
 					initialSetup:
 						this.itemData && this.itemData.brand_model_id
 							? {
@@ -700,17 +721,18 @@ export default {
 							  }
 							: null,
 					bindTo: [
-						{
+						/*{
 							prop: 'formData.equipment_type_id',
 							param: 'equipmentTypeId',
 							// noFetch: !this.formData.brand_model_id,
-							clean_prop: 'formData.brand_model_id',
+							// clean_prop: 'formData.brand_model_id',
 							disableFetch: true
-						},
+						},*/
 						{
 							prop: 'formData.brand_id',
 							param: 'brandId',
-							clean_prop: 'formData.brand_model_id'
+							clean_prop: 'formData.brand_model_id',
+							disableFetch: true
 						}
 					],
 					localProp: 'brandModelsList',
@@ -812,12 +834,26 @@ export default {
 			return null;
 		},
 
-		childEquipmentType() {
+		/*childEquipmentType() {
 			const { selectedEquipmentType, equipmentTypesList } = this;
 			if (equipmentTypesList.length && selectedEquipmentType) {
 				return findItemBy('parent_id', selectedEquipmentType.id, equipmentTypesList);
 			}
 			return null;
+		},*/
+
+		childComponentsForSelectedEquipmentType() {
+			const { selectedEquipmentType } = this;
+			if (selectedEquipmentType && selectedEquipmentType.child_components) {
+				// return selectedEquipmentType.child_components.map(ci => ci.child);
+				// return selectedEquipmentType.child_components;
+				return selectedEquipmentType.child_components.map(ci => ({
+					original_component: { ...ci },
+					id: null,
+					original_component_id: ci.id,
+				}));
+			}
+			return [];
 		},
 
 		drivesList() {
@@ -849,6 +885,8 @@ export default {
 			{ ref: 'ItemImagesBlock', targetProp: 'pictures' },
 			{ ref: 'nameplateImagesBlock', targetProp: 'pictures' },
 			{ ref: 'AttachmentItem', targetProp: 'libraries' },			
+			{ ref: 'AnalysisRuleItem', targetProp: 'vibration_analysis_rules' },
+			{ ref: 'ChildComponentItem', targetProp: 'child_components' },
 		]),
 
 		itemImagesList() {
@@ -982,6 +1020,76 @@ export default {
 		formulaTooltipContent() {
 			return this.$t('aliases.rpm_tooltip_prhrase');
 		},
+
+		// ------------------------------
+
+		preparedChildComponentsItems() {
+			// console.log(this.itemData)
+			return this.childComponentsForSelectedEquipmentType.map(ci => {
+				if (this.itemData) {
+					const equipmentChildComponentItem = findItemBy('original_component_id', ci.original_component.id, this.itemData.child_components);
+
+					if (equipmentChildComponentItem) {
+						const childItem = findItemBy('id', equipmentChildComponentItem.original_component.child_id, this.equipmentTypesList);
+
+						// --------------
+						let childs = [];
+						if (equipmentChildComponentItem.original_component.child_ids) {
+							equipmentChildComponentItem.original_component.child_id.forEach(child_id => {
+								const childItem = findItemBy('id', child_id, this.equipmentTypesList);
+								if (childItem) {
+									childs.push({...childItem});
+								}
+							})
+						}
+						
+						return {
+							...equipmentChildComponentItem,
+							original_component: {
+								...equipmentChildComponentItem.original_component,
+								child: childItem,
+								childs
+							}
+						};
+					}
+				}
+
+				return ci;
+			})
+		},
+
+		preparedVibrationAnalysisItems() {
+			return this.vibrationAnalysisList.map(rule => {
+				if (this.itemData) {
+					const ruleItemInEquipment = findItemBy('original_rule_id', rule.id, this.itemData.vibration_analysis_rules);
+
+					if (ruleItemInEquipment) {
+						return ruleItemInEquipment;
+					}
+				}
+
+				return {
+					original_rule: {...rule},
+					id: null,
+					original_rule_id: rule.id
+				};
+			})		
+		},
+
+		rpm_source_value: that => that.itemData.rpmSources ? that.itemData.rpmSources.rpm_source_value_evaluated : null,
+
+		/*preparedVibrationAnalysisItems2() {
+			if (this.vibrationAnalysisList.length) {
+				return this.vibrationAnalysisList.map(rule => ({
+					original_rule: {...rule},
+					id: null,
+					original_rule_id: rule.id
+				}))
+			} else if (this.itemData && this.itemData.vibration_analysis_rules) {
+				return this.itemData.vibration_analysis_rules;
+			}
+			return [];
+		},*/
 	},
 
 	methods: {
@@ -999,7 +1107,7 @@ export default {
 			fetch_equipments: 'equipments/fetch_equipments',
 			fetch_rpm_options: 'equipments/fetch_rpm_options',
 			fetch_production_line_rpm_nodes: 'production_lines/fetch_production_line_rpm_nodes',
-
+			fetch_vibration_analysis_rules: 'equipments/fetch_vibration_analysis_rules',
 			// save_item: 'equipments/save_equipment'
 		}),
 
@@ -1133,6 +1241,16 @@ export default {
 				if (item.brand_model_id && item.equipment_type_id) {
 					this.fetchRpmOptions(item.equipment_type_id, item.brand_model_id);
 				}
+
+				// -----------------------
+				// console.log(item)
+				/*if (
+					(!item.vibration_analysis_rules || !item.vibration_analysis_rules.length) 
+					&& item.equipment_type_id
+				) {
+					this.fetchVibrationAnalysis(item.equipment_type_id)
+				}*/
+
 			} else {
 				if (this.multiFormFilters && this.multiFormFilters.plantId) {
 					this.formData.plant_id = this.multiFormFilters.plantId;
@@ -1187,6 +1305,29 @@ export default {
 			}
 		},
 
+		handleEquipmentTypeChange() {
+			this.formData.equipment_subtype_id = null;
+			// -----------------
+			// this.equipmentTypeHasChanged = true;
+			// this.fetchVibrationAnalysis(id);
+		},
+
+		// ----------------------
+		fetchVibrationAnalysis(equipmentTypeId) {
+			const payload = { 
+				equipmentTypeId,
+				// params: { max: -1 }
+			};
+
+			this.doFetchAction(
+				'fetch_vibration_analysis_rules',
+				'vibrationAnalysisList',
+				'vibrationAnalysisLoading',
+				payload
+			);
+		},
+		// -------------------
+
 		localGetFormDataCallback(data) {
 			const { status_id, childEquipmentType } = this;
 			const { subtype_brand_id, subtype_brand_model_id } = this.formData;
@@ -1197,6 +1338,10 @@ export default {
 			if ((subtype_brand_id || subtype_brand_model_id) && childEquipmentType) {
 				data.equipment_subtype_id = childEquipmentType.id;
 			}
+
+			data.child_components = data.child_components.filter(ci => {
+				return ci.brand_id && ci.brand_model_id;
+			});
 
 			// if (!data.url) delete data.url;
 
@@ -1255,6 +1400,9 @@ export default {
 	},
 
 	watch: {
+		'formData.equipment_type_id'(id) {
+				this.fetchVibrationAnalysis(id);
+		},
 		/*'formData.equipment_type_id'(id) {
 			// console.log(id && this.equipmentTypesList.length)
 			if (id && this.equipmentTypesList.length) {
@@ -1280,9 +1428,9 @@ export default {
 			// if (this.isInitialSetup) return;
 			// this.formData.brand_id = null;
 			// this.formData.brand_model_id = null;
-		},
+		},*/
 
-		'equipmentTypesList'(list) {
+		/*'equipmentTypesList'(list) {
 			const { equipment_type_id } = this.formData;
 			if (list.length && equipment_type_id) {
 				const item = findItemBy('id', equipment_type_id, list);
@@ -1317,9 +1465,34 @@ export default {
 			}
 		},
 
+		/*'formData.equipment_type_id'() {
+			console.log('formData.equipment_type_id')
+			this.skipBindingCleanProp = 'formData.brand_id';
+		},*/
+
 		'selectedEquipmentType'(type) {
 			if (type && type.without_brand) {
 				this.rules.brand_id = null;
+			}
+			// console.log('selectedEquipmentType', type);
+
+			if (!this.itemId) {
+				if (type && type.default_brand_id && !this.formData.brand_id) {
+					this.brandsList = [type.default_brand];
+					this.skipBindingCleanProp['formData.brand_id'] = true;
+					this.skipListCleanProp['brandsList'] = true;
+
+					this.formData.brand_id = type.default_brand_id;
+					// console.log('selectedEquipmentType', type, this.brandsList)
+				}
+				if (type && type.default_brand_model_id && !this.formData.brand_model_id) {
+					this.brandModelsList = [type.default_brand_model];
+					this.skipBindingCleanProp['formData.brand_model_id'] = true;
+					this.skipListCleanProp['brandModelsList'] = true;
+
+					this.formData.brand_model_id = type.default_brand_model_id;
+					// console.log('selectedEquipmentType', this.brandModelsList)
+				}
 			}
 		},
 
@@ -1394,6 +1567,8 @@ export default {
 	}*/
 
 	beforeMount() {
+		// this.draggingLocked = !this.enableReorder;
+
 		this.isMobile = document.documentElement.clientWidth < 992;
 	}
 };

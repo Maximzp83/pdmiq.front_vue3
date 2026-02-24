@@ -5,6 +5,11 @@
 			:itemsName="tt('chart')"
 		/>
 
+		<!-- <span class="span-block" v-for="color in colorsList" 
+			:key="`color-indicator-${color}`"
+			:style="`backgroundColor: ${color}; width: 20px; display: inline-block; height: 20px;`"
+		></span> -->
+
 		<div class="card-header chart-card-header flex mrow wrap" v-show="hasStatistics">
 			<!-- <button @click="zoomYAxis">+</button> -->
 			<div class="flex mrow wrap align-center left-part ">
@@ -19,7 +24,7 @@
 							<div class="">
 								<el-button
 									@click="toggleChart"
-									type="primary inverted"
+									type="secondary"
 									native-type="button"
 									class="item-action-button capitalize flex align-center"
 								>
@@ -31,13 +36,14 @@
 				</div>
 
 				<div
-					class="zoom-block-container mcol-xs-9 mcol-sm-auto capitalize"
+					class="zoom-block-container mcol-xs-9 mcol-sm-auto capitalize fft-chart-actions"
 					v-if="ChartAPI"
 					v-show="!chartIsHidden"
 				>
 					<div class="chart-actions-block">
 						<div class="flex wrap mrow">
 							<ChartZoom
+								buttonType="secondary inverted"
 								class="mcol-xs-6 mcol-sm-auto"
 								@event="handleEventNew"
 								:ChartInstance="ChartInstance"
@@ -59,6 +65,21 @@
 						:activeButtonValues="activeButtonValues"
 						:xAxisTitle="xAxisTitle"
 						:chartPeaks="chartPeaks"
+					/>
+				</div>
+
+				<div
+					class="mcol-xs-12 mcol-lg-auto fft-chart-actions fft-analysis-bar-container capitalize"
+					v-show="!chartIsHidden"
+					v-for="component in selectedChildComponents"
+					:key="`fft-analysis-rules-bar-${component.id}`"
+				>
+					<ChartFFTAnalysisRulesBar
+						ref="ChartFFTAnalysisRulesBar"
+						:componentItem="component"
+						:equipmentData="additionalProps.equipmentData"
+						:selectedAnalysisRules="selectedAnalysisRules"
+						@event="handleEventNew"
 					/>
 				</div>
 
@@ -141,7 +162,7 @@
 <script>
 import { mapState } from 'vuex';
 
-import { getRoundedValue, findItemBy } from '@/helpers';
+import { getRoundedValue, findItemBy, /*countDecimalOrder*/ } from '@/helpers';
 
 import { BANNER_REQUEST_TYPES } from '@/constants/global';
 
@@ -157,7 +178,8 @@ export default {
 		ChartOperationsBar: () => import('../ChartOperationsBar.vue'),
 		PeaksList: () => import('./PeaksList.vue'),
 		ChartWrapper: () => import('@/components/charts/ChartWrapper.vue'),
-		WaterfallStatisticsContainer: () => import('./WaterfallStatisticsContainer.vue')
+		WaterfallStatisticsContainer: () => import('./WaterfallStatisticsContainer.vue'),
+		ChartFFTAnalysisRulesBar: () => import('./ChartFFTAnalysisRulesBar.vue')
 	},
 	props: {
 		ChartInstance: {
@@ -179,6 +201,11 @@ export default {
 		},
 
 		activeAxis: Number,
+
+		additionalProps: {
+			type: Object,
+			default: () => ({})
+		},
 
 		// prevFFTId: Number,
 	},
@@ -203,14 +230,19 @@ export default {
 				showPeaksActive: false,
 				showPeriodicActive: false,
 				showWaterfallActive: false,
-				generatingWaveform: false
+				generatingWaveform: false,
+				analysisRuleButton30: false
 			},
+
+			activeFFTAnalysisButtons: null,
 
 			createdWaveforms: {
 				axis_1: '',
 				axis_2: '',
 				axis_3: '',
-			}
+			},
+
+			selectedAnalysisRules: [],
 		};
 	},
 
@@ -249,7 +281,7 @@ export default {
 					{
 						id: 6,
 						prefix_icon: 'el-icon-video-play',
-						type: 'primary inverted',
+						type: 'secondary inverted',
 						event: 'handlePlaySound',
 						loadingKey: 'generatingWaveform'
 					}
@@ -262,7 +294,7 @@ export default {
 					id: 1,
 					text: `${this.tt('Add')} ${this.tt('Cursor')}`,
 					prefix_icon: 'icon-cursor',
-					type: 'primary inverted',
+					type: 'secondary inverted',
 					activeKey: 'addCursorActive',
 					event: 'addCursor'
 				},
@@ -270,7 +302,7 @@ export default {
 					id: 3,
 					text: `${this.tt('Show')} ${this.tt('Peaks')}`,
 					event: 'showPeaks',
-					type: 'primary inverted',
+					type: 'secondary inverted',
 					prefix_icon: 'icon-peaks',
 					activeKey: 'showPeaksActive'
 				},
@@ -278,7 +310,7 @@ export default {
 					id: 4,
 					text: `${this.tt('Periodic')} ${this.tt('Cursors')}`,
 					event: 'showPeriodicCursors',
-					type: 'primary inverted',
+					type: 'secondary inverted',
 					prefix_icon: 'icon-periodic',
 					activeKey: 'showPeriodicActive',
 					isPeriodicCursors: true
@@ -287,14 +319,14 @@ export default {
 					id: 5,
 					text: `${this.tt('Waterfall')}`,
 					event: 'showWaterfallCharts',
-					type: 'primary inverted',
+					type: 'secondary inverted',
 					prefix_icon: 'icon-waterfall',
 					activeKey: 'showWaterfallActive'
 				},
 				{
 					id: 2,
 					text: `${this.tt('Remove')}`,
-					type: 'primary inverted',
+					type: 'secondary inverted',
 					prefix_icon: 'icon-plus rotate',
 					isDelete: true,
 					event: 'removeAllCursors'
@@ -304,6 +336,8 @@ export default {
 
 			return Object.freeze(buttons);
 		},
+
+		// chartFFTAnalysisOperationsButtons
 
 		chartOptions: that =>
 			that.chartOptionsUpdate
@@ -366,7 +400,8 @@ export default {
 					this.handleStatisticsResponsesReady(ready),
 				hasStatistics: value => this.handleHasStatistics(value),
 				chartOptionsReady: options => this.handleChartOptionsReady(options),
-				chartOptionsUpdate: options => this.handleChartOptionsReady(options)
+				chartOptionsUpdate: options => this.handleChartOptionsReady(options),
+				rpmCursorDrop: data => this.handleRpmCursorDrop(data)
 			};
 
 			return Object.freeze(list);
@@ -381,6 +416,30 @@ export default {
 			});
 		},
 
+		selectedChildComponents() {
+			let colorIndex = 0;
+
+			return this.additionalProps.selectedChildComponents.map(ci => {
+
+				return {
+					...ci,
+					vibration_analysis_rules: ci.vibration_analysis_rules.map(rule => {
+						const item = {
+							...rule,
+							color: this.colorsList[colorIndex] || '#000',
+							y_position: -(250 - colorIndex * 20)
+						}
+						colorIndex++;
+						return item;
+					})
+				}
+			})
+		},
+
+		colorsList: () => Object.freeze([
+			'#ff0000','#00E676','#795548','#18FFFF','#00B8D4','#FFEA00',
+			'#ff00ff','#c800ea','#008a09','#FFAB40','#9c0303','#2979FF',
+		]),
 	},
 
 	methods: {
@@ -529,8 +588,8 @@ export default {
 		},
 
 		addCursor() {
-			this.activeButtonValues.addCursorActive = !this.activeButtonValues
-				.addCursorActive;
+			this.activeButtonValues['addCursorActive'] = !this.activeButtonValues
+				['addCursorActive'];
 		},
 
 		removeAllCursors() {
@@ -581,7 +640,41 @@ export default {
 				this.hoverData = {};
 				this.ChartInstance.addCursor(point);
 			}
-		}
+		},
+
+		handleRpmCursorDrop({ x }) {
+			this.$emit('event', {
+				eventName: 'handleRpmCursorDrop',
+				data: {
+					rpm_value: getRoundedValue(x, 0, 0),
+					isFFTRPM: true
+				},
+				onward: true
+			})
+		},
+
+		updateRpmCursor(rpm_value) {
+			this.ChartInstance.setValue('rpmValue', rpm_value);
+			this.ChartInstance.addRpmCursor(rpm_value);
+		},
+
+		// -------------------
+		addAnalysisRuleToSelected(rule) {
+			const isSelected = this.selectedAnalysisRules.some(item => item.id === rule.id);
+			if (!isSelected) {
+				this.selectedAnalysisRules.push(rule);
+
+			} else {
+				this.selectedAnalysisRules = this.selectedAnalysisRules.filter(item => item.id !== rule.id);
+			}
+
+			/*this.selectedAnalysisRules = this.selectedAnalysisRules.map((item, index) => ({
+				...item,
+				color: this.colorsList[index]
+			}));*/
+
+			this.ChartInstance.generateAnnotationsFromFFTAnalysisRules(this.selectedAnalysisRules);
+		},
 
 		/*handleCursorClick({point}) {
 			this.ChartInstance.removeCursor(point);
@@ -620,6 +713,21 @@ export default {
 				}
 			}, 500);
 		},
+
+		chartFFTAnalysisOperationsButtons(buttons) {
+			if (buttons.length) {
+				this.activeFFTAnalysisButtons = {};
+				buttons.forEach(button => {
+					this.activeFFTAnalysisButtons[button.activeKey] = false;
+				});
+
+			}
+		},
+
+		'currentFFTItem.rpm_value'(rpm_value) {
+			this.updateRpmCursor(rpm_value);
+			// console.log('watch currentFFTItem.rpm_value', rpm_value)
+		}
 	},
 
 	mounted() {
@@ -652,6 +760,9 @@ export default {
 		this.ChartInstance.setValue('seriesEvents', this.chartPointsEventsList);
 		// }
 
+		if (this.currentFFTItem.rpm_value != null) {
+			this.ChartInstance.setValue('rpmValue', this.currentFFTItem.rpm_value);
+		}
 	}
 };
 </script>

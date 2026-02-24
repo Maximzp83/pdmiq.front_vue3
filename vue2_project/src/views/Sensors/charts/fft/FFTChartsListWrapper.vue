@@ -107,7 +107,7 @@ export default {
 		},
 
 		ChartsListInstance() {
-			// console.log('ChartsListInstance', executeChartsListFactory)
+			// console.log('ChartsListInstance')
 			return executeChartsListFactory('FFTChartsListFactory', {
 				//1 level payload
 				settings: {
@@ -116,9 +116,9 @@ export default {
 				payload_1: {
 					sensorType: this.currentChartSettingsKey,
 					sensorItem: this.sensorData,
-					fftId: this.fftId,
+					// fftId: this.fftId,
 					currentSensorType: this.currentSensorType,
-					isRequestTypeEnvelope: this.isRequestTypeEnvelope
+					// isRequestTypeEnvelope: this.isRequestTypeEnvelope
 				}
 			});
 		},
@@ -177,12 +177,22 @@ export default {
 	},
 
 	methods: {
+		callChartsMethod(payload) {
+			if (this.ChartsListInstance) {
+				this.ChartsListInstance.callChartsMethod(payload);
+			}
+		},
+
 		buildCharts({ settings, payload }) {
 			payload = payload || {};
 
 			this.ChartsListInstance.buildCharts({
 				settings,
-				payload_1: { ...payload },
+				payload_1: {
+					...payload,
+					fftId: this.fftId,
+					isRequestTypeEnvelope: this.isRequestTypeEnvelope
+				},
 				filters: { ...this.rootFilters }
 			});
 

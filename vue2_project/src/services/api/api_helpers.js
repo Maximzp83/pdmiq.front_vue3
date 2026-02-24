@@ -353,13 +353,17 @@ const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'rpmSources', val_key: 'rpmSources' },
 		{ key: 'rpm_external_value', val_key: 'rpm_external_value' },
 		{ key: 'rpm_external_source_type', val_key: 'rpm_external_source_type' },
-		{ key: 'rpm_unit_expression', val_key: 'rpm_unit_expression' },
+		{ key: 'rpm_formula', val_key: 'rpm_formula' },
 		
 		{ key: 'prodline_rpm_source_type', val_key: 'asset.machine.productionLine.rpm_source_type' },
 		{ key: 'prodline_rpm_value', val_key: 'asset.machine.productionLine.rpm_value' },
 		{ key: 'prodline_rpm_node_parameter', val_key: 'asset.machine.productionLine.rpm_node_parameter' },
 		{ key: 'prodline_rpm_node_id', val_key: 'asset.machine.productionLine.rpm_node_id' },		
+		{ key: 'child_components', val_key: 'child_components' },		
+		{ key: 'vibration_analysis_rules', val_key: 'vibration_analysis_rules' },		
+		{ key: 'option_values', val_key: 'option_values' },
 		{ key: 'metric_multi_views', val_key: 'metric_multi_views' },
+		{ key: 'is_favorite', val_key: 'is_favorite' },
 	];
 
 	if (settings.addSettingItems) {

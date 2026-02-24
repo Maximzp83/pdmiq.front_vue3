@@ -135,9 +135,10 @@
 
 			<RPMSettingsDialog
 				:sensorData="sensorData"
-				:currentRpmSource="itemData && itemData.rpm_source_item"
+				:currentRpmSource="currentRpmSource"
 				@save="saveRpmParams"
 				@close="showRpmSettingsDialog = false"
+				:fftItem="fftItem"
 			/>
 		</el-dialog>
 	</div>
@@ -162,6 +163,10 @@ export default {
 	},
 
 	props: {
+		fftItem: {
+			type: Object,
+			required: true
+		},
 		itemData: {
 			type: Object,
 			required: true
@@ -281,7 +286,14 @@ export default {
 		}),
 
 		currentRpmSource() {
-			const { formData, preparedItemSpeedOptionsList } = this;
+			const { formData, preparedItemSpeedOptionsList, fftItem } = this;
+			if (fftItem && fftItem.rpm_value) {
+				return {
+					id:'fft-rpm',
+					value: fftItem.rpm_value,
+					name: 'FFT'
+				}
+			}
 			if (formData.rpm_source_item) {
 				return findItemBy('id', formData.rpm_source_item, preparedItemSpeedOptionsList);
 			}
@@ -417,8 +429,11 @@ export default {
 		rpm_source_value: that => that.itemData.rpmSources ? that.itemData.rpmSources.rpm_source_value_evaluated : null,
 
 		successRpmSaveCallback() {
-			return () => {
-				this.$emit('event', { eventName: 'reFetchEquipment' });
+			return (payload) => {
+				this.$emit('event', { 
+					eventName: 'updateEquipmentAndFFT',
+					data: payload,
+				});
 			};
 		}
 
@@ -431,6 +446,7 @@ export default {
 			fetch_vibration_analysis_rules: 'equipments/fetch_vibration_analysis_rules',
 			save_equipment: 'equipments/save_equipment',
 			set_equipment_rpm_params: 'equipments/set_equipment_rpm_params',
+			set_fft_rpm_params: 'sensors/set_fft_rpm_params',
 		}),
 
 		/*fetchBrandModel(itemId) {
@@ -541,7 +557,7 @@ export default {
 			this.$emit('event', { eventName: 'toggleEquipmentSaving', data: true });
 
 			this.save_equipment(payload)
-				.then(() => {
+				.then(({value}) => {
 					// const { data, updateRoute } = answer;
 					this.showOptionValuesDialog = false;
 
@@ -557,7 +573,10 @@ export default {
 						})
 					}
 
-					this.$emit('event', { eventName: 'reFetchEquipment' });
+					this.$emit('event', {
+						eventName: 'updateEquipmentAndFFT',
+						data: {equipmentItem: value}
+					});
 					this.$emit('event', { eventName: 'toggleEquipmentSaving', data: false });	
 					this.savingInProgress = false;
 				})

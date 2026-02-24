@@ -176,7 +176,7 @@ export default {
 			this.$emit('event', { eventName: 'toggleEquipmentSaving', data: true, onward:1 });
 
 			this.save_equipment(payload)
-				.then(() => {
+				.then(({value}) => {
 					// const { data, updateRoute } = answer;
 					if (this.$refs.AnalysisRuleItem) {
 						this.$refs.AnalysisRuleItem.forEach(ref => {
@@ -184,7 +184,11 @@ export default {
 						})
 					}
 					this.savingInProgress = false;					
-					this.$emit('event', { eventName: 'reFetchEquipment', onward:1 });
+					this.$emit('event', {
+						eventName: 'updateEquipmentAndFFT',
+						data: {equipmentItem: value},
+						onward:1
+					});
 					this.$emit('event', { eventName: 'toggleEquipmentSaving', data: false, onward:1 });	
 				})
 				.catch(() => {

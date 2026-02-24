@@ -15,6 +15,7 @@ const subItemMixin = {
 
 	data() {
 		return {
+			isMobile: false,
 			isInitialSetup: true,
 
 			new: false,

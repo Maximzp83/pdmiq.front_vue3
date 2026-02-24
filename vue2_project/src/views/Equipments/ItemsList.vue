@@ -49,6 +49,7 @@
 					<template v-if="activeGrid == ITEMS_GRID_TYPES.GRID">
 						<ItemsGridContainer
 							v-show="!itemsLoading"
+							:itemsLoading="isLoadingCards"
 							cardClassName="mcol-xs-12 mcol-sm-6 mcol-lg-4 drag-n-drop-item"
 							itemsListClassName="drag-n-drop-list"
 							ref="ItemsTableContainer"
@@ -146,6 +147,7 @@ export default {
 		equipmentItem: null,
 		showShotsCounterDialog: false,
 		shotsCounterData: null,
+		isLoadingCards: false,
 		// -----------
 		state_socket: null,
 		state_socket_ready: false
@@ -243,6 +245,13 @@ export default {
 					button_text: '+WO'
 				});
 			}
+
+			operations.actions.unshift({
+				name: 'handleAddToFavorites',
+				type: 'success',
+				icon: 'icomoon icon-eye',
+				tooltip_text: 'Add To Favorites',
+			})
 
 			if (this.$hasAccessTo(['edit_dashboard'])) {
 				operations.actions.push({
@@ -345,18 +354,20 @@ export default {
 					// { prop: 'machine_name' }
 				],
 				buttons: [
-					/*{
-						linkSettings: {
-							linkRoute: 'equipments/:id/details/main',
-						},
-						icon: 'icomoon icon-eye',
-						tooltip_text: 'View Item Details',
-					}*/
+					{
+						name: 'handleAddToFavorites',
+						tooltip_text: 'Add To Favorites',
+						buttonContent: {
+							component: {
+								componentPath: 'components/common/addToFavoriteButton'
+							}
+						}
+					}
 				]
 			};
 
 			if (this.$hasAccessTo(['create_maintenance'])) {
-				settings.buttons.unshift({
+				settings.buttons.push({
 					name: 'handleCreateWorkOrderButton',
 					formSetup: [
 						{ formKey: 'production_line_id', valKey: 'production_line_id' },
@@ -457,6 +468,7 @@ export default {
 			// save_pump: 'ultrasound_pumps/save_ultrasound_pump',
 			set_compare_list: 'set_compare_list',
 			reorder_equipment: 'equipments/reorder_equipment',
+			add_to_favorites_equipment: 'equipments/add_to_favorites_equipment',
 
 			// sensor_rebase_line: 'sensors/sensor_rebase_line',
 			ping_socket_endpoint: 'equipments/ping_socket_endpoint',
@@ -480,6 +492,37 @@ export default {
 		},*/
 
 		// ----------------------
+		handleAddToFavorites({row}) {
+			this.isLoadingCards = true;
+
+			this.add_to_favorites_equipment({
+				itemId: row.id,
+				notNotify: true,
+				method: row.is_favorite ? 'DELETE' : 'POST',
+			}).then(response => {
+				this.itemsList = this.updateEquipmentCardsFavorites(this.itemsList, {
+					...response,
+				});
+				this.isLoadingCards = false;
+			}).catch(e => {
+				console.warn(e)
+				this.isLoadingCards = false;
+			})
+		},
+
+		updateEquipmentCardsFavorites(itemsList, response) {
+			const { equipment_id, is_favorite, status } = response.value;
+			if (status == 'ok') {
+				// console.log('equipment_id', equipment_id, 'sensor_id', sensor_id)
+				return itemsList.map(ei => {
+					if (ei.id === equipment_id) {
+						ei.is_favorite = is_favorite;
+					}
+					return ei;
+				});
+			}
+		},
+
 		handleShowDetails(payload) {
 			let { row, options, column } = payload;
 
@@ -762,6 +805,8 @@ export default {
 
 		'filters.hasSensors'(hasSensors) {
 			if (!hasSensors) {
+				this.preventFetch = true;
+				console.log('filters.hasSensors')
 				this.setFilters({ sensorType: null, dataSet: null, page: 1 });
 			}
 		}

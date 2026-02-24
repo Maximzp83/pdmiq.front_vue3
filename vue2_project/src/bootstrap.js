@@ -97,6 +97,7 @@ import 'element-ui/lib/theme-chalk/popover.css';
 import 'element-ui/lib/theme-chalk/tooltip.css';
 import 'element-ui/lib/theme-chalk/icon.css';
 import 'element-ui/lib/theme-chalk/upload.css';
+import 'element-ui/lib/theme-chalk/color-picker.css';
 
 // import langEn from 'element-ui/lib/locale/lang/en';
 // import locale from 'element-ui/lib/locale';

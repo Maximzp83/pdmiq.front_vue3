@@ -64,16 +64,6 @@ const menuItems1 = [
 		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
 	},
-	{
-		name: 'Chart',
-		belongs_to_label: 'predictive_maintenance',
-		id: 2,
-		icon: 'icon-graph',
-		path: '/test-chart',
-		meta: { permissions: ['view_dashboard'] },
-		enableInCompanyMenuForm: true,
-		// roles: ['manager', 'operator']
-	},
 	// {
 	// 	name: 'sidebar_menu.CUSTOMER_SUCCESS',
 	// 	belongs_to_label: 'predictive_maintenance',

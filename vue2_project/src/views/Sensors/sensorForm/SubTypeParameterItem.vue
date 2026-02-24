@@ -47,6 +47,19 @@
 		</el-form-item>
 
 		<el-form-item
+			:label="`${tt('Chart')} ${tt('Type')}`"
+			prop="graph_type"
+			class="mcol-xs-9 label_pt-5 mini"
+		>
+			<CustomSelect
+				class="mini"
+				:optionsList="chartTypesList"
+				:placeholder="`${tt('Select')} ${tt('type')}`"
+				v-model="formData.graph_type"
+			/>
+		</el-form-item>
+
+		<el-form-item
 			:label="`${tt('line')} ${tt('speed')}`"
 			prop="is_line_speed"
 		>
@@ -62,12 +75,14 @@
 
 <script>
 // import { updateFormData } from '@/helpers';
+import { chartTypesList } from '@/constants/global';
+
 import { subItemMixin } from '@/mixins';
 
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		isMobile: Boolean,
+		// isMobile: Boolean,
 		fromModal: Boolean
 	},
 
@@ -78,12 +93,14 @@ export default {
 				name: '',
 				units: '',
 				formula: '',
+				graph_type: null,
 				is_line_speed: false
 			}
 		};
 	},
 
 	computed: {
+		chartTypesList: () => Object.freeze(chartTypesList()),
 		tooltipContent() {
 			/*`Use {value} as the input from the IO. <br/>
 			Example: {value} * 60 + 500 <br/>

@@ -1,8 +1,9 @@
 import { mergeObjects, hasOwnProperty1 } from '@/helpers';
-import { chartSeriesTemplates, blueColor, baseColor, alarmColor } from '../enums';
+import { chartSeriesTemplates, blueColor, baseColor, alarmColor, warningColor } from '../enums';
+import { NCD_ALARM_TYPES, SENSOR_THRESHOLD_TYPES } from '@/constants/global';
 
 const methodsList = {
-	setupSerieLowHighZones: arg => {
+	setupLineSerieZones: arg => {
 		let levelZoneData;
 		if (arg.payload && arg.payload.levelZoneData) {
 			levelZoneData = arg.payload.levelZoneData;
@@ -13,10 +14,29 @@ const methodsList = {
 
 		if (levelZoneData) {
 			const { alarm_zone, warning_zone } = levelZoneData;
-			if (warning_zone) zones.push({ value: warning_zone, color: blueColor });
-			if (alarm_zone) zones.push({ value: alarm_zone, color: baseColor });
-			if (zones.length) zones.push({ color: alarmColor });
+			const { ALARM, WARNING, BASELINE } = SENSOR_THRESHOLD_TYPES;
+			// console.log('setupLineSerieZones', arg.resources)
+			if (arg.resources) {
+				const { parameterItem, /*useFetchedColorScheme*/ } = arg.resources.chart_config.customSettings;
+
+					// console.log(arg.fetched_statistics_data, useFetchedColorScheme);
+				if (parameterItem) {
+					const { alarm_type } = parameterItem;
+					if (alarm_type === NCD_ALARM_TYPES.WARNING_ALARM) {
+						if (warning_zone) zones.push({ value: warning_zone, color: baseColor, threshold_level: BASELINE });
+						if (alarm_zone) zones.push({ value: alarm_zone, color: warningColor, threshold_level: WARNING });
+						if (zones.length) zones.push({ color: alarmColor, threshold_level: ALARM });
+
+						return zones;
+					} 
+				}
+			}
+
+			if (warning_zone) zones.push({ value: warning_zone, color: blueColor, threshold_level: WARNING });
+			if (alarm_zone) zones.push({ value: alarm_zone, color: baseColor, threshold_level: BASELINE });
+			if (zones.length) zones.push({ color: alarmColor, threshold_level: ALARM });
 		}
+
 		return zones;
 	}
 };

@@ -97,22 +97,34 @@
 			prop="option_value_id"
 			class=""
 		>
-			<div class="flex align-center">
+			<div class="flex align-center" >
 					<!-- default-first-option -->
+				<CustomInput
+					class="mcol-xs-8"
+					v-if="original_rule.is_editable && isCustomEnabled"
+					:placeholder="`${tt('Input')}`"
+					v-model="formData.custom_value"
+				/>
+
 				<CustomSelect
-					class="mcol-xs-11 span-block"
+					v-else
+					class="mcol-xs-8"
 					filterable
 					clearable
-					allow-create
-					:enabled="true"
 					:optionsLoading="ruleOptionsLoading"
 					:optionsList="ruleOptionsList"
 					:placeholder="`${tt('Select')} ${tt('option')}`"
 					labelKey="vibration_analysis_value"
 					v-model="formData.option_value_id"
 				/>
-			
-				<span class="span-block mcol-xs-1"> {{original_rule.unit}}</span>
+				<span class="mcol-xs-2 text-center"> {{original_rule.unit}}</span>
+				
+				<div v-if="original_rule.is_editable"
+					class="pointer mcol-xs-2 ml-auto"
+					@click="isCustomEnabled = !isCustomEnabled"
+				>
+					{{ isCustomEnabled ? 'Spec' : tt('Custom') }}
+				</div>
 			</div>
 		</el-form-item>
 	</el-form>
@@ -145,6 +157,8 @@ export default {
 			ruleOptionsLoading: false,
 			localCrossoverOptionsList: [],
 			isMobile: false,
+
+			isCustomEnabled: false,
 
 			formData: {
 				id: null,
@@ -203,22 +217,14 @@ export default {
 			);
 		},
 
-		localSetupPageActions(item) {
-			if (item.custom_value) {
-				this.formData.option_value_id = item.custom_value;
-			}
-		},
+		/*localSetupPageActions() {
+			this.isCustomEnabled = this.original_rule.is_editable;
+		},*/
 
 		localGetFormDataCallback(formData) {
-			if (formData.option_value_id) {
-				if (typeof formData.option_value_id == 'string') {
-					formData.custom_value = formData.option_value_id;
-					formData.option_value_id = null;
-				} else {
-					formData.custom_value = null;
-				}
-			}
-			if (!formData.custom_value) {
+			if (this.isCustomEnabled) {
+				formData.option_value_id = null;
+			} else {
 				formData.custom_value = null;
 			}
 			return formData;

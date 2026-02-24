@@ -129,6 +129,13 @@ article, .section-row, [class^="sectionBlockColumn_"] {
     }
   }
 
+  &.medium-padding {
+    margin: -4px;
+    & > * {
+      padding: 4px;
+    }
+  }
+
   &.big-padding {
     margin: -10px;
     & > * {

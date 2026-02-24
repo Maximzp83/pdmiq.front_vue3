@@ -260,6 +260,15 @@
 				<template v-slot:middle>
 					<div class="filter-item checkbox-item ml-auto">
 						<el-checkbox
+							:value="filters.favorite"
+							:false-label="null"
+							@change="val => setFilters({ favorite: val })"
+							>{{ tt('Favorites') }}
+						</el-checkbox>
+					</div>
+
+					<div class="filter-item checkbox-item ml-auto">
+						<el-checkbox
 							:value="filters.hasSensors"
 							:false-label="null"
 							@change="val => setFilters({ hasSensors: val })"
@@ -891,7 +900,7 @@ export default {
 			show_edit_modal: 'show_edit_modal'
 		}),
 
-		reorderHandler(event) {
+		/*reorderHandler(event) {
 			const { oldIndex, newIndex, dragEvent } = event;
 
 			if (oldIndex !== newIndex) {
@@ -908,7 +917,7 @@ export default {
 				// console.log(payload);
 				this[this.reorderAction](payload);
 			}
-		},
+		},*/
 
 		fetchEquipmentTypes() {
 			this.doFetchAction(
@@ -1170,7 +1179,7 @@ export default {
 		},
 
 		'filters.isShowList'(isShow) {
-			// console.log('filters.isShowList', isShow)
+			console.log('filters.isShowList', isShow)
 
 			if (isShow && !this.equipmentTypesList.length) {
 				this.fetchEquipmentTypes();
@@ -1178,7 +1187,7 @@ export default {
 		},
 
 		'filters.storeroomId'(id) {
-			// console.log('filters.storeroomId', id)
+			console.log('filters.storeroomId', id)
 			if (!id) {
 				this.preventFetch = true;
 				this.setFilters({ storeroomLocationId: null });
@@ -1186,7 +1195,7 @@ export default {
 		},
 
 		'filters.hasSensors'(has) {
-			// console.log('filters.hasSensors', has)
+			console.log('filters.hasSensors', has)
 			if (!has) {
 				this.preventFetch = true;
 				this.setFilters({ archivedNodes: null, sensor_class: null });

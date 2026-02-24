@@ -98,7 +98,7 @@ import { subItemMixin } from '@/mixins';
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		isMobile: Boolean,
+		// isMobile: Boolean,
 		fromModal: Boolean
 	},
 

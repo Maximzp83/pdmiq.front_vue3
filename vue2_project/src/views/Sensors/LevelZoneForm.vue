@@ -331,7 +331,10 @@ export default {
 		},
 
 		warningZoneMin() {
-			if (this.parameterData.parameterItem.type == 'temperature') {
+			if (
+				this.parameterData.parameterItem.type == 'temperature' 
+				|| this.parameterData.parameterItem.type === undefined // для всех generic parameters
+			) {
 				return -273;
 			}
 			return 0;

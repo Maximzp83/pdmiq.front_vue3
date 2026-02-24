@@ -24,8 +24,8 @@ const dragNdropSortableMixin = {
 	},
 
 	methods: {
-		setupDraggable() {
-			// console.log('setupDraggable', !this.draggingLockedFinal, !this.draggableInitiated)
+		setupDraggable(settings = {}) {
+			// console.log('setupDraggable', settings, !this.draggingLockedFinal, !this.draggableInitiated)
 			if (!this.draggingLockedFinal) {
 				if (!this.draggableInitiated) {
 					const lists = document.querySelectorAll(
@@ -34,7 +34,7 @@ const dragNdropSortableMixin = {
 					// console.log(`${this.drag_n_drop_wrapper_selector} .drag-n-drop-list`, lists);
 					if (/*!this.drug_n_dropListsReady &&*/ lists.length) {
 						// this.drug_n_dropListsReady = true;
-						this.initiateDraggable();
+						this.initiateDraggable(settings);
 					}
 				}
 			} else {
@@ -50,11 +50,9 @@ const dragNdropSortableMixin = {
 			}
 		},
 
-		initiateDraggable() {
-			// console.log('initiateDraggable', this.buttonsItemsList)
-			const content_container = document.querySelector(
-				'.dashboard-content-container'
-			);
+		initiateDraggable(settings = {}) {
+			// console.log('initiateDraggable', settings)
+			const content_container = document.querySelector('.dashboard-content-container');
 			const wrapper = document.querySelector(this.drag_n_drop_wrapper_selector);
 			const containerSelector = `${this.drag_n_drop_wrapper_selector} .drag-n-drop-list`;
 			const allContainers = document.querySelectorAll(containerSelector);
@@ -77,7 +75,8 @@ const dragNdropSortableMixin = {
 				draggable: '.drag-n-drop-item',
 				// droppable: '.item-drop-zone',
 				mirror: {
-					appendTo: containerSelector,
+					appendTo: settings.appendTo || containerSelector,
+					// appendTo: 'body',
 					constrainDimensions: true
 				}
 				// plugins: [Plugins.ResizeMirror],
@@ -145,6 +144,8 @@ const dragNdropSortableMixin = {
 
 	mounted() {
 		this.setupDraggable();
+		// setTimeout(() => {
+		// }, 500);
 	},
 
 	beforeDestroy() {

@@ -10,6 +10,7 @@
 			{ inline: inline },
 			{ multiple: multiple },
 			{ 'has-files': filesList.length },
+			blockId ? `upload-container-id-${blockId}`: '',
 			className || ''
 		]"
 		:auto-upload="false"
@@ -27,18 +28,15 @@
 		</div> -->
 
 		<!-- <div slot="tip" class="el-upload__tip">jpg/png не более 5000kb</div> -->
-		<div slot="tip" :class="uploadListWapperClass || 'el-upload-list-wrapper'">
-			<transition-group
-				name="component-scale"
-				mode="out-in"
-				tag="ul"
-				class="el-upload-list el-upload-list--picture"
-			>
-				<li
-					:class="['el-upload-list__item is-success', imgItemClass]"
-					v-for="file in filesList"
+		<div slot="tip" :class="uploadListWapperClass || 'el-upload-list-wrapper'" >
+			<div :class="['el-upload-list el-upload-list--picture', {'drag-n-drop-list': enableReorder}]" ref="uploadList">
+				<div
+					:class="['el-upload-list__item is-success', imgItemClass, {'drag-n-drop-item': enableReorder}]"
+					v-for="(file, idx) in filesList"
 					:key="`file-${file.id}`"
+					:data-id="file.id"
 				>
+					<!-- :data-set="reorderDataSet" -->
 					<!-- :replaceSelectedFile="replaceSelectedFile" -->
 					<FileUploadBlockItem
 						ref="FileUploadBlockItem"
@@ -56,12 +54,23 @@
 						:showImageClickOverlay="showImageClickOverlay"
 						:filePropName="filePropName"
 						:deleteButtonType="deleteButtonType"
+						:enableReorderFiles="enableReorderFiles"
 						@onRemove="id => removeFormItem(id, 'filesList')"
+						:itemIndex="idx"
 					/>
 						<!-- :uploadBlockType="uploadBlockType" -->
 						<!-- @ready="blockReady" -->
-				</li>
-			</transition-group>
+				</div>
+			</div>
+			<!-- <transition-group
+				name="component-scale"
+				mode="out-in"
+				tag="ul"
+				class="el-upload-list el-upload-list--picture "
+				ref="uploadList"
+			>	 -->
+				
+			<!-- </transition-group> -->
 		</div>
 
 		<el-button :class="[buttonClass]" size="small" type="primary" v-if="!disabled">
@@ -78,12 +87,14 @@
 import {
 	eventHandler,
 	createFormItemMixin,
+	dragNdropSortableMixin,
 } from '@/mixins';
 
 export default {
 	mixins: [
 		eventHandler(),
 		createFormItemMixin(),
+		dragNdropSortableMixin(),
 	],
 
 	components: {
@@ -129,13 +140,37 @@ export default {
 			default: () => ({})
 		},
 		enableLinkToFile: Boolean,
-		uploadBlockType: { type: String, default: 'standard-images' }
+		uploadBlockType: { type: String, default: 'standard-images' },
+		enableReorderFiles: { type: Object, default: () => null },
+		blockId: null,
 	},
 
 	data() {
 		return {
+			draggingLocked: false,
+			refsUpdate: 0,
+
 			filesList: [],
 		};
+	},
+
+	computed: {
+		enableReorder: that => that.enableReorderFiles /*&& that.filesList.length > 1*/,
+		drag_n_drop_wrapper_selector: that => that.blockId ? `.upload-container-id-${that.blockId}` : '.upload-container',
+
+		UploadListRef() {
+			if (this.refsUpdate) {
+				return this.$refs['uploadList'];
+			}
+			return null;
+		},
+
+		/*reorderDataSet(fileItem) {
+			if (this.enableReorderFiles && this.enableReorderFiles.formKey) {
+				return this.enableReorderFiles.dataSet;
+			}
+			return '';
+		}*/
 	},
 
 	methods: {
@@ -167,12 +202,40 @@ export default {
 			});
 		},
 
+		// ----------------------
+		dragStartHandler(event) {
+			const { target } = event.sensorEvent.data;
+
+			return target.classList.contains('can-dragging');
+		},
 		// ---------------
 
 		getFormData() {
 			// console.log(this.$refs['FileUploadBlockItem'])
 			if (this.$refs['FileUploadBlockItem']) {
-				return this.$refs['FileUploadBlockItem'].map(row => row.getFormData());				
+				let newOrder = {};
+				if (this.enableReorder) {
+					const allContainers = document.querySelectorAll(
+						`${this.drag_n_drop_wrapper_selector} .drag-n-drop-list > .drag-n-drop-item`
+					);
+					if (allContainers) {
+						allContainers.forEach((fileUploadBlockNode, idx) => {
+							newOrder[fileUploadBlockNode.dataset.id] = idx+1;
+							// console.log(newOrder, fileUploadBlockNode.dataset.id)
+						});
+					}
+				}
+
+				return this.$refs['FileUploadBlockItem'].map(row => {
+					if (this.enableReorder) {
+						return {
+							...row.getFormData(),
+							[this.enableReorderFiles.formKey]: newOrder[row.itemId]
+						};					
+					}
+					// console.log('newOrder', row.itemId, newOrder[row.itemId])
+					return row.getFormData()
+				});
 			}
 			return [];
 		}
@@ -183,10 +246,29 @@ export default {
 			// console.log('pictures', pictures)
 			this.filesList = this.setupFormSubItemsList(pictures, 'pic-');
 		},
+
+		UploadListRef(ref) {
+			if (this.enableReorder && ref) {
+				this.draggingLocked = false;				
+				this.setupDraggable(this.enableReorderFiles);
+			}
+		}
 	},
 
 	created() {
 		this.filesList = this.setupFormSubItemsList(this.pictures, 'pic-');
+	},
+
+	mounted() {
+		if (this.enableReorder && !this.refsUpdate && this.$refs['uploadList']) {
+			this.refsUpdate++;
+		}
+	},
+
+	updated() {
+		if (this.enableReorder && !this.refsUpdate && this.$refs['uploadList']) {
+			this.refsUpdate++;
+		}
 	},
 };
 </script>

@@ -319,9 +319,15 @@ export default {
 						// console.log('formData 1', this.formData)
 						let { equipmentSubmitPayload, multiViewsItems } = this.collectDataFromSubItems(this.subItemsSettings, options);
 
-						this.submitEquipment(equipmentSubmitPayload);
-						this.submitMultiViews(multiViewsItems);
+						// 1 = equipment
+						this.formsCount = 1+this.sensorFormsList.length;
 
+						this.submitEquipment(equipmentSubmitPayload);
+						
+						if (this.itemData && this.itemData.id) {
+							this.formsCount += 1; // multiViews
+							this.submitMultiViews(multiViewsItems);							
+						}
 					}
 				}			
 			} else {
@@ -336,9 +342,6 @@ export default {
 
 		// -----------------------
 		submitEquipment(equipmentSubmitPayload) {
-			// 2 - 1) equipment, 2) multiViews
-			this.formsCount = 2+this.sensorFormsList.length;
-
 			const {equipmentForm, withFile, desiredId, className} = equipmentSubmitPayload;
 			let payload = {
 				data: { ...prepareSubmitData(equipmentForm) },
@@ -347,7 +350,7 @@ export default {
 			};
 
 			/*if (payload) {
-				console.log('payload', payload)
+				console.log('payload', payload.data.pictures)
 				return
 			}*/
 			this.$emit('event', { eventName: 'toggleSaving', data: true });
@@ -395,19 +398,19 @@ export default {
 			if (success) {
 				this.formSubmitSuccessCount++;				
 			}
-			// console.log(this.formSubmitSuccessCount)
+			// console.log(this.formSubmitFinishCount , this.formsCount)
 			if (this.formSubmitFinishCount >= this.formsCount) {
 				this.toggleSaving(false);
 				
 				if (this.formSubmitSuccessCount >= this.formsCount) {
 					this.successModalSubmit(true);
 					if (this.successSubmitCallback) {
-						console.log('successSubmitCallback')
+						// console.log('successSubmitCallback')
 						this.successSubmitCallback();
 					}
 
 					if (this.propsSuccessSubmitCallback) {
-						console.log('propsSuccessSubmitCallback')						
+						// console.log('propsSuccessSubmitCallback')						
 						this.propsSuccessSubmitCallback();
 					}					
 				}

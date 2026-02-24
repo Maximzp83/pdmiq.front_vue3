@@ -128,7 +128,8 @@ export default {
 			hideExportButton: true,
 			setIsGraphMountedToWindow: true,
 			hideChartHeader: true,
-			disableAnimationAndSpinner: !!that.chartsToDisplay
+			disableAnimationAndSpinner: !!that.chartsToDisplay,
+			oneChartOnly: true
 		}),
 
 		injectToChartOptions() {
@@ -323,7 +324,7 @@ export default {
 					rpm_source_item, rpmSources,
 					// rpm_external_source_type, rpm_external_value,
 					rpm_external_node_parameter, rpm_external_node_id,
-					rpm_unit_expression, //is_rpm_visible
+					rpm_formula, //is_rpm_visible
 				} = this.equipmentData;
 				let data = { is_rpm_visible: true };
 
@@ -380,12 +381,12 @@ export default {
 					break;
 				}
 
-				if (rpm_unit_expression && data.rpm_request) {
+				if (rpm_formula && data.rpm_request) {
 					data.rpm_request.get_params = {
-						unitExpression: rpm_unit_expression
+						unitExpression: rpm_formula
 					}
 				}
-				// console.log(rpm_unit_expression, data.rpm_request)
+				// console.log(rpm_formula, data.rpm_request)
 				return data;				
 			}
 

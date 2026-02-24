@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<VueElementLoadingWrapper
-			:isLoading="itemLoading || fftLoading"
+			:isLoading="itemLoading || fftLoading || equipmentLoading"
 			:itemsName="itemsName.one"
 		/>
 
@@ -10,10 +10,18 @@
 				<div class="view-content-card card">
 					<div
 						class="card-header flex mrow wrap align-center space-between main-card-header"
-						v-if="loadContent && fftReady"
+						v-if="loadContent && fftReady && equipmentData"
 					>
 						<SimpleSpinner :active="fftLoading" />
-						<div class="flex align-center fluid mcol-xs-8 mcol-sm-10">
+						
+						<div class="images-part mcol-xs-12 mcol-sm-2">
+							<EquipmentPictureBlock
+								@event="handleEventNew"
+								:equipmentData="equipmentData"
+							/>
+						</div>
+
+						<div class="flex wrap align-center fluid mcol-xs-8">
 							<div
 								class="title outside-bg-addition article-title capitalize span-block fluid"
 							>
@@ -22,6 +30,14 @@
 							<span class="ml-auto mt-0 article-title outside-bg-addition timestamp">
 								{{ fftTimeStamp }}</span
 							>
+
+							<div class="mcol-xs-12 flex">
+								<div class="card filled_4 request-type-block">
+									<span>{{ requestType }} - </span>
+									<span class="no-margin">{{ requestFMax }}</span>
+								</div>
+								
+							</div>
 						</div>
 
 						<div class="mcol-xs-auto flex align-center prev-next-buttons-block">
@@ -40,13 +56,19 @@
 							</div>
 						</div>
 
-						<div class="text-center mcol-xs-12 request-type-block">
-							<span>{{ requestType }} - </span>
-							<span class="no-margin">{{ requestFMax }}</span>
+						<div class="rpm-block content-row" v-if="equipmentRPM">
+							{{ `${tt('rpm')}: ${equipmentRPM}` }}
 						</div>
 
-						<div class="rpm-block" v-if="equipmentRPM">
-							{{ `${tt('rpm')}: ${equipmentRPM}` }}
+						<div class="mcol-xs-12 content-row">
+							<AnalysisFFTContainer
+								ref="AnalysisFFTContainer"
+								:itemData="equipmentData"
+								:sensorData="itemData"
+								:fftItem="currentFFTItem"
+								@event="handleEventNew"
+								:selectedChildComponentIds="selectedChildComponentIds"
+							/>
 						</div>
 					</div>
 
@@ -112,8 +134,9 @@
 					</DropdownFilterbar>
 
 					<div class="1section-row card-content" v-if="loadContent && fftReady && currentFFTItem">
-						<!-- <FFTStatisticsContainer -->
 						<FFTChartsListWrapper
+							ref="FFTChartsListWrapper"
+							@event="handleEventNew"
 							:activeAxis="activeAxis"
 							:sensorId="itemData.id"
 							:fftId="+fftId"
@@ -122,6 +145,7 @@
 							:rootFilters="{ measurement }"
 							:prevFFTItems="prevFFTPreparedItems"
 							:currentFFTItem="currentFFTItem"
+							:additionalProps="chartsAdditionalProps"
 						/>
 					</div>
 
@@ -143,11 +167,19 @@ import Highcharts from 'highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 import draggablePoints from 'highcharts/modules/draggable-points';
+
+import highchartsMore from 'highcharts/highcharts-more';
+import annotations from 'highcharts/modules/annotations';
+
 // import highcharts3d from 'highcharts/highcharts-3d';
 
 stockInit(Highcharts);
 boost(Highcharts);
 draggablePoints(Highcharts);
+
+highchartsMore(Highcharts);
+annotations(Highcharts);
+
 // highcharts3d(Highcharts);
 
 import HighchartsVue from 'highcharts-vue';
@@ -176,16 +208,18 @@ import {
 	METRIC_SYSTEM_TYPES
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
-import { initPageDataMixin, sensorTypeMixin, requestsListMixin } from '@/mixins';
+import { initPageDataMixin, sensorTypeMixin, fetchItemsHelper, eventHandler } from '@/mixins';
 
 export default {
-	mixins: [initPageDataMixin(), sensorTypeMixin(), requestsListMixin()],
+	mixins: [initPageDataMixin(), sensorTypeMixin(), fetchItemsHelper(), eventHandler()],
 	name: 'FFTStatPage',
 
 	components: {
 		DropdownFilterbar: () => import('@/components/common/DropdownFilterbar.vue'),
 		FFTChartsListWrapper: () => import('./charts/fft/FFTChartsListWrapper.vue'),
-		RadioButtonsBlock: () => import('@/components/form/RadioButtonsBlock.vue')
+		RadioButtonsBlock: () => import('@/components/form/RadioButtonsBlock.vue'),
+		EquipmentPictureBlock: () => import('./charts/EquipmentPictureBlock.vue'),
+		AnalysisFFTContainer: () => import('./AnalysisFFT/AnalysisFFTContainer.vue'),
 	},
 
 	data: () => ({
@@ -199,7 +233,13 @@ export default {
 
 		showFilterbar: false,
 		splitCharts: false,
-		measurement: null
+		measurement: null,
+
+		// -------------
+		equipmentLoading: false,
+		equipmentData: null,
+
+		selectedChildComponents: []
 	}),
 
 	computed: {
@@ -250,10 +290,13 @@ export default {
 					is_hidden_ncd_active_vertical_axis
 				} = this.itemData;
 
+				const { isBannerM25 } = this.currentSensorType;
+
 				ncdAxisList.forEach(axis => {
+					const axis_name = isBannerM25 ? this.tt(axis.banner_m25_name) : axis.name;
 					if (ncd_active_vertical_axis === axis.id) {
 						if (!is_hidden_ncd_active_vertical_axis) {
-							result.push({ ...axis, name: axis.name + ' (V)' });
+							result.push({ ...axis, name: axis_name + ' (V)' });
 						}
 					} else {
 						result.push(axis);
@@ -339,6 +382,8 @@ export default {
 			return '';
 		},
 
+		currentSensorTypeDataKey: () => 'itemData',
+
 		sensorTitle() {
 			if (this.itemData && this.currentFFTItem) {
 				// console.log(this.itemData)
@@ -351,12 +396,25 @@ export default {
 				});
 			}
 			return '';
-		}
+		},
+
+		chartsAdditionalProps() {
+			return {
+				selectedChildComponents: this.selectedChildComponents,
+				equipmentData: this.equipmentData
+			}
+		},
+
+		selectedChildComponentIds() {
+			return this.selectedChildComponents.map(item => item.id);
+		},
 	},
 
 	methods: {
 		...mapActions({
 			fetch_item: 'sensors/fetch_sensor',
+			fetch_equipment: 'equipments/fetch_equipment',
+
 			fetch_ncd_fft: 'sensors/fetch_ncd_fft',
 			fetch_global_plants: 'fetch_global_plants',
 			set_filters: 'sensors/set_fft_statistics_filters'
@@ -365,6 +423,40 @@ export default {
 		toggleFilterbar(e) {
 			this.showFilterbar = !this.showFilterbar;
 			this.$refs.DropdownFilterbar.toggleFilterbar(e);
+		},
+
+		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload}) {
+			// console.log('reFetchEquipment', skipFFTReload)
+			// this.fetchEquipment(this.itemData.equipment_id);
+			/*if (callChartsMethod) {
+				if (this.$refs.FFTChartsListWrapper) {
+					this.$refs.FFTChartsListWrapper.callChartsMethod({
+						name: callChartsMethod.name,
+						payload: fftItem
+					});
+				}
+			}*/
+
+			if (equipmentItem) {
+				setTimeout(() => {
+					this.equipmentData = equipmentItem;
+				}, 10)
+			}
+			if (fftItem) {
+				if (!skipFFTReload) {
+					this.fftReady = false;	
+				}
+				setTimeout(() => {
+					this.currentFFTItem = fftItem;
+				}, 10)
+			}
+			this.selectedChildComponents = [];
+		},
+
+		fetchEquipment(id) {
+			this.doFetchAction('fetch_equipment', 'equipmentData', 'equipmentLoading', {
+				itemId: id
+			});
 		},
 
 		fetchFFT({ urlPostfix, FFTItemKey }) {
@@ -390,11 +482,13 @@ export default {
 		handleFFT({ prev, next }) {
 			// console.log(prev, next, this.$route)
 			const { currentFFTItem, prevFFTItem, nextFFTItem, itemData } = this;
+			const {isBannerTempVibe2, isBannerV2_1, isBannerV2Generic } = this.currentSensorType;
+			const url_type = (isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic) ? 'banner' : 'ncd';
 
 			if (prev) {
 				if (prevFFTItem) {
 					this.fftReady = false;
-					this.$router.replace(`/ncd/${itemData.id}/fft/${prevFFTItem.id}`);
+					this.$router.replace(`/${url_type}/${itemData.id}/fft/${prevFFTItem.id}`);
 					this.nextFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(prevFFTItem);
 					this.fetchFFT({
@@ -405,7 +499,8 @@ export default {
 			} else if (next) {
 				if (nextFFTItem) {
 					this.fftReady = false;
-					this.$router.replace(`/ncd/${itemData.id}/fft/${nextFFTItem.id}`);
+
+					this.$router.replace(`/${url_type}/${itemData.id}/fft/${nextFFTItem.id}`);
 					// this.prevFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(nextFFTItem);
 					this.fetchFFT({
@@ -426,6 +521,30 @@ export default {
 
 		switchMetricSystem({ id }) {
 			this.measurement = id;
+		},
+
+		toggleEquipmentSaving(val) {
+			this.equipmentLoading = val;			
+		},
+
+		addChildComponentToSelected(component) {
+			const isSelected = this.selectedChildComponents.some(item => item.id === component.id);
+			if (!isSelected) {
+				this.selectedChildComponents.push(component);
+			} else {
+				this.selectedChildComponents = this.selectedChildComponents.filter(item => item.id !== component.id);
+			}
+		},
+
+		handleRpmCursorDrop(data) {
+			const AnalysisFFTContainer = this.$refs.AnalysisFFTContainer;
+			if (AnalysisFFTContainer) {
+				AnalysisFFTContainer.saveRpmParams(data, {
+					successMessage: `RPM ${this.tt('updated')}`,
+					skipFFTReload: true,
+					// callChartsMethod: {name: 'handleFFTRpmUpdated'}
+				});
+			}
 		}
 	},
 
@@ -433,6 +552,9 @@ export default {
 		itemData(sensor) {
 			if (sensor) {
 				// console.log(sensor, this.itemData)
+
+				this.fetchEquipment(sensor.equipment_id);
+
 				this.fetchFFT({
 					FFTItemKey: 'currentFFTItem',
 					urlPostfix: `/${this.fftId}`

@@ -37,6 +37,7 @@ import subItemMixin from './subItemMixin';
 import itemDetailsPreviewMixin from '../views/Maintenance/itemDetailsPreviewMixin';
 import chartsCompareExportMixin from '../views/Sensors/mixins/chartsCompareExportMixin';
 import RebaselineRequestMixin from '../views/Sensors/mixins/RebaselineRequestMixin';
+import saveRPMParamsMixin from '../views/Sensors/mixins/saveRPMParamsMixin';
 
 // import handleSaveFormBlock from './handleSaveFormBlock'; //todo (remove)
 
@@ -72,6 +73,7 @@ export {
 	importMixin,
 	chartsCompareExportMixin,
 	RebaselineRequestMixin,
+	saveRPMParamsMixin,
 	// handleSaveFormBlock,
 	subItemsListMixin,
 	subItemMixin

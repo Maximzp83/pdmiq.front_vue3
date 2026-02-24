@@ -103,6 +103,17 @@
 							<span>{{ tt('Last') }}</span>
 						</el-button>
 					</div>
+
+					<div class="button-item" v-if="showUnlockFFTButton">
+						<el-button
+							@click="handleUnlockFFT"
+							native-type="button"
+							class="small"
+							:loading="loadingFFT"
+						>
+							<span class="capitalize">{{ tt('Unlock').toLowerCase() }}</span>
+						</el-button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -187,9 +198,10 @@
 			<SimpleSpinner :active="loadingRPM" />
 			<RPMSettingsDialog
 				:sensorData="sensorData"
-				:currentRpmSource="equipmentData && equipmentData.rpm_source_item"
-				@save="handleSaveRpmParams"
+				:currentRpmSource="currentRpmSource"
+				@save="saveRpmParams"
 				@close="showRpmSettingsDialog = false"
+				:rootFilters="rootFilters"
 			/>
 		</el-dialog>
 	</div>
@@ -199,10 +211,11 @@
 // import axios from '@/services/api/axiosService';
 
 import { mapActions, mapState } from 'vuex';
-import { prepareRangeParams, findItemBy } from '@/helpers';
+import { prepareRangeParams } from '@/helpers';
 import {
 	itemSpeedOptionsList,
-	ITEM_SPEED_OPTIONS
+	ITEM_SPEED_OPTIONS,
+	FFT_LOCK_STATUSES
 } from '@/constants/global';
 
 import { LANGUAGE_TYPES } from '@/localization/utils';
@@ -211,11 +224,12 @@ import {
 	webSocketMixin,
 	actionButtonsMixin,
 	chartsCompareExportMixin,
-	eventHandler
+	eventHandler,
+	saveRPMParamsMixin
 } from '@/mixins';
 
 export default {
-	mixins: [webSocketMixin(), actionButtonsMixin(), chartsCompareExportMixin(), eventHandler()],
+	mixins: [webSocketMixin(), actionButtonsMixin(), chartsCompareExportMixin(), eventHandler(), saveRPMParamsMixin()],
 	components: {
 		RPMSettingsDialog: () => import('./RPMSettingsDialog.vue'),
 		FFTRequestBlock: () => import('./FFTRequestBlock.vue'),
@@ -296,6 +310,11 @@ export default {
 			return [];
 		},
 
+		currentRpmSource: that => that.equipmentData && ({
+			id: that.equipmentData.rpm_source_item,
+			value: that.equipmentData.rpm_value,
+		}),
+
 		LANGUAGE_TYPES: () => LANGUAGE_TYPES,
 		itemSpeedOptionsList: () => itemSpeedOptionsList(),
 
@@ -334,6 +353,25 @@ export default {
 				}
 			}
 			return null;
+		},
+		
+		successRpmSaveCallback(value) {
+			return () => {
+				this.$emit('event', {
+					// eventName: 'reloadPage',
+					eventName: 'updateEquipment',
+					data: value,
+					onward: true
+				});
+			};
+		},
+
+		showUnlockFFTButton() {
+			const { sensorData } = this;
+			if (sensorData && sensorData.last_fft_lock) {
+				return sensorData.last_fft_lock.status !==  FFT_LOCK_STATUSES.UNLOCKED
+			}
+			return false;
 		}
 		// CONTROLLER_TYPES: () => CONTROLLER_TYPES
 	},
@@ -462,6 +500,12 @@ export default {
 				FFTRequestBlock.handleLastFFT();
 			}
 		},
+		handleUnlockFFT() {
+			const {FFTRequestBlock} = this.$refs;
+			if (FFTRequestBlock) {
+				FFTRequestBlock.handleUnlockFFT();
+			}
+		},
 
 		handleFFTSuccess() {
 			this.$emit('event', {
@@ -488,63 +532,9 @@ export default {
 			}
 		},
 
-		handleSaveRpmParams(rpm_source_item) {
+		/*handleSaveRpmParams(rpm_source_item) {
 			this.saveRpmParams({rpm_source_item});
-		},
-
-		saveRpmParams(data) {
-			if (this.enableRpmBlock) {
-				var {id, is_rpm_visible, rpm_source_item } = this.equipmentData;
-				var { rpmSources } = this.sensorData;
-				var selectedRpmOption = findItemBy('id', rpm_source_item, itemSpeedOptionsList);
-				var final_rpm_source_item = rpm_source_item;
-				
-				if (selectedRpmOption) {
-					final_rpm_source_item = rpmSources[selectedRpmOption.source_key]
-						? final_rpm_source_item
-						: this.defaultRpmSourceItem;
-				}
-
-				const payload = {
-					itemId: id,
-					notNotify: true,				
-					data: {
-						is_rpm_visible: !!is_rpm_visible,
-						rpm_source_item: final_rpm_source_item || this.defaultRpmSourceItem,
-						...data
-					}
-				};
-
-				/*if (payload) {
-					this.$emit('event', {
-						// eventName: 'reloadPage',
-						eventName: 'updateEquipment',
-						data: {
-							id,
-							...payload.data
-						},
-						onward: true
-					});
-					console.log(data, payload)
-					return
-				}*/
-				this.loadingRPM = true;
-
-				this.set_equipment_rpm_params(payload).then(({value}) => {
-					// console.log(response)
-					this.showRpmSettingsDialog = false;
-					this.$emit('event', {
-						// eventName: 'reloadPage',
-						eventName: 'updateEquipment',
-						data: value,
-						onward: true
-					});
-					this.loadingRPM = false;
-				}).catch(()=>{
-					this.loadingRPM = false;
-				});
-			}
-		}
+		},*/
 
 		/*handleStartCrashProcess() {
 			const { equipment } = this.sensorData;

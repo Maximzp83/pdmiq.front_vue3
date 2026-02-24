@@ -55,7 +55,7 @@
 							<el-option
 								v-for="item in filteredDataSetsList"
 								:key="'data_set-' + item.id"
-								:label="item.alt_label"
+								:label="item.alt_label || item.label"
 								:value="item.id"
 							/>
 						</el-select>
@@ -1084,8 +1084,17 @@ export default {
 		isSensorOnly: that => that.formData.functionality_type === ULTRASOUND_SENSOR_TYPES.SENSOR_ONLY,
 
 		// -----Sensor-----
-		filteredDataSetsList: () =>
-			Object.freeze(dataSetsList().filter(ds => ds.controller_type === SENSOR_TYPES.ULTRA_SOUND)),
+		filteredDataSetsList() {
+			if (this.formData.lube_version === LUBE_VERSIONS.V3) {
+				return Object.freeze(dataSetsList().filter(
+					ds => ds.isLubeV3
+				));
+			}
+
+			return Object.freeze(dataSetsList().filter(
+				ds => ds.controller_type === SENSOR_TYPES.ULTRA_SOUND
+			));						
+		},
 
 		portsList() {
 			const list = [];

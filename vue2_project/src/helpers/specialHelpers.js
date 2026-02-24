@@ -31,7 +31,7 @@ import {
 	bannerPowerTypesList
 } from '@/constants/global';
 
-import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
+import { sensorParametersList, METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 import { storeGetter, dispatchGetter } from '@/store';
 import { Lang } from '@/localization';
 import { Message } from 'element-ui';
@@ -574,6 +574,46 @@ const copyToClipboard1 = (string, settings = {}) => {
 	}
 };
 
+const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem, measurement}) => {
+	const {rpmSources} = sensorData;
+	let list = [];
+
+	Object.keys(rpmSources).forEach(source_key => {
+		let key = 'source_key';
+		if (source_key == 'max_peak_frequency_at_imperial_evaluated') {
+			if (measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+				key = `source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`;
+			}
+		} else if (source_key == 'max_peak_frequency_at_metric_evaluated') {
+			if (measurement === METRIC_SYSTEM_TYPES.METRIC) {
+				key = `source_key_${METRIC_SYSTEM_TYPES.METRIC}`;
+			}
+		}
+
+		const option = findItemBy(key, source_key, itemSpeedOptionsList);
+  	// console.log('dialog', rpmSources, source_key, rpmSources[source_key])
+		if (option && (rpmSources[source_key] || rpmSources[source_key] == 0)) {
+			list.push({
+				id: option.id,
+				name: option.name,
+				value: rpmSources[source_key],
+				hasInput: option.hasInput
+			});
+		}
+	})
+
+	if (fftItem) {
+		list.push({
+			id: 'fft-rpm',
+			name: 'FFT',
+			value: fftItem.rpm_value,
+			hasInput: true
+		});
+	}
+
+	return Object.freeze(list);
+};
+
 export const equipmentCardTitle = (titles, equipmentData) =>
 	equipmentCardTitle1(titles, equipmentData);
 export const getBrandModelImgByType = payload => getBrandModelImgByType1(payload);
@@ -609,5 +649,6 @@ export const getSensorTitle = (payload, options) =>
 	getSensorTitle1(payload, options);
 
 export const isPasswordStrong = str => isPasswordStrong1(str);
+export const setupItemSpeedOptionsList = payload => setupItemSpeedOptionsList1(payload);
 export const setupTrueFalseCellIcon = val => setupTrueFalseCellIcon1(val);
 export const copyToClipboard = (str, message) => copyToClipboard1(str, message);

@@ -15,6 +15,7 @@ export const ncdAxisList = [
 	{
 		id: NCD_AXIS.X,
 		name: 'X',
+		banner_m25_name: 'constants.Ultrasound',
 		key: 'x',
 		type_key: 'Radial',
 		banner_type_key: 'Axial'
@@ -22,6 +23,7 @@ export const ncdAxisList = [
 	{
 		id: NCD_AXIS.Y,
 		name: 'Y',
+		banner_m25_name: 'Envelope',
 		key: 'y',
 		type_key: 'Radial',
 		banner_type_key: 'Axial'
@@ -29,6 +31,7 @@ export const ncdAxisList = [
 	{
 		id: NCD_AXIS.Z,
 		name: 'Z',
+		banner_m25_name: 'Standard',
 		key: 'z',
 		type_key: 'Axial',
 		banner_type_key: 'Radial'
@@ -155,7 +158,7 @@ export const BANNER_V2_1_VIBRATION_PARAMETERS_TYPES = {
 	Z_PEAK_ACCEL_FREQ_COMPONENT: 93,
 };
 
-export const BANNER_S22_UVT_PARAMETERS_TYPES = {
+export const BANNER_M25_PARAMETERS_TYPES = {
 	ULTRASOUND_RMS: 103,
 	ULTRASOUND_IMPACT_INDEX: 104,
 	ULTRASOUND_PEAK: 105,
@@ -399,15 +402,15 @@ const metricKeysTable1 = {
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 			
-			[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: UNIT_TYPES.HZ,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY]: UNIT_TYPES.MM_SEC,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: UNIT_TYPES.HZ,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE]: UNIT_TYPES.CELSIUS,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: UNIT_TYPES.HZ,
+			[BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY]: UNIT_TYPES.MM_SEC,
+			[BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: UNIT_TYPES.HZ,
+			[BANNER_M25_PARAMETERS_TYPES.TEMPERATURE]: UNIT_TYPES.CELSIUS,
 		},
 		[METRIC_SYSTEM_TYPES.IMPERIAL]: {
 			[SENSOR_EXTRA_VIBRATION_PARAMETERS_TYPES.HI_FREQ_RMS_ACCEL_MAG]: UNIT_TYPES.G,
@@ -453,15 +456,15 @@ const metricKeysTable1 = {
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 
-			[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: UNIT_TYPES.HZ,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY]: UNIT_TYPES.INCHES_SEC,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: UNIT_TYPES.HZ,
-			[BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE]: UNIT_TYPES.FAHRENHEIT
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: UNIT_TYPES.HZ,
+			[BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY]: UNIT_TYPES.INCHES_SEC,
+			[BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: UNIT_TYPES.HZ,
+			[BANNER_M25_PARAMETERS_TYPES.TEMPERATURE]: UNIT_TYPES.FAHRENHEIT
 		}
 	}
 };
@@ -471,6 +474,7 @@ const sensorParametersList1 = {
 		id: SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.z_velocity',
+		short_name: 'Vz',
 		pair_name: 'radial (Z) velocity',
 		axis: 'z-axis',
 		axis_id: NCD_AXIS.Z,
@@ -491,6 +495,7 @@ const sensorParametersList1 = {
 		id: SENSOR_PARAMETERS_TYPES.X_AXIS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.x_velocity',
+		short_name: 'Vx',
 		pair_name: 'axial (X) velocity',
 		axis: 'x-axis',
 		axis_id: NCD_AXIS.X,
@@ -768,7 +773,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_hi_frequency_RMS_acceleration',
-		short_name: 'short_name.hi_freq_accel',
+		short_name: 'Ahf',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -805,7 +810,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_full_band_rms_acceleration',
-		short_name: 'short_name.full_band_accel',
+		short_name: 'Alf',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -823,7 +828,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.x_rms_velocity_mm',
-		short_name: 'short_name.x_rms_velocity',
+		short_name: 'Vx',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -832,7 +837,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.y_rms_velocity_mm',
-		short_name: 'short_name.y_rms_velocity',
+		short_name: 'Vy',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -841,7 +846,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.z_rms_velocity_mm',
-		short_name: 'short_name.z_rms_velocity',
+		short_name: 'Vz',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -1081,116 +1086,116 @@ const bannerV21vibrationParametersList1 = {
 	},
 };
 
-const bannerS22UVTParametersList1 = {
-	[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS,
+const bannerM25ParametersList1 = {
+	[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: {
+		id: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
 		icon: 'icon-sensor',
 		name: 'constants.ultrasound_rms',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX,
+	[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX]: {
+		id: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX,
 		icon: 'icon-sensor',
 		name: 'constants.ultrasound_impact_index',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK,
+	[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: {
+		id: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK,
 		icon: 'icon-sensor',
 		name: 'constants.ultrasound_peak',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR,
+	[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR]: {
+		id: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR,
 		icon: 'icon-sensor',
 		name: 'constants.ultrasound_crest_factor',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS,
+	[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS]: {
+		id: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS,
 		icon: 'icon-sensor',
 		name: 'constants.ultrasound_curtosis',
 		metricKeysTableName: 'extra_vibration'
 	},
 
-	[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
+	[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: {
+		id: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.high_frequency_rms_acceleration',
 		short_name: 'short_name.hi_freq_rms_accel',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+	[BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX]: {
+		id: BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
 		icon: 'icon-acceleration',
 		name: 'constants.hfe_impact_index',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+	[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: {
+		id: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.high_frequency_pk_acceleration',
 		short_name: 'short_name.hi_freq_pk_accel',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+	[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR]: {
+		id: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
 		icon: 'icon-acceleration',
 		name: 'constants.high_frequency_crest_factor',
 		short_name: 'short_name.hi_freq_crest_factor',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
+	[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS]: {
+		id: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
 		icon: 'icon-acceleration',
 		name: 'constants.high_frequency_kurtosis',
 		short_name: 'short_name.hi_freq_kurtosis',
 		metricKeysTableName: 'extra_vibration'
 	},
 
-	[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION,
+	[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: {
+		id: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.full_band_rms_acceleration',
 		short_name: 'short_name.full_band_accel',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ,
+	[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ]: {
+		id: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ,
 		icon: 'icon-acceleration',
 		name: 'constants.full_band_peak_acceleration_frequency',
 		short_name: 'short_name.full_band_pk_accel_freq',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR,
+	[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR]: {
+		id: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR,
 		icon: 'icon-acceleration',
 		name: 'constants.full_band_crest_factor',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS,
+	[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS]: {
+		id: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS,
 		icon: 'icon-acceleration',
 		name: 'constants.full_band_kurtosis',
 		metricKeysTableName: 'extra_vibration'
 	},
 
-	[BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY,
+	[BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY]: {
+		id: BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.rms_velocity',
 		metricKeysTableName: 'extra_vibration'
 	},
-	[BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT,
+	[BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: {
+		id: BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT,
 		icon: 'icon-velocity',
 		name: 'constants.peak_velocity_frequency_component',
 		short_name: 'short_name.peak_vel_comp_freq',
 		metricKeysTableName: 'extra_vibration'
 	},
 
-	[BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE]: {
-		id: BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE,
+	[BANNER_M25_PARAMETERS_TYPES.TEMPERATURE]: {
+		id: BANNER_M25_PARAMETERS_TYPES.TEMPERATURE,
 		icon: 'icon-temperature',
 		name: 'constants.temperature',
 		metricKeysTableName: 'extra_vibration'
@@ -1418,8 +1423,8 @@ export const sensorParametersListNCDOnly = key =>
 export const bannerV21vibrationParametersList = (key, settings = {}) =>
 	setupList(bannerV21vibrationParametersList1, key, {...settings, translate: { key: 'short_name' } });
 
-export const bannerS22UVTParametersList = (key, settings = {}) =>
-	setupList(bannerS22UVTParametersList1, key, {...settings, translate: { key: 'short_name' } });
+export const bannerM25ParametersList = (key, settings = {}) =>
+	setupList(bannerM25ParametersList1, key, {...settings, translate: { key: 'short_name' } });
 
 export const thresholdUpdateSourceTypesList = () =>
 	Lang.translate(thresholdUpdateSourceTypesList1);

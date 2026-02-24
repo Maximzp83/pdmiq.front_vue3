@@ -29,17 +29,25 @@
 
 <script>
 // import { mapActions, /*mapState*/ } from 'vuex';
-import { findItemBy } from '@/helpers';
+// import { findItemBy } from '@/helpers';
+import { setupItemSpeedOptionsList } from '@/helpers/specialHelpers';
 
 import {
-	itemSpeedOptionsList
+	itemSpeedOptionsList,
+	ITEM_SPEED_OPTIONS
 } from '@/constants/global';
-
-
 
 export default {
 	props: {
 		sensorData: {
+			type: Object,
+			default: () => ({})
+		},
+		fftItem: {
+			type: Object,
+			default: () => ({})
+		},
+		rootFilters: {
 			type: Object,
 			default: () => ({})
 		},
@@ -56,25 +64,12 @@ export default {
 
 	computed: {
 		itemSpeedOptionsList: () => itemSpeedOptionsList(),
-
-		preparedItemSpeedOptionsList() {
-			var { rpmSources } = this.sensorData;
-			var list = [];
-
-			Object.keys(rpmSources).forEach(source_key => {
-				const option = findItemBy('source_key', source_key, this.itemSpeedOptionsList);
-				// console.log('dialog', rpmSources, source_key, rpmSources[source_key])
-				if (option && (rpmSources[source_key] || rpmSources[source_key] == 0)) {
-					list.push({
-						id: option.id,
-						name: option.name,
-						value: rpmSources[source_key]
-					});
-				}
-			})
-
-			return Object.freeze(list);
-		},
+		preparedItemSpeedOptionsList: that => setupItemSpeedOptionsList({
+			sensorData: that.sensorData,
+			measurement: that.rootFilters.measurement,
+			itemSpeedOptionsList: that.itemSpeedOptionsList,
+			fftItem: that.fftItem
+		}),
 
 		radioSettings: () =>
 			Object.freeze({
@@ -82,14 +77,25 @@ export default {
 				title: 'RPM',
 				isCheckbox: true,
 				alwaysSwitch: true,
-				additionalInfoKey: 'value'
+				additionalInfoKey: 'value',
+				valueAsObject: { props: ['id', 'value'], isActiveKey: 'id', valueKey: 'value' },
 			}),
 
 	},
 
 	methods: {
 		handleSave() {
-			this.$emit('save', this.rpm_source_item);
+			let data = {
+				rpm_source_item: this.rpm_source_item.id,
+			}
+			if (this.rpm_source_item.id === ITEM_SPEED_OPTIONS.MANUAL_RPM) {
+				data.rpm_value = +this.rpm_source_item.value;
+			} else if (this.rpm_source_item.id === 'fft-rpm') {
+				// console.log('rpm_source_item', this.rpm_source_item)
+				data.rpm_value = +this.rpm_source_item.value;
+				data.isFFTRPM = true;
+			}
+			this.$emit('save', data);
 		},
 
 		handleCancel() {
@@ -98,7 +104,9 @@ export default {
 	},
 
 	created() {
-		this.rpm_source_item = this.currentRpmSource;
+		this.rpm_source_item = {
+			...this.currentRpmSource
+		};
 	}
 };
 </script>

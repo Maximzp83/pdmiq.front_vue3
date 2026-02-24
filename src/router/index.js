@@ -764,7 +764,7 @@ router.beforeEach((to, from, next) => {
 	}
 
 	const { hasAccess, reason, authUser } = hasRightsToRoute(to, authStore);
-	console.log('beforeEach', hasAccess, reason, authUser)
+	// console.log('beforeEach', hasAccess, reason, authUser)
 	if (hasAccess) {
 		if (authUser?.role?.is_forced_mfa && !authUser.is_mfa_enabled && to.path !== '/profile') {
 			Notify({

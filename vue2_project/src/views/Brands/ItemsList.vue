@@ -15,6 +15,7 @@
 						<!-- <template v-slot:middle>
 							<div class="filter-item ml-auto">
 								<CustomSelect
+									clearable
 									:optionsLoading="equipmentTypesLoading"
 									:optionsList="equipmentTypesList"
 									:placeholder="`${tt('Select')} ${tt('type')}`"

@@ -107,7 +107,7 @@
 		<el-dialog
 			v-if="chartThresoldsDialogInit"
 			center
-			:title="tt('Compare')"
+			:title="tt('Alarms')"
 			:append-to-body="true"
 			:visible.sync="showThresholdsDialog"
 			class="dialog-decorate-header filled-header standard"

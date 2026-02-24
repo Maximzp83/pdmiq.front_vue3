@@ -58,6 +58,17 @@
 				/>
 			</el-form-item>
 
+			<el-form-item
+				:label="`${tt('Allow')} FFT`"
+				prop="is_fft_allowed"
+			>
+				<el-switch
+					v-model="formData.is_fft_allowed"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<div :label="tt('IO_Parameters')" prop="parameters" class="el-form-item">
 				<div class="title article-title">{{ tt('IO_Parameters') }}:</div>
 				<div class="form-subitems-wrapper">
@@ -119,6 +130,7 @@ export default {
 				model_number: '',
 				part_number: '',
 				is_default: 0,
+				is_fft_allowed: 0,
 				parameters: [],
 				sensor_class: null
 			}

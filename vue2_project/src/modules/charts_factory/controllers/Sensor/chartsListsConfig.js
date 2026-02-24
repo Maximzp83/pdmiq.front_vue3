@@ -5,7 +5,7 @@ import {
 	SENSOR_HUMIDITY_PARAMETERS_TYPES,
 	SENSOR_COLORTECH_VFD_PRESSURE_RPM_AMPS_PARAMETERS_TYPES,
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
-	BANNER_S22_UVT_PARAMETERS_TYPES,
+	BANNER_M25_PARAMETERS_TYPES,
 	sensorParametersList,
 	sensorParametersListNCD,
 	sensorUltraSoundParametersList,
@@ -17,10 +17,10 @@ import {
 	sensorLubematrixSDTtempF_ParametersList,
 	// sensorExtraVibrationParametersList,
 	bannerV21vibrationParametersList,
-	bannerS22UVTParametersList
+	bannerM25ParametersList
 } from './enums';
 import { cloneDeep, validateBySettings, findItemBy } from '@/helpers';
-import { CHART_TYPES, /*NCD_ALARM_TYPES*/ } from '@/constants/global';
+import { CHART_TYPES, chartTypesList, SENSOR_THRESHOLD_TYPES, NCD_ALARM_TYPES } from '@/constants/global';
 import { METRIC_SYSTEM_TYPES } from './enums';
 const { METRIC, IMPERIAL } = METRIC_SYSTEM_TYPES;
 
@@ -260,7 +260,62 @@ const settingsForSplineChartsWithSplittedSeries = {
 	}
 };
 
-const splineSeriesConfigSettings1 = {
+const getSplineSeriesConfigSettings = (alarm_type) => {
+	let settings = {
+		remove: [{ path: 'pointsData.seriesConfigsList.0', idx: [2, 3] }],
+		inject: [
+			{
+				path: 'pointsData.seriesConfigsList.0.1',
+				value: {
+					customSettings: {
+						threshold_level: null,
+						thresholdLevelsInZones: true,
+						setupSeriePropValue: [
+							{ key: 'zones', methodName: 'setupLineSerieZones' }
+						]
+					}
+				}
+			},
+		]
+	}
+
+	if (!alarm_type || alarm_type === NCD_ALARM_TYPES.LOW_HIGH_ALARM) {
+		settings.inject.push(
+			{
+				path: 'plotlinesSeriesData.seriesConfigsList.0.1',
+				value: {
+					id: 'low_threshold-serie',
+					template: 'sensor.humidity_warning_threshold'
+				}
+			},
+			{
+				path: 'plotlinesData.plotlinesConfigsList.0.1',
+				value: {
+					id: 'low-alarm-plotline',
+					template: 'sensor.low_alarm_plotline'
+				}
+			},
+			{
+				path: 'historyData.seriesConfigsList.0.0',
+				value: {
+					id: 'high_alarm_history-serie',
+					template: 'sensor.high_alarm_history'
+				}
+			},
+			{
+				path: 'historyData.seriesConfigsList.0.1',
+				value: {
+					id: 'low_alarm_history-serie',
+					template: 'sensor.low_alarm_history'
+				}
+			}
+		)
+	}
+	
+	return settings;
+}
+
+/*var splineSeriesConfigSettings1 = {
 	remove: [{ path: 'pointsData.seriesConfigsList.0', idx: [2, 3] }],
 	inject: [
 		{
@@ -268,7 +323,7 @@ const splineSeriesConfigSettings1 = {
 			value: {
 				customSettings: {
 					setupSeriePropValue: [
-						{ key: 'zones', methodName: 'setupSerieLowHighZones' }
+						{ key: 'zones', methodName: 'setupLineSerieZones' }
 					]
 				}
 			}
@@ -302,7 +357,7 @@ const splineSeriesConfigSettings1 = {
 			}
 		}
 	]
-};
+};*/
 
 const displacement = {
 	chart_id: 'displacement',
@@ -587,7 +642,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		},
 		{
 			chart_id: `chart-${SENSOR_HUMIDITY_PARAMETERS_TYPES.TEMPERATURE}`,
@@ -599,7 +654,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		}
 	],
 	'colortech_vfd_pressure_rpm/amps': [
@@ -729,7 +784,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		},
 		{
 			chart_id: `chart-${SENSOR_PARAMETERS_TYPES.TEMPERATURE}`,
@@ -739,7 +794,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		},
 		{
 			chart_id: `chart-${NCD_SENSOR_PARAMETERS_TYPES.PRESSURE}`,
@@ -749,7 +804,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		},
 		{
 			chart_id: `chart-${NCD_SENSOR_PARAMETERS_TYPES.IAQ}`,
@@ -779,7 +834,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		}
 	],
 	'banner_pressure': [
@@ -791,7 +846,7 @@ const chartsListsConfig1 = {
 				navigator: { series: { type: 'spline' } }
 			},
 			...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: splineSeriesConfigSettings1
+			seriesConfigSettings: getSplineSeriesConfigSettings()
 		}
 	],
 	'ncd_ultrasound': [
@@ -874,7 +929,7 @@ const chartsListsConfig1 = {
 					seriesConfigMethod: 'modifySeriesConfigByHistory'
 				}
 			},
-			seriesConfigSettings: splineSeriesConfigSettings1,
+			seriesConfigSettings: getSplineSeriesConfigSettings(),
 			seriesConfigIncludes: ['fft_flag', 'runtime_flag'],
 			requestsList: [
 				sensorUltraSoundParametersList(SENSOR_SPECIFIC_PARAMETERS_TYPES.DB)
@@ -1334,9 +1389,9 @@ const chartsListsConfig1 = {
 			]
 		},
 	],
-	'banner_s22UVT': [
+	'banner_m25': [
 		{
-			chart_id: `chart-${BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS}`,
+			chart_id: `chart-${BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS}`,
 			// chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' }, 
 			updateChartTitleByMetric: true,
 			canBeHidden: true,
@@ -1351,25 +1406,25 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardColumn', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS }
+						{ setName: 'standardColumn', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR },
+						// { setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS }
 					]
 				}
 			}),
-			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS, {includeStatsLines:1}),
+			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS, {includeStatsLines:1}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_RMS),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				// bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
-			chart_id: `chart-${BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION}`,
+			chart_id: `chart-${BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION}`,
 			// chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' }, 
 			updateChartTitleByMetric: true,
 			canBeHidden: true,
@@ -1384,26 +1439,26 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardColumn', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS }
+						{ setName: 'standardColumn', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS }
 					]
 				}
 			}),
-			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {includeStatsLines:1}),
+			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {inject: {postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3}}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {inject: {postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3}}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
-			chart_id: `chart-${BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION}`,
-			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (6-10600Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' }, 
+			chart_id: `chart-${BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION}`,
+			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (6-10000Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' }, 
 			updateChartTitleByMetric: true,
 			canBeHidden: true,
 			inject_options: {	tooltip: { split: false }	},
@@ -1417,23 +1472,25 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardColumn', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS }
+						{ setName: 'standardColumn', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION },
+						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ },
 					]
 				}
 			}),
-			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION, {includeStatsLines:1}),
+			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION),
+				bannerM25ParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
-			chart_id: `chart-${BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY}`,
+			chart_id: `chart-${BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY}`,
 			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (6-1000Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' }, 
 			updateChartTitleByMetric: true,
 			canBeHidden: true,
@@ -1448,19 +1505,19 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardColumn', param: BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY },
-						{ setName: 'invisibleLine', param: BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT },
+						{ setName: 'standardColumn', param: BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY },
+						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT },
 					]
 				}
 			}),
-			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY, {includeStatsLines:1}),
+			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY, {includeStatsLines:1}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.RMS_VELOCITY),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
-			chart_id: `chart-${BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE}`,
+			chart_id: `chart-${BANNER_M25_PARAMETERS_TYPES.TEMPERATURE}`,
 			canBeHidden: true,
 			transformator_settings: {
 				specification: {
@@ -1469,7 +1526,7 @@ const chartsListsConfig1 = {
 				}
 			},
 			seriesConfigIncludes: ['runtime_flag'],
-			requestsList: [sensorParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.TEMPERATURE)]
+			requestsList: [sensorParametersList(BANNER_M25_PARAMETERS_TYPES.TEMPERATURE)]
 		},
 		// ------------
 
@@ -1477,7 +1534,7 @@ const chartsListsConfig1 = {
 			chart_id: 'ultrasound_high_frequency_impact_index',
 			updateChartTitleByMetric: true,
 			chart_title_prefix: `${Lang.tt('constants.ultrasound_high_frequency_impact_index')} `,
-			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
+			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (20-40kHz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
 			// chart_title_postfix: ')',
 			canBeHidden: true,
 			setValue: ['chartIsHidden', true],
@@ -1496,21 +1553,21 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardLine1', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX },
-						{ setName: 'standardLine2', param: BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX },
+						{ setName: 'standardLine1', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX },
+						{ setName: 'standardLine2', param: BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX },
 					]
 				}
 			}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(20-40kHz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
 			chart_id: 'ultrasound_high_frequency_peak',
 			updateChartTitleByMetric: true,
 			chart_title_prefix: `${Lang.tt('constants.ultrasound_high_frequency_peak')} `,
-			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
+			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (20-40kHz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
 			// chart_title_postfix: ')',
 			canBeHidden: true,
 			setValue: ['chartIsHidden', true],
@@ -1529,14 +1586,14 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardLine1', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK },
-						{ setName: 'standardLine2', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION },
+						{ setName: 'standardLine1', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK },
+						{ setName: 'standardLine2', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION },
 					]
 				}
 			}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:true, }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(20-40kHz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 
@@ -1544,7 +1601,7 @@ const chartsListsConfig1 = {
 			chart_id: 'crest_factor',
 			updateChartTitleByMetric: true,
 			chart_title_prefix: `${Lang.tt('constants.crest_factor')} `,
-			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
+			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (20-40kHz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
 			// chart_title_postfix: ')',
 			canBeHidden: true,
 			setValue: ['chartIsHidden', true],
@@ -1563,23 +1620,23 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardLine1', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR },
-						{ setName: 'standardLine2', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR },
-						{ setName: 'standardLine3', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR },
+						{ setName: 'standardLine1', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR },
+						{ setName: 'standardLine2', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR },
+						{ setName: 'standardLine3', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR },
 					]
 				}
 			}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:true, }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:true, }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
 			chart_id: 'kurtosis',
 			updateChartTitleByMetric: true,
 			chart_title_prefix: `${Lang.tt('constants.kurtosis')} `,
-			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-5300Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
+			chart_title_postfix_by_metric: { [METRIC_SYSTEM_TYPES.METRIC]:' (1000-10000Hz)', [METRIC_SYSTEM_TYPES.IMPERIAL]:' (60k-318k CPM)' },
 			// chart_title_postfix: ')',
 			canBeHidden: true,
 			setValue: ['chartIsHidden', true],
@@ -1598,16 +1655,16 @@ const chartsListsConfig1 = {
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardLine1', param: BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS },
-						{ setName: 'standardLine2', param: BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS },
-						{ setName: 'standardLine3', param: BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS },
+						// { setName: 'standardLine1', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS },
+						{ setName: 'standardLine2', param: BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS },
+						{ setName: 'standardLine3', param: BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS },
 					]
 				}
 			}),
 			requestsList: [
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:true }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerS22UVTParametersList(BANNER_S22_UVT_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(6-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				// bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:true }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(10-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 	],
@@ -1632,16 +1689,18 @@ const generateListsConfig = (config_key, settings) => {
 					units = overwritingParam.units;
 					name = overwritingParam.name;
 				}
-				// console.log(param)
+
 				let chart = {
 					chart_id: `chart-${node_parameter}`,
 					parameter_id: node_parameter,
+					customSettings: { parameterItem: param },
 					config_settings: { showCalculateThresholdsButton: true },
 					transformator_settings: {
 						specification: {
 							setupFlagsData: { enable_fft: 1, enable_runtime_tracker: 1 }
 						}
 					},
+					applyColorSchemeOnSeriesReady: true,
 					zonesKeysList: ['alarm', 'warning', 'off_alarm'],
 					seriesConfigIncludes: ['off_alarm', 'fft_flag', 'runtime_flag', 'statistic_lines'],
 					requestsList: [{
@@ -1652,27 +1711,43 @@ const generateListsConfig = (config_key, settings) => {
 					}]
 				}
 
-				if (graph_type === CHART_TYPES.LINE) {
+				if (graph_type === CHART_TYPES.LINE || graph_type === CHART_TYPES.AREASPLINE) {
+					let type = findItemBy('id', graph_type, chartTypesList());
+					
+					chart.applyColorSchemeToSeriesZones = true;
+					
 					chart.inject_options = {
-						chart: { type: 'spline' },
-						navigator: { series: { type: 'spline' } }
+						chart: { type: type.chart_type },
+						// chart: { type: 'column' },
+						navigator: { series: { type: type.chart_type } }
 					}
 
-					chart.config_settings = {
-						...chart.config_settings,
-						generateSeriesByStatistics: {
-							seriesConfigMethod: 'modifySeriesConfigByHistory'
+					if (graph_type === CHART_TYPES.AREASPLINE) {
+						chart.inject_options.plotOptions = {
+							areaspline: {
+								boostThreshold: 11000,
+								turboThreshold: 11000,
+								fillOpacity: 0.5,
+								fillColor: {
+									linearGradient: {
+										x1: 0,
+										y1: 0,
+										x2: 0,
+										y2: 1
+									},
+									stops: [
+										[0, 'rgba(54, 205, 138, 0.7)'],
+										[1, 'rgba(54, 205, 138, 0.05)']
+									]
+								}
+							}
 						}
-					};
-
-					chart.transformator_settings.specification = {
-						...chart.transformator_settings.specification,
-						setupPointsData: { enableZones: true, method: 'line_charts_datetime' },
 					}
 
-					chart.seriesConfigSettings = splineSeriesConfigSettings1;
+					chart = { ...chart, ...settingsForSplineChartsWithSplittedSeries };
+					chart.seriesConfigSettings = getSplineSeriesConfigSettings(param.alarm_type);
+					// console.log(chart.seriesConfigSettings)
 				}
-
 				return chart;
 			});
 		}
@@ -1702,19 +1777,22 @@ const defaultSeriesConfig1 = {
 					id: 'base-serie',
 					data_path: 'base',
 					template: 'sensor.base',
-					event_key: 'pointClickEvent'
+					event_key: 'pointClickEvent',
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.BASELINE } }
 				},
 				{
 					id: 'warning-serie',
 					data_path: 'warning',
 					template: 'sensor.warning',
-					event_key: 'pointClickEvent' /*tooltip: { inject: { valueSuffix: ' mm'} }*/
+					event_key: 'pointClickEvent', /*tooltip: { inject: { valueSuffix: ' mm'} }*/
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.WARNING } }
 				},
 				{
 					id: 'alarm-serie',
 					data_path: 'alarm',
 					template: 'sensor.alarm',
-					event_key: 'pointClickEvent'
+					event_key: 'pointClickEvent',
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.ALARM } }
 				},
 				{
 					id: 'off_alarm-serie',
@@ -1915,6 +1993,20 @@ const defaultSeriesConfig1 = {
 					}
 				},
 				{
+					id: 'fft-lock-flag-serie',
+					data_path: 'fft_lock_statistics',
+					template: 'sensor.lube_lock_log_flag',
+					conditionSettings: {
+						conditions: [
+							{
+								array_method: 'some',
+								data_value: 'fft_flag',
+								control_value_prop: 'seriesConfigIncludes'
+							}
+						]
+					}
+				},
+				{
 					id: 'lube-flag-serie_successfull',
 					data_path: 'lube_statistics_successfull',
 					template: 'sensor.lube_flag_successfull',
@@ -2037,12 +2129,14 @@ const defaultSeriesConfig1 = {
 				{
 					id: 'alarm_threshold-serie',
 					data_path: 'alarm_zone',
-					template: 'sensor.alarm_threshold'
+					template: 'sensor.alarm_threshold',
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.ALARM } }
 				},
 				{
 					id: 'warning_threshold-serie',
 					data_path: 'warning_zone',
-					template: 'sensor.warning_threshold'
+					template: 'sensor.warning_threshold',
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.WARNING } }
 				},
 				{
 					id: 'off_alarm_threshold-serie',
@@ -2246,8 +2340,8 @@ const filterDefaultSeriesConfig = ({
 
 // ----------------
 
-export const splineSeriesConfigSettings = () =>
-	cloneDeep(splineSeriesConfigSettings1);
+export var splineSeriesConfigSettings = (alarm_type) =>
+	cloneDeep(getSplineSeriesConfigSettings(alarm_type));
 
 export const getRequestList = payload => getRequestList1(payload);
 

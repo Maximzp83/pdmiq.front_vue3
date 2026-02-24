@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { commonStoreMixin } from './mixins/commonStoreMixin';
+import { api_request } from '@/api/request_provider';
 
 // import { Notification } from 'element-ui';
 import { Lang } from '@/localization';
@@ -11,7 +12,7 @@ const localStorageItemsActiveGridType = JSON.parse(
 const localStorageCompareList = JSON.parse(localStorage.getItem('compare_list'));
 
 const globalFiltersInit = {
-	plantId: null,
+	plantId: undefined,
 	companyId: null,
 };
 
@@ -139,10 +140,6 @@ export const useGlobalStore = defineStore('globalStore', {
 			});
 		},
 
-		set_global_plants(items = []) {
-			this.set_value('globalPlantsList', items);
-		},
-
 		set_compare_list(items = []) {
 			this.set_value('compareList', items, {
 				toLocalStorage: { prop: 'compare_list' },
@@ -176,6 +173,44 @@ export const useGlobalStore = defineStore('globalStore', {
 			this.set_value('items_active_grid_type', value, {
 				toLocalStorage: { prop: 'items_active_grid_type' },
 			});
+		},
+
+		fetch_global_plants(payload = {}) {
+			const extendedPayload = {
+				...payload,
+				method: 'GET',
+				setToStore: true,
+				loading: true,
+				storeName: 'GlobalStore',
+				stateProp: 'globalPlantsList',
+				prepareData: 'prepareGlobalPlantsData',
+				loadingProp: 'globalPlantsLoading',
+				notNotify: true,
+			};
+			return api_request(`/plants`, extendedPayload);
+		},
+
+		fetch_global_companies(payload = {}) {
+			const extendedPayload = {
+				...payload,
+				method: 'GET',
+				setToStore: true,
+				loading: true,
+				storeName: 'GlobalStore',
+				stateProp: 'globalCompaniesList',
+				loadingProp: 'globalCompaniesLoading',
+				notNotify: true,
+			};
+			return api_request(`/companies`, extendedPayload);
+		},
+
+		save_visit_analytics(payload = {}) {
+			const extendedPayload = {
+				...payload,
+				method: 'POST',
+				notNotify: true,
+			};
+			return api_request(`/analytics/visit`, extendedPayload);
 		},
 	},
 

@@ -98,41 +98,48 @@ export default {
 	},
 
 	methods: {
-		fetchItems(type) {
-			let { fetchAction, params, setToStore, loading } = this.settings;
-			let payload = {
-				params: {
-					max: 30,
-					q: this.query,
-					page: this.nextPage,
-					...params
-				},
-				// setToStore: setToStore,
-				loading: loading
-			};
+		fetchItems({ type, params={} }) {
+			try {
+				let { fetchAction, setToStore, loading } = this.settings;
+				let mergedParams = this.settings.params || {};
+				mergedParams = { ...mergedParams, ...params };
 
-			// if (!setToStore) {
-			this.$emit('update:optionsLoading', true);
-			// }
+				let payload = {
+					params: {
+						max: 30,
+						q: this.query,
+						page: this.nextPage,
+						...mergedParams
+					},
+					// setToStore: setToStore,
+					loading: loading
+				};
 
-			this.$store
-				.dispatch(fetchAction, payload)
-				.then(response => {
-					// if (!setToStore)
-					this.fetchSuccessHandler({
-						type: type,
-						response: response,
-						setToStore: setToStore
+				// if (!setToStore) {
+				this.$emit('update:optionsLoading', true);
+				// }
+				// console.log(payload.params)
+				this.$store
+					.dispatch(fetchAction, payload)
+					.then(response => {
+						// if (!setToStore)
+						this.fetchSuccessHandler({
+							type: type,
+							response: response,
+							setToStore: setToStore
+						});
+
+						this.$emit('update:optionsLoading', false);
+					})
+					.catch(e => {
+						// if (!setToStore) {
+						this.$emit('update:optionsLoading', false);
+						// }
+						console.warn(e);
 					});
-
-					this.$emit('update:optionsLoading', false);
-				})
-				.catch(e => {
-					// if (!setToStore) {
-					this.$emit('update:optionsLoading', false);
-					// }
-					console.warn(e);
-				});
+			} catch (e) {
+				console.warn(e);
+			}
 		},
 
 		selectQuery(query) {
@@ -152,8 +159,10 @@ export default {
 					this.timer = null;
 
 					if (cleanValues) cleanValuesByList(cleanValues, this);
-					this.fetchItems();
-				}, 600);
+					const params = {max: this.query.length ? -1 : 30};
+					// console.log(1, this.query, params)
+					this.fetchItems({params});
+				}, 700);
 			} else {
 				if (!setToStore && !this.preventResetOptionsWhenQueryIsCleared) {
 					this.$emit('update:optionsList', []);
@@ -224,7 +233,7 @@ export default {
 					(this.loadmoreIsActiveLocal && this.loadmoreIsActive) ||
 					(this.loadmoreIsActive && settings.isEmptyList)
 				) {
-					this.fetchItems('loadmore');
+					this.fetchItems({type:'loadmore'});
 				}
 			}
 		},

@@ -11,7 +11,7 @@
 		</div>
 
 		<div class="cell-item">
-			<el-checkbox v-model="formData.is_sms" :true-label="1" :false-label="0" />
+			<el-checkbox v-model="formData.is_sms" :true-label="1" :false-label="0" :disabled="!isPhoneVerified" />
 		</div>
 	</div>
 </template>
@@ -19,7 +19,8 @@
 <script>
 export default {
 	props: {
-		rowData: Object
+		rowData: Object,
+		isPhoneVerified: Boolean
 	},
 
 	data() {
@@ -40,6 +41,9 @@ export default {
 	methods: {
 		setupFormData(data) {
 			this.formData = { ...data };
+			if (!this.isPhoneVerified) {
+				this.formData.is_sms = 0;
+			}
 		},
 
 		getFormData() {

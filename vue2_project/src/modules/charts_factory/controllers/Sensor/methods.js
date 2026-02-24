@@ -21,7 +21,9 @@ import {
 	alertTypesList,
 	fftTypesList,
 	FFT_TYPES,
-	sensorTypesList
+	sensorTypesList,
+	fftLockStatusesList,
+	FFT_LOCK_STATUSES
 } from '@/constants/global';
 import {
 	lubeTypesObj,
@@ -37,7 +39,7 @@ import {
 import {
 	unitTypesList,
 	metricKeysTable,
-	METRIC_SYSTEM_TYPES,
+	// METRIC_SYSTEM_TYPES,
 	ncdAxisList,
 	thresholdUpdateSourceTypesList,
 } from './enums';
@@ -484,6 +486,37 @@ const setupLubeLockLogStatistics1 = ({ lubeData }) => {
 	return lube_lock_logs_statistics;
 };
 
+const setupFFTLockStatistics1 = (fft_locks = []) => {
+	let fft_lock_statistics = [];
+
+	for (let i = 0; i < fft_locks.length; i++) {
+		let { status, unlock_author, fft } = fft_locks[i];
+		let { created_at } = fft;
+
+		const statusItem = findItemBy('id', status, fftLockStatusesList());
+		let tooltip_text = statusItem ? statusItem.name : 'Wrong fft status';
+
+		let shape = 'url(/static/img/icons/warning_flag.svg)';
+
+		if (status === FFT_LOCK_STATUSES.UNLOCKED && unlock_author) {
+			tooltip_text = `${Lang.tt('constants.UNLOCKED')} by
+												${unlock_author.full_name}`;
+			shape = 'url(/static/img/icons/success_flag.svg)';
+		}
+
+		fft_lock_statistics.push({
+			x: Date.parse(created_at),
+			title: statusItem ? statusItem.name : '',
+			status: status,
+			text: tooltip_text,
+			color: statusItem ? statusItem.color : 'gray',
+			shape,
+		});
+	}
+
+	return fft_lock_statistics;
+};
+
 const setupCrashesStatistics1 = (crashesData, crashText) => {
 	let crashes_statistics = [];
 	let acute_statistics = [];
@@ -629,6 +662,8 @@ const setupFlagsFFTStatistics1 = (fftData = [], filterBy = []) => {
 	return statistics;
 };
 
+
+
 const setupRuntimeTrackersStatistics1 = (runtimeTrackersStatistics = []) => {
 	let statistics = [];
 
@@ -766,7 +801,7 @@ const getZoneMinMaxPoint = (
 const getUnitType1 = ({ parameterItem, measurement, returnItem }) => {
 	if (parameterItem && !parameterItem.skipUnit) {
 		const metricKeysTableName = parameterItem.metricKeysTableName || 'default';
-		// console.log( metricKeysTable, metricKeysTableName, [measurement])
+		// console.log( metricKeysTable, metricKeysTableName, parameterItem, 	[measurement])
 		const unitTypeId = metricKeysTable(metricKeysTableName, measurement)[parameterItem.id];
 		const unitTypeItem = findItemBy('id', unitTypeId, unitTypesList());
 		// console.log(system_type, parameter, metricKeysTableName, unitTypeId)
@@ -1295,9 +1330,9 @@ const standard_datetime1 = payload => {
 		if (parameter_item) {
 			toFixedNum = parameter_item.toFixedNum;
 
-			if (parameter_item.calc_imperial_cpm && measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+			/*if (parameter_item.calc_imperial_cpm && measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 				formula_y = y => y * 60;
-			}
+			}*/
 		}
 
 		const initialParams = getStatisticsItemParams(statistics[0]);
@@ -1617,6 +1652,7 @@ export const setupFlagsFFTStatistics = (fftData, filterBy) =>
 	setupFlagsFFTStatistics1(fftData, filterBy);
 export const setupRuntimeTrackersStatistics = payload =>
 	setupRuntimeTrackersStatistics1(payload);
+export const setupFFTLockStatistics = payload => setupFFTLockStatistics1(payload);
 
 export const setupZonesList = payload => setupZonesList1(payload);
 export const setupZonesListForLineSeries = payload =>

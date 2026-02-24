@@ -2,7 +2,7 @@
 	<div class="">
 		<el-button
 			size="small"
-			type="primary inverted"
+			:type="buttonType || 'primary inverted'"
 			class="block-item"
 			@click="zoomYAxis(0)"
 			>{{ tt('reset') }}</el-button
@@ -24,7 +24,8 @@ export default {
 		},
 		chartIsInit: Boolean,
 		chartOptionsUpdate: Number,
-		showHistory: Boolean
+		showHistory: Boolean,
+		buttonType: String
 	},
 
 	data: () => ({

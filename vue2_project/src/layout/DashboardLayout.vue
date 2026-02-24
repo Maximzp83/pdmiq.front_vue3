@@ -165,10 +165,10 @@ export default {
 
 		enableMfaWarning() {
 			// console.log('1', this.authUser)
-			if (this.authUser && !this.authUser.is_mfa_enabled) {
+			/*if (this.authUser && !this.authUser.is_mfa_enabled) {
 				const plantAdminsIds = [4,5,6,12];
 				return plantAdminsIds.some(id => id === this.authUser.role_id);
-			}
+			}*/
 			return false;
 		},
 	},

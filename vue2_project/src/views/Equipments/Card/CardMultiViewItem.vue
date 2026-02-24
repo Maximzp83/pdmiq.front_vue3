@@ -16,17 +16,23 @@
 					:columnIdx="columnIdx"
 					:column="column"
 				/>
+
+				<div class="reorder-button can-dragging" v-if="enableReorder">
+					<img class="can-dragging" :src="icon_drag" alt="" />
+				</div>
 			</div>
 		</div>
 </template>
 
 <script>
+	import { icon_drag } from '@/constants/global';
 import { eventHandler } from '@/mixins';
 
 export default {
 	mixins: [eventHandler()],
 	props: {
 		itemData: { type: Object, required: true },
+		enableReorder: Boolean,
 	},
 
 	components: {
@@ -39,6 +45,8 @@ export default {
 		};
 	},*/
 	computed: {
+		icon_drag: () => icon_drag,
+		
 		iconsAndButtonsSettings() {
 			const { itemData } = this;
 

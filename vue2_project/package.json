@@ -1,6 +1,6 @@
 {
   "name": "Industrial_Matrix_2",
-  "version": "0.2.1133",
+  "version": "0.2.1147",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

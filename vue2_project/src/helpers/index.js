@@ -236,6 +236,22 @@ const groupBy1 = (array, key, prefix = '') => {
 	return result;
 };
 
+const sortArrayByKeyNumber1 = (array, key, direction = 'asc') => {
+  return array
+    .slice()
+    .sort((a, b) => {
+      const aHasValue = a[key] != null;
+      const bHasValue = b[key] != null;
+
+      if (!aHasValue && !bHasValue) return 0;
+      if (!aHasValue) return 1;
+      if (!bHasValue) return -1;
+
+      const diff = Number(a[key]) - Number(b[key]);
+      return direction === 'asc' ? diff : -diff;
+    });
+}
+
 // -----------Routes/paths--------------
 const hasRightsToRoute1 = route => {
 	const { isAuthenticated, authUser /*first_loading_app */ } = storeGetter('auth');
@@ -725,7 +741,7 @@ const getPassedTime1 = (from, to) => {
 	if (typeof to === 'string') {
 		to = ((from || Date.now()) - Date.parse(to)) / 1000;
 	}
-
+	// console.log('getPassedTime1', to)
 	if (to < 60) {
 		return `${Math.floor(to)} ${Lang.tt('sec')}`;
 	}
@@ -733,10 +749,12 @@ const getPassedTime1 = (from, to) => {
 		return `${Math.floor(to / 60)} ${Lang.tt('min')}`;
 	}
 	if (to < 3600 * 24) {
-		return `${Math.floor(to / 3600)} ${Lang.tt('hours')}`;
+		const t = Math.floor(to / 3600);
+		return `${t} ${(t == 1 ? Lang.tt('hour') : Lang.tt('hours') )}`;
 	}
 	if (to < 3600 * 24 * 30) {
-		return `${Math.floor(to / (3600 * 24))} ${Lang.tt('days')}`;
+		const t = Math.floor(to / (3600 * 24));
+		return `${t} ${(t == 1 ? Lang.tt('day') : Lang.tt('days') )}`;
 	}
 
 	return `${Math.floor(to / (3600 * 24 * 30))} ${Lang.tt('months')}`;
@@ -1563,6 +1581,7 @@ export const concatValues = (initialData, additionalData, payload) =>
 export const getItemValue = (id, prop, list, index) =>
 	getItemValue1(id, prop, list, index);
 export const groupBy = (array, key, prefix) => groupBy1(array, key, prefix);
+export const sortArrayByKeyNumber = (array, key, direction) => sortArrayByKeyNumber1(array, key, direction);
 export const hasRightsToRoute = route => hasRightsToRoute1(route);
 export const validateRouteParams = id => validateRouteParams1(id);
 export const getParentPageRoute = (path, steps) => getParentPageRoute1(path, steps);

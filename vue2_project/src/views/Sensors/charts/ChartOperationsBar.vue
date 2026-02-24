@@ -1,6 +1,6 @@
 <template>
 	<div class="chart-actions-block">
-		<div class="flex wrap mrow">
+		<div class="flex wrap mrow medium-padding">
 			<div class="" v-for="item in actionButtons" :key="`button-${item.id}`">
 				<!-- trigger="manual" -->
 				<!-- :value="activeButtonValues[item.activeKey]" -->
@@ -74,9 +74,9 @@
 						'item-action-button capitalize',
 						{ 'delete-button inverted': item.isDelete },
 						item.className,
-						{ active: activeButtonValues[item.activeKey] }
+						{ active: activeButtonValues && activeButtonValues[item.activeKey] }
 					]"
-					:loading="item.loadingKey && activeButtonValues[item.loadingKey]"
+					:loading="item.loadingKey && (activeButtonValues &&activeButtonValues[item.loadingKey])"
 				>
 					<i v-if="item.prefix_icon" :class="[`icomoon ${item.prefix_icon}`]"></i>
 					<span v-if="item.text">{{ item.text }}</span>
@@ -94,7 +94,8 @@ export default {
 		actionButtons: { type: Array },
 		activeButtonValues: { type: Object, default: () => ({}) },
 		xAxisTitle: String,
-		chartPeaks: Array
+		chartPeaks: Array,
+
 	},
 
 	data: () => ({
@@ -119,7 +120,11 @@ export default {
 		chartPeaks(list) {
 			this.formData.start = list[0] ? list[0].x : 0;
 			this.formData.step = this.formData.start;
-		}
+		},
+
+		/*activeButtonValues(x) {
+			console.log('activeButtonValues', x)
+		}*/
 	}
 };
 </script>

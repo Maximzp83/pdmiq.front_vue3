@@ -42,7 +42,10 @@ span.capitalize-first {display: inline-block;}
 .uppercase { text-transform: uppercase; }
 .text-right {text-align: right;}
 .text-center {text-align: center;}
-.text-middle {vertical-align: middle;}
+.text-middle {
+	vertical-align: middle;
+	& > * {	vertical-align: middle;	}
+}
 .bold {font-weight: 700 !important; }
 .semi-bold {font-weight: 600 !important; }
 .medium {font-weight: 500 !important;}
@@ -120,6 +123,8 @@ span.capitalize-first {display: inline-block;}
 .dense-text_1 {
 	letter-spacing: -1px;
 }
+
+.line-height-normal {line-height: normal;}
 
 /* ======Media Queries===== */
 
