@@ -96,12 +96,12 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-// import { ALERT_TYPES, alertTypesList, sensorTypesList } from '@/constants/global';
 
 import { standardTableOperations, ITEMS_GRID_TYPES } from '@/constants/table';
 import { findItemBy, getValues, cloneDeep } from '@/helpers';
 import { equipmentCardTitle } from '@/helpers/specialHelpers';
 import { LUBE_PROCESSING_STATUSES, LUBE_CYCLE_STATUSES } from '@/constants/ultrasound';
+import { SUBJECT_TYPES, FFT_LOCK_STATUSES } from '@/constants/global';
 
 import {
 	itemsDataMixin,
@@ -355,8 +355,9 @@ export default {
 				],
 				buttons: [
 					{
-						name: 'handleAddToFavorites',
-						tooltip_text: 'Add To Favorites',
+						// name: 'handleAddToFavorites',
+						// tooltip_text: 'Add To Favorites',
+						disablePopover: true,
 						buttonContent: {
 							component: {
 								componentPath: 'components/common/addToFavoriteButton'
@@ -474,6 +475,7 @@ export default {
 			ping_socket_endpoint: 'equipments/ping_socket_endpoint',
 			reset_sensor_runtime: 'sensors/reset_sensor_runtime',
 			forceRerender: 'forceRerender',
+			unlock_fft: 'sensors/unlock_fft'
 		}),
 
 		toconsole(x) {
@@ -492,13 +494,26 @@ export default {
 		},*/
 
 		// ----------------------
-		handleAddToFavorites({row}) {
+		handleAddToFavorites({ row, subjectType }) {
+			const isPersonal = subjectType === SUBJECT_TYPES.USER;
+			const isFavorite = isPersonal ? row.is_my_favorite : row.is_company_favorite;
+
+			/*if (row) {
+				console.log('handleAddToFavorites', row, subjectType, {
+				itemId: row.id,
+				notNotify: true,
+				method: isFavorite ? 'DELETE' : 'POST',
+				data: { subject_type: subjectType }
+			});
+				return;
+			}*/
 			this.isLoadingCards = true;
 
 			this.add_to_favorites_equipment({
 				itemId: row.id,
 				notNotify: true,
-				method: row.is_favorite ? 'DELETE' : 'POST',
+				method: isFavorite ? 'DELETE' : 'POST',
+				data: { subject_type: subjectType }
 			}).then(response => {
 				this.itemsList = this.updateEquipmentCardsFavorites(this.itemsList, {
 					...response,
@@ -511,12 +526,12 @@ export default {
 		},
 
 		updateEquipmentCardsFavorites(itemsList, response) {
-			const { equipment_id, is_favorite, status } = response.value;
+			const { equipment_id, is_my_favorite, is_company_favorite, status } = response.value;
 			if (status == 'ok') {
-				// console.log('equipment_id', equipment_id, 'sensor_id', sensor_id)
 				return itemsList.map(ei => {
 					if (ei.id === equipment_id) {
-						ei.is_favorite = is_favorite;
+						ei.is_my_favorite = is_my_favorite;
+						ei.is_company_favorite = is_company_favorite;
 					}
 					return ei;
 				});
@@ -577,6 +592,56 @@ export default {
 					});
 				})
 				.catch(() => {});
+		},
+
+		handleUnlockFFT({row}) {
+			const { tt } = this;
+			this.confirmHelper({
+				insertToMessage: `<b>${tt('unlock')} FFT</b>`
+			})
+				.then(() => {
+					const payload = {
+						sensorId: row.id,
+						notNotify: true
+					};
+
+					// if (payload) {
+					// 	console.log('payload', payload);
+						
+					// 	this.$emit('event', {
+					// 		eventName: 'handleUnlockFFTSuccess',
+					// 		data: {},
+					// 		onward: true
+					// 	});
+					// 	return
+					// }
+
+					// this.$emit('update:isLoading', true);
+
+					this.unlock_fft(payload)
+						.then(({ value }) => {
+							// this.$emit('update:isLoading', false);
+
+							if (value.status === FFT_LOCK_STATUSES.UNLOCKED) {
+								this.$notify({
+									type: 'success',
+									title: tt('constants.Success'),
+									message: `${tt('phrases.FFT_successfully_unlocked')}`
+								});
+
+								this.fetchItems({
+									...this.filters,
+									...this.globalFilters,
+									...this.preventedFilters
+								});
+							}
+						})
+						.catch(() => {
+							// this.$emit('update:isLoading', false);
+						});
+				}).catch(() => {
+					// Cancelled
+				});
 		},
 
 		compareClick({ row }) {

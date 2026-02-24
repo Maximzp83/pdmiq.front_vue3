@@ -355,12 +355,12 @@ export default {
 			return null;
 		},
 		
-		successRpmSaveCallback(value) {
-			return () => {
+		successRpmSaveCallback() {
+			return (value) => {
 				this.$emit('event', {
 					// eventName: 'reloadPage',
 					eventName: 'updateEquipment',
-					data: value,
+					data: value.equipmentItem,
 					onward: true
 				});
 			};
@@ -500,10 +500,10 @@ export default {
 				FFTRequestBlock.handleLastFFT();
 			}
 		},
-		handleUnlockFFT() {
+		handleUnlockFFT(payload) {
 			const {FFTRequestBlock} = this.$refs;
 			if (FFTRequestBlock) {
-				FFTRequestBlock.handleUnlockFFT();
+				FFTRequestBlock.handleUnlockFFT(payload);
 			}
 		},
 

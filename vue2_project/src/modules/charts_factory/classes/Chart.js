@@ -388,16 +388,19 @@ export default class ChartBase {
 				responseDataKey ||
 				(parameterId ? `parameter_${parameterId}` : null);
 
-			// console.log(/*resultData.statistics_result,*/ this.chart_id, serie.id, responseDataKey, /*resultData.statistics_result[responseDataKey]*/)
 			if (!resultData.statistics_result[responseDataKey]) {
 				responseDataKey = 'main';
 			}
+			// console.log(/*resultData.statistics_result,*/ this.chart_id, serie.id, responseDataKey, /*resultData.statistics_result[responseDataKey]*/)
 
 			if (resultData.statistics_result[responseDataKey]) {
 				serie.data = getObjectVal(
 					resultData.statistics_result[responseDataKey],
 					data_accessor
 				) || [];
+				/*if (this.chart_id == 'chart-97' && serie.id == 'lube_threshold-serie') {
+					console.log(data_accessor, resultData.statistics_result[responseDataKey])
+				}*/
 
 				if (setupSeriePropValue) {
 					setupSeriePropValue.forEach(oi => {
@@ -424,7 +427,7 @@ export default class ChartBase {
 
 	assignDataToSeries(resultData, settings = {}) {
 		try {
-			// console.log('assignDataToSeries', this.options.series)
+			// console.log('assignDataToSeries', this.options.series, settings)
 			this.options.series.forEach(serie => {
 				if (
 					!settings.exceptList ||

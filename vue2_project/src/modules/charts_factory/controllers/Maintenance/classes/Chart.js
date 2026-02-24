@@ -81,7 +81,7 @@ class MaintenanceChartBase extends ChartBase {
 			} else {
 				this.requestsList.forEach(() => {
 					const params = { ...prepareFilters(this.resources.filters, settings) };
-
+					// console.log('1', this.chart_id, params)
 					fetch_statistics({ params, ...this.statisticsRequestPayload })
 						.then(({ value }) => {
 							// console.log('2 response', value)
@@ -857,6 +857,12 @@ class WOStatisticsChart extends MaintenanceChartBase {
 class SuccessGaugeChart extends MaintenanceChartBase {
 	constructor(resources) {
 		super();
+		this.statisticsRequestPayload = {
+			alternateResponseProp: 'data',
+			url: resources.payload_1.fetch_action_url
+		};
+
+		this.billing_plan_cost = resources.payload_1.billing_plan_cost;
 		// this.initialSetup(resources);
 		let options = {
 			chart: {
@@ -971,9 +977,22 @@ class SuccessGaugeChart extends MaintenanceChartBase {
 	}
 
 	setupResultData(data) {
-		// console.log(data)
 		try {
-			const { yMax, currentValue, redArea } = data;
+			const { roi_cost, billing_plan_cost } = data;
+			// const { billing_plan_cost } = this;
+			let billing_plan_cost_final = billing_plan_cost || this.billing_plan_cost;
+			// const { yMax, currentValue, redArea } = data;
+			let yMax = 500;
+			let currentValue = 0;
+			let redArea = 150;
+
+			if (billing_plan_cost_final) {
+				yMax = billing_plan_cost_final * 4;
+				redArea = billing_plan_cost_final;
+				yMax = roi_cost > yMax ? roi_cost : yMax; //|| 500,
+				currentValue = roi_cost; // || 300
+			}
+			// console.log(data, billing_plan_cost_final, currentValue)
 
 			return {
 				statistics_result: {

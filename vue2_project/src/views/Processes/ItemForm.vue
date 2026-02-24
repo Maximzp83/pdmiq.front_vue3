@@ -94,6 +94,24 @@
 				</el-select>
 			</el-form-item>
 
+			<el-form-item
+				:label="`${tt('Process')} ${tt('image')}`"
+				prop="pictures"
+				class="upload-form-item"
+			>
+					<!-- formPropName="pictures" -->
+				<FileUploadBlock
+					ref="FileUploadBlock"
+					multiple
+					rotate
+					showDeleteButton
+					:enableReorderFiles="{appendTo:'body', formKey:'display_order'}"
+					:pictures="itemPictures"
+				/>
+					<!-- @ready="blockReady" -->
+				<!-- :replace-selected-file="true" -->
+			</el-form-item>
+
 			<hr class="el-form-item" />
 
 			<div class="el-form-item">
@@ -363,7 +381,7 @@
 <script>
 import { mapActions } from 'vuex';
 import { required } from '@/constants/validation';
-// import { removeObjProps } from '@/helpers';
+import { sortArrayByKeyNumber } from '@/helpers';
 
 import {
 	itemFormMixin,
@@ -383,6 +401,7 @@ export default {
 		FaultItem: () => import('./FaultItem.vue'),
 		BreakTimeItem: () => import('./BreakTimeItem.vue'),
 		WorkDateItem: () => import('./WorkDateItem.vue'),
+		FileUploadBlock: () => import('@/components/form/uploadBlock/FileUploadBlock.vue'),
 		// ProcessItem: () => import('./ProcessItem.vue'),
 		ElTimeSelect: () =>
 			import(/* webpackChunkName: "ElTimePicker" */ 'element-ui/lib/time-select')
@@ -425,7 +444,9 @@ export default {
 				conveyor_processes: [],
 				production_hourly_rate: null,
 				expected_downtime_minutes: 1,
-				extremal_deviation_percent: 20
+				extremal_deviation_percent: 20,
+
+				pictures: [],
 			}
 		};
 	},
@@ -546,8 +567,22 @@ export default {
 		subItemsSettings: () => Object.freeze([
 			{ ref: 'BreakTimeItem', targetProp: 'work_breaks' },
 			{ ref: 'FaultItem', targetProp: 'faults' },
-			{ ref: 'WorkDateItem', targetProp: 'work_dates' }
+			{ ref: 'WorkDateItem', targetProp: 'work_dates' },
+			{ ref: 'FileUploadBlock', targetProp: 'pictures' },
 		]),
+
+		itemPictures() {
+			const { itemData } = this;
+			if (itemData && itemData.pictures) {
+				return sortArrayByKeyNumber(itemData.pictures, 'display_order');
+			}
+			return [];
+		},
+
+		uploadSettings: () =>
+			Object.freeze([
+				{ fileProp: 'pictures', multiple: true },
+			]),
 		
 		isIndustrialMatrix() {
 			return this.$store.state.auth.isIndustrialMatrix;

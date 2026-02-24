@@ -42,14 +42,12 @@
 						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('Data_Set')" prop="data_set" 
-						:class="{'showJustInfo':fromBannerSensorForm && !isNew}"
+					<el-form-item :label="tt('Data_Set')" prop="data_set"
+						v-if="!fromBannerSensorForm"
 					>
 						<!-- <div class="1mcol-sm-6"> -->
 						<el-select
 							v-model="formData.data_set"
-
-							:disabled="fromBannerSensorForm && !isNew"
 							:placeholder="`${tt('Select')} ${tt('dataset')}`"
 						>
 							<el-option
@@ -135,7 +133,7 @@
 				</el-form-item>
 
 				<el-form-item
-					v-if="formData.lube_version === LUBE_VERSIONS.V3"
+					v-if="!fromBannerSensorForm && formData.lube_version === LUBE_VERSIONS.V3"
 					:label="`${tt('Device')} ${tt('address')} id`"
 					prop="device_address_id"
 					required
@@ -144,7 +142,7 @@
 				</el-form-item>
 
 				<el-form-item
-					v-if="formData.lube_version === LUBE_VERSIONS.V3"
+					v-if="!fromBannerSensorForm && formData.lube_version === LUBE_VERSIONS.V3"
 					:label="`${tt('Sensor')} Id`"
 					prop="fft_sensor_id"
 					required
@@ -1003,7 +1001,10 @@ export default {
 
 				lube_version: null,
 				device_address_id: '',
-				fft_sensor_id: ''
+				fft_sensor_id: '',
+
+				// --------------
+				is_lube_mode: 1,
 			},
 
 			pumpFormData: {
@@ -1351,6 +1352,8 @@ export default {
 
 			this.frequencyBlockDisabled =
 				!this.isNew && this.formData.lube_method === LUBE_METHODS.FREQUENCY;
+
+			this.formData.is_lube_mode = 1;
 		},
 
 		handleResetValidate() {
@@ -1606,6 +1609,7 @@ export default {
 				if (this.fromBannerSensorForm) {
 					delete payload.formData.location_in_equipment;
 					delete payload.formData.controller_id;
+					delete payload.formData.data_set;
 					// console.log('us loc submit', payload)
 				}
 				return payload;

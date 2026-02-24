@@ -99,6 +99,7 @@
 						>
 								<!-- :key="dropdownFilterbarUpdated" -->
 							<BannerFilterBlock
+								ref="BannerFilterBlock"
 								v-if="enableFilterBlock.banner"
 								@event="handleEventNew"
 								:sensorData="sensorData"
@@ -120,7 +121,10 @@
 							/>
 
 							<UltrasoundFilterBlock
-								v-else-if="enableFilterBlock.ultrasound"
+								ref="UltrasoundFilterBlock"
+								v-if="enableFilterBlock.ultrasound"
+								:enableLubeTriggerButtonOnly="enableLubeTriggerButton"
+								:class="[{'ml-5': enableLubeTriggerButton }]"
 								@event="handleEvent"
 								:sensorData="sensorData"
 								:isCompare="isCompare"
@@ -130,6 +134,7 @@
 							/>
 
 							<CustomPDMFilterBlock
+								ref="FilterBlock"
 								v-else-if="enableFilterBlock.customPDM"
 								@event="handleEvent"
 								:sensorData="sensorData"
@@ -249,6 +254,7 @@
 				@closeDialog="showNewMessage = false"
 				@success="reloadChart(null, {reloadAll:1})"
 				:itemData="showNewMessage ? pointData : null"
+				:sensorId="sensorData.id"
 			/>
 				<!-- :visible="showNewMessage" -->
 		</el-dialog>
@@ -309,7 +315,8 @@ import {
 	getYmdDateString,
 	cloneDeep,
 	getTimeDifference,
-	convertMsToHours
+	convertMsToHours,
+	localToUtcYmdHis
 } from '@/helpers';
 
 import {
@@ -495,11 +502,17 @@ export default {
 			});
 		},
 
+		enableLubeTriggerButton: that =>
+			(that.currentSensorType.isBannerV2_1 || that.currentSensorType.isBannerM25) &&
+			that.sensorData.is_lube_mode,
+
 		enableFFT() {
+			if (this.isCompare) return false;
+			
 			const {enableAxisSelector, $hasAccessTo} = this;
+			const { isBannerV2_1, isBannerM25, isBannerV2Generic } = this.currentSensorType;
 			const { bannerV2Subtype } = this.sensorData;
 			// console.log(this.sensorData)
-			const { isBannerV2_1, isBannerV2Generic, isBannerM25 } = this.currentSensorType;
 
 			if ($hasAccessTo(['view_dashboard'])) {
 				return enableAxisSelector || isBannerV2_1 || isBannerM25 ||
@@ -1182,33 +1195,54 @@ export default {
 		},
 
 		setupPointData({ index, series }) {
-			let pointId = null,
+			/*let graph_timestamp = null,
 				message = '',
 				full_file_name = '';
-			const { data, custom_id } = series.options;
-			const { chart_id } = series.chart.userOptions;
 			const id_prop =
-				custom_id == 'notes_flag' || custom_id == 'crashes_flag' ? 'pointId' : 2;
-			const serie = data[index];
+				custom_id == 'notes_flag' || custom_id == 'crashes_flag' ? 'pointId' : 2;*/
+			const { data } = series.options;
+			const { chart_id } = series.chart.userOptions;
+			const point = data[index];
 
-			// console.log(index, custom_id, serie, id_prop )
-			if (serie) {
-				pointId = serie[id_prop];
-				full_file_name = serie.full_file_name;
-				if (custom_id == 'crashes_flag') {
-					message = serie.note || '';
-				} else {
-					message = serie.text || '';
+			if (point) {
+				// console.log(series, point)
+				if (point.id) {
+					return {
+						...point,
+						graph_timestamp: localToUtcYmdHis(point.graph_timestamp),
+						chartId: chart_id,						
+					};
+				} else if (point[2]) { //new note
+					return {
+						graph_timestamp: localToUtcYmdHis(point[2]),
+						chartId: chart_id,
+						metric_type: series.userOptions.customSettings.metric_type
+					}
+				} else if (point.pointId) { //crash
+					return {
+						metric_issue_alert_id: point.pointId,
+						chartId: chart_id,
+						metric_type: series.chart.options.chart_parameter_id
+					}
 				}
+				/*const graph_timestamp = localToUtcYmdHis(point[id_prop]);
+				full_file_name = point.full_file_name;
+				if (custom_id == 'crashes_flag') {
+					message = point.note || '';
+				} else {
+					message = point.text || '';
+				}*/
 			}
 
-			return {
-				id: pointId,
+			/*return {
+				// id: pointId,
 				message: message,
 				chartId: chart_id,
-				isCrash: custom_id == 'crashes_flag',
-				full_file_name: full_file_name
-			};
+				graph_timestamp: graph_timestamp,
+				// isCrash: custom_id == 'crashes_flag',
+				full_file_name: full_file_name,
+				metric_type: series.userOptions.customSettings.metric_type
+			};*/
 		},
 
 		handleJoinCharts(payload) {
@@ -1304,6 +1338,14 @@ export default {
 				.catch(() => {});
 		},
 
+		handleUnlockFFT(payload) {
+			const BannerFilterBlock = this.$refs.BannerFilterBlock;
+
+			if (BannerFilterBlock && BannerFilterBlock.handleUnlockFFT) {
+				BannerFilterBlock.handleUnlockFFT(payload);				
+			}
+		},
+
 		// --------
 		openFFTCharts({ payload, sensorType }) {
 			const { id, sensor_id } = payload;
@@ -1328,7 +1370,7 @@ export default {
 			// 	fromInstance: true,
 			// 	payload: y_filters
 			// });
-		}
+		},
 
 		/*updateChartsByYfilters(y_filters) {
 			this.callMethodInCharts({

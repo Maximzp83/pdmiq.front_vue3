@@ -60,31 +60,46 @@ export default {
 					// console.log('newMax 2', multiplier, newMax)
 					newMin = newMin || this.initialChartYAxisMin;
 					let q;
-					if (newMax > 30) {
+					const max_min_diff = newMax - newMin;
+
+					if (newMax > 30 || max_min_diff > 30) {
 						q = 3.5;
-					} else if (newMax > 20) {
+					} else if (newMax > 20 || max_min_diff > 20) {
 						q = 4;
 					}
 					// else if (newMax > 10) { q = 5 }
-					else if (newMax > 1) {
+					else if (newMax > 1 || max_min_diff > 1) {
 						q = 5;
 					}
 					// else if (newMax > 0.1) { q = 5 }
 					else q = 5.5;
-					const step = (newMax / q) * multiplier;
+					// console.log('max-min', max_min_diff, q)
+					let step;
+
+					if (newMax < 2 && max_min_diff > 1) {
+						step = (max_min_diff / q) * multiplier;
+
+					} else {
+						step = (newMax / q) * multiplier;
+					} 
+
 					newMax += step;
 					// console.log('newMax 3', newMax)
 
 					if (newMin < 0) {
-						newMin = -newMax;
+						const preMin = -newMax;
+						const chart_points_min_value = this.ChartInstance.getTransformedStatistics({accessor: 'chart_points_min_value'})
+
+						newMin = preMin < chart_points_min_value ? preMin : newMin;
+						// console.log('newMin 4', newMin)
 					} else {
 						newMin = this.calcMin(newMin, step);
 					}
-					// console.log('newMax 4', newMax)
+					// console.log('newMax 4', newMax, newMin)
 
 					newMax = getRoundedValue(newMax, multiplier);
 					newMin = getRoundedValue(newMin, multiplier);
-					if (newMax < newMin || newMax == 0) return;
+					if (newMax <= newMin) return;
 					// console.log('init', this.initialChartYAxisMax, 'step', step, 'newMin', newMin, 'newMax', newMax );
 				}
 

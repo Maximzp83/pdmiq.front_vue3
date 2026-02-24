@@ -591,7 +591,9 @@ export default {
 				// data_set_convert_value: '',
 				alarm_type: null,
 				is_iaq_disabled: false,
-				is_linespeed_node: false
+				is_linespeed_node: false,
+
+				is_lube_mode: false,
 
 				// is_creating_recommended_maintenance: false,
 				// alarms_types_maintenance: [],

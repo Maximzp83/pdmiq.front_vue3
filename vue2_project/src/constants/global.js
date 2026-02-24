@@ -339,7 +339,7 @@ export const DATASET = {
 	// WHITE_RIVER_EXTRA_VIBRATION: 5,
 	ULTRA_SOUND_SDT_DECIBELS: 6,
 	HUMIDITY: 7,
-	// EXTRA_VIBRATION: 8,
+	EXTRA_VIBRATION: 8,
 	ULTRA_SOUND_SDT_DECIBELS_4_20: 9,
 	SDT_SENSOR_FULL_SPECTRUM: 10,
 	CUSTOM_PDM_SETUP: 11,
@@ -360,7 +360,7 @@ export const DATASET = {
 	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25, // lubematrix v3
 	BANNER_M25: 26,
 
-	LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
+	// LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
 };
 
 const dataSetsList1 = [
@@ -386,11 +386,11 @@ const dataSetsList1 = [
 		label: 'constants.humidity',
 		controller_type: CONTROLLER_TYPES.BANNER
 	},
-	/*{
+	{
 		id: DATASET.EXTRA_VIBRATION,
 		label: 'constants.extra_vibration',
 		controller_type: CONTROLLER_TYPES.BANNER
-	},*/
+	},
 	{
 		id: DATASET.ULTRA_SOUND_SDT_DECIBELS,
 		label: 'constants.decibells',
@@ -654,7 +654,7 @@ const sensorTypesList1 = {
 			filters_group: 'custom',
 			group_technology: 'constants.Custom'
 		},
-		/*[DATASET.EXTRA_VIBRATION]: {
+		[DATASET.EXTRA_VIBRATION]: {
 			technology: 'constants.extra_vibration',
 			technology_abbr: 'constants.extra_vibration',
 			icons: ['vibration', 'temperature'],
@@ -662,7 +662,7 @@ const sensorTypesList1 = {
 			chartSettingsKey: 'extra_vibration'
 			// filters_group: 'vibration_temperature',
 			// group_technology: 'constants.vibration_temperature'
-		},*/
+		},
 		[DATASET.BANNER_PRESSURE]: {
 			technology: 'constants.pressure',
 			technology_abbr: 'constants.PSI',
@@ -700,15 +700,14 @@ const sensorTypesList1 = {
 			group_technology: 'constants.vibration_temperature'
 		},
 		[DATASET.BANNER_M25]: {
-			technology: 'constants.vibration_temperature',
-			technology_abbr: 'constants.vibe_temp',
-			icons: ['vibration', 'temperature'],
+			technology: 'technology.ultrasound_vibration_temperature',
+			technology_abbr: 'technology.uvt',
+			icons: ['ultrasound', 'vibration', 'temperature'],
 			isBannerM25: true,
 			chartSettingsKey: 'banner_m25',
 			filters_group: 'vibration_temperature',
 			group_technology: 'constants.vibration_temperature'
 		},
-
 		[DATASET.LUBEMATRIX_V3]: { // для работы в форме banner сенсора
 			technology: 'constants.ultrasound_sdt',
 			technology_abbr: 'constants.usound',
@@ -1719,6 +1718,16 @@ const fftLockStatusesList1 = [
 	{ id: FFT_LOCK_STATUSES.UNCONFIRMED_FFT_REQUEST, name: 'constants.unconfirmed_fft_request', color: '#ffde32', },
 ];
 
+export const SUBJECT_TYPES = {
+	USER: 1,
+	COMPANY: 2,
+};
+
+const subjectTypesList1 = [
+	{ id: SUBJECT_TYPES.USER, name: 'user', alt_label: 'phrases.personal_favorite', color: '#BF1E2E' },
+	{ id: SUBJECT_TYPES.COMPANY, name: 'company', alt_label: 'phrases.company_favorite', color: '#f7ba2a' },
+];
+
 export const userTypesList = () => Lang.translate(userTypesList1);
 export const mfaTypesList = () => Lang.translate(mfaTypesList1);
 
@@ -1803,6 +1812,7 @@ export const sensorAlarmTypesList = () => Lang.translate(sensorAlarmTypesList1);
 export const sensorThresholdsTypesList = () => Lang.translate(sensorThresholdsTypesList1);
 export const multiviewAlarmTypesList = () => Lang.translate(multiviewAlarmTypesList1);
 export const fftLockStatusesList = () => Lang.translate(fftLockStatusesList1);
+export const subjectTypesList = () => Lang.translate(Lang.translate(subjectTypesList1), { key: 'alt_label' });
 // -----------------
 
 export const not_wifi_icon = require('@/assets/img/icons/not-wifi.svg');
@@ -1835,3 +1845,4 @@ export const sensor_archive = require('@/assets/img/icons/sensor_archive.svg');
 export const icon_drag = require('@/assets/img/icons/icon_drag.svg');
 export const attention_icon_2 = require('@/assets/img/icons/attention2.svg');
 export const fft_wave = require('@/assets/img/icons/fft-wave.svg');
+export const anomaly1_icon = require('@/assets/img/icons/anomaly1.svg');

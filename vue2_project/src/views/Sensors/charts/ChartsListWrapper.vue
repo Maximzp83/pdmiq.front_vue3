@@ -284,7 +284,7 @@ export default {
 					setupChartsConfigsListSettings: {
 						// filterParamsBy: { prop: 'axis_id', value: this.activeAxis },
 						// getParamsByIds: this.getParamsByIds,
-					}
+					},
 				},
 				payload_1: {
 					sensorType: this.currentChartSettingsKey,
@@ -307,6 +307,7 @@ export default {
 				activeAxis,
 				joinChartsBy,
 				getParamsByIds,
+				oneChartOnly,
 				currentChartSettingsKey
 			} = this;
 			// console.log('metric', this.metric)
@@ -321,6 +322,16 @@ export default {
 					filterParamsBy: []
 				}
 			};
+
+			if (oneChartOnly) {
+				if (getParamsByIds.length > 1) {
+					settings.setupChartsConfigsListSettings.getParamsByIdsFilterMethod = 'every';
+				} else {
+					settings.setupChartsConfigsListSettings.filterParamsBy.push(
+						{ prop: 'skipTitle', method: '==', value: null },
+					);
+				}
+			}
 
 			if (
 				enableAxisSelector &&
@@ -386,7 +397,8 @@ export default {
 				isNCDWiredTempVibe,
 				isNCDTempVibeCurr,
 				isBannerTempVibe2,
-				isBannerV2_1
+				isBannerV2_1,
+				isBannerM25
 			} = this.currentSensorType;
 			return (
 				isBanner ||
@@ -395,7 +407,8 @@ export default {
 				isNCDWiredTempVibe ||
 				isNCDTempVibeCurr ||
 				isBannerTempVibe2 ||
-				isBannerV2_1
+				isBannerV2_1 ||
+				isBannerM25
 			);
 		}
 

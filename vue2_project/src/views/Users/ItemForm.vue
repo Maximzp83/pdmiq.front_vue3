@@ -113,7 +113,7 @@
 					<PhoneVerificationBlock
 						class="el-form-item"
 						v-if="itemId && 
-							(isPhoneVerified || !formData.is_mfa_enabled || formData.mfa_type !== MFA_TYPES.SMS)
+							(!formData.is_mfa_enabled || formData.mfa_type !== MFA_TYPES.SMS)
 						"
 						@phoneVerified="handlePhoneVerified"
 						:isPhoneVerified="isPhoneVerified"
@@ -252,6 +252,7 @@
 						prop="is_mfa_enabled"
 					>
 						<el-switch
+							@change="formData.mfa_type = null"
 							:disabled="disableMfaSwitcher"
 							v-model="formData.is_mfa_enabled"
 							:active-value="1"
@@ -558,11 +559,12 @@ export default {
 		},
 
 		isPhoneVerified() {
+			// return false
 			const { itemId, itemData, formData, confirmedPhoneNumber } = this;
 			return (
 				itemId && (
 					(itemData.phone_number && itemData.phone_number == formData.phone_number) ||
-					confirmedPhoneNumber == formData.phone_number
+					(confirmedPhoneNumber && confirmedPhoneNumber == formData.phone_number)
 				)
 			);
 		},
@@ -839,13 +841,14 @@ export default {
 				if (this.routeQuery && this.routeQuery.enableMfa == 'true') {
 					this.formData.is_mfa_enabled = 1;
 				}
+
 			} else {
 				// this.rules.password.push(required)
 			}
 
-			if (!this.confirmedPhoneNumber) {
+			/*if (!this.confirmedPhoneNumber) {
 				this.formData.mfa_type = null;
-			}
+			}*/
 
 			this.userNotificationItemsList = this.setupNotificationsBlockList({
 				list: this.userNotificationTypesList,

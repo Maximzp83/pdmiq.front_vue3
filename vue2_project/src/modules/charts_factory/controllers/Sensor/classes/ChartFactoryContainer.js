@@ -53,7 +53,8 @@ class MultiViewChartFactoryContainer extends ChartFactoryContainerBase {
 						...parameterItem,
 						metric_item_id: gi.id,
 						sensor_id: gi.sensor.id,
-						sensor_name
+						sensor_name,
+						sensor_location: gi.sensor.location_in_equipment,
 					}
 				})
 			};

@@ -169,6 +169,7 @@
 					<ROIStatisticsContainer
 						:plantItem="plantItem"
 						:predefinedFilters="predefinedFilters"
+						:equipments_statistics_filters="equipments_statistics_filters"
 					/>
 				</div>
 			</div>

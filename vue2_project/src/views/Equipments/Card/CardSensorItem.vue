@@ -249,9 +249,11 @@ import {
 	controller_offline_icon,
 	icon_drag,
 	NCD_ALARM_TYPES,
-	DATASET,
+	// DATASET,
 	sensorClassesList,
-	SENSOR_ALARM_TYPES
+	SENSOR_ALARM_TYPES,
+	FFT_LOCK_STATUSES,
+	anomaly1_icon
 } from '@/constants/global';
 
 import { ULTRASOUND_SENSOR_TYPES, LUBE_VERSIONS } from '@/constants/ultrasound';
@@ -348,15 +350,14 @@ export default {
 		currentFaultsType() {
 			const { isSDTsensor, isUltrasound, isNCDSDT, isBannerV2_1 } = this.currentSensorType;
 
-			if (isBannerV2_1) return 'banner_V2_1';
-
 			if (isUltrasound || this.isLubeMatrixV3) return 'lubematrix';
+			if (isBannerV2_1) return 'banner_V2_1';
 			if (isSDTsensor || isNCDSDT) return 'ultrasoundSDT';
 			// if (isHumiditySensor) return 'humidity';
 			return 'banner';
 		},
 
-		isLubeMatrixV3: that => that.itemData.data_set === DATASET.LUBEMATRIX_V3 || (that.itemData && that.itemData.lube_version === LUBE_VERSIONS.V3),
+		isLubeMatrixV3: that => that.itemData && that.itemData.lube_version === LUBE_VERSIONS.V3,
 
 		isNCDSensor() {
 			const { currentSensorType } = this;
@@ -387,7 +388,7 @@ export default {
 
 		lubesData: that => that.itemData.lubes,
 		lube_blocked: that =>
-			that.itemData && that.currentSensorType.isUltrasound &&
+			that.itemData && (that.currentSensorType.isUltrasound || that.isLubeMatrixV3) &&
 			(that.itemData.lube_cycle_status === LUBE_CYCLE_STATUSES.BLOCKED ||
 				that.itemData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNSUCCESSFUL ||
 				that.itemData.lube_shot_status === LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT ||
@@ -397,6 +398,15 @@ export default {
 				that.itemData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNKNOWN ||
 				that.itemData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE ||
 				that.itemData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE),
+
+		fftLocked() {
+			const { itemData } = this;
+			if (itemData && itemData.last_fft_lock) {
+				return itemData.last_fft_lock.status !== FFT_LOCK_STATUSES.UNLOCKED;
+			}
+			return false;
+		},
+
 		issuesDetectedCount() {
 			const { lubesData } = this;
 
@@ -512,8 +522,10 @@ export default {
 				itemData,
 				inCompareList,
 				lube_blocked,
+				fftLocked,
 				lubeShotsLeft,
-				isSensorOnly
+				isSensorOnly,
+				hasLubesCounters
 			} = this;
 			// console.log(isNCDSensor, itemData)
 			return Object.freeze([
@@ -679,6 +691,35 @@ export default {
 					meta: {
 						additionalActions: [
 							{
+								name: '',
+								tooltip_text: this.$t('aliases.anomaly1'),
+								img: anomaly1_icon,
+								conditionSettings: {
+									conditions: [
+										{ data_value: itemData.is_flat_metric_data_anomaly_now, control_value: true },
+									]
+								},
+							},
+							{
+								name: 'handleUnlockFFT',
+								tooltip_text: this.$t('phrases.unlock_fft'),
+								icon: 'icomoon icon-stop',
+								containerClassName: 'lube-blocked-container',
+								className: 'el-button--primary inverted',
+								conditionSettings: {
+									conditions: [
+										{ data_value: fftLocked, control_value: true },
+										{ data_value: isSensorOnly, control_value: false }
+									]
+								},
+								prefixContent: {
+									html: `<span class="time">${getPassedTime(
+										Date.now(),
+										itemData.last_fft_lock && itemData.last_fft_lock.created_at
+									)}</span>`
+								}
+							},
+							{
 								name: 'unblockLube',
 								tooltip_text: this.$t('phrases.Reset_lube'),
 								icon: 'icomoon icon-stop',
@@ -708,7 +749,7 @@ export default {
 								conditionSettings: {
 									conditions: [
 										{
-											data_value: currentSensorType.isUltrasound,
+											data_value: hasLubesCounters,
 											control_value: true
 										},
 										{	data_value: isSensorOnly, control_value: false },
@@ -764,6 +805,11 @@ export default {
 					str += pi.name;
 				});
 				return str;
+			} else if (currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25) {
+
+				return itemData.is_lube_mode ?
+					this.tt('technology.ultrasound_vibration_temperature') :
+					currentSensorType.group_technology;
 			} else if (currentSensorType.isUltrasound || isLubeMatrixV3) {
 				return isSensorOnly ? this.tt('constants.Ultrasound') : currentSensorType.group_technology;
 			} else {

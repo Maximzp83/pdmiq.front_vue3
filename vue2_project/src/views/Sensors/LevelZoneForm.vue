@@ -120,6 +120,16 @@
 				</el-form-item>
 			</div>
 
+			<div class="el-form-item" v-if="!isOffAlarm && enableLubeMatrixInputForBanner">
+				<el-form-item
+					:label="tt('constants.Lubeline_zone')"
+					prop="lube_zone"
+					required
+				>
+					<el-input-number v-model="formData.lube_zone" :min="0" />
+				</el-form-item>
+			</div>
+
 			<div
 				class="el-form-item"
 				v-if="!isOffAlarm && isNCDTempVibeSensor && is_off_alarm_zone_include"
@@ -265,13 +275,17 @@ export default {
 		]),
 
 		SENSOR_PARAMETERS_TYPES: () => SENSOR_PARAMETERS_TYPES,
-		// parameter_type: that => that.parameterData.parameterItem,
+		parameter_type: that => that.parameterData.parameterItem.id,
 		parameterItem: that => that.parameterData.parameterItem,
 
 		// statistics_data: that => that.zoneSetupSettings.statistics_data,
 		isSDTsensor: that =>
 			that.currentSensorType.isSDTsensor || that.currentSensorType.isNCDSDT,
 		isUltrasound: that => that.currentSensorType.isUltrasound,
+		isLubeModeOnForBanner: that => !that.currentSensorType.isUltrasound && that.sensor.is_lube_mode,
+
+		enableLubeMatrixInputForBanner: that => that.isLubeModeOnForBanner && that.sensor.lube_trigger_metric_type === that.parameter_type,
+
 		isNCDPressure: that => that.currentSensorType.isNCDPressure,
 		isBannerPressure: that => that.currentSensorType.isBannerPressure,
 		isHumiditySensor: that =>
@@ -369,7 +383,8 @@ export default {
 				parameterItem,
 				isOffAlarm,
 				isUltrasound,
-				isSDTsensor
+				isSDTsensor,
+				enableLubeMatrixInputForBanner
 			} = this;
 
 			this.rules.baseline_zone = isUltrasound || isSDTsensor ? required : null;
@@ -425,7 +440,7 @@ export default {
 				}
 			}
 			
-			if (this.isUltrasound) {
+			if (isUltrasound || enableLubeMatrixInputForBanner) {
 				this.formData.is_lube_zone_included = true;
 			}
 		},

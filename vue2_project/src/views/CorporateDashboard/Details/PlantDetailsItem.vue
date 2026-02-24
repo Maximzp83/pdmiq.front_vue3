@@ -35,6 +35,7 @@
 
 					<div :class="[selectedColumnsNumber.id > 1 ? 'mcol-xs-12' : 'mcol-lg-6', 'roi-charts-wrapper']">
 						<ROIStatisticsContainer
+							@event="handleEventNew"
 							:plantItem="plantItem"
 							:plantsList="plantsList"
 							:predefinedFilters="predefinedFilters"
@@ -42,6 +43,7 @@
 							disableTabs
 							standardIconBlock
 							:selectedColumnsNumber="selectedColumnsNumber"
+							:allPlantsRoiStatistics="allPlantsRoiStatistics"
 						/>
 					</div>
 				</div>
@@ -78,7 +80,8 @@ export default {
 		plantsList: {type:Array, required:false},
 		propsFilters: {type:Object, required:false},
 		selectedColumnsNumber: {type:Object, default: () => ({})},
-		isLastItem: Boolean
+		isLastItem: Boolean,
+		allPlantsRoiStatistics: null,
 		// sensorsList: Array
 	},
 

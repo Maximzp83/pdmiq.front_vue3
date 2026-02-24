@@ -867,10 +867,10 @@
 				min-width: 135px;
 			}
 
-			.buttons-container {
+			/*.buttons-container {
 				// justify-content: flex-end;
 				min-width: 75px;
-			}
+			}*/
 		}
 	}
 
@@ -930,7 +930,15 @@
 	.lube-blocked-container {
 		.time {
 			color: $primary-color;
-			& + * {margin-left: 10px;}
+		}
+
+		.info-part {
+			& > * {line-height: 15px;}
+		}
+
+		.unlock-block {
+			padding-top: 3px;
+			padding-bottom: 3px;
 		}
 	}
 	

@@ -10,6 +10,7 @@ export const noteColor = '#ffffff';
 export const blueColor = '#0e52ef';
 export const alarmColor = '#ff0000';
 export const lubeColor = '#75c2db';
+export const anomalyColor = '#FF8C00';
 
 export const colorsList = [
 	'#0ff',
@@ -281,6 +282,12 @@ const chartSeriesTemplates1 = {
 			custom_id: 'off_alarm_series',
 			color: 'black'
 		},
+		anomaly: {
+			...serie_template,
+			custom_id: 'anomaly_series',
+			color: anomalyColor,
+			zIndex: 5,
+		},
 		lube: {
 			...serie_template,
 			custom_id: 'lube_series',
@@ -488,7 +495,7 @@ const chartSeriesTemplates1 = {
 			...plotline_template,
 			zone_id: LEVEL_ZONES.LUBELINE,
 			zone_label: 'constants.Lubeline_Zone',
-			zone_key: 'lubeline_zone',
+			zone_key: 'lube_zone',
 			color: lubeColor
 		},
 		low_alarm_plotline: {
@@ -624,6 +631,15 @@ const chartSeriesTemplates1 = {
 			zIndex: 2000,
 			shape: 'url(/static/img/icons/reset_icon.svg)',
 			className: 'crash-flag runtime'
+		},
+
+		anomaly_flag: {
+			...flags_template,
+			zIndex: 2000,
+			color: anomalyColor,
+			shape: 'url(/static/img/icons/warning_flag.svg)',
+			className: 'crash-flag anomaly-flag',
+			custom_id: 'anomaly_flag'
 		},
 
 		cursor_flag_odd: {

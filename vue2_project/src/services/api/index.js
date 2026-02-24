@@ -22,6 +22,11 @@ export const api = (method, url, payload) => {
 		axios.defaults.headers.common.Authorization = token ? `Bearer ${token}` : null;
 	}
 
+	/*if (headers && headers['Content-Type'] == 'multipart/form-data') {
+		console.log(data);
+		return
+	}*/
+
 	/*if (payload && payload.baseURL) {
 		console.log(payload.baseURL)
 	}*/
@@ -78,7 +83,7 @@ const setupMultipartFormData = (obj, form, namespace) => {
 		// debugger;
 
 		for (let property in obj) {
-			if (obj[property] || obj[property] === 0) {
+			// if (obj[property] || obj[property] === 0) {
 				if (namespace) {
 					formKey = namespace + '[' + property + ']';
 				} else {
@@ -86,13 +91,13 @@ const setupMultipartFormData = (obj, form, namespace) => {
 				}
 				// console.log(formKey)
 				// if the property is an object, but not a File, use recursivity.
-				if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
+				if (obj[property] && typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
 					setupMultipartFormData(obj[property], fd, formKey);
 				} else {
 					// if it's a string or a File object
 					fd.append(formKey, obj[property]);
 				}
-			}
+			// }
 		}
 
 		return fd;

@@ -350,7 +350,7 @@ export default {
 			};
 
 			/*if (payload) {
-				console.log('payload', payload.data.pictures)
+				console.log('payload equipment', payload.data)
 				return
 			}*/
 			this.$emit('event', { eventName: 'toggleSaving', data: true });
@@ -374,7 +374,7 @@ export default {
 
 		submitMultiViews(multiViewsItems) {
 			/*if (process.env.NODE_ENV === 'development') {
-				console.log(multiViewsItems);
+				console.log('multiviews', multiViewsItems);
 				return;
 			}*/
 			

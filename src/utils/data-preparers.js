@@ -243,7 +243,8 @@ export const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'vibration_analysis_rules', val_key: 'vibration_analysis_rules' },
 		{ key: 'option_values', val_key: 'option_values' },
 		{ key: 'metric_multi_views', val_key: 'metric_multi_views' },
-		{ key: 'is_favorite', val_key: 'is_favorite' },
+		{ key: 'is_my_favorite', val_key: 'is_my_favorite' },
+		{ key: 'is_company_favorite', val_key: 'is_company_favorite' },
 	];
 
 	if (settings.addSettingItems) {

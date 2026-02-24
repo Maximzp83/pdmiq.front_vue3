@@ -1,7 +1,7 @@
 import ChartBase from '../../../classes/Chart';
 
 import { fetch_ncd_sensor_fft_statistics } from '../api/index.js';
-import { mergeObjects, cloneDeep, findItemBy } from '@/helpers';
+import { mergeObjects, cloneDeep, findItemBy, buildFormula } from '@/helpers';
 import { METRIC_SYSTEM_TYPES } from '../enums';
 
 // import { ncdAxisList } from '@/constants/global';
@@ -190,23 +190,7 @@ class FFTChart extends FFTChartBase {
 				stickyTracking: true
 			},
 			xAxis: {min: 0},
-			annotations: [
-				{
-					events: {},
-					draggable: '',
-					labelOptions: {
-						// backgroundColor: 'gray',
-						// verticalAlign: 'top',
-						// y: 3,
-						// x: 3,
-						borderWidth: 1,
-						allowOverlap: true,
-						className: 'fft-analysis-annotation'
-					},
-					zIndex: 50,
-					labels: []
-				}
-			],
+			annotations: [],
 		};
 		// this.seriesConfig = this.getSeriesConfig();
 
@@ -226,6 +210,22 @@ class FFTChart extends FFTChartBase {
 		const { chart_id /*config_settings*/ } = resources.chart_config;
 		const chart_id_splitted = chart_id.split('-');
 		this.measurement = resources.filters.measurement;
+
+		this.fft_annotation_template = {
+			events: {},
+			draggable: '',
+			labelOptions: {
+				// backgroundColor: 'gray',
+				// verticalAlign: 'top',
+				// y: 3,
+				// x: 3,
+				borderWidth: 1,
+				allowOverlap: true,
+				className: 'fft-analysis-annotation'
+			},
+			zIndex: 50,
+			labels: []
+		};
 
 		this.chart_parameter_id =
 			chart_id_splitted.length > 1
@@ -314,8 +314,8 @@ class FFTChart extends FFTChartBase {
 	chartDataReadyCallback() {
 		this.generatePeaks();
 
-		if (this.rpmValue != null) {
-			this.addRpmCursor(this.rpmValue);
+		if (this.rpmSourceValue != null) {
+			this.addRpmCursor();
 		}
 	}
 
@@ -648,11 +648,16 @@ class FFTChart extends FFTChartBase {
 		console.log('handleFFTRpmUpdated', fftItem)
 	}*/
 
-	addRpmCursor(rpmValue) {
-		if (!this.hasCursorFlagConfig()) {
+	addRpmCursor(settings={}) {
+		const { rpmSourceValue } = this;
+		/*if(this.chart_id == 'chart-3') {
+			debugger
+		}*/
+		if (!rpmSourceValue || !this.hasCursorFlagConfig()) {
 			return;
 		}
-
+		const {value, draggable} = rpmSourceValue;
+		// console.log('addRpmCursor', value, draggable, this.hasCursorFlagConfig())
 		const serieId = 'rpm-cursor-flag-serie';
 		const { index } = findItemBy('id', serieId, this.options.series, {
 			returnIndex: true
@@ -661,7 +666,7 @@ class FFTChart extends FFTChartBase {
 		if (index !== undefined) {
 			// console.log('addRpmCursor', this.ChartAPI)
 			
-			if (!rpmValue) {
+			if (!value) {
 				this.options.series[index].data = [];
 				// this.ChartAPI.series[index].setData([], false);
 				this.emitChartOptionsUpdate();
@@ -671,17 +676,20 @@ class FFTChart extends FFTChartBase {
 			this.options.series[index].data = this.options.series[index].data || [];
 
 			const cursor_item = setupFFTCursorItem({
-				x: rpmValue,
+				x: value,
 				id: 'rpm-cursor',
 				serie_idx: index,
 				point_idx: 0,
 				units_x: this.options.xAxis.title.text,
-				isRpmCursor: true
+				isRpmCursor: true,
 			});
-			// console.log('cursor_item',cursor_item)
 			this.options.series[index].data = [cursor_item];
+			this.options.series[index].dragDrop.draggableX = draggable;
+			// console.log('cursor_item', this.chart_id, cursor_item, this.options.series[index].data)
 			// this.ChartAPI.series[index].setData([cursor_item], false);
-			this.emitChartOptionsUpdate();
+			if (!settings.skipOptionsUpdate) {
+				this.emitChartOptionsUpdate();
+			}
 		}
 	}
 
@@ -693,6 +701,8 @@ class FFTChart extends FFTChartBase {
 
 			newData[point_idx] = setupFFTCursorItem({ ...newData[point_idx], x });
 			this.ChartAPI.series[serie_idx].setData(newData, false);
+
+			this.updateAnnotationsFromFFTAnalysisRules({rpmValue: x});
 
 			if (this.events.rpmCursorDrag) {
 				this.events.rpmCursorDrag({ x });
@@ -781,18 +791,26 @@ class FFTChart extends FFTChartBase {
 	}
 
 	generateAnnotationsFromFFTAnalysisRules(selectedAnalysisRules) {
-		this.options.annotations[0].labels = [];
+		this.options.annotations = [];
+		const {value: rpmValue} = this.rpmSourceValue;
+		// console.log('generateAnnotationsFromFFTAnalysisRules', rpmValue)
 		// this.options.xAxis.minRange = 0.1;
 		// this.options.xAxis.startOnTick = false;
-		// console.log(this.options.xAxis)
-		selectedAnalysisRules.forEach((rule_item) => {
-		// console.log('generateAnnotationsFromFFTAnalysisRules', rule_item)
+		selectedAnalysisRules.forEach((rule_item, idx) => {
+			this.options.annotations[idx] = cloneDeep(this.fft_annotation_template);
+			const calcFormula = buildFormula(rule_item.original_rule.formula);
+			this.options.annotations[idx].customSettings = { calcFormula };
+			// console.log('generateAnnotationsFromFFTAnalysisRules', rule_item)
 			const { harmonics, name } = rule_item.original_rule;
-			let start = rule_item.vibration_analysis_value || rule_item.option_value || rule_item.custom_value;
+			this.options.annotations[idx].customSettings.harmonics = harmonics;
+			this.options.annotations[idx].customSettings.value = +rule_item.option_value.value;
+			// let start = rule_item.vibration_analysis_custom_value || rule_item.vibration_analysis_value || rule_item.option_value || rule_item.custom_value;
+			let start = calcFormula({ rpm: rpmValue, value: +rule_item.option_value.value });
 			start = +start;
 			const step = +start;
 
 			const isValidData = !isNaN(start) && !isNaN(step) && /*start > 0 &&*/ step > 0;	
+			// console.log(rule_item, start, step, isValidData)
 
 			if (isValidData) {
 				const baseStatistics = this.getTransformedStatistics({
@@ -811,7 +829,7 @@ class FFTChart extends FFTChartBase {
 				if (lastPointXvalue) {
 
 					while (x_value < lastPointXvalue && step_pos <= max_steps) {
-						this.options.annotations[0].labels.push({
+						this.options.annotations[idx].labels.push({
 							shape: 'connector',
 							borderColor: rule_item.color || '#000',
 							point: {
@@ -840,6 +858,27 @@ class FFTChart extends FFTChartBase {
 		})
 		// console.log(this.options.annotations[0].labels)
 		this.emitChartOptionsUpdate();
+	}
+
+	updateAnnotationsFromFFTAnalysisRules({ rpmValue }) {
+		this.ChartAPI.annotations.forEach((annotation) => {
+		// console.log('updateAnnotationsFromFFTAnalysisRules', annotation, rpmValue)
+			const start = annotation.userOptions.customSettings.calcFormula({ rpm: rpmValue, value: annotation.userOptions.customSettings.value });
+			const step = +start;
+			let x_value = start;
+			const newLabels = [];
+			annotation.labels.forEach(() => {
+				newLabels.push({
+					point: { x: x_value	}
+				})
+				x_value += step;
+			})
+			// console.log(newLabels)
+			annotation.update({ labels: newLabels });
+		})
+
+		// this.emitChartOptionsUpdate();
+		this.ChartAPI.redraw(false);
 	}
 }
 

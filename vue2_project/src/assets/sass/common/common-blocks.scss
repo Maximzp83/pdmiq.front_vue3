@@ -1368,6 +1368,8 @@
 .chart-actions-block {
 	// margin-left: 10px;
 	padding: 10px;
+	// padding-left: 10px;
+	// padding-right: 10px;
 	display: flex;
 	align-items: center;
 	background-color: #f7f7f7;
@@ -3888,20 +3890,40 @@
 .one-chart-page-legend {
 	position: absolute;
 	top: 20px;
-	left: 50px;
+	left: 80px;
 	z-index: 1000;
-	background-color: #fff;
+	// background-color: #fff;
 	display: inline-block;
 	width: auto;
+	font-size: 11px;
+	line-height: 14px;
 
 	.color-block {
-		width: 10px;
-		height: 10px;
+		width: 8px;
+		height: 8px;
 		border-radius: 50%;
 
 		& + div {margin-left: 10px;}
 
 	}
+}
+	
+.reorder-button {
+	position: absolute;
+	left: 5px;
+	z-index: 1002;
+	visibility: hidden;
+	opacity: 0;
+	// margin-left: auto;
+	cursor: grab;
+	margin-left: 5px;
+	border-radius: 3px;
+	background-color: #f0f2f5;
+	padding: 5px;
+	box-sizing: border-box;
+	width: 32px;
+	height: 32px;
+	transition: all .2s;
 }
 
 @keyframes horizontal-move {

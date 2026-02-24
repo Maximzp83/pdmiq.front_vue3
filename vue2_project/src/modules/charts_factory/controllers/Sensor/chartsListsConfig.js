@@ -19,7 +19,7 @@ import {
 	bannerV21vibrationParametersList,
 	bannerM25ParametersList
 } from './enums';
-import { cloneDeep, validateBySettings, findItemBy } from '@/helpers';
+import { cloneDeep, validateBySettings, findItemBy, mergeObjects } from '@/helpers';
 import { CHART_TYPES, chartTypesList, SENSOR_THRESHOLD_TYPES, NCD_ALARM_TYPES } from '@/constants/global';
 import { METRIC_SYSTEM_TYPES } from './enums';
 const { METRIC, IMPERIAL } = METRIC_SYSTEM_TYPES;
@@ -958,16 +958,18 @@ const chartsListsConfig1 = {
 						{ setName: 'standardColumn', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION },
 						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_PK_ACCELERATION },
 						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_CREST_FACTOR },
-						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_KURTOSIS }
+						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_KURTOSIS },
+						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS },
 					]
 				}
 			}),
 			seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum: 2, /*postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} */}}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, checkForDuplicates:1}}),
 			]
 		},
 
@@ -989,13 +991,15 @@ const chartsListsConfig1 = {
 					seriesConfigsList: [
 						{ setName: 'standardColumn', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION },
 						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION },
+						{ setName: 'invisibleLine', param: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS },
 					]
 				}
 			}),
 			seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION, {inject: {postfix_by_metric: {[METRIC]:'(6-5300Hz)', [IMPERIAL]:'(360-318k CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION, {inject: {skipTitle:true, skipUnit:1, toFixedNum:3, postfix_by_metric: {[METRIC]:'(6-5300Hz)', [IMPERIAL]:'(360-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION, {inject: {skipTitle:true, toFixedNum:3, postfix_by_metric: {[METRIC]:'(6-5300Hz)', [IMPERIAL]:'(360-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, checkForDuplicates:1}}),
 			]
 		},
 
@@ -1024,8 +1028,8 @@ const chartsListsConfig1 = {
 			seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_RMS_VELOCITY, {includeStatsLines:1}),
 			requestsList: [
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_RMS_VELOCITY, {inject: {checkForDuplicates:1, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(360-60k CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_PEAK_VELOCITY_COMPONENT_FREQ, {inject: {skipTitle:1, skipUnit:1, postfix_by_metric: {[METRIC]:'(6-100Hz)', [IMPERIAL]:'(360-6000 CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, skipUnit:1, checkForDuplicates:1}}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_PEAK_VELOCITY_COMPONENT_FREQ, {inject: {skipTitle:1, postfix_by_metric: {[METRIC]:'(6-100Hz)', [IMPERIAL]:'(360-6000 CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, checkForDuplicates:1}}),
 			]
 		},
 
@@ -1054,8 +1058,8 @@ const chartsListsConfig1 = {
 			seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_RMS_VELOCITY, {includeStatsLines:1}),
 			requestsList: [
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_RMS_VELOCITY, {inject: {checkForDuplicates:1, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(360-60k CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_VELOCITY_COMPONENT_FREQ, {inject: {skipTitle:1, skipUnit:1, postfix_by_metric: {[METRIC]:'(6-100Hz)', [IMPERIAL]:'(360-6000 CPM)'} }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, skipUnit:1, checkForDuplicates:1}}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_VELOCITY_COMPONENT_FREQ, {inject: {skipTitle:1, postfix_by_metric: {[METRIC]:'(6-100Hz)', [IMPERIAL]:'(360-6000 CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, checkForDuplicates:1}}),
 			]
 		},
 
@@ -1085,7 +1089,7 @@ const chartsListsConfig1 = {
 			requestsList: [
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_RMS_VELOCITY, {inject: {checkForDuplicates:1, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(360-60k CPM)'} }}),
 				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_PEAK_VELOCITY_COMPONENT_FREQ, {inject: {skipTitle:1, skipUnit:1}}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, skipUnit:1, checkForDuplicates:1}}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS, {inject: {skipTitle:1, checkForDuplicates:1}}),
 			]
 		},
 
@@ -1203,9 +1207,9 @@ const chartsListsConfig1 = {
 				}
 			}),
 			requestsList: [
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum:2 }}),
 			]
 		},
 
@@ -1239,9 +1243,9 @@ const chartsListsConfig1 = {
 				}
 			}),
 			requestsList: [
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
-				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_KURTOSIS, {inject: {skipTitle:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_KURTOSIS, {inject: {skipTitle:1, toFixedNum:2 }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_KURTOSIS, {inject: {skipTitle:1, toFixedNum:2 }}),
 			]
 		},
 
@@ -1417,10 +1421,10 @@ const chartsListsConfig1 = {
 			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS, {includeStatsLines:1}),
 			requestsList: [
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				// bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX, {inject: {skipTitle:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				// bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CURTOSIS, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-5300Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
@@ -1450,10 +1454,10 @@ const chartsListsConfig1 = {
 			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION, {inject: {postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3}}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX, {inject: {skipTitle:1, toFixedNum: 3}}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum: 2,/* postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'}*/ }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(1000-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
@@ -1483,10 +1487,10 @@ const chartsListsConfig1 = {
 			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION, {includeStatsLines:1}),
 			requestsList: [
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION),
-				bannerM25ParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerV21vibrationParametersList(BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_PK_TO_PK_ACCELERATION, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_KURTOSIS, {inject: {skipTitle:1, toFixedNum: 2, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_PEAK_ACCELERATION_FREQ, {inject: {skipTitle:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-10000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
@@ -1513,7 +1517,7 @@ const chartsListsConfig1 = {
 			// seriesConfigSettings: getSeriesConfigSettingsForBannerV2_1For(BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY, {includeStatsLines:1}),
 			requestsList: [
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.RMS_VELOCITY),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT, {inject: {skipTitle:1, skipUnit:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT, {inject: {skipTitle:1, toFixedNum: 3, postfix_by_metric: {[METRIC]:'(6-1000Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
 		{
@@ -1628,7 +1632,7 @@ const chartsListsConfig1 = {
 			}),
 			requestsList: [
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR, {inject: {skipTitle:true, }}),
-				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
+				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR, {inject: {skipTitle:true, /*postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'}*/ }}),
 				bannerM25ParametersList(BANNER_M25_PARAMETERS_TYPES.FULL_BAND_CREST_FACTOR, {inject: {skipTitle:true, postfix_by_metric: {[METRIC]:'(1000-10600Hz)', [IMPERIAL]:'(60k-318k CPM)'} }}),
 			]
 		},
@@ -1751,6 +1755,31 @@ const generateListsConfig = (config_key, settings) => {
 				return chart;
 			});
 		}
+	} else if (config_key == 'banner_temp_vibe_v2_1' || config_key == 'banner_m25') {
+		// console.log(settings.resources)
+		if (settings.resources && settings.resources.payload_1.sensorItem.is_lube_mode) {
+			const { sensorItem } = settings.resources.payload_1;
+			return chartsListsConfig1[config_key].map(chart => {
+				if (
+					chart.requestsList[0].id == sensorItem.lube_trigger_metric_type
+					&& !(chart.transformator_settings?.specification?.setupPlotlinesData === false)
+				) {
+					chart.zonesKeysList.push('lube');
+					chart.seriesConfigIncludes.push('lube');
+					chart.transformator_settings = mergeObjects(
+						chart.transformator_settings, {
+							specification: {
+								setupFlagsData: {	enable_lube: 1 }
+							}
+						}
+					);
+					return chart;
+				}
+				return chart;
+			});
+		} else {
+			return cloneDeep(chartsListsConfig1[config_key])
+		}
 	}
 
 	return [];
@@ -1793,6 +1822,12 @@ const defaultSeriesConfig1 = {
 					template: 'sensor.alarm',
 					event_key: 'pointClickEvent',
 					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.ALARM } }
+				},
+				{
+					id: 'anomaly-serie',
+					data_path: 'anomaly',
+					template: 'sensor.anomaly',
+					event_key: 'pointClickEvent'
 				},
 				{
 					id: 'off_alarm-serie',
@@ -1923,17 +1958,20 @@ const defaultSeriesConfig1 = {
 				{
 					id: 'acute-flag-serie',
 					data_path: 'acute_statistics',
-					template: 'sensor.acute_flag'
+					template: 'sensor.acute_flag',
+					// event_key: 'pointClickEvent'
 				},
 				{
 					id: 'chronic-flag-serie',
 					data_path: 'chronic_statistics',
-					template: 'sensor.chronic_flag'
+					template: 'sensor.chronic_flag',
+					// event_key: 'pointClickEvent'
 				},
 				{
 					id: 'crashes-flag-serie',
 					data_path: 'crashes_statistics',
-					template: 'sensor.crashes_flag'
+					template: 'sensor.crashes_flag',
+					// event_key: 'pointClickEvent'
 				},
 				{
 					id: 'note-flag-serie',
@@ -2061,6 +2099,11 @@ const defaultSeriesConfig1 = {
 							}
 						]
 					}
+				},
+				{
+					id: 'anomaly-flag-serie',
+					data_path: 'flat_metric_data_anomaly_statistics',
+					template: 'sensor.anomaly_flag'
 				}
 			]
 		}
@@ -2294,7 +2337,6 @@ const getRequestList1 = ({parameter, sensor}) => {
 		}
 	}
 
-
 	return [];
 };
 
@@ -2340,13 +2382,17 @@ const filterDefaultSeriesConfig = ({
 
 // ----------------
 
-export var splineSeriesConfigSettings = (alarm_type) =>
+export const splineSeriesConfigSettings = (alarm_type) =>
 	cloneDeep(getSplineSeriesConfigSettings(alarm_type));
 
 export const getRequestList = payload => getRequestList1(payload);
 
 export const chartsListsConfig = (key, settings = {}) => {
-	if (key == 'banner_v2_generic') {
+	if (
+		key == 'banner_v2_generic' ||
+		key == 'banner_temp_vibe_v2_1' ||
+		key == 'banner_m25'
+	) {
 		return generateListsConfig(key, settings);
 	}
 	return cloneDeep(chartsListsConfig1[key])

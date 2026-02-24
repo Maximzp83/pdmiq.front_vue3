@@ -1147,6 +1147,13 @@ export default {
 		confirm_phone_number: 'Confirmar número de teléfono',
 		fft_successfully_unlocked: 'FFT desbloqueado con éxito',
 		open_in_new_window: 'Abrir en nueva ventana',
+		personal_favorite: 'Favorito Personal',
+		company_favorite: 'Favorito de la Empresa',
+		unlock_fft: 'Desbloquear FFT',
+		lube_based_device_address_id: 'ID de dirección de dispositivo de lubricación',
+		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
+		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
+		flat_data_anomaly: 'Anomalia de datos Plano',
 	},
 
 	aliases: {
@@ -1177,6 +1184,7 @@ export default {
 	  	creation_link_exp: 'El enlace para crear la contraseña ha expirado. Ingrese su correo electrónico a continuación y haga clic en enviar. <b>Recibirá un nuevo enlace en su bandeja de entrada en breve.</b>',
 	  	to_clipboard_msg: 'El enlace fue copiado al portapapeles',
 	  	mfa_warn_3: 'Si desea cambiar el número de teléfono, desactive 2FA o cámbielo a Authenticator',
+	  	anomaly1: 'Anomalia de datos de metrica',
 	},
 
 	constants: {
@@ -1281,12 +1289,12 @@ export default {
 		'radial_v_acceleration': 'Aceleración (V) Radial',
 		'radial_h_velocity': 'Velocidad (H) Radial',
 		'radial_h_acceleration': 'Aceleración (H) Radial',
-		'mm_per_second': 'mm por segundo',
-		'inches_per_second': 'pulgadas por segundo',
+		'mm_per_second': 'mm/s',
+		'inches_per_second': 'pul/s',
 		'celsius': 'Celsius',
 		'fahrenheit': 'Fahrenheit',
 		'g': 'g',
-		'hertz': 'Hercios',
+		'hertz': 'Hz',
 		'dbuv': 'dB&micro;V',
 		'amps': 'Amperes',
 		'percent': '%',
@@ -1670,5 +1678,7 @@ export default {
 		lube_matrix: 'LubeMatrix',
 		humidity_temperature_air_quality: 'Humedad, Temperatura, Calidad del Aire',
 		pressure: 'Presión',
+		ultrasound_vibration_temperature: 'Ultrasonido, Vibración, Temperatura',
+		uvt: 'UVT',
 	}
 };

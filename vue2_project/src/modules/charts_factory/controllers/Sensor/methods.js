@@ -5,7 +5,7 @@ import {
 	convertTZ,
 	cleanDateString,
 	getRoundedValue,
-	countDecimalOrder,
+	// countDecimalOrder,
 	getYmdDateString,
 	getTimeDifference,
 	convertMsToHours
@@ -340,14 +340,16 @@ const setupPlotlinesData1 = historyPayload => {
 				actual_zone_value_for_current_period = getRoundedValue(
 					actual_zone_value_for_current_period,
 					0,
-					countDecimalOrder(actual_zone_value_for_current_period)
+					1
+					// countDecimalOrder(actual_zone_value_for_current_period)
 				);
 
 				if (actual_average_metric_data_value_for_current_period) {
 					actual_average_metric_data_value_for_current_period = getRoundedValue(
 						actual_average_metric_data_value_for_current_period,
 						0,
-						countDecimalOrder(actual_average_metric_data_value_for_current_period)
+						1
+						// countDecimalOrder(actual_average_metric_data_value_for_current_period)
 					);
 				}
 
@@ -491,14 +493,16 @@ const setupFFTLockStatistics1 = (fft_locks = []) => {
 
 	for (let i = 0; i < fft_locks.length; i++) {
 		let { status, unlock_author, fft } = fft_locks[i];
-		let { created_at } = fft;
+		const created_at = fft_locks[i].created_at || (fft && fft.created_at);
 
 		const statusItem = findItemBy('id', status, fftLockStatusesList());
+		let title = 'L';
 		let tooltip_text = statusItem ? statusItem.name : 'Wrong fft status';
 
 		let shape = 'url(/static/img/icons/warning_flag.svg)';
 
 		if (status === FFT_LOCK_STATUSES.UNLOCKED && unlock_author) {
+			title = 'U';
 			tooltip_text = `${Lang.tt('constants.UNLOCKED')} by
 												${unlock_author.full_name}`;
 			shape = 'url(/static/img/icons/success_flag.svg)';
@@ -506,7 +510,8 @@ const setupFFTLockStatistics1 = (fft_locks = []) => {
 
 		fft_lock_statistics.push({
 			x: Date.parse(created_at),
-			title: statusItem ? statusItem.name : '',
+			// title: statusItem ? statusItem.name : '',
+			title,
 			status: status,
 			text: tooltip_text,
 			color: statusItem ? statusItem.color : 'gray',
@@ -612,15 +617,31 @@ const setupNotesStatistics1 = (notesData = []) => {
 	let statistics = [];
 
 	for (let i = 0; i < notesData.length; i++) {
-		const { signal_date_at, message, sensor_job_id, full_file_name } = notesData[i];
+		const { 
+			attachment_file_name,
+			attachment_file_url,
+			author_id,
+			graph_timestamp,
+			id,
+			message,
+			metric_issue_alert_id,
+			metric_type,
+		} = notesData[i];
 		// const alert_type_item = findItemBy('id', alert_type, alertTypesList) || {};
 		// console.log(notesData[i])
 		statistics.push({
-			pointId: sensor_job_id,
-			x: Date.parse(signal_date_at),
+			id,
+			graph_timestamp,
+			attachment_file_name,
+			attachment_file_url,
+			author_id,
+			metric_issue_alert_id,
+			metric_type,
+			message,
+			// pointId: sensor_job_id,
+			x: Date.parse(graph_timestamp),
 			title: ' ',
 			text: message,
-			full_file_name: full_file_name
 		});
 	}
 
@@ -1287,7 +1308,8 @@ const standard_datetime1 = payload => {
 		xKey,
 		yKey,
 		skipDataPointsList,
-		parameter_item
+		parameter_item,
+		flat_metric_data_anomalies
 		/*resources*/
 		/*transformatorData,*/
 	} = payload;
@@ -1317,6 +1339,8 @@ const standard_datetime1 = payload => {
 		});
 	}
 
+	
+	// ------------------------
 	// console.log(parameter_item.name, skipMaxValues)
 
 	// console.time('standard_datetime1')
@@ -1326,7 +1350,7 @@ const standard_datetime1 = payload => {
 
 		// let formula_x = x => x;
 		let formula_y, toFixedNum;
-	
+
 		if (parameter_item) {
 			toFixedNum = parameter_item.toFixedNum;
 
@@ -1344,9 +1368,46 @@ const standard_datetime1 = payload => {
 
 		const skipSet = skipDataPointsList ? new Set(skipDataPointsList) : null;
 
+		// ---------Anomaly find--------
+		// --- anomaly ranges ---
+		let anomalyRanges = null;
+		if (flat_metric_data_anomalies && flat_metric_data_anomalies.length) {
+			newData.anomaly = [];
+			const activeAnomalies = flat_metric_data_anomalies.filter(a => a.is_active);
+			if (activeAnomalies.length) {
+				anomalyRanges = activeAnomalies.map(a => ({
+					created_at: Date.parse(a.created_at),
+					// start: Date.parse(a.metric_data_start_time),
+					end: Date.parse(a.metric_data_end_time)
+				}));
+			}
+		}
+		// let activeAnomalyDataPointsSpawn = [];
+		if (anomalyRanges) {
+			anomalyRanges = anomalyRanges.map(anomaly => {
+				for (let i = 0; i < filteredStatistics.length; i++) {
+					const x = getPointX_ms(
+						filteredStatistics[i][xKey] || getStatisticsItemParams(filteredStatistics[i]).x
+					);
+
+					let y = getPointY(
+						filteredStatistics[i][yKey] || getStatisticsItemParams(filteredStatistics[i]).y,
+						{ formula: formula_y, toFixedNum }
+					);
+
+					if (x >= anomaly.created_at) {
+						anomaly.y = y;
+						break;
+					}
+				}
+				return anomaly;
+			})
+		}
+
+		// console.log(anomalyRanges)
 		for (let i = 0; i < filteredStatistics.length; i++) {
 			// if (i % 2 === 0) {
-				const { id } = filteredStatistics[i];
+				const { t } = filteredStatistics[i];
 				const x = getPointX_ms(
 					filteredStatistics[i][xKey] || getStatisticsItemParams(filteredStatistics[i]).x
 				);
@@ -1379,6 +1440,24 @@ const standard_datetime1 = payload => {
 					continue;
 				}
 
+				// --- check anomaly range before zone classification ---
+				if (anomalyRanges) {
+					let isAnomaly = false;
+					for (let ai = 0; ai < anomalyRanges.length; ai++) {
+						if (x < anomalyRanges[ai].created_at && y == anomalyRanges[ai].y) {
+							isAnomaly = true;
+							break;
+						}	if (x >= anomalyRanges[ai].created_at && x <= anomalyRanges[ai].end) {
+							isAnomaly = true;
+							break;
+						}
+					}
+					if (isAnomaly) {
+						newData.anomaly.push([x, y]);
+						continue;
+					}
+				}
+
 				let presentInSomeZone = false;
 
 				if (zonesList) {
@@ -1386,7 +1465,7 @@ const standard_datetime1 = payload => {
 						const zone = zonesList[zi];
 
 						if (isInZone({ x, y, zone })) {
-							newData[zone.key].push([x, y, id]);
+							newData[zone.key].push([x, y, t]);
 							presentInSomeZone = true;
 							/*if (zone.key == 'alarm') {
 								console.log(newData[zone.key][newData[zone.key].length-1])
@@ -1397,11 +1476,11 @@ const standard_datetime1 = payload => {
 				}
 
 				if (!presentInSomeZone) {
-					newData.base.push([x, y, id]);
+					newData.base.push([x, y, t]);
 				}
 
 				// pointsSum += y;
-			// } 
+			// }
 		}
 		/*let average = pointsSum / statistics.length;
 		average = getRoundedValue(average, 0, countDecimalOrder(average));
@@ -1601,6 +1680,22 @@ const line_charts_datetime1 = payload => {
 	return newData;
 };
 
+const setupFlatMetricDataAnomalyFlags1 = (anomaliesData) => {
+	let anomaly_statistics = [];
+
+	for (let i = 0; i < anomaliesData.length; i++) {
+		const { created_at } = anomaliesData[i];
+
+		anomaly_statistics.push({
+			x: Date.parse(created_at),
+			title: '!',
+			text: 'Flat data anomaly'
+		});
+	}
+
+	return anomaly_statistics;
+};
+
 const get_sensor_parameter_item1 = ({sensor, parameter_id, graph_item}) => {
 	const { type, data_set } = sensor;
 	if (type && data_set) {
@@ -1653,6 +1748,7 @@ export const setupFlagsFFTStatistics = (fftData, filterBy) =>
 export const setupRuntimeTrackersStatistics = payload =>
 	setupRuntimeTrackersStatistics1(payload);
 export const setupFFTLockStatistics = payload => setupFFTLockStatistics1(payload);
+export const setupFlatMetricDataAnomalyFlags = payload => setupFlatMetricDataAnomalyFlags1(payload);
 
 export const setupZonesList = payload => setupZonesList1(payload);
 export const setupZonesListForLineSeries = payload =>

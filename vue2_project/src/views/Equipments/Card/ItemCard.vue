@@ -264,7 +264,9 @@ export default {
 
 		equipment_picture() {
 			const { pictures /*equipment_type_img*/ } = this.cardData;
-			if (pictures.length) return pictures[0].full_thumb_file_name;
+			if (pictures.length) {
+				return sortArrayByKeyNumber(pictures,	'display_order')[0].full_thumb_file_name;
+			}
 			// else if (equipment_type_img) return cardData.equipment_type_img;
 
 			return null;
@@ -412,7 +414,7 @@ export default {
 				return type.isBannerM25
 			})) {
 				console.log('isBannerM25', this.cardData.machine_name, this.cardData.asset_name);
-			}
+			}*/
 
 			/*if (this.dashboardSensors.some(sensor=>{
 				const type = this.getType(sensor);

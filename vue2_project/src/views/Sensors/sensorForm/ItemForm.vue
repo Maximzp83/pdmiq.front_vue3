@@ -1,5 +1,12 @@
 <template>
 	<div :class="['edit-form-container', {'half-width': !fromModal}]">
+		<!-- <div class="toggle-lubematrix-button" v-if="showLubeMatrixButton">
+			<el-button
+				type="primary"
+				size="small"
+				@click="formData.is_lube_mode = !formData.is_lube_mode"
+			>{{ `${tt(formData.is_lube_mode ? 'Disable' : 'Enable')} LubeMatrix` }}</el-button>
+		</div> -->
 		<!-- :validate="" -->
 		<el-form
 			class="item-edit-form"
@@ -120,7 +127,7 @@
 			</el-form-item>
 
 			<!-- <el-form-item :label="tt('Type')" prop="data_set"
-				v-if="!isLubeMatrixV3 || !itemId"
+				v-if="!formData.is_lube_mode || !itemId"
 			>
 				<el-select
 					v-model="formData.port_number"
@@ -135,28 +142,7 @@
 				</el-select>
 			</el-form-item> -->
 
-			<div class="el-form-item"	v-if="isLubeMatrixV3">
-				<ItemFormUltraSound
-					@event="handleEventNew"
-					ref="ItemFormUltraSound"
-					fromBannerSensorForm
-					:fromModal="fromModal"
-					:equipmentData="equipmentData"
-					:itemData="itemData"
-					:itemsName="itemsName"
-					:isNew="isNew"
-					:formulasList="formulasList"
-					:bearingsList="bearingsList"
-					:lubeTypesList="lubeTypesList"
-					:controllersList="ultrasound_controllersList"
-					:banner_controllersList="controllersList"
-					:commonItemsLoadings="commonItemsLoadings"
-				/>
-			</div>
-
-			<div class="el-form-item"
-				v-else
-			>
+			<div class="el-form-item">
 				<el-form-item :label="tt('Node')" prop="port_number"
 					v-if="!currentSensorType.isBannerTempVibe2 && !currentSensorType.isBannerV2Generic && !currentSensorType.isBannerV2_1 && !currentSensorType.isBannerM25"
 				>
@@ -484,7 +470,7 @@
 								:item-data="item"
 								:item-index="idx"
 								:isLast="idx === runningThresholdItemsList.length - 1"
-								:parametersList="runningThresholdParametersList"
+								:parametersList="runningThresholdParametersList.all"
 								@onRemove="id => removeFormItem(id, 'runningThresholdItemsList')"
 							/>
 						</div>
@@ -502,6 +488,70 @@
 						</div>
 					</div>
 				</el-form-item>
+
+				<!-- ---------------------- -->
+				<el-form-item
+					v-if="showLubeMatrixButton"
+					:label="`${tt('Enable')} LubeMatrix`"
+					prop="is_lube_mode"
+				>
+					<el-switch
+						v-model="formData.is_lube_mode"
+						:active-value="1"
+						:inactive-value="0"
+					/>
+				</el-form-item>
+
+				<div class="el-form-item"	v-if="formData.is_lube_mode">
+					<div class="content-row">
+						<b>{{ `LubeMatrix ${tt('Setup')}` }}</b>
+					</div>
+
+					<el-form-item class="content-row"
+						:label="tt('phrases.lube_based_device_address_id')" prop="lube_based_device_address_id" required>
+						<CustomInput
+							v-model="formData.lube_based_device_address_id"
+							:placeholder="`${tt('address')}`"
+						/>
+					</el-form-item>
+
+					<el-form-item :label="tt('phrases.lube_based_physical_sensor_id')" prop="lube_based_physical_sensor_id" required>
+						<CustomInput
+							v-model="formData.lube_based_physical_sensor_id"
+							placeholder="id"
+						/>
+					</el-form-item>
+
+					<el-form-item  class="content-row"
+						:label="tt('phrases.lube_trigger_metric_type')" prop="lube_trigger_metric_type" required>
+						<!-- <div class="1mcol-sm-6"> -->
+						<CustomSelect
+							filterable
+							:optionsList="runningThresholdParametersList.withThresholdsOnly"
+							:placeholder="`${tt('Select')} ${tt('type')}`"
+							v-model="formData.lube_trigger_metric_type"
+						/>
+						<!-- </div> -->
+					</el-form-item>
+
+					<ItemFormUltraSound
+						class="content-row"
+						@event="handleEventNew"
+						ref="ItemFormUltraSound"
+						fromBannerSensorForm
+						:fromModal="fromModal"
+						:equipmentData="equipmentData"
+						:itemData="itemData"
+						:itemsName="itemsName"
+						:isNew="isNew"
+						:formulasList="formulasList"
+						:bearingsList="bearingsList"
+						:lubeTypesList="lubeTypesList"
+						:controllersList="ultrasound_controllersList"
+						:banner_controllersList="controllersList"
+						:commonItemsLoadings="commonItemsLoadings"
+					/>
+				</div>
 
 				<el-form-item
 					:label="tt('phrases.runtime_tracking_threshold_data_value')"
@@ -629,7 +679,7 @@ import {
 	bannerPressureRangesList,
 } from '@/constants/global';
 
-import { ADJUSTMENT_ACTIONS_TYPES, LUBE_VERSIONS } from '@/constants/ultrasound';
+import { ADJUSTMENT_ACTIONS_TYPES, /*LUBE_VERSIONS*/ } from '@/constants/ultrasound';
 
 import { 
 	ncdAxisList,
@@ -774,6 +824,12 @@ export default {
 				banner_v2_subtype_parameters: [],
 				running_thresholds: [],
 
+				// -----------
+				is_lube_mode: false,
+				lube_based_device_address_id: '',
+			  lube_based_physical_sensor_id: '',
+			  lube_trigger_metric_type: null,
+
 				ultrasound_formData: null
 			},
 
@@ -803,7 +859,7 @@ export default {
 			const { isBannerTempVibe2, isBannerV2_1, isBannerV2Generic, isBannerM25 } = this.currentSensorType;
 			if (
 				(this.itemData && this.itemData.device_data) &&
-				(isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic || this.isLubeMatrixV3 || isBannerM25)
+				(isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic || this.formData.is_lube_mode || isBannerM25)
 			) {
 				return true;
 			}
@@ -811,7 +867,7 @@ export default {
 		},
 
 		showLastLubricationExternalStats() {
-			return this.itemData && this.isLubeMatrixV3 && this.itemData.last_lubrication_external_stats;
+			return this.itemData && this.formData.is_lube_mode && this.itemData.last_lubrication_external_stats;
 		},
 
 		instanceName: () => 'Sensors',
@@ -823,16 +879,15 @@ export default {
 					ds.controller_type === SENSOR_TYPES.BANNER ||
 					ds.id === DATASET.ULTRA_SOUND_SDT_DECIBELS ||
 					ds.id === DATASET.ULTRA_SOUND_SDT_DECIBELS_4_20 ||
-					ds.id === DATASET.SDT_SENSOR_FULL_SPECTRUM ||
-					ds.id === DATASET.LUBEMATRIX_V3 // для внедрения lube v3 в banner форму
+					ds.id === DATASET.SDT_SENSOR_FULL_SPECTRUM
 				// )
 			);
 
 			return Object.freeze(list);
 		},
 
-		isLubeMatrixV3: that => that.formData.data_set === DATASET.LUBEMATRIX_V3,
-		// || (that.itemData && that.sensor_item_lube_version === LUBE_VERSIONS.V3),
+		// formData.is_lube_mode: that => that.formData.data_set === DATASET.LUBEMATRIX_V3,
+		showLubeMatrixButton: that => that.formData.data_set === DATASET.BANNER_TEMP_VIBE_V2_1 || that.formData.data_set === DATASET.BANNER_M25,
 
 		SENSOR_TYPES: () => SENSOR_TYPES,
 		dataSetConvertersList: that =>
@@ -993,8 +1048,8 @@ export default {
 						title: `${item.name}: ${item.formula} ${item.units}`,
 						name: item.name,
 						units: item.units,
-						formula: item.formula,
-						isDefaultValues: true
+						formula: '{value}',
+						graph_type: item.graph_type,
 					};
 				});				
 			}
@@ -1031,14 +1086,28 @@ export default {
 				const configsList = chartsListsConfig(chartSettingsKey);
 				if (configsList) {
 					let result = [];
+					let resultWithThresholdsOnly = [];
 					configsList.forEach(ci => {
 						result = result.concat(ci.requestsList);
+						if (ci.transformator_settings.specification.setupPlotlinesData === false) {
+							//skip
+						} else {
+							resultWithThresholdsOnly = resultWithThresholdsOnly.concat(ci.requestsList[0]);
+						}
+						// console.log(ci.transformator_settings.specification.setupPlotlinesData === false, ci.transformator_settings.specification.setupPlotlinesData)
 					})
 
-					return Object.freeze(removeDuplicatesObjectsArray(result, 'id'));
+					return {
+						all: Object.freeze(removeDuplicatesObjectsArray(result, 'id')),
+						withThresholdsOnly: Object.freeze(removeDuplicatesObjectsArray(resultWithThresholdsOnly, 'id'))
+					}
 				}
 			}
-			return  [];
+
+			return {
+				all: [],
+				withThresholdsOnly: []
+			};
 		},
 
 		/*isSDTsensorDB: that => that.formData.data_set === DATASET.ULTRA_SOUND_SDT_DECIBELS,
@@ -1066,6 +1135,10 @@ export default {
 		/*toConsole(val) {
 			console.log(val);
 		},*/
+		toggleLubeMatrix() {
+
+		},
+
 		toggleProp(propName) {
 			this[propName] = !this[propName];
 		},
@@ -1129,12 +1202,7 @@ export default {
 					});
 				}
 
-				if (item.lube_version === LUBE_VERSIONS.V3) {
-					this.formData.type = SENSOR_TYPES.BANNER;
-					this.formData.data_set = DATASET.LUBEMATRIX_V3;
-				} else {
-					this.runningThresholdItemsList = this.setupFormSubItemsList(item.running_thresholds, 'rt_i');
-				}
+				this.runningThresholdItemsList = this.setupFormSubItemsList(item.running_thresholds, 'rt_i');
 
 
 				// this.sensor_item_lube_version = ;
@@ -1148,10 +1216,6 @@ export default {
 				this.formData.controller_id = this.controllerId;
 			}
 
-			/*if (this.isLubeMatrixV3) {
-				this.formData.type = SENSOR_TYPES.ULTRA_SOUND;
-				this.formData.data_set = DATASET.LUBEMATRIX_V3;
-			}*/
 		},
 
 		setupEquipmentRpm(item) {
@@ -1242,6 +1306,12 @@ export default {
 				delete data.banner_v2_subtype_id;
 			}
 
+			if (!data.is_lube_mode) {
+				delete data.lube_based_device_address_id;
+			  delete data.lube_based_physical_sensor_id;
+			  delete data.lube_trigger_metric_type;
+			}
+
 			/*if (!this.editAcute) {
 				delete data.crash_indication_threshold;
 			}
@@ -1261,12 +1331,12 @@ export default {
 				}
 			};
 			
-			if (this.isLubeMatrixV3) {
+			if (data.is_lube_mode) {
 				sensorType = 'ultrasound';
 				payload.formData = {
 					...payload.formData,
 					...data.ultrasound_formData.formData,
-					type: SENSOR_TYPES.ULTRA_SOUND,
+					type: SENSOR_TYPES.BANNER,
 				};
 				if (data.ultrasound_formData.levelZonesFormData) {
 					payload.levelZonesFormData = {
@@ -1544,3 +1614,16 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss" scoped>
+	.toggle-lubematrix-button {
+		position: absolute;	
+		top: 75px;
+		right: 0;
+
+		.el-button {
+			padding-top: 8px;
+			padding-bottom: 8px;	
+		}
+	}
+</style>

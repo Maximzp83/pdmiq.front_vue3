@@ -18,8 +18,9 @@ import {
 	findItemBy,
 	getRoundedValue,
 	updateFormData,
-	countDecimalOrder,
-	removeDuplicatesObjectsArray
+	// countDecimalOrder,
+	removeDuplicatesObjectsArray,
+	hexToRgba
 } from '@/helpers';
 
 import { sensorThresholdsTypesList } from '@/constants/global';
@@ -128,6 +129,7 @@ class SensorChartBase extends ChartBase {
 			chart_id_splitted.length > 1
 				? +chart_id_splitted[chart_id_splitted.length - 1]
 				: null;
+		this.options.chart_parameter_id = this.chart_parameter_id;
 
 		this.sensorItem = sensorItem;
 		this.sensorType = sensorType;
@@ -361,7 +363,7 @@ class SensorChartBase extends ChartBase {
 				}
 
 				if (this.localSetupYAxisHook) axis = this.localSetupYAxisHook(axis);
-
+				// console.log('1 axis', axis)
 				this.options.yAxis.push(axis);
 			});
 		} catch (e) {
@@ -384,6 +386,7 @@ class SensorChartBase extends ChartBase {
 			} = this.resources.chart_config;
 			const { yAxisMax, yAxisSoftMax } = this.resources.payload_1;
 			let yAxis = cloneDeep(this.options.yAxis[0]);
+
 			// console.log('localSetupYAxis')
 			if (yAxisMax) {
 				yAxis.max = yAxisMax;
@@ -422,7 +425,11 @@ class SensorChartBase extends ChartBase {
 			}
 
 			// console.log('assignDataToYAxis', yAxis, 	additionalProps)
+			/*if (this.chart_id == 'chart-97') {
+				debugger
+			}*/
 			this.options.yAxis[0] = { ...yAxis, ...additionalProps };
+				// console.log('2 axis', this.chart_id, yAxis, this.options.yAxis[0], additionalProps)
 			if (this.isPlotLinesReady !== undefined) {
 				this.isPlotLinesReady = false;
 				this.isDraggablePlotLinesReady = false;
@@ -488,6 +495,9 @@ class SensorChartBase extends ChartBase {
 
 				return mergeObjects(item, {
 					inject: {
+						customSettings: {
+							metric_type: parameterItem.id,
+						},
 						name: prefix,
 						tooltip: { valueSuffix: ` ${unit_type_name}` }
 					}
@@ -802,7 +812,15 @@ class SensorChartBase extends ChartBase {
 				chart_serie_indexes.forEach(idx => {
 					if (this.options.series[idx]) {
 						this.options.series[idx].color = li.color_scheme;
-						// console.log('applyColorScheme', idx, this.options.series[idx].id, li);
+
+						if (this.options.chart.type == 'areaspline') {
+							this.options.series[idx].fillColor = {
+								stops: [
+									[0, hexToRgba(li.color_scheme, 0.7)],
+									[1, hexToRgba(li.color_scheme, 0.05)],
+								] 
+							};
+						}
 						
 						if (settings.applyColorSchemeToSeriesZones && this.options.series[idx].zones) {
 							this.options.series[idx].zones.forEach(zone => {
@@ -1025,7 +1043,7 @@ class SensorChart extends SensorChartBase {
 			});
 
 			if (overlaySerie) {
-				console.log('push overlay serie')
+				// console.log('push overlay serie')
 				this.options.series.push(overlaySerie);
 			}
 		}
@@ -1114,15 +1132,20 @@ class SensorChart extends SensorChartBase {
 
 					responseDataKey =
 						responseDataKey || (parameterId ? `parameter_${parameterId}` : null);
-
 					const statistics = resultData.statistics_result[responseDataKey];
 					if (statistics) {
-						if (plotline.zone_key == 'lubeline_zone') {
+						/*if (this.chart_id == 'chart-97') {
+							console.log('responseDataKey', plotline.id, responseDataKey, this.sensorItem)
+						}*/
+						if (plotline.zone_key == 'lube_zone') {
 							plotline.value =
 								statistics.levelZoneData &&
-								statistics.levelZoneData.is_lube_zone_included
+								(
+									statistics.levelZoneData.is_lube_zone_included
+									|| this.sensorItem.is_lube_mode
+								)
 									? getObjectVal(statistics, data_accessor)
-									: 0;
+									: null;
 						} else {
 							plotline.value = getObjectVal(statistics, data_accessor);
 						}
@@ -1393,7 +1416,7 @@ class SensorChart extends SensorChartBase {
 		}
 	}
 
-	updatePlotLines({ zone_key, new_val, alarm_value, warning_value }) {
+	updatePlotLines({ zone_key, new_val, alarm_value, warning_value, lube_value }) {
 		this.options.yAxis[0].plotLines.forEach(pli => {
 			if (zone_key == 'alarm_zone') {
 				switch (pli.id) {
@@ -1415,6 +1438,9 @@ class SensorChart extends SensorChartBase {
 						pli.value = warning_value || new_val;
 						break;
 				}
+			} else if (zone_key == 'lube_zone') {
+				if (pli.id == 'lube-plotline') pli.value = lube_value || new_val;
+				// console.log(pli.id, zone_key);
 			}
 		});
 
@@ -1434,7 +1460,7 @@ class SensorChart extends SensorChartBase {
 					: this[`current_position_warning_zone`];
 			this.options.yAxis[0].max = max + max / 9;
 		}
-
+		// console.log('updatePlotLines', this[`current_position_${zone_key}`], this.options.yAxis[0].plotLines);
 		this.emitChartOptionsUpdate();
 	}
 
@@ -1455,6 +1481,7 @@ class SensorChart extends SensorChartBase {
 				this.initialPlotlinesValues[plotLine.id] = optionsPlotline.value;
 				this[`current_position_${plotLine.zone_key}`] = optionsPlotline.value;
 			}
+			// console.log('initialPlotlinesValues', plotLine, optionsPlotline);
 		}
 
 		const DraggablePlotlineInstance = createDraggablePlotline(settings);
@@ -1503,8 +1530,8 @@ class SensorChart extends SensorChartBase {
 				[zone_key]: new_val
 			};
 
+			// console.log(this.updateThresholdsData, plotLine, zone_key, new_val);
 			this.updatePlotLines({ zone_key, new_val });
-
 			if (this.events.chartThresholdsUpdate) {
 				this.events.chartThresholdsUpdate({ open_dialog: true });
 			}
@@ -1671,13 +1698,14 @@ class SensorChart extends SensorChartBase {
 	}
 
 	discardThresholdsChanges(settings) {
-		['alarm_zone', 'warning_zone'].forEach(zone_key => {
+		['alarm_zone', 'warning_zone', 'lube_zone'].forEach(zone_key => {
 			this.updatePlotLines({
 				zone_key,
 				alarm_value: this.initialPlotlinesValues['alarm-plotline'],
 				warning_value:
 					this.initialPlotlinesValues['warning-plotline'] ||
-					this.initialPlotlinesValues['low-alarm-plotline']
+					this.initialPlotlinesValues['low-alarm-plotline'],
+				lube_value: this.initialPlotlinesValues['lube-plotline']
 			});
 		});
 
@@ -1749,9 +1777,9 @@ class SensorChart extends SensorChartBase {
 						data_key: 'statsData',
 					});
 					// console.log(average_metric_value)
-					average_metric_value = average_metric_value ? getRoundedValue(average_metric_value, 0, countDecimalOrder(average_metric_value)) : 0;
-					warning_level = warning_level ? getRoundedValue(warning_level, 0, countDecimalOrder(warning_level)) : 0;
-					alarm_level = alarm_level ? getRoundedValue(alarm_level, 0, countDecimalOrder(alarm_level)) : 0;
+					average_metric_value = average_metric_value ? getRoundedValue(average_metric_value, 0, 1) : 0;
+					warning_level = warning_level ? getRoundedValue(warning_level, 0, 1) : 0;
+					alarm_level = alarm_level ? getRoundedValue(alarm_level, 0, 1) : 0;
 
 					if (average_metric_value > chart_points_max_value) chart_points_max_value = average_metric_value;
 					if (warning_level > chart_points_max_value) chart_points_max_value = warning_level;
@@ -2438,9 +2466,9 @@ class MultiViewChart extends ChartBase {
 
 			if (requestsList && requestsList.length) {
 				requestsList.forEach(ri => {
-					const { sensor_name, name } = ri;
+					const { sensor_name, name, sensor_location } = ri;
 					// console.log('setupChartTitle', sensor_name, name)
-					result += `Sensor ${sensor_name} - Metric ${name}, </br>`;					
+					result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
 				});
 
 				result = result.slice(0, -7); // remove last comma
@@ -2601,7 +2629,7 @@ class MultiViewChart extends ChartBase {
 					// event_keys: ['pointClickEvent'],
 					inject: {
 						showInNavigator: true,
-						name: `${parameterItem.sensor_name} - ${parameterItem.short_name || parameterItem.name}`,
+						name: `${parameterItem.sensor_name}, ${parameterItem.sensor_location} - ${parameterItem.short_name || parameterItem.name}`,
 						tooltip: { valueSuffix: ` ${unit_type_name}` },
 						color: colorsList[idx],
 						yAxis: actualAxisIdx,

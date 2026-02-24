@@ -79,7 +79,7 @@
 							:item-data="child"
 							:item-index="idx"
 							fromFFTPage
-							:rpm_source_value="rpm_source_value"
+							:rpm_source_value="currentRpmSource && currentRpmSource.value"
 							@save="handleSaveForm"
 							:savingInProgress="savingInProgress"
 						/>
@@ -146,9 +146,9 @@
 
 <script>
 import { mapActions, /*mapState*/ } from 'vuex';
-import { RPM_SOURCES_TYPES, itemSpeedOptionsList, ITEM_SPEED_OPTIONS } from '@/constants/global';
+import { RPM_SOURCES_TYPES, ITEM_SPEED_OPTIONS } from '@/constants/global';
 import { findItemBy } from '@/helpers';
-import { setupItemSpeedOptionsList } from '@/helpers/specialHelpers';
+import { getCurrentRpmSource } from '@/helpers/specialHelpers';
 
 import { requestsListMixin, itemFormMixin, subItemsListMixin, eventHandler, saveRPMParamsMixin } from '@/mixins';
 
@@ -279,25 +279,12 @@ export default {
 			return [];
 		},
 
-		itemSpeedOptionsList: () => itemSpeedOptionsList(),
-		preparedItemSpeedOptionsList: that => setupItemSpeedOptionsList({
-			sensorData: that.sensorData,
-			itemSpeedOptionsList: that.itemSpeedOptionsList
-		}),
-
 		currentRpmSource() {
-			const { formData, preparedItemSpeedOptionsList, fftItem } = this;
-			if (fftItem && fftItem.rpm_value) {
-				return {
-					id:'fft-rpm',
-					value: fftItem.rpm_value,
-					name: 'FFT'
-				}
-			}
-			if (formData.rpm_source_item) {
-				return findItemBy('id', formData.rpm_source_item, preparedItemSpeedOptionsList);
-			}
-			return null;
+			return getCurrentRpmSource({
+				fftItem: this.fftItem,
+				sensorData: this.sensorData,
+				rpm_source_item: this.formData.rpm_source_item
+			})
 		},
 
 		// ------------------

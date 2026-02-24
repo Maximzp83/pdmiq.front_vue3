@@ -1,7 +1,7 @@
 import axios from 'axios';
 let apiUrl = '';
-// let devApiUrl = 'https://api.testmatrix.assetmatrix.com/api';
-let devApiUrl = 'https://api.pdmmatrix.assetmatrix.com/api';
+let devApiUrl = 'https://api.testmatrix.assetmatrix.com/api';
+// let devApiUrl = 'https://api.pdmmatrix.assetmatrix.com/api';
 
 // console.log('API URL:', process.env.VUE_APP_SENSOR_STATISTICS_API_URL);
 if (process.env.VUE_APP_API_URL) {

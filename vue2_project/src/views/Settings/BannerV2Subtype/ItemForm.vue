@@ -130,9 +130,9 @@ export default {
 				model_number: '',
 				part_number: '',
 				is_default: 0,
-				is_fft_allowed: 0,
 				parameters: [],
-				sensor_class: null
+				sensor_class: null,
+				is_fft_allowed: 0,
 			}
 		};
 	},

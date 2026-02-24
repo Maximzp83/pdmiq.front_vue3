@@ -133,7 +133,7 @@
 						</div>
 					</DropdownFilterbar>
 
-					<div class="1section-row card-content" v-if="loadContent && fftReady && currentFFTItem">
+					<div class="1section-row card-content" v-if="loadContent && fftReady && currentFFTItem && equipmentData">
 						<FFTChartsListWrapper
 							ref="FFTChartsListWrapper"
 							@event="handleEventNew"
@@ -425,7 +425,7 @@ export default {
 			this.$refs.DropdownFilterbar.toggleFilterbar(e);
 		},
 
-		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload}) {
+		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload, updateRpmValue}) {
 			// console.log('reFetchEquipment', skipFFTReload)
 			// this.fetchEquipment(this.itemData.equipment_id);
 			/*if (callChartsMethod) {
@@ -437,25 +437,34 @@ export default {
 				}
 			}*/
 
+			// ---------------
 			if (equipmentItem) {
 				setTimeout(() => {
 					this.equipmentData = equipmentItem;
 				}, 10)
 			}
 			if (fftItem) {
+				if (updateRpmValue) {
+					// console.log('fftItem', fftItem)
+					this.currentFFTItem.rpm_value = fftItem.rpm_value;
+				}
+
 				if (!skipFFTReload) {
 					this.fftReady = false;	
+					setTimeout(() => {
+						this.currentFFTItem = fftItem;
+					}, 10)
 				}
-				setTimeout(() => {
-					this.currentFFTItem = fftItem;
-				}, 10)
 			}
-			this.selectedChildComponents = [];
+			// this.selectedChildComponents = [];
 		},
 
 		fetchEquipment(id) {
 			this.doFetchAction('fetch_equipment', 'equipmentData', 'equipmentLoading', {
-				itemId: id
+				itemId: id,
+				/*params: {
+					rpm: 1000
+				}*/
 			});
 		},
 
@@ -541,6 +550,7 @@ export default {
 			if (AnalysisFFTContainer) {
 				AnalysisFFTContainer.saveRpmParams(data, {
 					successMessage: `RPM ${this.tt('updated')}`,
+					updateRpmValue: true,
 					skipFFTReload: true,
 					// callChartsMethod: {name: 'handleFFTRpmUpdated'}
 				});

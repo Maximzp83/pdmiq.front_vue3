@@ -18,10 +18,13 @@
 
 			<div :class="['content-row', {'mt-auto': !disableTabs}]">
 				<GaugeStatisticsContainer
+					@event="handleEventNew"
 					:plantItem="plantItem"
 					:plantsList="plantsList"
 					:selectedColumnsNumber="selectedColumnsNumber"
 					:showStatisticsOutsideChart="disableTabs"
+					:rootFilters="equipments_statistics_filters"
+					:allPlantsRoiStatistics="allPlantsRoiStatistics"
 				/>
 			</div>
 
@@ -108,7 +111,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import { tabsMixin, navigation } from '@/mixins';
+import { tabsMixin, navigation, eventHandler } from '@/mixins';
 import { fetch_statistics } from '@/modules/charts_factory/controllers/Maintenance/api/index.js';
 import { prepareFilters } from '@/modules/charts_factory/helpers';
 import { setupProblemsStatistics } from '@/modules/charts_factory/controllers/Maintenance/methods';
@@ -116,7 +119,7 @@ import { setupProblemsStatistics } from '@/modules/charts_factory/controllers/Ma
 import { findItemBy, getDateRange } from '@/helpers';
 
 export default {
-	mixins: [tabsMixin(), navigation()],
+	mixins: [tabsMixin(), navigation(), eventHandler()],
 	components: {
 		TabsBar: () => import('@/components/common/TabsBar.vue'),
 		InstanceROIStatisticsContainer: () =>
@@ -134,6 +137,8 @@ export default {
 		disableTabs: Boolean,
 		switchTabTo: null,
 		selectedColumnsNumber: { type: Object, default: () => ({}) },
+		equipments_statistics_filters: { type: Object, default: () => ({}) },
+		allPlantsRoiStatistics: null,
 	},
 
 	data: () => ({

@@ -7,6 +7,7 @@
 			class="p-0"
 			:sensorData="sensorData"
 			:currentSensorType="currentSensorType"
+			v-if="!enableLubeTriggerButtonOnly"
 		/>
 
 		<div
@@ -146,7 +147,8 @@ export default {
 		},
 		currentSensorType: Object,
 		showHistory: Boolean,
-		isLubeMatrixV3: Boolean
+		isLubeMatrixV3: Boolean,
+		enableLubeTriggerButtonOnly: Boolean
 	},
 
 	data() {
@@ -197,67 +199,78 @@ export default {
 
 			let buttons = [];
 
-			if (this.$hasAccessTo(['edit_dashboard'])) {
-				buttons.push(
-				{
-					id: 13,
-					text: `${tt('Gain')} +`,
-					method: 'toggleGainAdjustment',
-					args: ADJUSTMENT_ACTIONS_TYPES.INCREASE,
-					loadingProp: 'adjustmentLoading'
-				},
-				{
-					id: 14,
-					text: `${tt('Gain')} -`,
-					method: 'toggleGainAdjustment',
-					args: ADJUSTMENT_ACTIONS_TYPES.DECREASE,
-					loadingProp: 'adjustmentLoading'
+			if (!this.enableLubeTriggerButtonOnly) {
+				if (this.$hasAccessTo(['edit_dashboard'])) {
+					buttons.push(
+					{
+						id: 13,
+						text: `${tt('Gain')} +`,
+						method: 'toggleGainAdjustment',
+						args: ADJUSTMENT_ACTIONS_TYPES.INCREASE,
+						loadingProp: 'adjustmentLoading'
+					},
+					{
+						id: 14,
+						text: `${tt('Gain')} -`,
+						method: 'toggleGainAdjustment',
+						args: ADJUSTMENT_ACTIONS_TYPES.DECREASE,
+						loadingProp: 'adjustmentLoading'
+					}
+					);
 				}
-				);
-			}
 
-			buttons.push(
-			{
-				id: 3,
-				text: `${tt('Toggle')} ${tt('History')}`,
-				event: 'toggleHistory'
-			},
-			{
-				id: 4,
-				text: `${tt('High_speed')} ${tt('On')}`,
-				method: 'toggleHighSpeed',
-				args: true
-			},
-			{
-				id: 5,
-				text: `${tt('High_speed')} ${tt('Off')}`,
-				method: 'toggleHighSpeed',
-				args: false
-			}
-			);
-
-			if ((currentSensorType.isUltrasound || isLubeMatrixV3) && !isSensorOnly) {
 				buttons.push(
 					{
-						id: 1,
-						text: `${tt('Purge_Mode')} ${tt('On')}`,
-						method: 'togglePurgeMode',
-						args: true,
-						loadingProp: 'purgeLoading'
+						id: 3,
+						text: `${tt('Toggle')} ${tt('History')}`,
+						event: 'toggleHistory'
 					},
 					{
-						id: 2,
-						text: `${tt('Purge_Mode')} ${tt('Off')}`,
-						method: 'togglePurgeMode',
-						args: false
+						id: 4,
+						text: `${tt('High_speed')} ${tt('On')}`,
+						method: 'toggleHighSpeed',
+						args: true
 					},
+					{
+						id: 5,
+						text: `${tt('High_speed')} ${tt('Off')}`,
+						method: 'toggleHighSpeed',
+						args: false
+					}
+				);
+
+				if ((currentSensorType.isUltrasound || isLubeMatrixV3) && !isSensorOnly) {
+					buttons.push(
+						{
+							id: 1,
+							text: `${tt('Purge_Mode')} ${tt('On')}`,
+							method: 'togglePurgeMode',
+							args: true,
+							loadingProp: 'purgeLoading'
+						},
+						{
+							id: 2,
+							text: `${tt('Purge_Mode')} ${tt('Off')}`,
+							method: 'togglePurgeMode',
+							args: false
+						},
+						{
+							id: 6,
+							text: `${tt('Trigger')} ${tt('Lube_Cycle')}`,
+							method: 'handleLubeCycle',
+							loadingProp: 'purgeLoading'
+						}
+					);
+				}
+			} else {
+				buttons.push(
 					{
 						id: 6,
 						text: `${tt('Trigger')} ${tt('Lube_Cycle')}`,
 						method: 'handleLubeCycle',
 						loadingProp: 'purgeLoading'
-					}
-				);
+					}	
+				)
 			}
 
 			return Object.freeze(buttons);

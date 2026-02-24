@@ -580,6 +580,7 @@ export default {
 		component: 'Component',
 		components: 'Components',
 		allow: 'Allow',
+		luber: 'Luber',
 	},
 
 	sidebar_menu: {
@@ -1084,6 +1085,13 @@ export default {
 		for_sensors_on_controller: 'For sensors on controller',
 		multiple_fft: 'Multiple FFT',
 		reports_saved_successfully: 'Reports saved successfully',
+		personal_favorite: 'Personal Favorite',
+		company_favorite: 'Company Favorite',
+		unlock_fft: 'Unlock FFT',
+		lube_based_device_address_id: 'Lube Based Device Address ID',
+		lube_based_physical_sensor_id: 'Lube Based Physical Sensor ID',
+		lube_trigger_metric_type: 'Lube Trigger Metric Type',
+		flat_data_anomaly: 'Flat Data Anomaly',
 	},
 
 	aliases: {
@@ -1107,6 +1115,7 @@ export default {
 	 	mult_fft_confirm: 'Do you really want to request an FFT for all sensor on controller',
 	  	mult_rebaseline_confirm: 'Do you really want to Rebaseline for sensor on controller',
 		skip_mfa_check: 'Trust this device and dont ask MFA code next 7 days',
+		anomaly1: 'Flat metric data anomaly',
 	},
 
 	constants: {
@@ -1210,12 +1219,12 @@ export default {
 		'radial_v_acceleration': 'Radial (V) Acceleration',
 		'radial_h_velocity': 'Radial (H) Velocity',
 		'radial_h_acceleration': 'Radial (H) Acceleration',
-		'mm_per_second': 'mm per second',
-		'inches_per_second': 'inches per second',
+		'mm_per_second': 'mm/s',
+		'inches_per_second': 'in/s',
 		'celsius': 'Celsius',
 		'fahrenheit': 'Fahrenheit',
 		'g': 'g',
-		'hertz': 'Hertz',
+		'hertz': 'Hz',
 		'dbuv': 'dB&micro;V',
 		'amps': 'Amps',
 		'percent': '%',
@@ -1349,6 +1358,8 @@ export default {
 		'wired_vibration_temperature': 'Wired Vibration, Temperature',
 		'ultrasound_sdt_full_spectrum': 'Ultrasound (SDT Full Spectrum)',
 		'humidity_temperature_air_quality': 'Humidity, Temperature, Air Quality',
+		'ultrasound_vibration_temperature': 'Ultrasound, Vibration, Temperature',
+		'uvt': 'UVT',
 		'inches_sec': 'inches/sec',
 
 		// --------------

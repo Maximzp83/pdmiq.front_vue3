@@ -359,7 +359,7 @@ const actions = {
 	save_chart_note(storeArgs, payload) {
 		const extendedPayload = {
 			...payload,
-			method: 'POST'
+			// method: 'POST'
 		};
 
 		return multipurpose_response(storeArgs, extendedPayload.url, extendedPayload);

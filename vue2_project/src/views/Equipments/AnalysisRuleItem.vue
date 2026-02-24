@@ -11,7 +11,7 @@
 				{'flex align-center data-block': insideChartAnalysisRulesBar},
 			]">
 				<SimpleSpinner :active="ruleOptionsLoading" />
-				<div class="value">{{selectedRuleItemTextValue}}</div>
+				<div class="value" v-if="showRuleItemTextValue">{{selectedRuleItemTextValue}}</div>
 				<div class="unit">{{original_rule.unit}}</div>
 				<el-button
 					@click.stop="handleShowAnalysisRuleFormDialog"
@@ -56,8 +56,8 @@
 							:optionsLoading="ruleOptionsLoading"
 							:optionsList="ruleOptionsList"
 							:placeholder="`${tt('Select')} ${tt('option')}`"
-							labelKey="vibration_analysis_value"
 							v-model="formData.option_value_id"
+							labelKey="value"
 						/>
 					
 						<span class="span-block mcol-xs-1"> {{original_rule.unit}}</span>
@@ -114,9 +114,10 @@
 					:optionsLoading="ruleOptionsLoading"
 					:optionsList="ruleOptionsList"
 					:placeholder="`${tt('Select')} ${tt('option')}`"
-					labelKey="vibration_analysis_value"
 					v-model="formData.option_value_id"
+					labelKey="value"
 				/>
+					<!-- labelKey="vibration_analysis_value" -->
 				<span class="mcol-xs-2 text-center"> {{original_rule.unit}}</span>
 				
 				<div v-if="original_rule.is_editable"
@@ -146,7 +147,8 @@ export default {
 		insideChartAnalysisRulesBar: Boolean,
 		savingInProgress: Boolean,
 		rpm_source_value: null,
-		crossoverRulesList: null
+		crossoverRulesList: null,
+		showRuleItemTextValue: Boolean
 	},
 
 	data() {
@@ -180,7 +182,7 @@ export default {
 				return custom_value
 			} else if (option_value_id) {
 				const item = this.ruleOptionsList.find(item => item.id === option_value_id);
-				return item ? (item.vibration_analysis_value || item.value) : '-'
+				return item ? item.vibration_analysis_value : '-'
 			}
 			return '-';
 		},
@@ -226,6 +228,10 @@ export default {
 				formData.option_value_id = null;
 			} else {
 				formData.custom_value = null;
+			}
+
+			if (formData.option_value_id == null) {
+				delete formData.option_value_id;
 			}
 			return formData;
 		}

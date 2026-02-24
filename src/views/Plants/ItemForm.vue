@@ -174,6 +174,10 @@
 				/>
 			</el-form-item>
 
+			<el-form-item label="ZOHO Deal ID" prop="zoho_id">
+				<CustomInput v-model="formData.zoho_id" placeholder="ID" />
+			</el-form-item>
+
 			<el-form-item
 				class="mcol-xs-6"
 				v-if="isIndustrialMatrix"
@@ -502,6 +506,7 @@ export default {
 				amplitude_alarm_threshold_multiplier: 2.5,
 				is_equipment_runtime_tracking: false,
 				is_commissioning: false,
+				zoho_id: '',
 
 				is_archived: false
 				// workStations: []

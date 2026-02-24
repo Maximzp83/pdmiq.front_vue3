@@ -163,6 +163,7 @@
 import { mapState } from 'vuex';
 
 import { getRoundedValue, findItemBy, /*countDecimalOrder*/ } from '@/helpers';
+import { getCurrentRpmSource } from '@/helpers/specialHelpers';
 
 import { BANNER_REQUEST_TYPES } from '@/constants/global';
 
@@ -440,6 +441,15 @@ export default {
 			'#ff0000','#00E676','#795548','#18FFFF','#00B8D4','#FFEA00',
 			'#ff00ff','#c800ea','#008a09','#FFAB40','#9c0303','#2979FF',
 		]),
+
+		currentRpmSource() {
+			// console.log('currentRpmSource', this.additionalProps.equipmentData)
+			return getCurrentRpmSource({
+				fftItem: this.currentFFTItem,
+				sensorData: this.ChartInstance.sensorItem,
+				rpm_source_item: this.additionalProps.equipmentData.rpm_source_item
+			})
+		},
 	},
 
 	methods: {
@@ -653,17 +663,16 @@ export default {
 			})
 		},
 
-		updateRpmCursor(rpm_value) {
-			this.ChartInstance.setValue('rpmValue', rpm_value);
-			this.ChartInstance.addRpmCursor(rpm_value);
-		},
+		/*updateRpmCursor(source) {
+			this.ChartInstance.setValue('rpmValue', source);
+			this.ChartInstance.addRpmCursor();
+		},*/
 
 		// -------------------
 		addAnalysisRuleToSelected(rule) {
 			const isSelected = this.selectedAnalysisRules.some(item => item.id === rule.id);
 			if (!isSelected) {
 				this.selectedAnalysisRules.push(rule);
-
 			} else {
 				this.selectedAnalysisRules = this.selectedAnalysisRules.filter(item => item.id !== rule.id);
 			}
@@ -672,7 +681,7 @@ export default {
 				...item,
 				color: this.colorsList[index]
 			}));*/
-
+			// console.log('addAnalysisRuleToSelected', this.selectedAnalysisRules)
 			this.ChartInstance.generateAnnotationsFromFFTAnalysisRules(this.selectedAnalysisRules);
 		},
 
@@ -724,8 +733,11 @@ export default {
 			}
 		},
 
-		'currentFFTItem.rpm_value'(rpm_value) {
-			this.updateRpmCursor(rpm_value);
+		'currentRpmSource'(data) {
+			// console.log('currentRpmSource watch', data)
+			this.ChartInstance.setValue('rpmSourceValue', data);
+			// this.ChartInstance.addRpmCursor({skipOptionsUpdate: true});
+			// this.updateRpmCursor(data);
 			// console.log('watch currentFFTItem.rpm_value', rpm_value)
 		}
 	},
@@ -760,8 +772,11 @@ export default {
 		this.ChartInstance.setValue('seriesEvents', this.chartPointsEventsList);
 		// }
 
-		if (this.currentFFTItem.rpm_value != null) {
-			this.ChartInstance.setValue('rpmValue', this.currentFFTItem.rpm_value);
+		if (this.currentRpmSource && this.currentRpmSource.value != null) {
+			// console.log('currentRpmSource 1', this.currentRpmSource)
+			// this.updateRpmCursor(this.currentRpmSource);
+
+			this.ChartInstance.setValue('rpmSourceValue', this.currentRpmSource);
 		}
 	}
 };

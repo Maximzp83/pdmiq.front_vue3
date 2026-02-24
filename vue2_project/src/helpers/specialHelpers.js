@@ -28,7 +28,8 @@ import {
 	alertTypesList,
 	DATASET,
 	SENSOR_TYPES,
-	bannerPowerTypesList
+	bannerPowerTypesList,
+	itemSpeedOptionsList
 } from '@/constants/global';
 
 import { sensorParametersList, METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
@@ -614,6 +615,26 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem, 
 	return Object.freeze(list);
 };
 
+const getCurrentRpmSource1 = ({fftItem, sensorData, rpm_source_item}) => {
+	const preparedItemSpeedOptionsList = setupItemSpeedOptionsList1({
+		sensorData,
+		itemSpeedOptionsList: itemSpeedOptionsList(),
+	});
+
+	if (fftItem && fftItem.rpm_value) {
+		return {
+			id:'fft-rpm',
+			value: fftItem.rpm_value,
+			name: 'FFT',
+			draggable: true
+		}
+	}
+	if (rpm_source_item) {
+		return findItemBy('id', rpm_source_item, preparedItemSpeedOptionsList);
+	}
+	return null;
+};
+
 export const equipmentCardTitle = (titles, equipmentData) =>
 	equipmentCardTitle1(titles, equipmentData);
 export const getBrandModelImgByType = payload => getBrandModelImgByType1(payload);
@@ -652,3 +673,4 @@ export const isPasswordStrong = str => isPasswordStrong1(str);
 export const setupItemSpeedOptionsList = payload => setupItemSpeedOptionsList1(payload);
 export const setupTrueFalseCellIcon = val => setupTrueFalseCellIcon1(val);
 export const copyToClipboard = (str, message) => copyToClipboard1(str, message);
+export const getCurrentRpmSource = payload => getCurrentRpmSource1(payload);

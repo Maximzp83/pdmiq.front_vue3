@@ -45,7 +45,7 @@ export default {
 		},
 		fftItem: {
 			type: Object,
-			default: () => ({})
+			default: () => null
 		},
 		rootFilters: {
 			type: Object,

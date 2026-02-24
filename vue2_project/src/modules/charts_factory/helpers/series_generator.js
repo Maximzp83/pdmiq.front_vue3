@@ -15,8 +15,8 @@ const methodsList = {
 		if (levelZoneData) {
 			const { alarm_zone, warning_zone } = levelZoneData;
 			const { ALARM, WARNING, BASELINE } = SENSOR_THRESHOLD_TYPES;
-			// console.log('setupLineSerieZones', arg.resources)
-			if (arg.resources) {
+
+			if (arg.resources && arg.resources.chart_config && arg.resources.chart_config.customSettings) {
 				const { parameterItem, /*useFetchedColorScheme*/ } = arg.resources.chart_config.customSettings;
 
 					// console.log(arg.fetched_statistics_data, useFetchedColorScheme);
@@ -230,6 +230,7 @@ const setupYAxisPlotlines1 = ({ plotlinesConfigsList, data_key, axisIdx }) => {
 				);
 			}
 		} else {
+				// console.log('setupYAxisPlotlines1', serie_config, generateSerieItem({ serie_config, data_key: data_key || 'levelZoneData' }))
 			plotlines.push(
 				generateSerieItem({ serie_config, data_key: data_key || 'levelZoneData' })
 			);

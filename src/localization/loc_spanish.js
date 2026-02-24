@@ -1104,6 +1104,13 @@ export default {
 		for_sensors_on_controller: 'Para sensores en el controlador',
 		multiple_fft: 'FFT Múltiples',
 		reports_saved_successfully: 'Informes guardados correctamente',
+		personal_favorite: 'Favorito Personal',
+		company_favorite: 'Favorito de la Empresa',
+		unlock_fft: 'Desbloquear FFT',
+		lube_based_device_address_id: 'ID de dirección de dispositivo de lubricación',
+		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
+		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
+		flat_data_anomaly: 'Anomalia de datos Plano',
 	},
 
 	aliases: {
@@ -1127,6 +1134,7 @@ export default {
 		skip_mfa_check: 'Confíe en este dispositivo y no solicite el código MFA en los próximos 7 días',
 		mult_fft_confirm: '¿Realmente desea solicitar una FFT para todos los sensores del controlador',
 		mult_rebaseline_confirm: 'Realmente desea restablecer la línea base de todos los sensores en el controlador',
+		anomaly1: 'Anomalia de datos de metrica',
 	},
 
 	constants: {
@@ -1230,12 +1238,12 @@ export default {
 		'radial_v_acceleration': 'Aceleración (V) Radial',
 		'radial_h_velocity': 'Velocidad (H) Radial',
 		'radial_h_acceleration': 'Aceleración (H) Radial',
-		'mm_per_second': 'mm por segundo',
-		'inches_per_second': 'pulgadas por segundo',
+		'mm_per_second': 'mm/s',
+		'inches_per_second': 'pul/s',
 		'celsius': 'Celsius',
 		'fahrenheit': 'Fahrenheit',
 		'g': 'g',
-		'hertz': 'Hercios',
+		'hertz': 'Hz',
 		'dbuv': 'dB&micro;V',
 		'amps': 'Amperes',
 		'percent': '%',
@@ -1369,6 +1377,8 @@ export default {
 		'wired_vibration_temperature': 'Vibración, Temperatura Cableado',
 		'ultrasound_sdt_full_spectrum': 'Ultrasonido (SDT de Espectro Completo)',
 		'humidity_temperature_air_quality': 'Humedad, Temperatura, Calidad del Aire',
+		'ultrasound_vibration_temperature': 'Ultrasonido, Vibración, Temperatura',
+		'uvt': 'UVT',
 		'inches_sec': 'pulgadas/seg',
 		'ncd_pressure': 'Presión de NCD',
 

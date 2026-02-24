@@ -28,7 +28,7 @@ export default {
 		content() {
 			const { device_data, data_set } = this.propsData;
 			// console.log(data_set, device_data ? device_data.SenFwVer : '')
-			if (data_set !== DATASET.BANNER_V2_GENERIC) {
+			if (data_set !== DATASET.BANNER_V2_GENERIC && data_set !== DATASET.BANNER_M25) {
 				if (device_data && device_data.SenFwVer && device_data.SenFwVer > 300) {
 					return `${this.tt('phrases.Wrong_sensor_firmware_version')}: ${device_data.SenFwVer}`;
 				}

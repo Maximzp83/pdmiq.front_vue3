@@ -116,7 +116,7 @@ import {
 	bannerRequestTypesList,
 	bannerRequestFmaxTypesList,
 	FFT_SOURCE_TYPES,
-	// BANNER_REQUEST_FMAX_TYPES,
+	BANNER_REQUEST_FMAX_TYPES,
 	BANNER_REQUEST_TYPES,
 	FFT_LOCK_STATUSES
 } from '@/constants/global';
@@ -173,8 +173,8 @@ export default {
 		currentSensorTypeDataKey: () => 'sensorData',
 
 		isBannerTempVibe2: that =>
-			that.currentSensorType && (that.currentSensorType.isBannerTempVibe2 || that.currentSensorType.isBannerV2_1 || that.currentSensorType.isBannerV2Generic ),
-		isBannerS22UVT: that =>	that.currentSensorType && that.currentSensorType.isBannerM25,
+			that.currentSensorType && (that.currentSensorType.isBannerTempVibe2 || that.currentSensorType.isBannerV2_1 || that.currentSensorType.isBannerV2Generic),
+		isBannerM25: that => that.currentSensorType && that.currentSensorType.isBannerM25,
 
 		LANGUAGE_TYPES: () => LANGUAGE_TYPES,
 
@@ -200,9 +200,9 @@ export default {
 		bannerRequestFmaxTypesList() {
 			let list = bannerRequestFmaxTypesList();
 			
-			/*if (!this.isBannerM25) {
+			if (!this.isBannerM25) {
 				list = list.filter(li => li.id !== BANNER_REQUEST_FMAX_TYPES.HZ_10600);
-			}*/
+			}
 
 			if (this.rootFilters.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 				return list.map(type => ({
@@ -399,26 +399,27 @@ export default {
 				});
 		},
 
-		handleUnlockFFT() {
+		handleUnlockFFT(data = {}) {
 			const { tt } = this;
 			this.confirmHelper({
 				insertToMessage: `<b>${tt('unlock')} FFT</b>`
 			})
 				.then(() => {
+					const sensorId = data.sensorId || this.sensorData.id;
 					const payload = {
-						sensorId: this.sensorData.id,
+						sensorId,
 						notNotify: true
 					};
 
 					// if (payload) {
-					// 	console.log('payload', payload);
+						// console.log('payload', payload);
 						
 					// 	this.$emit('event', {
 					// 		eventName: 'handleUnlockFFTSuccess',
 					// 		data: {},
 					// 		onward: true
 					// 	});
-					// 	return
+						// return
 					// }
 
 					this.$emit('update:isLoading', true);

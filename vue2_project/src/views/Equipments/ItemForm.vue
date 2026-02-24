@@ -413,7 +413,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import { findItemBy, cloneArr } from '@/helpers';
+import { findItemBy, cloneArr, sortArrayByKeyNumber } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 
 import { required } from '@/constants/validation';
@@ -890,11 +890,17 @@ export default {
 		]),
 
 		itemImagesList() {
-			return this.getPicturesByType(EQUIPMENT_IMG_TYPES.EQUIPMENT);
+			return sortArrayByKeyNumber(
+				this.getPicturesByType(EQUIPMENT_IMG_TYPES.EQUIPMENT),
+				'display_order'
+			);
 		},
 
 		nameplateImagesList() {
-			return this.getPicturesByType(EQUIPMENT_IMG_TYPES.NAMEPLATE);
+			return sortArrayByKeyNumber(
+				this.getPicturesByType(EQUIPMENT_IMG_TYPES.NAMEPLATE),
+				'display_order'
+			);
 		},
 
 		// validateSubItems: () => true,
@@ -1076,7 +1082,7 @@ export default {
 			})		
 		},
 
-		rpm_source_value: that => that.itemData.rpmSources ? that.itemData.rpmSources.rpm_source_value_evaluated : null,
+		rpm_source_value: that => that.itemData && that.itemData.rpmSources ? that.itemData.rpmSources.rpm_source_value_evaluated : null,
 
 		/*preparedVibrationAnalysisItems2() {
 			if (this.vibrationAnalysisList.length) {
@@ -1275,6 +1281,7 @@ export default {
 			if (this.itemData && this.itemData.pictures) {
 				return this.itemData.pictures.filter(p => p.type === type);
 			}
+			return [];
 		},
 
 		/*filterBrandModels(list, brand_id, equipment_type_id) {

@@ -192,6 +192,7 @@ export default {
 					itemData.url ||
 					itemData.full_file_name ||
 					itemData.file_path ||
+					itemData.attachment_file_name ||
 					itemData.file
 			);
 		},

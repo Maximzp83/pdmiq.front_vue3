@@ -186,6 +186,10 @@
 				/>
 			</el-form-item>
 
+			<el-form-item label="ZOHO Deal ID" prop="zoho_id">
+				<CustomInput v-model="formData.zoho_id" placeholder="ID" />
+			</el-form-item>
+
 			<el-form-item
 				class="mcol-xs-6"
 				v-if="isIndustrialMatrix"
@@ -517,6 +521,7 @@ export default {
 				is_archived: false,
 				is_commissioning: false,
 				joined_at: '',
+				zoho_id: '',
 				// workStations: []
 				// ---------------
 				// has_conveyor_mode: 0,

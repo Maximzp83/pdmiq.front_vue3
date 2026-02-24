@@ -150,6 +150,7 @@ export default class ChartsListFactoryBase {
 			const {
 				filterParamsBy,
 				getParamsByIds,
+				getParamsByIdsFilterMethod,
 				// returnChartConfigByIdxIfEmptyAfterFiltration,
 				modifyParamsMethod,
 				joinChartsBy,
@@ -167,11 +168,12 @@ export default class ChartsListFactoryBase {
 			if (charts_configs) {
 				// console.log(getParamsByIds, filterParamsBy, joinChartsBy, modifyParamsMethod)
 				if (getParamsByIds && getParamsByIds.length) {
-					// console.log(getParamsByIds)
+					const method = getParamsByIdsFilterMethod || 'some';
+					// console.log(settings, getParamsByIds, method)
 					charts_configs = charts_configs.filter(chart => {
 						const { requestsList } = chart;
 						if (requestsList && requestsList.length) {
-							return requestsList.some(
+							return requestsList[method](
 								request => getParamsByIds.indexOf(request.id) !== -1
 							);
 						}
@@ -364,7 +366,7 @@ export default class ChartsListFactoryBase {
 			const {
 				chartFactoryName,
 				setupChartsConfigsListSettings,
-				returnChartConfigByIdx /*chart_instance_name*/
+				returnChartConfigByIdx, /*chart_instance_name*/
 			} = this.resources.settings;
 
 			let {

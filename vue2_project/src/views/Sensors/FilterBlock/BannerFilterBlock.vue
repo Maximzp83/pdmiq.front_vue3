@@ -35,6 +35,7 @@
 		</div>
 
 		<PDFandFFTrequestsBlock
+			ref="PDFandFFTrequestsBlock"
 			@event="handleEvent"
 			:enableFFT="enableFFT"
 			:isCompare="isCompare"
@@ -243,7 +244,7 @@ export default {
 		equipmentData: Object,
 		rootFilters: { type: Object, default: () => ({}) },
 		statsThresholdsActive: Boolean,
-		V2_1ViewActive: Boolean
+		V2_1ViewActive: Boolean,
 	},
 
 	data() {
@@ -289,6 +290,7 @@ export default {
 			]),
 		metricSystemsList: () => Object.freeze(metricSystemsList()),
 
+		
 
 		sensorParametersList() {
 			return Object.freeze({
@@ -372,6 +374,14 @@ export default {
 		switchMetricSystem({ id }) {
 			// console.log(id)
 			this.set_filters({ ...this.filters, measurement: id });
+		},
+
+		handleUnlockFFT(payload) {
+			const PDFandFFTrequestsBlock = this.$refs.PDFandFFTrequestsBlock;
+
+			if (PDFandFFTrequestsBlock && PDFandFFTrequestsBlock.handleUnlockFFT) {
+				PDFandFFTrequestsBlock.handleUnlockFFT(payload);				
+			}
 		},
 
 		/*handleStartCrashProcess() {

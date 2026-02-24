@@ -260,9 +260,9 @@
 				<template v-slot:middle>
 					<div class="filter-item checkbox-item ml-auto">
 						<el-checkbox
-							:value="filters.favorite"
+							:value="filters.favorites"
 							:false-label="null"
-							@change="val => setFilters({ favorite: val })"
+							@change="val => setFilters({ favorites: val })"
 							>{{ tt('Favorites') }}
 						</el-checkbox>
 					</div>
@@ -634,7 +634,8 @@ export default {
 				'dataSet',
 				'alert_types',
 				'offlineNodes',
-				'sensor_class'
+				'sensor_class',
+				'flat_metric_data_anomaly'
 			]),
 
 		showClearFilters() {
@@ -665,7 +666,10 @@ export default {
 					t.id == ALERT_TYPES.WARNING ||
 					t.id == ALERT_TYPES.LUBE
 			);
-			list.push({ id: 'offline', name: that.tt('Offline') });
+			list.push(
+				{ id: 'offline', name: that.tt('Offline') },
+				{ id: 'anomaly', name: that.tt('phrases.Flat_Data_Anomaly') }
+			);
 			return list;
 		},
 
@@ -1030,7 +1034,8 @@ export default {
 				'productionLineId',
 				'rawOptionsValuesIDs',
 				'max',
-				'sensor_class'
+				'sensor_class',
+				'flat_metric_data_anomaly',
 			];
 			// console.log('3', removeObjProps(newFilters, removePropsForModels))
 			this.set_storeroom_brand_models_filters(
@@ -1046,16 +1051,21 @@ export default {
 		handleAlertTypesFilter(ids) {
 			this.alertTypesFilters = ids;
 			const hasOffline = ids.some(id => id == 'offline');
-			let newFilters = { alert_types: ids.filter(id => id != 'offline') };
+			const hasAnomaly = ids.some(id => id == 'anomaly');
+			let newFilters = { alert_types: ids.filter(id => id != 'offline' && id != 'anomaly') };
 
-			if (hasOffline) {
-				newFilters.offlineNodes = true;
+			if (hasOffline || hasAnomaly) {
+				newFilters.offlineNodes = hasOffline || null;
+				newFilters.flat_metric_data_anomaly = hasAnomaly || null;
 			} else {
 				this.alertTypesFilters = this.alertTypesFilters.filter(
-					fi => fi !== 'offline'
+					fi => fi !== 'offline' && fi !== 'anomaly'
 				);
 				newFilters.offlineNodes = null;
+				newFilters.flat_metric_data_anomaly = null;
 			}
+
+			// console.log('newFilters', ids, newFilters)
 			this.setFilters(newFilters);
 		},
 
@@ -1241,6 +1251,9 @@ export default {
 			: [];
 		if (this.filters.offlineNodes) {
 			this.alertTypesFilters.push('offline');
+		}
+		if (this.filters.flat_metric_data_anomaly) {
+			this.alertTypesFilters.push('anomaly');
 		}
 
 		/*if (!this.filters.acknowledgeOnly) {

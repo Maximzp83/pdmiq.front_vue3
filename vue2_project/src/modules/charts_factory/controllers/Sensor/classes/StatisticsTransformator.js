@@ -11,7 +11,8 @@ import {
 	setupNotesStatistics,
 	setupFlagsFFTStatistics,
 	setupRuntimeTrackersStatistics,
-	setupFFTLockStatistics
+	setupFFTLockStatistics,
+	setupFlatMetricDataAnomalyFlags
 	// pointsDataMethodSelector
 } from '../methods';
 
@@ -123,6 +124,9 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 	setupRuntimeTrackersStatistics(payload) {
 		return setupRuntimeTrackersStatistics(payload);
 	}
+	setupFlatMetricDataAnomalyFlags(payload) {
+		return setupFlatMetricDataAnomalyFlags(payload);
+	}
 
 	transformAction(statistics_data, settings = {}) {
 		const { specification, currentResultData } = settings;
@@ -143,6 +147,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				gainAdjustments,
 				runtimeTrackers,
 				issue_alerts,
+				flat_metric_data_anomalies,
 				parameter_item
 			} = statistics_data[statisticsKey];
 			// console.log('parameter', statistics_data[statisticsKey])
@@ -259,6 +264,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						generateSeriesByStatistics: actualSpecification.generateSeriesByStatistics,
 						history: history,
 						parameter_item,
+						flat_metric_data_anomalies,
 						...settings,
 						...actualSpecification.setupPointsData,
 					});
@@ -356,6 +362,11 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 								this.resources.sensorType == 'banner_humidity' ? 'Alarm' : undefined
 							)
 						};
+					}
+
+					if (flat_metric_data_anomalies && flat_metric_data_anomalies.length) {
+						statistics_result.flagsData.flat_metric_data_anomaly_statistics =
+							this.setupFlatMetricDataAnomalyFlags(flat_metric_data_anomalies);
 					}
 				}
 				// ---------------------

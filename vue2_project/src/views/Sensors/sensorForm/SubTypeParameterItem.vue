@@ -110,7 +110,7 @@ export default {
 	},
 
 	methods: {
-		localGetFormDataCallback(formData) {
+		/*localGetFormDataCallback(formData) {
 			// if (!formData.name) delete formData.name;
 			if (this.itemData.isDefaultValues) {
 				const { itemData } = this;
@@ -120,7 +120,7 @@ export default {
 			}
 
 			return formData;
-		}
+		}*/
 	}
 };
 </script>

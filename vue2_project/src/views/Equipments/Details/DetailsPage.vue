@@ -593,6 +593,7 @@ export default {
 		},
 
 		updateEquipment(equipment) {
+			// console.log(equipment)
 			var { index } = findItemBy('id', equipment.id, this.equipmentsList, {returnIndex:1});
 
 			// console.log('updateEquipment', equipment.rpm_source_item)

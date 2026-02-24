@@ -127,6 +127,16 @@ export default {
 		hasAccesToEdit: that => that.$hasAccessTo(['edit_oee']),
 		hasAccesToDelete: that => that.$hasAccessTo(['delete_oee']),
 
+		localModalSettings() {
+			return Object.freeze({
+				single: true,
+				callback: () => {
+					// this.refetchItemsList();
+					this.show_edit_modal({ show: false });
+				}
+			});
+		},
+
 		cardActionsSettings() {
 			let actions = [
 				{

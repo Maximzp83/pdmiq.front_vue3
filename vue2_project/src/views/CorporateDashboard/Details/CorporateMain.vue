@@ -20,6 +20,7 @@
 				:companyId="companyId"
 				:plantsList="plantsList"
 				:propsFilters="predefinedFiltersForAllPlants"
+				:allPlantsRoiStatistics="allPlantsRoiStatistics"
 			/>
 				<!-- :selectedColumnsNumber="selectedColumnsNumber" -->
 
@@ -50,7 +51,9 @@
 					v-for="(plantItem, idx) in plantsList"
 					:key="`plant-${plantItem.id}`"
 				>
+						<!-- v-if="idx == 0" -->
 					<PlantDetailsItem
+						@event="handleEventNew"
 						class="card column-item"
 						:plantItem="plantItem"
 						:selectedColumnsNumber="selectedColumnsNumber"
@@ -76,10 +79,10 @@ import { mapActions, mapState } from 'vuex';
 import { main_logo } from '@/constants/global';
 
 
-import { fetchItemsHelper } from '@/mixins';
+import { fetchItemsHelper, eventHandler } from '@/mixins';
 
 export default {
-	mixins: [fetchItemsHelper()],
+	mixins: [fetchItemsHelper(), eventHandler()],
 	// name: 'QuoteTab',
 	components: {
 		PlantDetailsItem: () => import('./PlantDetailsItem.vue'),
@@ -95,7 +98,12 @@ export default {
 		return {
 			plantsList: [],
 			plantsLoading: false,
-			columnsNumber: 1
+			columnsNumber: 1,
+
+			allPlantsRoiStatistics: {
+				currentValue: 0,
+				redArea: 0,
+			},
 		};
 	},
 
@@ -202,11 +210,23 @@ export default {
 				}
 				// console.log(rowsHeight)
 			}
+		},
+
+		plantRoiStatisticsReady(data) {
+			// console.log('plantRoiStatisticsReady', data)
+			this.allPlantsRoiStatistics = {
+				currentValue: this.allPlantsRoiStatistics.currentValue + data.currentValue,
+				redArea: this.allPlantsRoiStatistics.redArea + data.redArea
+			}
 		}
 	},
 
 	watch: {
 		companyId(id) {
+			this.allPlantsRoiStatistics = {
+				currentValue: 0,
+				redArea: 0
+			}
 			this.fetchPlants(id);			
 		},
 

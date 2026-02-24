@@ -97,7 +97,7 @@ export default {
 			someChartLoading: true,
 
 			sensors: [],
-			current_sensor_ids: [],
+			// current_sensor_ids: [],
 			sensorsReadyCount: 0,
 
 			lube_cycle_high_speed: false,
@@ -150,15 +150,29 @@ export default {
 			})
 		},
 
+		sensorId() {
+			const { params } = this.$route;
+			return +params.sensorId || +params.id || params.id;
+		},
+
+		current_sensor_ids: that => [that.sensorId],
+
 		allSensorsReady() {
+			// console.log('allSensorsReady', this.sensorsReadyCount, this.current_sensor_ids)
 			return this.sensorsReadyCount === this.current_sensor_ids.length;
 		},
 
-		showRPM() {
+		enableRPM() {
 			return this.routeQuery && this.routeQuery.is_rpm_visible;
 		},
 
+		showRPM() {
+			// console.log('showRPM')
+			return this.enableRPM && this.sensorData && this.sensorData.equipment.is_rpm_visible;
+		},
+
 		equipmentDataReady() {
+			// console.log('equipmentDataReady', this.sensorData)
 			if (this.showRPM && this.sensorData.equipment_id) {
 				return !!this.equipmentData;
 			}
@@ -166,6 +180,7 @@ export default {
 		},
 
 		sensorData() {
+			// console.log('sensorData')
 			if (this.allSensorsReady) {
 				return this.sensorDataFromProps || this.sensors[0];
 			}
@@ -621,6 +636,7 @@ export default {
 
 	watch: {
 		sensorData(data) {
+			// console.log('watch sensorData', data)
 			if (data) {
 				if (this.showRPM && data.equipment_id) {
 					this.fetchEquipment(data.equipment_id);
@@ -664,8 +680,8 @@ export default {
 			}
 		}
 
-		const { params, query } = this.$route;
-		const sensorId = +params.sensorId || +params.id || params.id;
+		const { query } = this.$route;
+		// const sensorId = +params.sensorId || +params.id || params.id;
 		// const { dateStart, dateFinish } = getParamsFromUrl(this.$route.fullPath);
 
 		if (query) {
@@ -706,8 +722,8 @@ export default {
 			})
 		}*/
 
-		if (validateRouteParams(sensorId)) {
-			this.current_sensor_ids = [sensorId];
+		if (validateRouteParams(this.sensorId)) {
+			// this.current_sensor_ids = [sensorId];
 
 			this.initSensors();
 		} else {

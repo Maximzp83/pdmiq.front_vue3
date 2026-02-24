@@ -57,7 +57,8 @@ export default {
 		},
 		parameter_type: Number,
 		// sensorId: Number,
-		visible: Boolean
+		visible: Boolean,
+		sensorId: Number
 	},
 
 	components: {
@@ -71,7 +72,10 @@ export default {
 			formData: {
 				message: '',
 				file: null,
-				img_rotate: 0
+				image_angle: 0,
+				graph_timestamp: '',
+				metric_type: null,
+				metric_issue_alert_id: null
 			},
 
 			rules: {
@@ -89,8 +93,11 @@ export default {
 
 		itemPictures() {
 			const { itemData } = this;
-			if (itemData && itemData.full_file_name) {
-				return [{ full_file_name: itemData && itemData.full_file_name }];
+			if (itemData && itemData.attachment_file_url) {
+				return [{ 
+					full_file_name: itemData && itemData.attachment_file_url,
+					name: itemData && itemData.attachment_file_name
+				}];
 			}
 
 			return [];
@@ -101,7 +108,7 @@ export default {
 		}),
 
 		subItemsSettings: () => Object.freeze([
-			{ ref: 'FileUploadBlock', setIfEmpty: { prop:'file_delete', val: 1 }, cleanIfEmpty: { prop:'file', val: null } },
+			{ ref: 'FileUploadBlock', setIfEmpty: { prop:'is_file_deleted', val: 1 }, cleanIfEmpty: { prop:'file', val: null } },
 		]),
 	},
 
@@ -115,20 +122,25 @@ export default {
 		},
 
 		localSubmit(data) {
-			const pointId = this.itemData ? this.itemData.id : null;
+			const note_id = this.itemData ? this.itemData.id : null;
 			const payload = {
 				data: {	...data },
-				url: this.itemData.isCrash
-					? `/sensors/jobs/crashes${pointId}/notes`
-					: `/sensors/jobs/${pointId}/notes`
+				method: note_id ? 'PUT' : 'POST',
+				url: note_id
+					? `/sensors/${this.sensorId}/graphs/notes/${note_id}`
+					: `/sensors/${this.sensorId}/graphs/notes`
 			};
 			const { fileProp } = this.uploadSettings;
 			payload.withFile = !!payload.data[fileProp];
 
 			delete payload.data.id;
 
+			if (payload.data.metric_issue_alert_id) {
+				delete payload.data.graph_timestamp;
+			}
+
 			/*if (payload) {
-				console.log(options, payload)
+				console.log(payload)
 				return				
 			}*/
 

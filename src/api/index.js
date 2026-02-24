@@ -41,20 +41,22 @@ const setupMultipartFormData = (obj, form, namespace) => {
 		let formKey;
 
 		for (const property in obj) {
-			if (obj[property] || obj[property] === 0) {
-				if (namespace) {
-					formKey = `${namespace}[${property}]`;
-				} else {
-					formKey = property;
-				}
+			if (namespace) {
+				formKey = `${namespace}[${property}]`;
+			} else {
+				formKey = property;
+			}
 
-				// If the property is an object, but not a File, use recursion
-				if (typeof obj[property] === 'object' && !(obj[property] instanceof File)) {
-					setupMultipartFormData(obj[property], fd, formKey);
-				} else {
-					// If it's a string, number, or File object
-					fd.append(formKey, obj[property]);
-				}
+			// If the property is an object, but not a File, use recursion
+			if (
+				obj[property] &&
+				typeof obj[property] === 'object' &&
+				!(obj[property] instanceof File)
+			) {
+				setupMultipartFormData(obj[property], fd, formKey);
+			} else {
+				// If it's a primitive value or File object
+				fd.append(formKey, obj[property]);
 			}
 		}
 

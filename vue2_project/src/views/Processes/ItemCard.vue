@@ -32,16 +32,40 @@
 
 			<div class="card-content">
 				<div class="data-section colored-counters">
-					<div class="info-part">
-						<ul class="info-list">
-							<li v-for="item in mainInfoList" :key="`info-${item.label}`">
-								<span class="key">{{ item.label }}: </span>
-								<span
-									:class="[item.className || '', 'value']"
-									v-html="getCellValue(cardData, item)"
-								></span>
-							</li>
-						</ul>
+					<div class="flex mrow">
+						<div class="info-part mcol-xs-7">
+							<ul class="info-list">
+								<li v-for="item in mainInfoList" :key="`info-${item.label}`">
+									<span class="key">{{ item.label }}: </span>
+									<span
+										:class="[item.className || '', 'value']"
+										v-html="getCellValue(cardData, item)"
+									></span>
+								</li>
+							</ul>
+						</div>
+						
+						<div class="images-part mcol-xs-5">
+							<div
+								class="imgWrapper"
+								v-if="cardData.pictures && cardData.pictures.length"
+							>
+								<div
+									class="images-part-overlay dark-overlay"
+									@click="togglePreviewModal"
+								>
+									<div class="caption">
+										<i class="icomoon icon-zoom-in"></i>
+									</div>
+								</div>
+								<img
+									v-if="mainImage"
+									:src="mainImage.full_thumb_file_name"
+									alt="img error"
+								/>
+									<!-- :src="cardData.pictures[0].full_thumb_file_name" -->
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -98,7 +122,7 @@
 <script>
 import { not_wifi_icon } from '@/constants/global';
 import { itemCardMixin, eventHandler } from '@/mixins';
-import { getCellValue } from '@/helpers';
+import { getCellValue, sortArrayByKeyNumber } from '@/helpers';
 
 export default {
 	mixins: [itemCardMixin(), eventHandler()],
@@ -131,7 +155,11 @@ export default {
 				popperClass: 'button-popover',
 				width: '90',
 				buttonType: 'mini'
-			})
+			}),
+
+		mainImage() {
+			return this.cardData.pictures ? sortArrayByKeyNumber(this.cardData.pictures, 'display_order')[0] : null;
+		}
 
 		/*thirdInfoList() {
 			return [

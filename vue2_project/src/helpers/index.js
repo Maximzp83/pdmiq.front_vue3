@@ -250,7 +250,7 @@ const sortArrayByKeyNumber1 = (array, key, direction = 'asc') => {
       const diff = Number(a[key]) - Number(b[key]);
       return direction === 'asc' ? diff : -diff;
     });
-}
+};
 
 // -----------Routes/paths--------------
 const hasRightsToRoute1 = route => {
@@ -1227,6 +1227,31 @@ const todayDateRange1 = () => {
 	return [today, today];
 };
 
+export function isoToYmdHis(isoString) {
+  return isoString.replace(
+    /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})(?:\.\d+)?Z$/,
+    '$1 $2'
+  );
+};
+
+export function localToUtcYmdHis(dateString) {
+  // убираем Z, чтобы Date воспринял строку как локальное время
+  const normalized = dateString.replace(/Z$/, '');
+
+  const d = new Date(normalized);
+
+  const pad = (value) => String(value).padStart(2, '0');
+
+  return (
+    `${d.getUTCFullYear()}-` +
+    `${pad(d.getUTCMonth() + 1)}-` +
+    `${pad(d.getUTCDate())} ` +
+    `${pad(d.getUTCHours())}:` +
+    `${pad(d.getUTCMinutes())}:` +
+    `${pad(d.getUTCSeconds())}`
+  );
+};
+
 /*const thisMonthDateRange = () => {
 	const this_month = getDateRange('this_month');
 	
@@ -1569,6 +1594,29 @@ const getRandomInt1 = (min, max) => {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
+export const hexToRgba = (hex, alpha = 1) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+ };
+ 
+const buildFormula1 = (formula) => {
+  // заменяем {key} → data.key
+  const expression = formula.replace(
+    /\{(\w+)\}/g,
+    (_, key) => `data.${key}`
+  );
+
+  return new Function(
+    'data',
+    `return ${expression};`
+  );
+};
+
+
+
 export const findItemBy = (property, value, itemsList, settings) =>
 	findItemBy1(property, value, itemsList, settings);
 export const setObjectVal = (obj, accessors, val) =>
@@ -1651,4 +1699,5 @@ export const setupTableCellImage = (picturesList, settings) =>
 	setupTableCellImage1(picturesList, settings);
 export const getFileName = str => getFileName1(str);
 export const getRandomInt = (min, max) => getRandomInt1(min, max);
+export const buildFormula = (formula) => buildFormula1(formula);
 

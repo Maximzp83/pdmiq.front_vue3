@@ -1,7 +1,7 @@
 <template>
 	<div class="card">
 		<div class="one-chart-page-legend" v-if="oneChartPageLegend">
-			<div class="article-title">{{ ChartInstance.chartTitle }}</div>
+			<!-- <div class="chart-title bold">{{ ChartInstance.chartTitle }}</div> -->
 			<div class="item flex align-center"
 				v-for="(item, index) in oneChartPageLegend"
 				:key="index"
@@ -25,8 +25,11 @@
 			v-show="hasStatistics"
 		>
 			<!-- <button @click="zoomYAxis">+</button> -->
-			<div class="mcol-xs-10 mcol-sm-9 mcol-lg-7 flex mrow wrap align-center left-part">
-				<div class="title-block ellipsis" v-text="chartTitle"></div>
+			<div :class="['mcol-xs-10 mcol-sm-9 flex mrow wrap align-center left-part',
+				{'mcol-lg-7': !additionalProps.isCompare},
+				{'mcol-lg-auto fluid': additionalProps.isCompare}
+			]">
+				<div :class="['title-block ellipsis', {'mcol-xs-12': additionalProps.isCompare}]" v-text="chartTitle"></div>
 				<div
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto"
 					v-if="enableZoomBlock && ChartAPI"
@@ -62,24 +65,40 @@
 
 				<div
 					class="zoom-block-container lube-blocked-container mcol-xs-9 mcol-sm-auto"
-					v-if="enableLubeBlock && ChartAPI"
+					v-if="(enableLubeUnlockBlock || enableFFTUnlockBlock) && ChartAPI"
 				>
 					<div class="chart-actions-block">
 						<div class="flex wrap mrow">
-							<LubeBlock
+							<UnlockBlock
+								v-if="enableLubeUnlockBlock"
 								ref="LubeBlock"
-								class="mcol-xs-12 mcol-sm-auto"
-								@event="handleEventNew"
+								class="mcol-xs-12 mcol-sm-auto unlock-block"
+								@onUnlock="handleUnlockLube"
+								:popoverTitle="tt('phrases.Reset_lube')"
+								:instanceLabel="tt('Luber')"
 								:sensorData="sensorData"
 								:chartOptionsUpdate="chartOptionsUpdate"
-								:chartIsInit="chartRendering"
+								:passedTimeValue="sensorData.lube_cycle_updated_at || sensorData.lube_shot_updated_at"
 							/>
+
+							<UnlockBlock
+								v-if="enableFFTUnlockBlock"
+								ref="FFTBlock"
+								class="mcol-xs-12 mcol-sm-auto unlock-block"
+								@onUnlock="handleUnlockFFT"
+								:popoverTitle="tt('phrases.unlock_fft')"
+								instanceLabel="FFT"
+								:sensorData="sensorData"
+								:chartOptionsUpdate="chartOptionsUpdate"
+								:passedTimeValue="sensorData.last_fft_lock && sensorData.last_fft_lock.created_at"
+							/>
+								<!-- :chartIsInit="chartRendering" -->
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="mcol-xs-2 mcol-sm-auto ml-auto" v-if="showDisableChartButton">
+			<div class="flex align-center mcol-xs-2 mcol-sm-auto ml-auto" v-if="showDisableChartButton">
 				<div class="header-item">
 					<el-button
 						@click="toggleChart"
@@ -196,8 +215,8 @@ import {
 	SENSOR_PARAMETERS_TYPES,
 	NCD_SENSOR_PARAMETERS_TYPES
 } from '@/modules/charts_factory/controllers/Sensor/enums';
-import { LUBE_PROCESSING_STATUSES, LUBE_CYCLE_STATUSES } from '@/constants/ultrasound';
-
+import { LUBE_PROCESSING_STATUSES, LUBE_CYCLE_STATUSES, LUBE_VERSIONS } from '@/constants/ultrasound';
+import { FFT_LOCK_STATUSES } from '@/constants/global';
 import { eventHandler } from '@/mixins';
 
 export default {
@@ -205,7 +224,7 @@ export default {
 	components: {
 		ChartWrapper: () => import('@/components/charts/ChartWrapper.vue'),
 		ChartZoom: () => import('./ChartZoom.vue'),
-		LubeBlock: () => import('./LubeBlock.vue'),
+		UnlockBlock: () => import('./UnlockBlock.vue'),
 		ChartThresholdsOperations: () => import('./ChartThresholdsOperations.vue'),
 		HeaderRightPart: () => import('./HeaderRightPart.vue'),
 		ChartColorShemeBlock: () => import('./ChartColorShemeBlock.vue'),
@@ -339,8 +358,9 @@ export default {
 
 		hideChartHeader: that => that.additionalProps.hideChartHeader,
 		enableZoomBlock: that => !that.additionalProps.hideZoomBlock,
-		enableLubeBlock: that =>
-			that.sensorData && that.currentSensorType.isUltrasound &&
+		isLubeMatrixV3: that => that.sensorData && that.sensorData.lube_version === LUBE_VERSIONS.V3,
+		enableLubeUnlockBlock: that =>
+			that.sensorData && (that.currentSensorType.isUltrasound || that.isLubeMatrixV3) &&
 			(that.sensorData.lube_cycle_status === LUBE_CYCLE_STATUSES.BLOCKED ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNSUCCESSFUL ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT ||
@@ -350,6 +370,15 @@ export default {
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNKNOWN ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE),
+
+		enableFFTUnlockBlock() {
+			const { sensorData } = this;
+			if (sensorData && sensorData.last_fft_lock) {
+				return sensorData.last_fft_lock.status !== FFT_LOCK_STATUSES.UNLOCKED;
+			}
+			return false;
+		},
+
 		disableAnimationAndSpinner: that =>	that.additionalProps.disableAnimationAndSpinner,
 		
 		statsThresholdsActive: that => that.additionalProps.statsThresholdsActive,
@@ -619,6 +648,14 @@ export default {
 		handleUnlockLube() {
 			this.$emit('event', { 
 				eventName: 'handleUnlockLube',
+				data: {chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id},
+				onward: true
+			});
+		},
+
+		handleUnlockFFT() {
+			this.$emit('event', { 
+				eventName: 'handleUnlockFFT',
 				data: {chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id},
 				onward: true
 			});
