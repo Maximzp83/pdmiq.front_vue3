@@ -724,7 +724,7 @@ const hasRightsToRoute = (to, authStore) => {
 	const isAuth = authStore.isAuthenticated;
 	const authUser = authStore.authUser;
 	const { meta = {} } = to;
-
+	// console.log('to', to);
 	if (meta.auth && !isAuth) {
 		return { hasAccess: false, reason: 'not_auth', authUser };
 	}
@@ -764,7 +764,7 @@ router.beforeEach((to, from, next) => {
 	}
 
 	const { hasAccess, reason, authUser } = hasRightsToRoute(to, authStore);
-	// console.log('beforeEach', hasAccess, reason, authUser)
+
 	if (hasAccess) {
 		if (authUser?.role?.is_forced_mfa && !authUser.is_mfa_enabled && to.path !== '/profile') {
 			Notify({
@@ -793,6 +793,7 @@ router.beforeEach((to, from, next) => {
 			title: tt('phrases.limited_access'),
 			message: tt('phrases.you_are_not_authorized_to_view_this_page'),
 		});
+
 		authStore.set_redirect_to?.(to.fullPath);
 		return next('/login');
 	}

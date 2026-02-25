@@ -31,7 +31,7 @@
 					</div>
 
 					<div class="ml-auto">
-						<i class="icomoon icon-testing" @click="editProfile" />
+						<i class="icomoon icon-testing" @click="changeRoute({ path: '/profile' })" />
 						<i
 							class="icomoon icon-sign-out"
 							@click="changeRoute({ path: '/logout' })"
@@ -131,7 +131,7 @@ import { hasAccessTo } from '@/utils/hasAccessTo';
 import { validateBySettings, findItemBy, cloneDeep } from '@/helpers';*/
 // import { USER_TYPES } from '@/constants/global';
 
-import { ref, onMounted, computed, shallowReactive } from 'vue';
+import { computed } from 'vue';
 // import { storeToRefs } from 'pinia';
 
 import { validateBySettings, findItemBy, cloneDeep } from '@/helpers';
@@ -249,11 +249,11 @@ const isLabelHasChildren = (label) => {
 };
 
 const isActiveItem = (itemPath) => {
-	console.log('itemPath',itemPath)
+	// console.log('itemPath',itemPath)
 	const parts = props.currentPath.split('/');
 	if (parts.length) {
 		const categoryPath = '/' + parts[1];
-		console.log('categoryPath',categoryPath)
+		// console.log('categoryPath',categoryPath)
 		if (categoryPath === itemPath) {
 			return true;
 		}

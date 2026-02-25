@@ -1,3 +1,4 @@
+@use "sass:math";
 @use "@/assets/sass/variables" as *;
 
 /* --------logic_blocks_common-------- */
@@ -103,7 +104,7 @@ article, .section-row, [class^="sectionBlockColumn_"] {
 
 .mrow {
   box-sizing: border-box;
-  margin: -( $articleMarginMobile / 2 );
+  margin: -(math.div($articleMarginMobile, 2));
   width: auto !important;
 
   &.vertical-margin-0 {
@@ -118,7 +119,7 @@ article, .section-row, [class^="sectionBlockColumn_"] {
   
   & > * {
     box-sizing: border-box;
-    padding: $articleMarginMobile / 2;
+    padding: math.div($articleMarginMobile, 2);
   }
 
   .sectionBlock:first-child {
@@ -680,10 +681,10 @@ body div.contentWrapper .no-margin, .no-margin {
   }
 
   .mrow {
-    margin: -( $articleMarginLaptop / 2 );
+    margin: -(math.div($articleMarginLaptop, 2));
     
     & > * {
-      padding: $articleMarginLaptop / 2;
+      padding: math.div($articleMarginLaptop, 2);
     }
 
   }
@@ -696,10 +697,10 @@ body div.contentWrapper .no-margin, .no-margin {
   }
 
   .mrow {
-    margin: -( $articleMarginDesktop / 2 );
+    margin: -(math.div($articleMarginDesktop, 2));
     
     & > * {
-      padding: $articleMarginDesktop / 2;
+      padding: math.div($articleMarginDesktop, 2);
     }
   }
 

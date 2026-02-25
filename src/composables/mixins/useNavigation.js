@@ -5,7 +5,7 @@ import { getParentPageRoute } from '@/helpers';
 import { useAuthStore } from '@/stores/AuthStore';
 
 export function useNavigation() {
-	const { set_redirect_to } = useAuthStore();
+	const { set_redirect_to, sign_out } = useAuthStore();
 	const currentPath = useRoute().fullPath;
 	const router = useRouter();
 
@@ -15,7 +15,8 @@ export function useNavigation() {
 		if (path === '/logout') {
 			// console.log('logout')
 			set_redirect_to(currentPath);
-			// this.$store.dispatch('auth/sign_out');
+			router.push({ path: '/login' });
+			sign_out();
 			return;
 		}
 

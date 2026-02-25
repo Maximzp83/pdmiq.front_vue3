@@ -4,6 +4,7 @@ import { USER_ROLES_TYPES } from '@/constants/global';
 import { hasAccessTo, setupPermissionsMap } from '@/utils/hasAccessTo';
 import { api_request } from '@/api/request_provider';
 import { Lang } from '@/localization';
+import { useNotify } from '@/composables/useNotify';
 
 const token = localStorage.getItem('access_token');
 const user = JSON.parse(localStorage.getItem('authUser'));
@@ -204,28 +205,33 @@ export const useAuthStore = defineStore('authStore', {
 		 */
 		sign_out(options = {}) {
 			const { message, type = 'success', duration } = options;
+			const { Notify } = useNotify();
+
+			this.clear_auth();
+			
+			const notifySettings = {
+				type,
+				title: '',
+				message: message || 'Successfully logged out',
+				duration: duration || 3000,
+			};
 
 			// Call server-side logout in production
 			if (process.env.NODE_ENV !== 'development') {
-				this.logout();
+				return this.logout().then(() => {
+					Notify(notifySettings);
+				})
 			}
 
-			// Clear auth state
-			this.clear_auth();
-
 			// Clear all module filters
-			this.clearFilters();
+			// this.clearFilters();
 
 			// Show notification after a short delay
+
 			return new Promise((resolve) => {
 				setTimeout(() => {
-					if (window.$notify) {
-						window.$notify[type]({
-							title: '',
-							message: message || 'Successfully logged out',
-							duration: duration || 3000,
-						});
-					}
+					// console.log('Sign out')
+					Notify(notifySettings);					
 					resolve();
 				}, 100);
 			});

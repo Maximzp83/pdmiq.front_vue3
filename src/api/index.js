@@ -1,5 +1,8 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/AuthStore';
+import { getResponseMessage } from '@/api/request_provider';
+import { useNotify } from '@/composables/useNotify';
+import { Lang } from '@/localization';
 
 /**
  * Get base API URL from environment or use default
@@ -107,12 +110,32 @@ apiInstance.interceptors.response.use(
 	},
 	async (error) => {
 		if (error.response?.status === 401) {
+			const message = getResponseMessage(error);
+			
 			const authStore = useAuthStore();
-			authStore.isAuthenticated = false;
-			authStore.access_token = null;
-			localStorage.removeItem('access_token');
-			localStorage.removeItem('authUser');
-			window.location.href = '/login';
+			authStore.clear_auth();
+			const { Notify } = useNotify();
+			Notify({
+				type: 'warning',
+				title: Lang.tt(`phrases.Not_authorized`),
+				message: message || Lang.tt('phrases.Try_sign_in_again')
+			});
+
+			try {
+				const { default: router } = await import('@/router');
+				if (router.currentRoute.value.path !== '/login') {
+					// Let notification render before navigation
+					setTimeout(() => {
+						router.replace({
+							path: '/login',
+							query: { reason: 'unauthorized' },
+						});
+					}, 0);
+				}
+			} catch (e) {
+				// Fallback if router import fails
+				window.location.href = '/login?reason=unauthorized';
+			}
 		}
 		return Promise.reject(error);
 	},

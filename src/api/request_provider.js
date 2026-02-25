@@ -115,7 +115,7 @@ const getResultMessage = (resultMessage, data) => {
  * @param {Object} errorMessageSettings - Error message settings
  * @returns {string}
  */
-const getResponseMessage = (response, errorMessageSettings) => {
+export const getResponseMessage = (response, errorMessageSettings) => {
 	if (errorMessageSettings?.customMessage) {
 		return errorMessageSettings.customMessage;
 	}
@@ -283,11 +283,13 @@ const api_request = (url, payload = {}) => {
 								// Show success notification
 								const message = getResultMessage(resultMessage, response.data?.data);
 								if (notify) {
+									// console.log(message);
 									Notify({
 										type: 'success',
 										title: Lang.tt('Success'),
 										message: message,
 										duration: 3500,
+										// duration: 0,
 									});
 								}
 							} catch (e) {
