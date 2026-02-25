@@ -30,27 +30,28 @@ All migrated files MUST:
 - use the new page architecture from `src/views`
 
 ❗ Forbidden:
-- copying old `api/`, `store/`, `helpers/`, `mixins/`, `plugins` as-is
+
+- copying old `api/`, `store/`, `helpers/`, `mixins/`, `plugins`, `modules/charts_factory` as-is
 - reintroducing Vue2-style architecture
 
 Old logic must be ADAPTED using existing new project scaffolding.
 
- - use Promise syntax for async operations
- - use router from src/router
+- use Promise syntax for async operations
+- use router from src/router
 
 ---
 
 ### 1.2 File and folder mapping
 
-| Vue2 location | Vue3 location |
-|--------------|--------------|
-| vue2_project/src/components/* | src/components/ |
-| vue2_project/src/views/* | src/views/ |
-| vue2_project/src/mixins/* | src/composables/ |
-| vue2_project/src/api/*.js | src/api/adapters/ |
-| vue2_project/src/store/* | src/stores/ |
-| vue2_project/src/helpers/* | src/utils/ |
-| vue2_project/static/img/* | src/assets/img/ |
+| Vue2 location                  | Vue3 location     |
+| ------------------------------ | ----------------- |
+| vue2_project/src/components/\* | src/components/   |
+| vue2_project/src/views/\*      | src/views/        |
+| vue2_project/src/mixins/\*     | src/composables/  |
+| vue2_project/src/api/\*.js     | src/api/adapters/ |
+| vue2_project/src/store/\*      | src/stores/       |
+| vue2_project/src/helpers/\*    | src/utils/        |
+| vue2_project/static/img/\*     | src/assets/img/   |
 
 ---
 
@@ -63,8 +64,6 @@ Automatically replace asset paths:
 /static/img/...
 
 @/assets/img/...
-
-
 
 Images must be physically moved from:
 
@@ -97,14 +96,14 @@ Files in `src/helpers/*` MUST NOT be modified,
 
 Replace legacy patterns:
 
-| Vue2 | Vue3 |
-|----|----|
-| this.$emit('input', ...) | v-model |
-| slot syntax | v-slot |
-| beforeDestroy | beforeUnmount |
-| .native | native events |
-| filters | functions / computed |
-| v-bind.sync | new v-model |
+| Vue2                     | Vue3                 |
+| ------------------------ | -------------------- |
+| this.$emit('input', ...) | v-model              |
+| slot syntax              | v-slot               |
+| beforeDestroy            | beforeUnmount        |
+| .native                  | native events        |
+| filters                  | functions / computed |
+| v-bind.sync              | new v-model          |
 
 ---
 
@@ -135,7 +134,7 @@ Replace legacy patterns:
 ---
 
 4. Store Migration
-4.1 Vuex → Pinia 
+   4.1 Vuex → Pinia
 
 Convert each module into a Pinia store
 
@@ -149,26 +148,26 @@ exclude all api actions to the components using composables
 
 - Use as template from existing stores in src/stores
 
-4.2 Use existing Pinia scaffolding
-If a store already exists in src/stores,
-extend or reuse it instead of creating duplicates.
+  4.2 Use existing Pinia scaffolding
+  If a store already exists in src/stores,
+  extend or reuse it instead of creating duplicates.
 
 5. Mixins → Composables
-Copy legacy mixins from vue2_project/src/mixins
+   Copy legacy mixins from vue2_project/src/mixins
 
 Rewrite them as composables:
 
 js
 
 export function useExample() {
-  // logic
+// logic
 }
 Place them in src/composables
 
 6. Protected Files (DO NOT TOUCH)
-Claude Code MUST NOT modify:
+   Claude Code MUST NOT modify:
 
-src/assets/* (except adding images)
+src/assets/\* (except adding images)
 
 index.html
 
@@ -177,7 +176,7 @@ Vite configuration (unless Element Plus import is required)
 any files explicitly marked as "ready"
 
 7. Automatic Cleanup & Standardization
-After migration:
+   After migration:
 
 remove unused imports
 
@@ -188,8 +187,8 @@ replace module.exports → export
 format code using project prettier / eslint rules
 
 8. Execution Order (Agent Workflow)
-Phase 1 — Structure migration
-move components
+   Phase 1 — Structure migration
+   move components
 
 move views
 

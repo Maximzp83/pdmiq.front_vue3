@@ -1,0 +1,71 @@
+# SCSS Additions Log
+
+This log lists added SCSS blocks imported from `vue2_project/src/assets/sass` into `src/assets/sass`.
+Format: `file:line | first added line(s)`
+
+- src/assets/sass/common/common-blocks.scss:851 | 	.button-rounded { || 		border-radius: 50%;
+- src/assets/sass/common/common-blocks.scss:1228 | 		.el-icon-odometer { || 			font-size: 22px;
+- src/assets/sass/common/common-blocks.scss:1373 | 	// padding-left: 10px; || 	// padding-right: 10px;
+- src/assets/sass/common/common-blocks.scss:1381 | 	& + *:not(.chart-actions-block) {margin-left: auto;}
+- src/assets/sass/common/common-blocks.scss:1539 | 		.el-select.multiple-select.collapse-tags > .el-input { || 			height: 34px !important; || 			min-height: 34px !important;
+- src/assets/sass/common/common-blocks.scss:1646 | 			&.drag-n-drop-item { || 				// cursor: grab;
+- src/assets/sass/common/common-blocks.scss:2504 | 			min-height: 40px;
+- src/assets/sass/common/common-blocks.scss:2749 | /*.testing-radio-block { || 	.radio-item { || 		& > .radio-button {width: 100%;}
+- src/assets/sass/common/common-blocks.scss:3033 | 			&.rebaselineButton { || 				& > span {
+- src/assets/sass/common/common-blocks.scss:3091 | 	& > * {vertical-align: middle;}
+- src/assets/sass/common/common-blocks.scss:3096 | 	border-color: $primary-color !important;
+- src/assets/sass/common/common-blocks.scss:3824 | .fft-animation-container { || 	position: relative; || 	display: flex;
+- src/assets/sass/common/common-content.scss:253 | 	&.fix-height { || 		min-height: calc(100vh - 78px);		 || 	}
+- src/assets/sass/common/common-content.scss:268 | 
+- src/assets/sass/common/common-content.scss:444 | 					&.icon-money-insert {font-size: 28px;}
+- src/assets/sass/common/common-content.scss:587 | 		.statistics-block { || 			&.adopt-chart-to-viewport {
+- src/assets/sass/common/common-content.scss:708 | 		min-height: 100vh; ||  || 		.tab-container {margin-top: 0;}
+- src/assets/sass/common/common-content.scss:717 | 			/*.card-header {
+- src/assets/sass/common/common-content.scss:724 | 			}*/
+- src/assets/sass/common/common-content.scss:739 | 		&.full-height-chart { || 			.chart-container, || 			.chart-container > div > div,
+- src/assets/sass/common/common-content.scss:817 | 	.show-statistics-lines { ||  || 		.chart-container .thresholds-line {display: none !important;}
+- src/assets/sass/common/common-content.scss:872 | 			/*.buttons-container {
+- src/assets/sass/common/common-content.scss:875 | 			}*/
+- src/assets/sass/common/common-content.scss:931 | 	.lube-blocked-container { || 		.time {
+- src/assets/sass/common/common-content.scss:1130 | 	.rpm-overlay, || 	.statistics-line {display: none;}
+- src/assets/sass/common/common-content.scss:1170 | 		&.lock-log-flag { || 			text {
+- src/assets/sass/common/common-content.scss:1223 | 		.fft-analysis-annotation { || 			& > span {top: 2px !important;} || 
+- src/assets/sass/common/common-content.scss:1689 | 			max-width: 1450px;
+- src/assets/sass/common/common-content.scss:1700 | 			max-width: 1450px;
+- src/assets/sass/common/common-content.scss:1731 | 			max-width: 101px;
+- src/assets/sass/common/common-content.scss:1759 | 			&.component-item { || 				max-width: 500px;
+- src/assets/sass/common/common-content.scss:2108 | 	&.user-report-form { || 
+- src/assets/sass/common/common-content.scss:2420 | 		&.equipment-card-item { || 			.status-round-block { || 				height: 36px;
+- src/assets/sass/common/common-content.scss:2801 | 		&.alarm { || 			background-color: #f9e8ea; || 			.sensors-block {background-color: inherit;}
+- src/assets/sass/common/common-content.scss:3019 | 				padding: 10px; || 				
+- src/assets/sass/common/common-content.scss:3040 | 					padding: 10px;
+- src/assets/sass/common/common-content.scss:3055 | 					padding: 10px;
+- src/assets/sass/common/common-content.scss:3085 | 			&.alarm > .content-container {background-color: #edc0c4;} || 			&.warning > .content-container {background-color: #ffd78f};
+- src/assets/sass/common/common-content.scss:3348 | 	&.controller-devices-table { || 		.fft-animation-container  > .fft-animation-wrapper {
+- src/assets/sass/common/common-content.scss:3790 | 		.running-threshold-suffix { || 			font-size: 23px;
+- src/assets/sass/common/common-content.scss:4486 | 		transition: none !important; || 
+- src/assets/sass/common/common-content.scss:4529 | 			// position: absolute !important;
+- src/assets/sass/common/common-content.scss:5058 | 		.images-part { || 			max-width: 130px; || 		}
+- src/assets/sass/common/common-content.scss:5071 | 			button.el-button.el-button--secondary {
+- src/assets/sass/common/common-content.scss:5073 | 				color: $secondaryFontColor; || 				transition: none !important;
+- src/assets/sass/common/common-content.scss:5077 | 					color: #A1A1A1;
+- src/assets/sass/common/common-content.scss:5088 | 			&.fftAnalysisBar { || 				font-size: 12px;
+- src/assets/sass/common/common-content.scss:5140 | 			// padding-top: 0; || 			// padding-bottom: 0; || 			box-shadow: none;
+- src/assets/sass/common/common-content.scss:5146 | 			font-weight: 600;
+- src/assets/sass/common/common-content.scss:5154 | 	.vibration-analysis-block { || 		margin-top: 5px; || 
+- src/assets/sass/common/common-content.scss:5243 | 						.value {width: 40%;} || 						.unit {width: 40%;} || 						.el-button {width: 32px;}
+- src/assets/sass/common/common-content.scss:5320 | .controller-form { || 	.dxm-controllers-commands-form  { || 		.el-form-item__label {
+- src/assets/sass/common/common-content.scss:5534 | .rpm-settings-list, || .fft-analysis-values-dialog {
+- src/assets/sass/common/common-content.scss:5549 | 		max-width: 240px; || 		line-height: 30px; || 		min-height: 30px;
+- src/assets/sass/common/common-content.scss:5568 | 	} || } || 
+- src/assets/sass/common/common-content.scss:5669 | 		.pdmPie-statistics-wrapper:not(.legendEnabled) { || 			& > .card-content { || 				display: flex !important;
+- src/assets/sass/common/common-content.scss:5773 | 		.columns-selector {margin-top: 10px !important;} || 		.perPage-item {	display: none !important;	} || 
+- src/assets/sass/common/common-content.scss:5922 | 
+- src/assets/sass/frames/grids/page-grid.scss:32 | .ml-5 {margin-left: 5px !important;}
+- src/assets/sass/frames/grids/page-grid.scss:106 |   margin: -( $articleMarginMobile / 2 );
+- src/assets/sass/frames/grids/page-grid.scss:121 |     padding: $articleMarginMobile / 2;
+- src/assets/sass/frames/grids/page-grid.scss:128 |   &.small-padding { ||     margin: -2px; ||     & > * {
+- src/assets/sass/frames/grids/page-grid.scss:683 |     margin: -( $articleMarginLaptop / 2 );
+- src/assets/sass/frames/grids/page-grid.scss:686 |       padding: $articleMarginLaptop / 2;
+- src/assets/sass/frames/grids/page-grid.scss:699 |     margin: -( $articleMarginDesktop / 2 );
+- src/assets/sass/frames/grids/page-grid.scss:702 |       padding: $articleMarginDesktop / 2;

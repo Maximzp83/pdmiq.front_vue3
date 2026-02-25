@@ -29,6 +29,7 @@ article, .section-row, [class^="sectionBlockColumn_"] {
 .pt-20 {padding-top: 20px !important;}
 .mt-10 {margin-top: 10px !important;}
 .mt-5 {margin-top: 5px !important;}
+.ml-5 {margin-left: 5px !important;}
 .mt-0 {margin-top: 0 !important;}
 .mr-10 {margin-right: 10px !important;}
 .pt-0 {padding-top: 0 !important;}
@@ -102,7 +103,7 @@ article, .section-row, [class^="sectionBlockColumn_"] {
 
 .mrow {
   box-sizing: border-box;
-  margin: calc(-#{$articleMarginMobile} / 2 );
+  margin: -( $articleMarginMobile / 2 );
   width: auto !important;
 
   &.vertical-margin-0 {
@@ -117,11 +118,25 @@ article, .section-row, [class^="sectionBlockColumn_"] {
   
   & > * {
     box-sizing: border-box;
-    padding: calc(#{$articleMarginMobile} / 2);
+    padding: $articleMarginMobile / 2;
   }
 
   .sectionBlock:first-child {
     margin-top: 0;
+  }
+
+  &.small-padding {
+    margin: -2px;
+    & > * {
+      padding: 2px;
+    }
+  }
+
+  &.medium-padding {
+    margin: -4px;
+    & > * {
+      padding: 4px;
+    }
   }
 
   &.big-padding {
@@ -665,10 +680,10 @@ body div.contentWrapper .no-margin, .no-margin {
   }
 
   .mrow {
-    margin: calc(-#{$articleMarginLaptop} / 2 );
+    margin: -( $articleMarginLaptop / 2 );
     
     & > * {
-      padding: calc(#{$articleMarginLaptop} / 2);
+      padding: $articleMarginLaptop / 2;
     }
 
   }
@@ -681,10 +696,10 @@ body div.contentWrapper .no-margin, .no-margin {
   }
 
   .mrow {
-    margin: calc(-#{$articleMarginDesktop} / 2 );
+    margin: -( $articleMarginDesktop / 2 );
     
     & > * {
-      padding: calc(#{$articleMarginDesktop} / 2);
+      padding: $articleMarginDesktop / 2;
     }
   }
 

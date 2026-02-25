@@ -33,54 +33,74 @@ export const lubePeriodsList1 = [
 	{ id: LUBE_PERIODS.DAY, label: 'constants.day' }
 ];
 
+export const LUBE_CYCLE_STATUSES = {
+	ACTIVE: 2,
+	BLOCKED: 4,
+	SUCCESSFUL: 5,
+};
+
 export const LUBE_PROCESSING_STATUSES = {
 	/*INACTIVE: 1,
 	LUBRICATES: 2,
 	PENDING: 3,
 	BLOCKED: 4*/
-	LUBRICATED: 1,
-	FAIL: 2,
-	EMPTY: 3,
-	BLOCK: 4,
-	SUCCESS: 5,
+	UNVERIFIED: 0,
+	VERIFIED: 1,
+	UNSUCCESSFUL: 2,
+	LUBRICANT_FULL_SPENT: 3,
+	BLOCKED: 4,
+	SUCCESSFUL: 5,
 	LOSS_CONNECTION: 6,
-	NOT_ALARM_RESPONSE: 7
-	// GLITCHED: 7,
+	NO_COMMAND_RESPONSE: 7,	
+	UNKNOWN: 8,
+	NO_START_LUBRICATION_COMMAND_RESPONSE: 9,
+	NO_LUBRICATION_STATUS_RESPONSE: 10,
 
+	IN_PROGRESS: 99
+	// GLITCHED: 7,
 };
+
 const lubeProcessingStatusesList1 = [
 	{
-		id: LUBE_PROCESSING_STATUSES.LUBRICATED,
-		label: 'constants.lubricated',
-		color: 'green',
-		text: 'constants.Lube_OK'
+		id: LUBE_PROCESSING_STATUSES.UNVERIFIED,
+		label: 'constants.unverified',
+		color: 'gray',
+		text: 'constants.unverified'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.FAIL,
+		id: LUBE_PROCESSING_STATUSES.VERIFIED,
+		label: 'constants.lubricated',
+		color: 'green',
+		text: 'constants.Lube_OK',
+		isSuccess: true
+	},
+	{
+		id: LUBE_PROCESSING_STATUSES.UNSUCCESSFUL,
 		label: 'constants.fail',
 		color: 'red',
 		text: 'constants.Lubricator_Error',
 		labelTitle: '!'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.EMPTY,
+		id: LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT,
 		label: 'constants.empty',
 		color: 'orange',
 		text: 'constants.Lubricator_Cartridge_Empty',
 		labelTitle: '!'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.BLOCK,
-		label: 'constants.block',
+		id: LUBE_PROCESSING_STATUSES.BLOCKED,
+		label: 'constants.blocked',
 		color: 'red',
 		text: 'constants.Lubricator_Blocked',
 		labelTitle: '!'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.SUCCESS,
+		id: LUBE_PROCESSING_STATUSES.SUCCESSFUL,
 		label: 'constants.success',
 		color: '#1af03a',
-		text: 'constants.Lube_OK'
+		text: 'constants.Lube_OK',
+		isSuccess: true
 	},
 	{
 		id: LUBE_PROCESSING_STATUSES.LOSS_CONNECTION,
@@ -89,23 +109,79 @@ const lubeProcessingStatusesList1 = [
 		text: 'constants.Loss_Connection'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.NOT_ALARM_RESPONSE,
-		label: 'constants.rsp_timeout',
+		id: LUBE_PROCESSING_STATUSES.NO_COMMAND_RESPONSE,
+		label: 'constants.controller_timeout',
 		color: 'orange',
-		text: 'constants.rsp_timeout',
+		text: 'constants.controller_timeout',
 		labelTitle: '!'
 	},
 	{
-		id: LUBE_PROCESSING_STATUSES.GLITCHED,
-		label: 'constants.glitched',
+		id: LUBE_PROCESSING_STATUSES.UNKNOWN,
+		label: 'constants.unknown',
 		color: 'gray',
 		text: 'constants.Unknown_Status'
+	},
+	{
+		id: LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE,
+		label: 'constants.no_start_lubrication_command_response',
+		color: 'gray',
+		text: 'constants.controller_timeout'
+	},
+	{
+		id: LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE,
+		label: 'constants.no_lubrication_status_response',
+		color: 'gray',
+		text: 'constants.controller_error'
+	},
+	{
+		id: LUBE_PROCESSING_STATUSES.IN_PROGRESS,
+		label: 'constants.in_progress',
+		color: '#75c2db',
+		text: 'constants.in_progress'
 	}
 
 	/*{ id: LUBE_PROCESSING_STATUSES.INACTIVE, label: 'inactive' },
 	{ id: LUBE_PROCESSING_STATUSES.LUBRICATES, label: 'lubricates' },
 	{ id: LUBE_PROCESSING_STATUSES.PENDING, label: 'pending' },
 	{ id: LUBE_PROCESSING_STATUSES.BLOCKED, label: 'blocked' }*/
+];
+
+export const LUBE_LOCK_LOG_TYPES = {
+	UNSUCCESSFUL_SHOT: 1,
+	CYCLE_DID_NOT_AFFECT: 2,
+	SHOTS_FULL_SPENT: 3,
+	LUBRICATION_UNLOCKED: 4,
+};
+const lubeLockLogTypesList1 = [
+	{
+		id: LUBE_LOCK_LOG_TYPES.UNSUCCESSFUL_SHOT,
+		label: 'constants.unsuccessful_shot',
+		color: '#ffde32',
+		text: 'constants.unsuccessful_shot',
+		labelTitle: 'B'
+	},
+	{
+		id: LUBE_LOCK_LOG_TYPES.CYCLE_DID_NOT_AFFECT,
+		label: 'constants.CYCLE_DID_NOT_AFFECT',
+		color: '#ffde32',
+		text: 'constants.CYCLE_DID_NOT_AFFECT',
+		labelTitle: 'B'
+	},
+	{
+		id: LUBE_LOCK_LOG_TYPES.SHOTS_FULL_SPENT,
+		label: 'constants.SHOTS_FULL_SPENT',
+		color: '#ffde32',
+		text: 'constants.SHOTS_FULL_SPENT',
+		labelTitle: 'B'
+	},
+	{
+		id: LUBE_LOCK_LOG_TYPES.LUBRICATION_UNLOCKED,
+		label: 'constants.LUBRICATION_UNLOCKED',
+		color: '#059966',
+		text: 'constants.LUBRICATION_UNLOCKED',
+		labelTitle: 'R'
+	},
+
 ];
 
 /*export const GREASE_PACKS = {
@@ -433,3 +509,4 @@ export const adjustmentsStatusesList = () =>
 
 export const ultrasoundSensorTypesList = () => Lang.translate(ultrasoundSensorTypesList1);
 export const lubeVersionsList = () => lubeVersionsList1;
+export const lubeLockLogTypesList = () => Lang.translate(Lang.translate(lubeLockLogTypesList1), { key: 'text' });
