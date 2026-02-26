@@ -43,33 +43,42 @@
 	</el-form>
 </template>
 
-<script>
-import { required } from '@/constants/validation';
-import { subItemMixin } from '@/mixins';
+<script setup>
+import { computed, ref } from 'vue';
 
-export default {
-	mixins: [subItemMixin()],
-	props: {
-		machinesList: { type: Array, default: () => [] },
-		machinesLoading: Boolean
-	},
-	data() {
-		return {
-			formData: {
-				id: null,
-				name: '',
-				machines_ids: []
-			}
-		};
-	},
+import { required as requiredRule } from '@/constants/validation';
+import { Lang } from '@/localization';
+import { useSubItem } from '@/composables/mixins/useSubItem';
 
-	computed: {
-		rules: that => ({
-			name: that.required ? required : null,
-			machines_ids: that.required ? required : null
-		}),
-		// targetPropName: () => 'conveyor_processes',
-		deleteNewId: () => true
-	}
-};
+const { tt } = Lang;
+
+const props = defineProps({
+	itemIndex: { type: Number, default: 0 },
+	itemData: { type: Object, required: true },
+	required: { type: Boolean, default: false },
+	machinesList: { type: Array, default: () => [] },
+	machinesLoading: { type: Boolean, default: false },
+});
+
+const emit = defineEmits(['onRemove', 'onCreate']);
+
+const itemForm = ref(null);
+const formData = ref({
+	id: null,
+	name: '',
+	machines_ids: [],
+});
+
+const rules = computed(() => ({
+	name: props.required ? requiredRule : null,
+	machines_ids: props.required ? requiredRule : null,
+}));
+
+const { removeItem } = useSubItem({
+	itemData: props.itemData,
+	formData,
+	itemFormRef: itemForm,
+	deleteNewId: true,
+	emit,
+});
 </script>

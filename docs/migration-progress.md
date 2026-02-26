@@ -172,10 +172,65 @@ await fetchUsers({ page: 1 });
 
 ## Phase 3 — Composables
 - [ ] Migrate mixins → composables
+- [x] useActionButtons (from actionButtonsMixin)
+- [x] useEventEmitter/useEventHandler (normalized event payloads)
+- [x] useCreateFormItem (from createFormItemMixin)
+- [x] useDashboardListsReorder (from dashboardListsReorderMixin)
+- [x] useDragNdropDroppable (from dragNdropDroppableMixin)
+- [x] useDragNdropSortable (from dragNdropSortableMixin)
+- [x] eventHandler (covered by useEventHandler with onward re-emit)
+- [x] useExportListToFile (from exportListToFileMixin)
+- [x] fetchItemsHelper (covered by useFetchAction)
+- [x] useFormOperationsInItemsList (from formOperationsInItemsListMixin)
+- [x] itemsDataMixin (core covered by useItemsData; UI helpers migrate with components)
+- [x] useItemForm (from itemFormMixin)
+- [x] useItemPage (from itemPageMixin)
+- [x] useLoadMore (from loadMoreMixin)
+- [x] useMainInstanceDetailsPage (from mainInstanceDetailsPage)
+- [x] useMultiform (from multiformMixin)
+- [x] navigation (covered by useNavigation)
+- [x] useSelectFile (from onSelectFileMixin)
+- [x] useRequestsList (from requestsListMixin)
+  - NOTE: `bindTo` config now uses `getValue()`/`alternateGetValue()` functions (no string paths)
+- [x] useSensorType (from sensorTypeMixin)
+- [x] useSubItem (from subItemMixin)
+- [x] useSubItemsList (from subItemsListMixin)
+- [x] useSwitchGridView (from switchGridViewMixin)
+- [x] useTabs (from tabsMixin)
+- [x] useWebSocket (from webSocketMixin)
+- [x] useImport (from importMixin)
+- [x] useInitPageData (from initPageDataMixin)
+- [x] useItemCard (from itemCardMixin)
+- [x] hasAccessToMixin (covered by AuthStore getters)
+- [ ] Skipped mixins (not needed / empty)
+  - pusherMixin (not needed)
+  - handleSaveFormBlock (not needed)
+  - sensorChartMixin (empty file)
 
 ## Phase 4 — Components
 - [ ] Vue2 → Vue3 syntax
 - [ ] Element UI → Element Plus
+- [x] Chunk C-001: migrated Plants sub-item components from `subItemMixin` to `useSubItem`
+  - `src/views/Plants/LocationItem.vue`
+  - `src/views/Plants/WorkStationItem.vue`
+  - `src/views/Plants/ProcessItem.vue`
+  - Notes:
+    - Converted to `<script setup>` + Composition API
+    - Preserved `itemData` / `itemIndex` / `required` props and `onRemove` emit contract
+    - ESLint check passed for all 3 files
+- [x] Chunk C-002: added Plants list view in Vue3
+  - `src/views/Plants/ItemsList.vue`
+  - Notes:
+    - Added route-ready `PlantsList` component using `useItemsData('/plants')` + `PlantsStore` filters
+    - ESLint check passed
+- [x] Chunk C-003: migrated missing base components from `vue2_project/src/components`
+  - `src/components/common/PageMockImg.vue`
+  - `src/components/common/PaginationContainer.vue`
+  - `src/components/itemDetails/InfoItem.vue`
+  - Notes:
+    - Migrated to Vue3 (`<script setup>`) with preserved props/events API
+    - `PaginationContainer` keeps legacy `setFilters` emit signature for compatibility
+    - ESLint check passed for all 3 files
 
 ## Phase 5 — Views
 - [ ] Views migrated and wired

@@ -54,7 +54,7 @@ const menuItems1 = [
 		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
 	},
-	{
+	/*{
 		name: 'Machines',
 		belongs_to_label: 'predictive_maintenance',
 		id: 8888,
@@ -63,7 +63,7 @@ const menuItems1 = [
 		meta: { permissions: ['view_dashboard'] },
 		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
-	},
+	},*/
 	// {
 	// 	name: 'sidebar_menu.CUSTOMER_SUCCESS',
 	// 	belongs_to_label: 'predictive_maintenance',
@@ -93,10 +93,10 @@ const menuItems1 = [
 	// 	enableInCompanyMenuForm: true
 	// },
 
-	// {
-	// 	name: 'sidebar_menu.System',
-	// 	category_label: 'system'
-	// },
+	{
+		name: 'sidebar_menu.System',
+		category_label: 'system'
+	},
 	// {
 	// 	name: 'Companies',
 	// 	belongs_to_label: 'system',
@@ -106,15 +106,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_companies'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'Plants',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.PLANTS,
-	// 	icon: 'icon-plant',
-	// 	path: '/plants',
-	// 	meta: { permissions: ['view_plants'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Plants',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.PLANTS,
+		icon: 'icon-plant',
+		path: '/plants',
+		meta: { permissions: ['view_plants'] },
+		enableInCompanyMenuForm: true
+	},
 	// {
 	// 	name: 'Users',
 	// 	belongs_to_label: 'system',

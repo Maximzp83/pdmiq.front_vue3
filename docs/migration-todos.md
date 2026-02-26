@@ -1,0 +1,37 @@
+# Migration TODOs / Follow-ups
+
+- DONE (chunk C-001): migrated `src/views/Plants/LocationItem.vue`, `src/views/Plants/WorkStationItem.vue`, `src/views/Plants/ProcessItem.vue` to `useSubItem`.
+- DONE (chunk C-002): added `src/views/Plants/ItemsList.vue` (Vue3 + `useItemsData`).
+- DONE (chunk C-003): migrated components `PageMockImg`, `PaginationContainer`, `InfoItem` from `vue2_project/src/components` into `src/components`.
+- Next priority (components-first rule): migrate missing components required by current imports:
+  - `src/components/gridTable/GridItemCardHeader.vue`
+  - `src/components/common/Filterbar.vue`
+  - `src/components/common/DropdownFilterbar.vue`
+  - `src/components/table/CustomDataListTable.vue`
+  - `src/components/gridTable/ItemsGridContainer.vue`
+  - `src/components/form/RadioButtonsBlock.vue`
+
+- useCreateFormItem: when migrating components, pass list as ref/array (string prop is not supported).
+- useDashboardListsReorder: pass tt, emit, itemsList, reorderAction, filters, itemsLoading, globalFilters, fromDetailsPage, showEditModal.
+- useDragNdropDroppable: pass wrapperSelector, containersQuantity, dragStartCallback, dropValidateCallback, dropCallback.
+- useDragNdropSortable: pass wrapperSelector, draggingLockedProp, reorderHandler, dragStartHandler.
+- useExportListToFile: pass prepareFilters if custom; otherwise defaults to prepareRangeParams.
+- fetchItemsHelper: use useFetchAction instead.
+- itemsDataMixin: core covered by useItemsData; UI helpers migrate with components.
+- useItemForm: pass formData/itemData refs and submitAction function.
+- useItemPage: pass itemFormRef, saveItem, changeRoute, itemData.
+- useLoadMore: use loadMore(() => ...) and pass dataList as ref/array to prepareLoadMorePayload.
+- useMainInstanceDetailsPage: pass itemData, instanceDataKey, instanceViewName, itemsName, predefinedFilters, filters, initialPageSetup, maintenanceListWrapperRef, equipmentsLayoutRef.
+- useMultiform: pass emit, formData, instancesItemsData, multiFormFilters.
+- useSelectFile: pass formData (ref/obj) and clearValidate.
+- useRequestsList: update bindTo config to getValue()/alternateGetValue() functions (no string paths).
+- useSensorType: pass currentSensorTypeData (ref/obj).
+- useSubItem: pass itemData, formData, itemFormRef, emit, and optional hooks.
+- useSubItemsList: pass formData and refsMap (object of template refs); lists should be ref/array (no string prop).
+- useSwitchGridView: pass filters ref, setFilters function, and preventFetch ref if needed.
+- useTabs: pass tabsList (ref/array), optional hideTabsBar, switchTabTo, localTabSetup.
+- useWebSocket: pass socketChannel, onMessage callback, and optional socketReadyRef; use readyMap if no ref.
+- useImport: pass emit, currentLogId ref, successImportCallback, and actions as functions (progressAction/revertAction).
+- useInitPageData: pass fetchItem function, itemsName, and optional additionalNavbarSettings; itemData/loadContent/itemLoading refs if you need control.
+- Consider optional wrapper: `useItemPageWithInit` that composes useItemPage + useInitPageData after migration.
+- useItemCard: pass cardData, changeRoute, titleLinkRoute, resetPageFiltersList, emit.
