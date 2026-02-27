@@ -231,6 +231,69 @@ await fetchUsers({ page: 1 });
     - Migrated to Vue3 (`<script setup>`) with preserved props/events API
     - `PaginationContainer` keeps legacy `setFilters` emit signature for compatibility
     - ESLint check passed for all 3 files
+- [x] Chunk C-004: sync audit of already migrated components against updated `vue2_project/src/components`
+  - Updated:
+    - `src/components/common/SearchBar.vue` (restored `options.prepend` support)
+    - `src/components/form/CustomSelect.vue` (restored legacy label/filtering logic with Vue3 emits)
+    - `src/components/form/CustomInput.vue` (fixed exposed focus ref usage)
+    - `src/components/common/Datepicker.vue` (fixed date-range compare value path)
+  - Notes:
+    - Checked all mapped migrated components under `src/components/**`
+    - Applied only functional sync updates where logic drift was detected
+    - ESLint check passed for updated files
+- [x] Chunk C-005: router unblock for missing Plants view targets
+  - Added temporary stubs:
+    - `src/views/Plants/Details/DetailsPage.vue`
+    - `src/views/Plants/ItemPage.vue`
+  - Notes:
+    - Unblocks Vite import resolution for router paths referencing Plants views
+    - Intended as temporary placeholders until full migration of Plants views
+    - ESLint check passed
+- [x] Chunk C-006: migrated core filter UI components from `vue2_project/src/components`
+  - `src/components/common/Filterbar.vue`
+  - `src/components/common/DropdownFilterbar.vue`
+  - `src/components/form/RadioButtonsBlock.vue`
+  - Notes:
+    - Migrated to Vue3 (`<script setup>`) while preserving legacy event API (`event`, `input`, `onChange`)
+    - Kept compatibility with existing consumers in `src/views/Machines/*`
+    - ESLint check passed for all 3 files
+- [x] File-by-file migration: `GridItemCardHeader.vue`
+  - Added `src/components/gridTable/GridItemCardHeader.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/gridTable/GridItemCardHeader.vue` to Vue3 `<script setup>`
+    - Preserved selection/title-click events and title rendering logic
+    - ESLint check passed
+- [x] File-by-file migration: `CustomDataListTable.vue`
+  - Added `src/components/table/CustomDataListTable.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/table/CustomDataListTable.vue` to Vue3 `<script setup>`
+    - Preserved table selection/operations-width logic and event forwarding contract
+    - ESLint check passed
+- [x] File-by-file migration: `ItemsGridContainer.vue`
+  - Added `src/components/gridTable/ItemsGridContainer.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/gridTable/ItemsGridContainer.vue` to Vue3 `<script setup>`
+    - Preserved dynamic item-card loading and selection event behavior
+    - ESLint check passed
+- [x] File-by-file migration: `CounterItem.vue`
+  - Added `src/components/itemDetails/CounterItem.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/itemDetails/CounterItem.vue` to Vue3 `<script setup>`
+    - Preserved counter click-to-scroll behavior via `scrollToElement`
+    - ESLint check passed
+- [x] File-by-file migration: `FileUploadBlockItem.vue`
+  - Added `src/components/form/uploadBlock/FileUploadBlockItem.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/form/uploadBlock/FileUploadBlockItem.vue`
+    - Replaced legacy `subItemMixin` with `useSubItem` and preserved exposed API (`getFormData`, `itemId`)
+    - ESLint check passed
+- [x] File-by-file migration: `FileUploadBlock.vue`
+  - Added `src/components/form/uploadBlock/FileUploadBlock.vue`
+  - Notes:
+    - Migrated from `vue2_project/src/components/form/uploadBlock/FileUploadBlock.vue`
+    - Replaced legacy mixins with composables (`useCreateFormItem`, `useDragNdropSortable`, `useEventHandler`)
+    - Preserved parent API via ref (`getFormData`, `resetFilesList`) and events (`onSelectFile`, `onImgClick`)
+    - ESLint check passed
 
 ## Phase 5 — Views
 - [ ] Views migrated and wired

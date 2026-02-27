@@ -24,14 +24,16 @@
 
 <script setup>
 // import 'element-ui/lib/theme-chalk/date-picker.css';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { Lang } from '@/localization';
 const { tt } = Lang;
 
 import { datePickerShortcuts } from '@/constants/date_time';
 import { getDateRange } from '@/helpers';
 
-const datepicker_raw_value = ref([]);
+defineOptions({
+	name: 'CommonDatepicker',
+});
 // =========================
 const props = defineProps({
 	modelValue: null,
@@ -94,7 +96,7 @@ const prepareDateRange = (range, currentValue) => {
 const handleInput = (val) => {
 	// console.log(val)
 	if (props.setupDaterangeFilter) {
-		const { daterange, next } = prepareDateRange(val, inputValue);
+		const { daterange, next } = prepareDateRange(val, inputValue.value);
 		if (next) {
 			emit('update:modelValue', daterange);
 			emit('input', daterange);

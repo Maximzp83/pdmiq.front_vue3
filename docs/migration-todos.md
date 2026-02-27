@@ -1,15 +1,37 @@
 # Migration TODOs / Follow-ups
 
+- Process mode for current project phase:
+  - One file per step.
+  - Apply only after explicit user confirmation.
+  - Ask first on any risk/ambiguity.
+  - After each file: lint that file, update docs, STOP.
+
 - DONE (chunk C-001): migrated `src/views/Plants/LocationItem.vue`, `src/views/Plants/WorkStationItem.vue`, `src/views/Plants/ProcessItem.vue` to `useSubItem`.
 - DONE (chunk C-002): added `src/views/Plants/ItemsList.vue` (Vue3 + `useItemsData`).
 - DONE (chunk C-003): migrated components `PageMockImg`, `PaginationContainer`, `InfoItem` from `vue2_project/src/components` into `src/components`.
+- DONE (chunk C-004): sync-audited all already migrated `src/components/**` files against updated `vue2_project/src/components/**`; applied functional updates in `SearchBar`, `CustomSelect`, `CustomInput`, `Datepicker`.
+- DONE (chunk C-005): added temporary stubs `src/views/Plants/Details/DetailsPage.vue` and `src/views/Plants/ItemPage.vue` to fix router import resolution error.
+- DONE (chunk C-006): migrated `Filterbar`, `DropdownFilterbar`, `RadioButtonsBlock` from `vue2_project/src/components`.
+- DONE (file-by-file): migrated `src/components/gridTable/GridItemCardHeader.vue`.
+- DONE (file-by-file): migrated `src/components/table/CustomDataListTable.vue`.
+- DONE (file-by-file): migrated `src/components/gridTable/ItemsGridContainer.vue`.
+- DONE (file-by-file): migrated `src/components/itemDetails/CounterItem.vue`.
+- DONE (file-by-file): migrated `src/components/form/uploadBlock/FileUploadBlockItem.vue`.
+- DONE (file-by-file): migrated `src/components/form/uploadBlock/FileUploadBlock.vue`.
 - Next priority (components-first rule): migrate missing components required by current imports:
-  - `src/components/gridTable/GridItemCardHeader.vue`
-  - `src/components/common/Filterbar.vue`
-  - `src/components/common/DropdownFilterbar.vue`
-  - `src/components/table/CustomDataListTable.vue`
-  - `src/components/gridTable/ItemsGridContainer.vue`
-  - `src/components/form/RadioButtonsBlock.vue`
+  - `src/components/itemDetails/ItemInfoBlock.vue`
+  - `src/components/itemDetails/ItemImagesBlock.vue`
+  - `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
+  - `src/components/itemDetails/ItemWOStatisticBlock.vue`
+  - `src/components/itemDetails/MaintenanceListWrapper.vue`
+  - `src/components/table/TableHeader.vue`
+  - `src/components/table/Row.vue`
+  - `src/components/table/TableCell.vue`
+  - `src/components/table/TableHeaderCell.vue`
+
+- Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.
+  - Note: `src/views/Plants/Details/DetailsPage.vue` was restored from previous commit (not stub anymore).
+  - `src/views/Plants/ItemPage.vue` is still a temporary stub and must be fully migrated.
 
 - useCreateFormItem: when migrating components, pass list as ref/array (string prop is not supported).
 - useDashboardListsReorder: pass tt, emit, itemsList, reorderAction, filters, itemsLoading, globalFilters, fromDetailsPage, showEditModal.

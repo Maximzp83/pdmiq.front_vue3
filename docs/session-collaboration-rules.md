@@ -1,11 +1,17 @@
 # Session Collaboration Rules
 
-- Do not apply changes without user confirmation if there are risks or ambiguous/disputable points.
-- Before making risky or disputable changes, explicitly ask for confirmation.
-- If a task is straightforward and risk-free, changes can be applied directly.
+- Apply changes only after user confirmation.
+- If there are risks or ambiguous/disputable points, highlight them and ask clarifying questions before changes.
+- Migrate one file at a time (no multi-file chunks).
+- Diff preview is NOT required before applying a file.
+- After each single-file migration, stop and wait for the next user instruction.
+- Continue migrating all components from `vue2_project/src/components` and update already migrated ones if needed.
 
 ## Language Note
 
-Original user rule (RU):
+Latest user rules (RU):
 
-"не применяй изменения без моего подтверждения, если есть риски или спорные моменты - спрашивай."
+- "применять изменения только после подтверждения"
+- "если есть риски или спорные моменты - спрашивай"
+- "не выводи diff и просто применяй изменения ... и только по одному файлу"
+- "останавливайся после каждого файла"

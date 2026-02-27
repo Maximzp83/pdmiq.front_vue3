@@ -4,7 +4,7 @@
 		<i v-if="prefixIcon" :class="['input-prefix', prefixIcon]"></i>
 		<span v-if="prefixText" class="input-prefix prefix-text">{{ prefixText }}</span>
 
-		<el-select-v2
+		<el-select
 			:class="[
 				{ 'multiple-select': multiple },
 				className,
@@ -28,15 +28,23 @@
 			:collapse-tags="collapseTags"
 			:allow-create="allowCreate"
 			:default-first-option="defaultFirstOption"
-			:options="computedOptions"
-			:props="computedSelectProps"
-			:popper-class="popperClass || 'plant-select-dropdown'"
-		/>
+		>
+			<el-option
+				v-for="item in filteredList"
+				:key="'select_id-' + item[idKey]"
+				:class="optionClassName"
+				:value="item[valueKey]"
+				:label="useHtml ? getLabel(item).label : getLabel(item)"
+			>
+				<div v-if="useHtml" v-html="getLabel(item).html"></div>
+			</el-option>
+		</el-select>
 	</div>
 </template>
 
 <script setup>
 import { computed, ref } from 'vue';
+import { setupLabel, findItemBy } from '@/helpers';
 
 // =========================
 const props = defineProps({
@@ -69,17 +77,10 @@ const props = defineProps({
 	setupLabelMethod: { type: Function, default: undefined },
 	useHtml: Boolean,
 	multipleLimit: { type: Number, default: undefined },
-
 	optionsList: {
 		type: Array,
 		default: () => []
-	},
-
-	selectProps: {
-		type: Object,
-		default: () => null
-	},
-	popperClass: { type: String, default: '' }
+	}
 });
 
 const emit = defineEmits(['update:modelValue', 'change', 'input', 'focus', 'blur', 'toggleDropdown']);
@@ -94,23 +95,41 @@ const currentValue = computed(() => {
 		: props.value;
 });
 
-// Вычисляемые props для el-select-v2
-const computedSelectProps = computed(() => {
-	if (props.selectProps) {
-		return props.selectProps;
-	}
-	return {
-		value: props.valueKey,
-		label: props.labelKey
-	};
-});
+const filteredList = computed(() => {
+	const value = currentValue.value;
+	const origList = props.optionsList;
+	if (!origList.length) return [];
 
-// Опции для el-select-v2
-const computedOptions = computed(() => {
-	return props.optionsList;
+	if (isDropdownActive.value) {
+		return Object.freeze(origList);
+	}
+
+	if (value) {
+		if (value instanceof Array) {
+			let list = [];
+			for (let i = 0; i < value.length; i++) {
+				const item = findItemBy('id', value[i], origList);
+				if (item) list.push(item);
+			}
+			return Object.freeze(list);
+		}
+		return Object.freeze(origList.filter((pi) => pi.id === value));
+	}
+
+	return Object.freeze([origList[0]]);
 });
 
 // =========================
+const getLabel = (item) => {
+	if (props.setupLabelSettings) {
+		return setupLabel(item, props.setupLabelSettings);
+	}
+	if (props.setupLabelMethod) {
+		return props.setupLabelMethod(item);
+	}
+	return props.label || item[props.labelKey];
+};
+
 const handleToggleDropdown = (val) => {
 	isDropdownActive.value = val;
 	emit('toggleDropdown', val);

@@ -4,7 +4,7 @@
 			@input="searchSubmit"
 			:value="query"
 			:placeholder="`${tt('search')}...`"
-			prefixIcon="icomoon icon-search"
+			:prepend="options.prepend"
 		/>
 
 		<button

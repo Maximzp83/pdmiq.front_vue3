@@ -125,10 +125,11 @@ import { onMounted, computed, useTemplateRef } from 'vue';
 	}
 
 	const focus = () => inputRef.value.focus();
+	defineExpose({ focus });
 
 	onMounted(() => {
-		if (props.elastic) {
-			inputRef.style.height = inputRef.scrollHeight + 'px';
+		if (props.elastic && inputRef.value) {
+			inputRef.value.style.height = inputRef.value.scrollHeight + 'px';
 		}
 	});
 </script>
