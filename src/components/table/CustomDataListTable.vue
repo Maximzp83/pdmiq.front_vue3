@@ -1,5 +1,5 @@
 <template>
-	<div :class="['items-table-container', tableSettings.tableClass || '']">
+	<div :class="['items-table-container relative', tableSettings.tableClass || '']">
 		<VueElementLoadingWrapper :isLoading="itemsLoading" :itemsName="itemsName.mult" />
 
 		<div v-if="tableData.length" class="flex-table custom-table-container">

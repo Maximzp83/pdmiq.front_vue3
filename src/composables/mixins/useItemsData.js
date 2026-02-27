@@ -1,4 +1,4 @@
-import { ref, watch, onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, shallowReactive, watch, onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { api_request } from '@/api/request_provider.js';
@@ -26,10 +26,11 @@ import { useGlobalStore } from '@/stores/GlobalStore';
  * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
+export function useItemsData({ apiRoute, filters: filtersRef, options = {}, itemsName }) {
 	const route = useRoute();
 	const router = useRouter();
 	const globalStore = useGlobalStore();
+	const { set_value: set_global_store } = globalStore;
 	const { globalFilters } = storeToRefs(globalStore);
 
 	// ========== State ==========
@@ -69,6 +70,11 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
 		}
 		return filters;
 	};
+
+	const navbarSettings = shallowReactive({
+		showFilter: true,
+		pageTitle: itemsName && itemsName.value ? itemsName.value.mult : ''
+	});
 
 	// ========== Methods ==========
 
@@ -154,6 +160,7 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
 		let payload = {
 			params: preparedFilters,
 			incudeMeta: true,
+			notNotify: true,
 			...fetchItemsPayload,
 			...requestOptions,
 			...additionalOptions,
@@ -307,6 +314,11 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
 				});
 			}
 		}
+
+		if (navbarSettings) {
+			set_global_store('navbarSettings', navbarSettings);
+		}
+		// console.log('useItemsData beforeMount', itemsName.value)
 	});
 
 	return {

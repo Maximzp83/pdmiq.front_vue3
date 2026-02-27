@@ -13,11 +13,7 @@
 					>
 						<template v-if="canSeeArchivedToggle">
 							<div class="filter-item checkbox-item">
-								<el-checkbox
-									:model-value="filters.archived"
-									:false-label="null"
-									@change="(val) => setFilters({ archived: val })"
-								>
+								<el-checkbox v-model="archivedChecked">
 									<span class="semi-bold">{{ tt('phrases.Show_Archived') }}</span>
 								</el-checkbox>
 							</div>
@@ -99,18 +95,22 @@ const { changeRoute } = useNavigation();
 const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
 	apiRoute: '/plants',
 	filters,
+	itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
 	},
 });
 
-const setupPlantName = (plant) => {
-	let result = `<span class="div-block">${plant.name}</span>`;
-	if (plant?.company?.is_archived || plant?.is_archived) {
-		result += `<span class="archived-label div-block">${tt('Archived')}</span>`;
-	}
-	return result;
-};
+const archivedChecked = computed({
+	get: () => {
+		const archived = filters.value?.archived;
+		return archived === true || archived === 1 || archived === '1' || archived === 'true';
+	},
+	set: (checked) => {
+		setFilters({ archived: checked ? 1 : null });
+	},
+});
+
 
 const tableSettings = computed(() => {
 	const actions = [];
@@ -162,6 +162,14 @@ const tableSettings = computed(() => {
 		},
 	};
 });
+
+const setupPlantName = (plant) => {
+	let result = `<span class="div-block">${plant.name}</span>`;
+	if (plant?.company?.is_archived || plant?.is_archived) {
+		result += `<span class="archived-label div-block">${tt('Archived')}</span>`;
+	}
+	return result;
+};
 
 const createItem = () => {
 	changeRoute({ path: '/plants/create' });

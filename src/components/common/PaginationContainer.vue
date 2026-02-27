@@ -63,3 +63,55 @@ const currentPage = computed({
 	},*/
 });
 </script>
+
+<style lang="scss" scoped>
+@use "@/assets/sass/variables" as *;
+
+:deep(.el-pagination) {
+	padding: 0;
+	margin: 0 -5px;
+
+	button,
+	.el-pager > li {
+		border-radius: 50% !important;
+		height: 35px !important;
+		width: 35px !important;
+		line-height: 35px !important;
+			// background-color: $primary-color !important;
+
+
+		&:hover {
+			&:not(.disabled):not(.is-active) {
+				color: $primary-color !important;
+			}
+		}
+
+		&:not(.disabled).is-active {
+			background-color: $primary-color !important;
+		}
+	}
+
+	button {
+		> i {
+			line-height: 35px;
+			transition: none !important;
+		}
+
+		&[disabled='disabled'] {
+			pointer-events: none;
+		}
+
+		&.btn-next {
+			margin-right: 0 !important;
+		}
+	}
+}
+
+@media (min-width: 768px) {
+	.pagination-container {
+		:deep(.el-pagination) {
+			text-align: right;
+		}
+	}
+}
+</style>

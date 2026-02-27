@@ -21,6 +21,16 @@
 			border-color: $formElementsFocusBorderColor !important;
 		}
 	}
+
+	.el-input__inner {
+		border: 1px solid $formElementsBorderColor;
+		border-radius: 4px;
+
+		&:focus {
+			border-color: $primary-color;	
+		}
+	}
+
 	
 	.el-input__inner,
 	.el-select__input {
@@ -84,11 +94,6 @@
 		.el-checkbox__inner {
 			width: inherit;
 			height: inherit;
-
-			&:after {
-				top: 2px;
-				left: 5px;
-			}
 		}
 	}
 }
