@@ -218,6 +218,25 @@ await fetchUsers({ page: 1 });
     - Converted to `<script setup>` + Composition API
     - Preserved `itemData` / `itemIndex` / `required` props and `onRemove` emit contract
     - ESLint check passed for all 3 files
+- [x] File-by-file: migrated `src/components/itemDetails/ItemInfoBlock.vue`
+  - Added missing Vue3 component in `src/components`
+  - Preserved legacy props/markup and counters mapping logic
+  - ESLint check passed
+- [x] File-by-file: migrated `src/components/itemDetails/ItemImagesBlock.vue`
+  - Added missing Vue3 component in `src/components`
+  - Preserved legacy image sources merge/filter behavior
+  - ESLint check passed
+- [x] File-by-file: migrated `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
+  - Added missing Vue3 component in `src/components`
+  - Migrated legacy event handling to `useEventHandler` with `@event="handleEvent"`
+  - ESLint check passed
+- [x] Batch table migration: completed remaining table components
+  - Added `src/components/table/TableHeader.vue`
+  - Added `src/components/table/Row.vue`
+  - Added `src/components/table/TableCell.vue`
+  - Added `src/components/table/TableHeaderCell.vue`
+  - Synced event handler naming to `handleEvent` in table components
+  - ESLint check passed for `src/components/table/*.vue`
 - [x] Chunk C-002: added Plants list view in Vue3
   - `src/views/Plants/ItemsList.vue`
   - Notes:
@@ -302,3 +321,55 @@ await fetchUsers({ page: 1 });
 - [ ] Dead code removed
 - [ ] Lint & format
 - [ ] Build succeeds
+- [x] Dependency migration for table components
+  - Added `src/components/common/DynamicComponentWrapper.vue`
+  - Updated event forwarding to `@event="handleEvent"`
+  - ESLint check passed for wrapper and table components
+- [x] Batch common migration: completed all remaining files from `vue2_project/src/components/common`
+  - Added `src/components/common/ButtonWithPopover.vue`
+  - Added `src/components/common/ButtonsNavbar.vue`
+  - Added `src/components/common/CustomPopover.vue`
+  - Added `src/components/common/CustomProgressbar.vue`
+  - Added `src/components/common/CustomTransition.vue`
+  - Added `src/components/common/ItemDetailsPreview.vue`
+  - Added `src/components/common/NavigationButtons.vue`
+  - Added `src/components/common/addToFavoriteButton.vue`
+  - ESLint check passed for migrated common components
+- [x] Batch form migration: completed remaining required files from `vue2_project/src/components/form`
+  - Added `src/components/form/FetchByQuerySelect.vue`
+  - Added `src/components/form/FormOperationsButtons.vue`
+  - Added `src/components/form/InputItemBlock.vue`
+  - Added `src/components/form/PhoneInput.vue`
+  - Added phone flags assets: `src/assets/img/flags/{CA,US,MX}.png`
+  - ESLint check passed for migrated form components
+- [x] Batch pages migration: completed remaining files from `vue2_project/src/components/pages`
+  - Added `src/components/pages/NotFoundPage.vue`
+  - Added `src/components/pages/RemoteLogin.vue`
+  - Added image asset `src/assets/img/404.png` (from legacy static images)
+  - ESLint check passed for migrated pages components
+- [x] Grid table migration: added remaining component `src/components/gridTable/CardDroppedSection.vue`
+  - Replaced legacy navigation mixin with `useNavigation` composable
+  - ESLint check passed
+- [x] Item details migration: completed remaining components
+  - Added `src/components/itemDetails/CreateWOButton.vue`
+  - Added `src/components/itemDetails/ItemWOStatisticBlock.vue`
+  - Added `src/components/itemDetails/MaintenanceListWrapper.vue`
+  - ESLint check passed for migrated itemDetails components
+- [x] Top navbar finish: completed migration cleanup for `src/components/layout/TopNavbar.vue`
+  - Removed debug-only logs/watchers and unused props scaffold
+  - Fixed temp-role plant filter update in global filters
+  - ESLint check passed
+- [x] Plants views migration: restored missing files and replaced temporary item page
+  - Added `src/views/Plants/Details/CounterItem.vue`
+  - Added `src/views/Plants/Details/Counters.vue`
+  - Added `src/views/Plants/ItemForm.vue`
+  - Replaced stub `src/views/Plants/ItemPage.vue` with API-backed create/edit page
+  - ESLint check passed for changed Plants files
+- [x] Plants list migration: completed `src/views/Plants/ItemsList.vue`
+  - Replaced temporary list with full Filterbar + table + pagination flow
+  - Added table operations handling (details/edit/delete) via event map
+  - ESLint check passed
+- [x] Pagination modernization: updated `src/components/common/PaginationContainer.vue` for Element Plus
+  - Replaced deprecated pagination event usage with `v-model:current-page`
+  - Fixed page-change emit payload to preserve selected page (`preventResetPage`)
+  - ESLint check passed

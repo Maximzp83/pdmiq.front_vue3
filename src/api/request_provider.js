@@ -57,7 +57,7 @@ const isSuccessStatus = (response, statusCheckSettings) => {
  * @returns {*} Response value
  */
 const getResponseValue = (response, payload) => {
-	const { prepareData, prepareDataSettings, dataPath } = payload;
+	const { prepareData, prepareDataSettings, dataPath, incudeMeta } = payload;
 
 	if (dataPath) {
 		// Extract data from specific path
@@ -148,6 +148,13 @@ const handleError = (error, options = {}) => {
 		}
 	}
 
+	if (error.response?.status == 401) {
+		if (reject) {
+			reject(error);
+		}
+		return;
+	}
+	
 	const message =
 		error.response?.data?.message ||
 		errorMessageSettings?.customMessage ||
@@ -238,8 +245,9 @@ const api_request = (url, payload = {}) => {
 									concatData,
 									returnResponse,
 									returnResponseOnly,
+									incudeMeta
 								} = payload;
-
+								// console.log('response', response);
 								const value = returnResponseOnly
 									? response
 									: getResponseValue(response, payload);
@@ -273,6 +281,10 @@ const api_request = (url, payload = {}) => {
 									value: value,
 									request_payload: payload,
 								};
+
+								if (incudeMeta) {
+									payloadResolve.fetchedMeta = response.data?.meta;
+								}
 
 								if (returnResponse) {
 									payloadResolve.response = response;

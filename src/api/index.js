@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '@/stores/AuthStore';
-import { getResponseMessage } from '@/api/request_provider';
+// import { getResponseMessage } from '@/api/request_provider';
 import { useNotify } from '@/composables/useNotify';
 import { Lang } from '@/localization';
 
@@ -110,7 +110,6 @@ apiInstance.interceptors.response.use(
 	},
 	async (error) => {
 		if (error.response?.status === 401) {
-			const message = getResponseMessage(error);
 			
 			const authStore = useAuthStore();
 			authStore.clear_auth();
@@ -118,7 +117,7 @@ apiInstance.interceptors.response.use(
 			Notify({
 				type: 'warning',
 				title: Lang.tt(`phrases.Not_authorized`),
-				message: message || Lang.tt('phrases.Try_sign_in_again')
+				message: Lang.tt('phrases.Try_sign_in_again')
 			});
 
 			try {

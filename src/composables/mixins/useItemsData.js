@@ -153,6 +153,7 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
 
 		let payload = {
 			params: preparedFilters,
+			incudeMeta: true,
 			...fetchItemsPayload,
 			...requestOptions,
 			...additionalOptions,
@@ -162,6 +163,7 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {} }) {
 			return new Promise((resolve, reject) => {
 				api_request.get(apiRoute, payload)
 					.then(({ value, fetchedMeta }) => {
+						// console.log(value)
 						itemsList.value = value;
 						if (fetchedMeta) meta.value = fetchedMeta;
 						itemsLoading.value = false;

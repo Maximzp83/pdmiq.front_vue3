@@ -2,7 +2,7 @@
 	<div :class="['items-table-container', tableSettings.tableClass || '']">
 		<VueElementLoadingWrapper :isLoading="itemsLoading" :itemsName="itemsName.mult" />
 
-		<div class="flex-table custom-table-container" v-if="tableData.length">
+		<div v-if="tableData.length" class="flex-table custom-table-container">
 			<TableHeader
 				v-if="!hideHeader"
 				:columns="tableSettings.columns"
@@ -11,7 +11,8 @@
 				:itemsName="itemsName"
 				:operationsWidth="operationsWidth"
 				:disableSelection="disableSelection"
-				@event="handleEventNew"
+				:activeSortingFilters="activeSortingFilters"
+				@event="handleEvent"
 			/>
 
 			<Row
@@ -27,15 +28,18 @@
 				:operationsWidth="operationsWidth"
 				:disableSelection="disableSelection"
 				:canDeleteSettings="canDeleteSettings"
-				@event="handleEventNew"
+				@event="handleEvent"
 			/>
 		</div>
 
-		<div class="errors-block" v-else-if="!itemsLoading">
-			<div class="text-center section-block" v-if="Lang.currentLangId === LANGUAGE_TYPES.ENGLISH">
+		<div v-else-if="!itemsLoading" class="errors-block">
+			<div v-if="Lang.currentLangId === LANGUAGE_TYPES.ENGLISH" class="text-center section-block">
 				{{ `${itemsName.mult} ${tt('phrases.not_found')}` }}...
 			</div>
-			<div class="text-center section-block" v-else-if="Lang.currentLangId === LANGUAGE_TYPES.SPANISH">
+			<div
+				v-else-if="Lang.currentLangId === LANGUAGE_TYPES.SPANISH"
+				class="text-center section-block"
+			>
 				{{ `${tt('phrases.not_found')} ${itemsName.mult}` }}...
 			</div>
 		</div>
@@ -80,6 +84,14 @@ const actionsLength = ref(0);
 
 const showOperations = computed(() => true);
 
+const activeSortingFilters = computed(() => {
+	const filtersSource = props.tableSettings?.activeSortingFilters || props.tableSettings?.filters || {};
+	return Object.freeze({
+		orderByColumn: filtersSource.orderByColumn,
+		orderByMethod: filtersSource.orderByMethod,
+	});
+});
+
 const operationsWidth = computed(() => {
 	if (props.tableSettings.operations && props.tableSettings.operations.width) {
 		return props.tableSettings.operations.width;
@@ -119,7 +131,7 @@ const methodsMap = {
 	calcOperationsWidth,
 };
 
-const { handleEvent: handleEventNew } = useEventHandler(methodsMap, emit);
+const { handleEvent } = useEventHandler(methodsMap, emit);
 
 void Lang;
 </script>

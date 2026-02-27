@@ -39,7 +39,7 @@
 						:propsData="rowData"
 						:additionalProps="action"
 						:componentPath="action.buttonContent.component.componentPath"
-						@event="handleEventNew"
+						@event="handleEvent"
 					/>
 					<span v-else-if="preparedLink.label">{{ preparedLink.label }}</span>
 					<i v-if="action.icon" :class="action.icon"></i>
@@ -52,7 +52,7 @@
 					:loading="isProccessing"
 					:size="buttonSize || 'small'"
 					:type="action.type"
-					:icon="action.icon"
+					:icon="elButtonIcon"
 					@click="executeAction"
 				>
 					<DynamicComponentWrapper
@@ -61,10 +61,11 @@
 						:propsData="rowData"
 						:additionalProps="action"
 						:componentPath="action.buttonContent.component.componentPath"
-						@event="handleEventNew"
+						@event="handleEvent"
 					/>
 
 					<img v-else-if="action.img" class="button-image" :src="action.img" />
+					<i v-else-if="useCssIcon" :class="action.icon" />
 					<img v-if="action.second_img" class="button-image" :src="action.second_img" />
 					<span v-if="actionButtonText">{{ actionButtonText }}</span>
 				</ElButton>
@@ -187,6 +188,15 @@ const actionButtonText = computed(() => {
 	return '';
 });
 
+const useCssIcon = computed(() => {
+	const icon = props.action?.icon;
+	return typeof icon === 'string' && /\s/.test(icon);
+});
+
+const elButtonIcon = computed(() => {
+	return useCssIcon.value ? undefined : props.action?.icon;
+});
+
 const executeLink = () => {
 	const { action } = props;
 	if (!action.useHref && preparedLink.value.route) {
@@ -218,7 +228,7 @@ const executeAction = (settings = {}) => {
 	});
 };
 
-const handleEventNew = (event) => {
+const handleEvent = (event) => {
 	emit('event', event);
 };
 </script>

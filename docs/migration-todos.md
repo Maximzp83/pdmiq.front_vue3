@@ -18,16 +18,21 @@
 - DONE (file-by-file): migrated `src/components/itemDetails/CounterItem.vue`.
 - DONE (file-by-file): migrated `src/components/form/uploadBlock/FileUploadBlockItem.vue`.
 - DONE (file-by-file): migrated `src/components/form/uploadBlock/FileUploadBlock.vue`.
+- DONE (file-by-file): migrated `src/components/itemDetails/ItemInfoBlock.vue`.
+- DONE (file-by-file): migrated `src/components/itemDetails/ItemImagesBlock.vue`.
+- DONE (file-by-file): migrated `src/components/itemDetails/ItemPDMsStatisticBlock.vue`.
+- DONE (batch): migrated remaining table components `TableHeader`, `Row`, `TableCell`, `TableHeaderCell`; synced table events to `handleEvent`.
+- DONE (dependency): migrated `src/components/common/DynamicComponentWrapper.vue` for table component chain.
+- DONE (batch): migrated all remaining files from `vue2_project/src/components/common`.
+- DONE (batch): migrated remaining required files from `vue2_project/src/components/form` (excluding `SelectorBlock.vue` and `IsolatedSelect.vue` by request).
+- DONE (batch): migrated remaining files from `vue2_project/src/components/pages` (`NotFoundPage.vue`, `RemoteLogin.vue`).
+- DONE (batch): completed remaining component from `vue2_project/src/components/gridTable` (`CardDroppedSection.vue`).
+- DONE (batch): completed remaining components from `vue2_project/src/components/itemDetails`.
+- DONE (single-file): finished `src/components/layout/TopNavbar.vue` cleanup/migration alignment.
+- DONE (batch): migrated missing `src/views/Plants` files and replaced `ItemPage.vue` stub.
+- DONE (single-file): migrated `src/views/Plants/ItemsList.vue` to full list page behavior.
+- DONE (single-file): modernized `src/components/common/PaginationContainer.vue` to remove ElPagination deprecated usage.
 - Next priority (components-first rule): migrate missing components required by current imports:
-  - `src/components/itemDetails/ItemInfoBlock.vue`
-  - `src/components/itemDetails/ItemImagesBlock.vue`
-  - `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
-  - `src/components/itemDetails/ItemWOStatisticBlock.vue`
-  - `src/components/itemDetails/MaintenanceListWrapper.vue`
-  - `src/components/table/TableHeader.vue`
-  - `src/components/table/Row.vue`
-  - `src/components/table/TableCell.vue`
-  - `src/components/table/TableHeaderCell.vue`
 
 - Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.
   - Note: `src/views/Plants/Details/DetailsPage.vue` was restored from previous commit (not stub anymore).

@@ -14,13 +14,14 @@
 
 			<div class="mcol-xs-12 mcol-sm-8 fluid text-right">
 				<el-pagination
-					@current-change="setFilters"
 					background
-					:current-page="filters.page"
-					:page-size="meta.per_page"
-					:pager-count="5"
 					layout="prev, pager, next"
-					:total="meta.total"
+					:current-page="currentPage"
+					@update:current-page="applyPage"
+					:page-size="Number(meta?.per_page) || 10"
+					@update:page-size="() => {}"
+					:pager-count="5"
+					:total="Number(meta?.total) || 0"
 				/>
 			</div>
 		</div>
@@ -30,6 +31,7 @@
 <script setup>
 import { scrollToElement } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
+import { computed } from 'vue';
 
 const { tt } = Lang;
 
@@ -44,8 +46,8 @@ const props = defineProps({
 
 const emit = defineEmits(['setFilters']);
 
-const setFilters = (page) => {
-	emit('setFilters', { page }, [], { preventResetPage: true });
+const applyPage = (page) => {
+	emit('setFilters', { page }, { preventResetPage: true });
 
 	if (props.disableScroll) return;
 
@@ -53,4 +55,11 @@ const setFilters = (page) => {
 		scrollToElement(props.scrollTo || '.view-list-wrapper');
 	}, props.scrollToTimeout || 10);
 };
+
+const currentPage = computed({
+	get: () => Number(props.filters?.page) || 1,
+	/*set: (page) => {
+		applyPage(page);
+	},*/
+});
 </script>

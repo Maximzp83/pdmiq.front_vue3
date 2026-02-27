@@ -1,6 +1,10 @@
 <template>
 	<Teleport to="body">
-		<div v-if="active" class="vue-element-loading-container" :style="containerStyle">
+		<div
+			v-if="active"
+			:class="['vue-element-loading-container', attrs.class]"
+			:style="containerStyle"
+		>
 			<div class="vue-element-loading-spinner">
 				<el-icon class="is-loading" :size="40">
 					<Loading />
@@ -14,8 +18,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, useAttrs } from 'vue';
 import { Loading } from '@element-plus/icons-vue';
+
+defineOptions({
+	inheritAttrs: false,
+});
 
 const props = defineProps({
 	active: {
@@ -44,8 +52,11 @@ const props = defineProps({
 	},
 });
 
+const attrs = useAttrs();
+
 const containerStyle = computed(() => ({
 	backgroundColor: props.backgroundColor,
+	...(attrs.style || {}),
 }));
 </script>
 

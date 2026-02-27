@@ -1,0 +1,22 @@
+We are about to restart the Codex session.
+
+  Create a minimal but sufficient context snapshot to resume work in a new session.
+  Include only:
+  - project stack
+  - key architecture rules
+  - current task status
+  - files already modified
+  - unresolved issues
+  - next actionable step
+
+  Exclude redundant discussion history.
+  Format it as a continuation briefing.
+  Update a file called SESSION_CONTEXT.md with this summary.
+
+==================================================
+  At New Session:
+  Read docs/session-collaboration-rules.md, docs/new-session-handoff.md,
+  docs/migration-progress.md, and docs/migration-todos.md.
+  Briefly confirm the current rules, SESSION_CONTEXT.md, keeping the mode: no code/diff output,
+  one step at a time, and after each step provide the result and the path to the
+  newly created file in plain text.

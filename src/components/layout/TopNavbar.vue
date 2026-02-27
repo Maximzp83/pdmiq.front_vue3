@@ -112,8 +112,8 @@
 
 						<el-button
 							@click="callMethod('set_compare_list', [])"
-							class="el-button--secondary clear-compare-button" native-type="button"
-							
+							class="el-button--secondary clear-compare-button"
+							native-type="button"
 							>{{ `${tt('clear')} ${tt('compare')}` }}</el-button
 						>
 					</div>
@@ -125,8 +125,8 @@
 						>
 							<el-button
 								@click="callMethod('createItem')"
-								class="el-button--secondary shadow" native-type="button"
-								
+								class="el-button--secondary shadow"
+								native-type="button"
 							>
 								<i class="icomoon icon-plus"></i>
 							</el-button>
@@ -138,7 +138,7 @@
 						>
 							<el-button
 								@click="changeRoute(navbarSettings.navigateButton)"
-								class="el-button--secondary shadow save-button" 
+								class="el-button--secondary shadow save-button"
 								native-type="button"
 							>
 								<i class="icomoon icon-path_2"></i>
@@ -148,7 +148,7 @@
 						<div class="menu-block buttonWrapper" v-if="navbarSettings.editButton">
 							<el-button
 								@click="changeRoute(navbarSettings.editButton)"
-								class="el-button--secondary shadow save-button" 
+								class="el-button--secondary shadow save-button"
 								native-type="button"
 							>
 								<i class="icomoon icon-pencil"></i>
@@ -161,9 +161,9 @@
 						>
 							<el-button
 								@click="callMethod('cleanForm')"
-								class="el-button--secondary shadow clean-button" native-type="button"
+								class="el-button--secondary shadow clean-button"
+								native-type="button"
 								plain
-								
 							>
 								<i class="icomoon icon-clean"></i>
 							</el-button>
@@ -186,7 +186,7 @@
 							:options="userRolesList"
 							:placeholder="`${tt('select')} ${tt('role')}`"
 							:props="{ value: 'id', label: 'name' }"
-							popper-class="plant-select-dropdown"							
+							popper-class="plant-select-dropdown"
 						/>
 					</div>
 
@@ -198,7 +198,8 @@
 							filterable
 							clearable
 							:class="
-								globalPlantsList.length < 2 && (isCustomer || navbarSettings.infoOnly)
+								globalPlantsList.length < 2 &&
+								(isCustomer || navbarSettings.infoOnly)
 									? 'isClient'
 									: ''
 							"
@@ -249,16 +250,17 @@
 							@click="callMethod('printHTML', navbarSettings.printButtonSettings)"
 							class="el-button--secondary"
 							native-type="button"
-
 						>
-							<i :class="navbarSettings.printButtonSettings.icon || 'el-icon-printer'"></i>
+							<i
+								:class="navbarSettings.printButtonSettings.icon || 'el-icon-printer'"
+							></i>
 						</el-button>
 					</div>
 
 					<div
 						:class="[
 							'menu-block creation-button-wrapper mcol-sm-auto',
-							navbarSettings.datepickerSettings ? 'mcol-xs-1' : 'mcol-xs-2'
+							navbarSettings.datepickerSettings ? 'mcol-xs-1' : 'mcol-xs-2',
 						]"
 						v-if="creationMenuList.length"
 					>
@@ -273,8 +275,8 @@
 								<template #reference>
 									<el-button
 										@click="showCreationMenu = !showCreationMenu"
-										class="el-button--secondary creation-menu-button" native-type="button"
-										
+										class="el-button--secondary creation-menu-button"
+										native-type="button"
 									>
 										<i class="icomoon icon-plus"></i>
 									</el-button>
@@ -286,7 +288,7 @@
 										:key="`creation-item-${item.label}`"
 										:class="{
 											disabled:
-												item.checkPlant && !globalFilters.plantId && !showPlant
+												item.checkPlant && !globalFilters.plantId && !showPlant,
 										}"
 										@click="createItemByMenu(item)"
 									>
@@ -298,96 +300,6 @@
 						</div>
 					</div>
 				</TransitionGroup>
-
-				<!-- <transition name="standard-fade" mode="out-in">
-					<div
-						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-3 text-right ml-auto relative"
-						v-if="navbarSettings.showFilter"
-					>
-						<CustomSelect
-							filterable
-							clearable
-							:className="
-								plantsList.length < 2 && (isCustomer || navbarSettings.infoOnly)
-									? 'isClient'
-									: ''
-							"
-							:optionsLoading="plantsLoading"
-							:optionsList="plantsList"
-							:placeholder="`${tt('select')} ${tt('plant')}`"
-							@change="id => setGlobalFilters({ id: id, filterName: 'plantId' })"
-							:value="globalFilters.plantId"
-						/>
-					</div>
-				</transition> -->
-
-				<!-- <transition name="standard-fade" mode="out-in">
-					<div
-						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-auto text-right ml-auto"
-						v-if="showPlant"
-					>
-						<div class="">{{ showPlant.name }}</div>
-					</div>
-				</transition> -->
-
-				<!-- <transition name="standard-fade" mode="out-in">
-					<div
-						class="menu-block buttonWrapper ml-auto"
-						v-if="navbarSettings.printButtonSettings"
-					>
-						<el-button
-							@click="callMethod('printHTML', navbarSettings.printButtonSettings)"
-							class="el-button--secondary"
-							native-type="button"
-
-							icon="el-icon-printer"
-						/>
-					</div>
-				</transition> -->
-
-				<!-- <transition name="standard-fade" mode="out-in">
-					<div
-						:class="[
-							'menu-block creation-button-wrapper mcol-sm-auto',
-							navbarSettings.datepickerSettings ? 'mcol-xs-1' : 'mcol-xs-2'
-						]"
-						v-if="creationMenuList.length"
-					>
-						<div class="ml-auto">
-							<el-popover
-								placement="bottom-end"
-								popper-class="creation-menu-popover"
-								trigger="manual"
-								v-model:visible="showCreationMenu"
-								:width="230"
-							>
-								<el-button
-									slot="reference"
-									@click="showCreationMenu = !showCreationMenu"
-									class="el-button--secondary creation-menu-button" native-type="button"
-									
-								>
-									<i class="icomoon icon-plus"></i>
-								</el-button>
-
-								<ul class="creation-menu-list">
-									<li
-										v-for="item in creationMenuList"
-										:key="`creation-item-${item.label}`"
-										:class="{
-											disabled:
-												item.checkPlant && !globalFilters.plantId && !showPlant
-										}"
-										@click="createItemByMenu(item)"
-									>
-										<i :class="item.icon"></i>
-										<span class="label">{{ item.label }}</span>
-									</li>
-								</ul>
-							</el-popover>
-						</div>
-					</div>
-				</transition> -->
 			</div>
 		</div>
 	</div>
@@ -396,14 +308,9 @@
 <script setup>
 // import { MAINTENANCE_TYPES } from '@/constants/global';
 import { hasAccessTo } from '@/utils/hasAccessTo';
-// import { USER_ROLES_TYPES } from '@/constants/global';
 
-// import { navigation, fetchItemsHelper } from '@/mixins';
-// import { mapActions, mapState } from 'vuex';
-// import { findItemBy } from '@/helpers';
 import {
 	onMounted,
-	onUpdated,
 	onBeforeUnmount,
 	computed,
 	defineAsyncComponent,
@@ -447,15 +354,6 @@ const {
 	globalCompaniesLoading: companiesLoading,
 } = storeToRefs(globalStore);
 // const { set_value: set_global_store } = globalStore;
-
-watch(
-	() => globalPlantsLoading.value,
-	(loading) => {
-		console.log('Global plant loading:', loading);
-	},
-);
-
-
 
 const setGlobalFilters = ({ id, filterName }) => {
 	const newFilters = { ...globalFilters.value, [filterName]: id };
@@ -505,11 +403,6 @@ const { doFetchAction } = useFetchAction();
 import { api_request } from '@/api/request_provider';
 
 // =========================
-const props = defineProps({
-	currentPath: String,
-	loading: Boolean,
-	saving: Boolean,
-});
 defineOptions({
 	name: 'TopNavbar',
 });
@@ -525,7 +418,6 @@ const handleDisposableHistoryButton = (settings, additionalSettings) => {
 const setFilters = ({ storeName, stateKey }, filters, settings = {}) => {
 	const storePromise = useLoadStore(storeName);
 	if (storePromise) {
-		console.log('setFilters', storeName, stateKey, filters, settings);
 		storePromise
 			.then((store) => {
 				if (store) {
@@ -630,7 +522,7 @@ const setTempRole = async (role_id) => {
 						plant_id: globalFilters.value.plantId,
 						role_id,
 					},
-			  }
+				}
 			: {};
 
 		const response = await api_request[method]('/auth/temp-role', payload);
@@ -660,8 +552,8 @@ const setTempRole = async (role_id) => {
 			// Обновляем plantId filter если есть plant_id у пользователя
 			if (user.plant_id) {
 				globalStore.set_global_filters({
-					stateProp: 'plantId',
-					value: user.plant_id,
+					...globalFilters.value,
+					plantId: user.plant_id,
 				});
 			}
 
@@ -811,8 +703,6 @@ watch(
 
 // ========== Hooks ==============
 onMounted(() => {
-	console.log('Navbar mounted');
-
 	// Fetch user roles if Industrial Matrix user
 	if (isIndustrialMatrix.value) {
 		fetchUserRoles();
@@ -820,8 +710,6 @@ onMounted(() => {
 
 	// Fetch plants
 	fetchPlants();
-		console.log('Global plant loading:', globalStore.globalPlantsLoading);
-
 
 	// Set globalFilters from authUser if customer
 	if (authUser.value && authUser.value.plant_id && isCustomer.value) {
@@ -839,286 +727,7 @@ onMounted(() => {
 	}
 });
 
-onUpdated(() => {
-	console.log('Navbar updated');
-});
-
 onBeforeUnmount(() => {
 	globalStore.set_global_filters({ plantId: null, companyId: null });
 });
-
-// export default {
-
-// mixins: [navigation(), fetchItemsHelper()],
-
-/*components: {
-		Datepicker: () => import('@/components/common/Datepicker.vue')
-	},*/
-
-/*props: {
-		currentPath: String,
-		loading: Boolean,
-		saving: Boolean
-		// filters: Object
-	},*/
-
-/*data: () => ({
-		userRolesList: [],
-		userRolesLoading: false,
-		showCreationMenu: false,
-		keepGlobalFilters: false
-	}),*/
-
-/*computed: {
-		...mapState({
-			report_filters: state => state.sensors.report_filters,
-			navbarSettings: state => state.global.navbarSettings,
-
-			globalFilters: state => state.global.globalFilters,
-			// globalSelectedPlant: state => state.global.globalSelectedPlant,
-			plantsLoading: state => state.global.globalPlantsLoading,
-			plantsList: state => state.global.globalPlantsList,
-			authUser: state => state.auth.authUser,
-			isIndustrialMatrix: state => state.auth.isIndustrialMatrix,
-			isCustomer: state => state.auth.isCustomer,
-
-			compareList: state => state.global.compareList,
-			fromDashboard: state => state.global.fromDashboard,
-			disposableHistoryButton: state => state.global.disposableHistoryButton,
-			userRolesListState: state => state.user_roles.itemsList
-		}),
-
-		pageTitle() {
-			const { navbarSettings } = this;
-			// console.log(navbarSettings)
-			if (navbarSettings) {
-				return navbarSettings.pageTitle || '';
-			}
-
-			return '';
-		},
-
-		factUserRoleType() {
-			let result = {};
-			if (this.authUser.type === USER_ROLES_TYPES.INDUSTRIAL_MATRIX) {
-				result.isIndustrialMatrix = true;
-			} else if (this.authUser.type === USER_ROLES_TYPES.DEVELOPER) {
-				result.isIndustrialMatrix = true;
-				result.isDeveloper = true;
-			} else if (this.authUser.type === USER_ROLES_TYPES.CUSTOMER) {
-				result.isCustomer = true;
-			}
-
-			return Object.freeze(result);
-		},
-
-		// isCustomer: that => that.authUser && that.authUser.plants.length == 1,
-
-		creationMenuModalSettings: () =>
-			Object.freeze({
-				editModalProp: 'editModalClassic',
-				modalClassName: 'fixed-header-footer small-header small-footer'
-			}),
-
-		baseCreationMenuList() {
-			return Object.freeze([
-				{
-					label: this.tt('common.Production_line'),
-					instance: 'ProductionLines',
-					checkPlant: true,
-					icon: 'icomoon icon-production_lines',
-					permissions: ['create_dashboard']
-				},
-				{
-					label: this.tt('common.Utility'),
-					instance: 'Utilities',
-					checkPlant: true,
-					componentPath: 'ProductionLines/ItemForm',
-					icon: 'icomoon icon-production_lines',
-					permissions: ['create_dashboard']
-				},
-				{
-					label: this.tt('common.Machine'),
-					instance: 'Machines',
-					checkPlant: true,
-					icon: 'icomoon icon-machines',
-					permissions: ['create_dashboard']
-				},
-				{
-					label: this.tt('common.Asset'),
-					instance: 'Assets',
-					checkPlant: true,
-					icon: 'icomoon icon-assets',
-					permissions: ['create_dashboard']
-				},
-				{
-					label: this.tt('common.Item'),
-					componentPath: 'Equipments/ItemFormWrapper',
-					checkPlant: true,
-					icon: 'icomoon icon-equipments',
-					permissions: ['create_dashboard']
-				},
-				{
-					label: this.tt('common.Work_Order'),
-					componentPath: 'Maintenance/MaintenanceFormWrapper',
-					icon: 'icomoon icon-maintenance',
-					checkPlant: true,
-					permissions: ['create_maintenance'],
-					additionalModalSettings: {
-						switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
-						plantId: this.globalFilters.plantId
-					}
-				},
-				{
-					label: this.tt('common.Maintenance_Log'),
-					componentPath: 'Maintenance/MaintenanceFormWrapper',
-					checkPlant: true,
-					icon: 'icomoon icon-maintenance',
-					permissions: ['create_maintenance'],
-					additionalModalSettings: {
-						switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
-						plantId: this.globalFilters.plantId
-					}
-				}
-			]);
-		},
-
-		creationMenuList() {
-			return Object.freeze(
-				this.baseCreationMenuList.filter(mi =>
-					hasAccessTo({ role: this.authUser.role, permissionKeys: mi.permissions })
-				)
-			);
-		},
-
-		showPlant() {
-			if (this.navbarSettings && this.navbarSettings.showPlantName) {
-				const { id, name } = this.navbarSettings.showPlantName;
-
-				return Object.freeze({ id, name });
-			}
-			return null;
-		},
-
-
-		// SCOPES: () => SCOPES,
-	},*/
-
-/*methods: {
-		...mapActions({
-			show_edit_modal: 'show_edit_modal',
-			fetch_user_roles: 'user_roles/fetch_user_roles',
-
-			// set_global_filters: 'set_global_filters',
-			set_global_filters: 'set_global_filters',
-			set_report_filters: 'sensors/set_report_filters',
-			fetch_global_plants: 'fetch_global_plants',
-			set_global_state: 'set_global_state',
-			set_temp_role: 'auth/set_temp_role',
-			get_auth_user: 'auth/get_auth_user',
-			set_user_roles: 'user_roles/set_user_roles',
-			set_auth_user: 'auth/set_auth_user'
-		}),
-
-		fetchUserRoles() {
-			this.doFetchAction('fetch_user_roles', 'userRolesList', 'userRolesLoading', {
-				// toStore: true,
-				params: { max: -1 }
-			});
-		},
-
-		emitEvent(eventName, data) {
-			this.$emit('event', eventName, data);
-		},
-
-
-
-		handleCloseButton() {
-			this.changeRoute({ history: true, steps: -1 });
-		},
-
-
-
-
-
-		createItemByMenu(item) {
-			// console.log(item)
-			const settings = {
-				...this.creationMenuModalSettings,
-				show: true,
-				itemName: item.label,
-				componentPath: item.componentPath,
-				instanceName: item.instance,
-				additionalModalSettings: item.additionalModalSettings
-			};
-			// console.log(settings)
-			this.show_edit_modal(settings);
-			this.showCreationMenu = false;
-		},
-
-		globalClick({ target }) {
-			if (
-				!target.closest('creation-menu-list') &&
-				!target.closest('.creation-menu-button')
-			) {
-				this.showCreationMenu = false;
-			}
-		},
-
-
-
-		fetchPlants() {
-			this.fetch_global_plants({
-				params: {
-					max: -1,
-					// archivedCompanies: false,
-					orderByColumn: 'name',
-					orderByMethod: 'asc'
-				}
-			});
-		}
-	},*/
-
-/*watch: {
-		$route() {
-			if (this.disposableHistoryButton) {
-				this.set_global_state({
-					stateProp: 'disposableHistoryButton',
-					value: false
-				});
-			}
-		},
-
-		showCreationMenu(show) {
-			if (show) {
-				document.addEventListener('click', this.globalClick);
-			} else {
-				document.removeEventListener('click', this.globalClick);
-			}
-		}
-	},*/
-
-/*created() {
-		if (this.isIndustrialMatrix) {
-			this.fetchUserRoles();
-		} else {
-			this.userRolesList = this.userRolesListState;
-		}
-
-		this.fetchPlants();
-
-		if (this.authUser && this.authUser.plant_id && this.isCustomer) {
-			this.setGlobalFilters({
-				id: this.authUser.plant_id,
-				filterName: 'plantId'
-			});
-		}
-	},*/
-
-/*beforeDestroy() {
-		// if (!this.keepGlobalFilters) {
-		this.set_global_filters({ plantId: null, companyId: null });
-		// }
-	}*/
-// };
 </script>
