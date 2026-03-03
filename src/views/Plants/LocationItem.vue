@@ -13,11 +13,12 @@
 		<div>
 			<el-button
 				class="action-button remove-button"
-				size="mini"
+				size="small"
 				type="danger"
-				icon="icomoon icon-cross"
 				@click="removeItem"
-			/>
+			>
+				<i class="icomoon icon-cross"></i>
+			</el-button>
 		</div>
 	</el-form>
 </template>
@@ -49,11 +50,19 @@ const rules = computed(() => ({
 	name: props.required ? requiredRule : null,
 }));
 
-const { removeItem } = useSubItem({
+const useSubItemResult = useSubItem({
 	itemData: props.itemData,
 	formData,
 	itemFormRef: itemForm,
 	deleteNewId: true,
 	emit,
+});
+
+const { removeItem, validateItemForm, getFormData, submitItemForm } = useSubItemResult;
+
+defineExpose({
+	validateItemForm,
+	getFormData,
+	submitItemForm,
 });
 </script>

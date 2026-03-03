@@ -1,5 +1,4 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { Sortable } from '@shopify/draggable';
 
 export function useDragNdropSortable({
 	wrapperSelector,
@@ -10,6 +9,7 @@ export function useDragNdropSortable({
 	const draggingLocked = ref(true);
 	const sortableInstance = ref(null);
 	const draggableInitiated = ref(false);
+	const sortableLib = ref(null);
 
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
@@ -21,14 +21,28 @@ export function useDragNdropSortable({
 		return draggingLocked.value;
 	});
 
-	const setupDraggable = (settings = {}) => {
+	const loadSortable = async () => {
+		if (sortableLib.value) return sortableLib.value;
+
+		try {
+			const mod = await import('@shopify/draggable');
+			sortableLib.value = mod?.Sortable || null;
+		} catch {
+			console.warn('[useDragNdropSortable] @shopify/draggable is not available');
+			sortableLib.value = null;
+		}
+
+		return sortableLib.value;
+	};
+
+	const setupDraggable = async (settings = {}) => {
 		if (!draggingLockedFinal.value) {
 			if (!draggableInitiated.value) {
 				const selector = resolve(wrapperSelector);
 				if (!selector) return;
 				const lists = document.querySelectorAll(`${selector} .drag-n-drop-list`);
 				if (lists.length) {
-					initiateDraggable(settings);
+					await initiateDraggable(settings);
 				}
 			}
 		} else {
@@ -44,7 +58,10 @@ export function useDragNdropSortable({
 		}
 	};
 
-	const initiateDraggable = (settings = {}) => {
+	const initiateDraggable = async (settings = {}) => {
+		const Sortable = await loadSortable();
+		if (!Sortable) return;
+
 		const selector = resolve(wrapperSelector);
 		if (!selector) return;
 		const contentContainer = document.querySelector('.dashboard-content-container');

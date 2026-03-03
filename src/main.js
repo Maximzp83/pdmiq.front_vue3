@@ -25,7 +25,14 @@ Highcharts.setOptions({
 
 import './assets/sass/app.scss';
 
+
+import CustomInput from '@/components/form/CustomInput.vue';
+import CustomSelectV from '@/components/form/CustomSelectV2.vue';
+
 const app = createApp(App);
+
+app.component('CustomInput', CustomInput);
+app.component('CustomSelectV', CustomSelectV);
 
 app.use(createPinia());
 app.use(router);

@@ -65,7 +65,7 @@
 					:href="itemData.full_file_name || itemData.url || '#'"
 					target="_blank"
 				>
-					<el-button class="uppercase action-button link-button" size="mini" type="success">
+					<el-button class="uppercase action-button link-button" size="small" type="success">
 						{{ tt('VIEW') }}
 					</el-button>
 				</a>
@@ -74,10 +74,11 @@
 					v-if="(multiple || showDeleteButton) && deleteButtonType == 'mini-red-button'"
 					class="action-button remove-button span-block"
 					type="primary"
-					size="mini"
-					icon="icomoon icon-cross"
+					size="small"
 					@click="removeItem"
-				/>
+				>
+					<i class="icomoon icon-cross"></i>
+				</el-button>
 
 				<span
 					v-if="(multiple || showDeleteButton) && deleteButtonType == 'mini-cross'"

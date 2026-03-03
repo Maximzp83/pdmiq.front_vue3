@@ -616,28 +616,6 @@
 	.filterbar-container {padding: 0;}
 }
 
-.datepicker-container {
-	max-width: 237px;
-	
-	&:not(.no-min-width) {min-width: 222px;}
-
-	&.mini {
-		max-width: 130px;
-		min-width: 130px;
-
-		.el-input {
-			.el-input__prefix {left: 5px;}
-
-			.el-input__inner {
-				padding-left: 30px;
-				padding-right: 15px;
-			}
-
-			.el-input__icon {line-height: 30px;}
-		}
-	}
-}
-
 .legend-container {max-width: 320px;}
 
 .hiddenContent {

@@ -3,8 +3,10 @@
 - Apply changes only after user confirmation.
 - If there are risks or ambiguous/disputable points, highlight them and ask clarifying questions before changes.
 - Migrate one file at a time (no multi-file chunks).
+- Exception: if a change is structurally coupled across parent/child or otherwise tightly linked files, one combined step may include multiple files.
 - Diff preview is NOT required before applying a file.
 - After each single-file migration, stop and wait for the next user instruction.
+- For the coupled-files exception above, stop after the combined step and wait for the next user instruction.
 - Continue migrating all components from `vue2_project/src/components` and update already migrated ones if needed.
 - During migration, replace all `@event="handleEventNew"` with `@event="handleEvent"`.
 - Do not display code/diff in terminal responses unless there is a risky or ambiguous point that requires discussion.

@@ -1,12 +1,14 @@
 # Continuation Briefing
 
 ## Project stack
+
 - Vue 3 (`script setup`), Vite 6, Vue Router 4, Pinia 3.
 - UI: Element Plus 2.
 - HTTP: Axios via `src/api` + `api_request` wrapper.
 - Tooling: ESLint 9, Prettier 3, Vitest.
 
 ## Key architecture rules
+
 - Migrate from `vue2_project` into current Vue3 architecture only.
 - Use `src/api`, Pinia stores, and composables (`src/composables/mixins/*`), do not reintroduce Vue2 mixins/Vuex patterns.
 - Replace `@event="handleEventNew"` with `@event="handleEvent"` during migration.
@@ -14,6 +16,7 @@
 - Working mode from docs: one migration step at a time, apply changes directly, stop after each step.
 
 ## Current task status
+
 - Migrated and added missing groups:
   - `src/components/table/*` completed (including `Row`, `TableCell`, `TableHeader`, `TableHeaderCell`).
   - `src/components/common/*` remaining files migrated.
@@ -26,6 +29,7 @@
 - Runtime crash source identified and fixed in `TableAction.vue` for CSS class icons (`icon: 'icomoon ...'`).
 
 ## Files already modified
+
 - `docs/migration-progress.md`
 - `docs/migration-todos.md`
 - `docs/session-collaboration-rules.md`
@@ -68,12 +72,14 @@
 - Assets: `src/assets/img/404.png`, `src/assets/img/flags/{CA,US,MX}.png`
 
 ## Unresolved issues
+
 - Need runtime verification in UI after latest fixes on Plants flow (list actions, pagination, notifications).
 - `src/views/Plants/Details/DetailsPage.vue` is still not fully migrated (contains large placeholder/commented blocks).
 - `src/components/layout/TopNavbar.vue` was cleaned partially and may still contain legacy/commented sections; functional verification needed.
 - Repo has additional pre-existing modified files unrelated to current step (`components.d.ts`, `src/api/*`, styles, router, etc.) and should be treated carefully.
 
 ## Next actionable step
+
 - Start with runtime validation of `/plants`:
   - open Plants list,
   - verify pagination, create/edit/delete actions, and absence of runtime exceptions.

@@ -4,7 +4,7 @@
 		<i v-if="prefixIcon" :class="['input-prefix', prefixIcon]"></i>
 		<span v-if="prefixText" class="input-prefix prefix-text">{{ prefixText }}</span>
 
-		<el-select
+		<el-select-v2
 			:class="[
 				{ 'multiple-select': multiple },
 				className,
@@ -12,41 +12,36 @@
 				{ 'collapse-tags': collapseTags },
 				{ mini: mini }
 			]"
-			@visible-change="handleToggleDropdown"
+			:model-value="currentValue"
+			:options="normalizedOptions"
 			:disabled="!enabled && (!optionsList.length || disabled)"
 			:filterable="filterable"
 			:clearable="clearable"
-			:required="required"
 			:multiple="multiple"
 			:multiple-limit="multipleLimit"
 			:filter-method="filterMethod"
 			:placeholder="placeholder"
-			@change="handleInput"
-			:model-value="currentValue"
-			@focus="handleFocus"
-			@blur="handleBlur"
 			:collapse-tags="collapseTags"
 			:allow-create="allowCreate"
 			:default-first-option="defaultFirstOption"
+			@visible-change="handleToggleDropdown"
+			@update:model-value="handleInput"
+			@focus="handleFocus"
+			@blur="handleBlur"
 		>
-			<el-option
-				v-for="item in filteredList"
-				:key="'select_id-' + item[idKey]"
-				:class="optionClassName"
-				:value="item[valueKey]"
-				:label="useHtml ? getLabel(item).label : getLabel(item)"
-			>
-				<div v-if="useHtml" v-html="getLabel(item).html"></div>
-			</el-option>
-		</el-select>
+			<template v-if="useHtml" #default="slotProps">
+				<div v-if="slotProps.item.html" v-html="slotProps.item.html"></div>
+				<span v-else>{{ slotProps.item.label }}</span>
+			</template>
+		</el-select-v2>
 	</div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-import { setupLabel, findItemBy } from '@/helpers';
+import { computed } from 'vue';
+import { setupLabel } from '@/helpers';
+import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 
-// =========================
 const props = defineProps({
 	modelValue: null,
 	value: null,
@@ -79,47 +74,18 @@ const props = defineProps({
 	multipleLimit: { type: Number, default: undefined },
 	optionsList: {
 		type: Array,
-		default: () => []
-	}
+		default: () => [],
+	},
 });
 
 const emit = defineEmits(['update:modelValue', 'change', 'input', 'focus', 'blur', 'toggleDropdown']);
 
-// =========================
-const isDropdownActive = ref(false);
-
-// Поддержка как v-model, так и :value
 const currentValue = computed(() => {
 	return props.modelValue !== null && props.modelValue !== undefined
 		? props.modelValue
 		: props.value;
 });
 
-const filteredList = computed(() => {
-	const value = currentValue.value;
-	const origList = props.optionsList;
-	if (!origList.length) return [];
-
-	if (isDropdownActive.value) {
-		return origList;
-	}
-
-	if (value) {
-		if (value instanceof Array) {
-			let list = [];
-			for (let i = 0; i < value.length; i++) {
-				const item = findItemBy('id', value[i], origList);
-				if (item) list.push(item);
-			}
-			return list;
-		}
-		return origList.filter((pi) => pi.id === value);
-	}
-
-	return [origList[0]];
-});
-
-// =========================
 const getLabel = (item) => {
 	if (props.setupLabelSettings) {
 		return setupLabel(item, props.setupLabelSettings);
@@ -130,17 +96,30 @@ const getLabel = (item) => {
 	return props.label || item[props.labelKey];
 };
 
+const normalizedOptions = computed(() => {
+	return (props.optionsList || []).map((item) => {
+		const labelData = getLabel(item);
+		const label = typeof labelData === 'object' ? labelData.label : labelData;
+		const html = typeof labelData === 'object' ? labelData.html : '';
+
+		return {
+			...item,
+			label,
+			value: item[props.valueKey],
+			disabled: item.disabled || false,
+			html,
+			optionClassName: props.optionClassName,
+		};
+	});
+});
+
 const handleToggleDropdown = (val) => {
-	isDropdownActive.value = val;
 	emit('toggleDropdown', val);
 };
 
 const handleInput = (value) => {
-	// Поддержка v-model (Vue 3)
 	emit('update:modelValue', value);
-	// Поддержка @input (Vue 2 совместимость)
 	emit('input', value);
-	// Поддержка @change
 	emit('change', value);
 };
 

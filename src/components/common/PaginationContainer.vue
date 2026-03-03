@@ -95,6 +95,12 @@ const currentPage = computed({
 		> i {
 			line-height: 35px;
 			transition: none !important;
+			text-align: center;
+
+			svg {
+				display: block;
+				width: 100%;
+			}
 		}
 
 		&[disabled='disabled'] {

@@ -375,18 +375,18 @@ const routes = [
 			// 	component: () => import('@/views/Machines/ItemPage.vue'),
 			// 	meta: { auth: true, permissions: ['edit_machines'] },
 			// },
-			// {
-			// 	path: 'plants/:id/details',
-			// 	name: 'PlantDetailsPage',
-			// 	component: () => import('@/views/Plants/Details/DetailsPage.vue'),
-			// 	meta: { auth: true, permissions: ['view_plants'] },
-			// },
-			// {
-			// 	path: 'plants/:id',
-			// 	name: 'PlantEdit',
-			// 	component: () => import('@/views/Plants/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_plants'] },
-			// },
+			{
+				path: 'plants/:id/details',
+				name: 'PlantDetailsPage',
+				component: () => import('@/views/Plants/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_plants'] },
+			},
+			{
+				path: 'plants/:id',
+				name: 'PlantEdit',
+				component: () => import('@/views/Plants/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_plants'] },
+			},
 			// {
 			// 	path: 'plants/create',
 			// 	name: 'PlantCreate',

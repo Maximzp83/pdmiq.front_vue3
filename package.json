@@ -12,11 +12,13 @@
 		"format": "prettier --write src/"
 	},
 	"dependencies": {
+		"@shopify/draggable": "^1.2.1",
 		"axios": "^1.13.2",
 		"element-plus": "^2.10.2",
 		"highcharts": "^12.4.0",
 		"highcharts-vue": "^2.0.1",
 		"pinia": "^3.0.1",
+		"uniqid": "^5.4.0",
 		"vue": "^3.5.13",
 		"vue-element-loading": "^2.0.2",
 		"vue-router": "^4.5.0"

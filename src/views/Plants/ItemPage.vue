@@ -64,7 +64,7 @@ const fetchItem = async () => {
 	itemLoading.value = true;
 	try {
 		const { value } = await api_request.get(`/plants/${route.params.id}`, {
-			notNotify: false,
+			notNotify: true,
 		});
 		itemData.value = value;
 		loadContent.value = true;
