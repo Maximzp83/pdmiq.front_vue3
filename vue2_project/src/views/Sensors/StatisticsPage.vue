@@ -512,8 +512,7 @@ export default {
 			const {enableAxisSelector, $hasAccessTo} = this;
 			const { isBannerV2_1, isBannerM25, isBannerV2Generic } = this.currentSensorType;
 			const { bannerV2Subtype } = this.sensorData;
-			// console.log(this.sensorData)
-
+			
 			if ($hasAccessTo(['view_dashboard'])) {
 				return enableAxisSelector || isBannerV2_1 || isBannerM25 ||
 						(isBannerV2Generic && (bannerV2Subtype && bannerV2Subtype.is_fft_allowed));

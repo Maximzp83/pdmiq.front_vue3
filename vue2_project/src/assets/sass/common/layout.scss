@@ -1,4 +1,6 @@
 body {
+	padding-right: 0!important;
+
 	& > .draggable-mirror {
 		z-index: 2250!important;
 		transition: none !important;

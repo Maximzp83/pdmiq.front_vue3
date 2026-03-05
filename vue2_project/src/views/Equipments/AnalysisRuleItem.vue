@@ -46,8 +46,15 @@
 					class=""
 				>
 					<div class="flex align-center">
+						<CustomInput
+							class="mcol-xs-11 span-block"
+							v-if="itemData.custom_value & isCustomEnabled"
+							:placeholder="`${tt('Input')}`"
+							v-model="formData.custom_value"
+						/>
 							<!-- default-first-option -->
 						<CustomSelect
+							v-else
 							class="mcol-xs-11 span-block"
 							filterable
 							clearable
@@ -198,6 +205,7 @@ export default {
 		handleShowAnalysisRuleFormDialog() {
 			this.initiatedAnalysisRuleFormDialog = true;
 			this.showAnalysisRuleFormDialog = true;
+			this.setupPage(this.itemData);
 		},
 
 		handleSave() {
@@ -219,9 +227,9 @@ export default {
 			);
 		},
 
-		/*localSetupPageActions() {
-			this.isCustomEnabled = this.original_rule.is_editable;
-		},*/
+		localSetupPageActions() {
+			this.isCustomEnabled = this.original_rule.is_editable && this.itemData.custom_value;
+		},
 
 		localGetFormDataCallback(formData) {
 			if (this.isCustomEnabled) {
@@ -241,7 +249,7 @@ export default {
 		brandModelId() {
 			// console.log('brandModelId', id)
 			this.fetchAnalysisRuleCrossoverOptions();			
-		}
+		},
 	
 	},
 

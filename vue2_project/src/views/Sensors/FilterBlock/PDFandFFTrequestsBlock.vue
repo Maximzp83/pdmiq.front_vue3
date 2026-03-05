@@ -354,7 +354,15 @@ export default {
 			}
 			return null;
 		},
-		
+
+		showUnlockFFTButton() {
+			const { sensorData } = this;
+			if (sensorData && sensorData.last_fft_lock) {
+				return sensorData.last_fft_lock.status !==  FFT_LOCK_STATUSES.UNLOCKED
+			}
+			return false;
+		},
+
 		successRpmSaveCallback() {
 			return (value) => {
 				this.$emit('event', {
@@ -364,14 +372,6 @@ export default {
 					onward: true
 				});
 			};
-		},
-
-		showUnlockFFTButton() {
-			const { sensorData } = this;
-			if (sensorData && sensorData.last_fft_lock) {
-				return sensorData.last_fft_lock.status !==  FFT_LOCK_STATUSES.UNLOCKED
-			}
-			return false;
 		}
 		// CONTROLLER_TYPES: () => CONTROLLER_TYPES
 	},

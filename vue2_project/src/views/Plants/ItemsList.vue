@@ -138,6 +138,12 @@ export default {
 			set_global_filters: 'set_global_filters'
 		}),
 
+		goToDashboard({ row }) {
+			const newFilters = { ...this.globalFilters, plantId: row.id };
+			this.set_global_filters(newFilters);
+			this.changeRoute({ path: '/dashboard/plant' });
+		},
+
 		setupPlantName(plant) {
 			let result = `<span class="div-block">${plant.name}</span>`;
 
@@ -146,12 +152,6 @@ export default {
 			}
 
 			return result;
-		},
-
-		goToDashboard({row}) {
-			const newFilters = { ...this.globalFilters, plantId: row.id };
-			this.set_global_filters(newFilters);
-			this.changeRoute({ path: '/dashboard/plant' });
 		}
 	}
 };

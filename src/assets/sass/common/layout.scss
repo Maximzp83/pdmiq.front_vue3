@@ -1,5 +1,9 @@
 @use "@/assets/sass/variables" as *;
 
+body {
+	padding-right: 0!important;
+}
+
 
 .main-wrapper {
 	max-width: $pageMaxWidth !important;

@@ -162,12 +162,12 @@
 				/>
 			</el-form-item>
 
-			<el-form-item v-if="canArchivePlant" :label="tt('Archive')" prop="is_archived">
-				<el-switch v-model="formData.is_archived" :active-value="1" :inactive-value="0" />
-			</el-form-item>
-
 			<el-form-item :label="tt('Commissioning')" prop="is_commissioning">
 				<el-switch v-model="formData.is_commissioning" :active-value="1" :inactive-value="0" />
+			</el-form-item>
+
+			<el-form-item v-if="canArchivePlant" :label="tt('Archive')" prop="is_archived">
+				<el-switch v-model="formData.is_archived" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
 			<el-form-item :label="tt('Locations')" prop="locations">

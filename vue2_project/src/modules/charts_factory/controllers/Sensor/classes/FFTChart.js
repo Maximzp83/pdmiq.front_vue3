@@ -1,7 +1,7 @@
 import ChartBase from '../../../classes/Chart';
 
 import { fetch_ncd_sensor_fft_statistics } from '../api/index.js';
-import { mergeObjects, cloneDeep, findItemBy, buildFormula } from '@/helpers';
+import { mergeObjects, cloneDeep, findItemBy, buildFormula, getRoundedValue } from '@/helpers';
 import { METRIC_SYSTEM_TYPES } from '../enums';
 
 // import { ncdAxisList } from '@/constants/global';
@@ -695,20 +695,49 @@ class FFTChart extends FFTChartBase {
 
 	handleRpmCursorDrag({ target }, settings = {}) {
 		try {
-			const { x, point_idx, serie_idx } = target;
-			// console.log(target, x, point_idx, serie_idx, this.options.series[serie_idx].data);
-			let newData = this.options.series[serie_idx].data || [];
+			if (!this.ChartAPI || !this.rpmSourceValue || !this.hasCursorFlagConfig()) {
+				return;
+			}
 
-			newData[point_idx] = setupFFTCursorItem({ ...newData[point_idx], x });
-			this.ChartAPI.series[serie_idx].setData(newData, false);
+			const { x, serieId, pointId, point_idx, serie_idx } = target;
+			// console.log(this.chart_id, this.ChartAPI.series)
+			const serieIdx = settings.isUpdateOnly ?
+				this.ChartAPI.series.find(serie => serie.userOptions.id === serieId)?.index :
+				serie_idx;
+			const pointIdx = settings.isUpdateOnly ?
+				this.ChartAPI.series[serieIdx].points.find(point => point.id === pointId)?.index :
+				point_idx;
+
+			const point = this.ChartAPI.series[serieIdx]?.points[pointIdx];
+				// console.log(serieIdx, this.ChartAPI.series[serieIdx])
+			if (!point) return;
 
 			this.updateAnnotationsFromFFTAnalysisRules({rpmValue: x});
 
+			if (settings.isUpdateOnly) {
+				const	title = `<div class="fft-cursor"><b>${getRoundedValue(x, 0, 3)} ${point.units_x}</b></div>`;
+
+				point.update({ x, title	}, true, false);
+
+				if (settings.isDrop) {
+					this.options.series[serieIdx].data[pointIdx].x = x;
+					this.options.series[serieIdx].data[pointIdx].title = title;
+				}
+				
+				return;
+			}
+			
 			if (this.events.rpmCursorDrag) {
 				this.events.rpmCursorDrag({ x });
 			}
 
+			if (this.events.rpmCursorDragFactoryHandler) {
+				this.events.rpmCursorDragFactoryHandler({ point, isDrop: settings.isDrop });
+			}
+
 			if (settings.isDrop) {
+				this.options.series[serieIdx].data[pointIdx].x = x; 
+				// console.log(this.options.series[serieIdx].data[pointIdx]);
 				if (this.events.rpmCursorDrop) {
 					this.events.rpmCursorDrop({ x });
 				}
@@ -793,6 +822,7 @@ class FFTChart extends FFTChartBase {
 	generateAnnotationsFromFFTAnalysisRules(selectedAnalysisRules) {
 		this.options.annotations = [];
 		const {value: rpmValue} = this.rpmSourceValue;
+
 		// console.log('generateAnnotationsFromFFTAnalysisRules', rpmValue)
 		// this.options.xAxis.minRange = 0.1;
 		// this.options.xAxis.startOnTick = false;
@@ -802,10 +832,11 @@ class FFTChart extends FFTChartBase {
 			this.options.annotations[idx].customSettings = { calcFormula };
 			// console.log('generateAnnotationsFromFFTAnalysisRules', rule_item)
 			const { harmonics, name } = rule_item.original_rule;
+			let activeValue = /*rule_item.vibration_analysis_custom_value || rule_item.vibration_analysis_value ||*/ (rule_item.option_value_id && rule_item.option_value.value) || rule_item.custom_value;
+			// console.log(activeValue, rule_item)
 			this.options.annotations[idx].customSettings.harmonics = harmonics;
-			this.options.annotations[idx].customSettings.value = +rule_item.option_value.value;
-			// let start = rule_item.vibration_analysis_custom_value || rule_item.vibration_analysis_value || rule_item.option_value || rule_item.custom_value;
-			let start = calcFormula({ rpm: rpmValue, value: +rule_item.option_value.value });
+			this.options.annotations[idx].customSettings.value = +activeValue;
+			let start = calcFormula({ rpm: rpmValue, value: +activeValue });
 			start = +start;
 			const step = +start;
 
@@ -1145,7 +1176,7 @@ class FFTWaterfall3DChart extends FFTChartBase {
 				}
 			];
 		});
-		//test
+
 		seriesConfig.flagsData = [];
 		// console.log('seriesConfig', seriesConfig)
 		return seriesConfig;

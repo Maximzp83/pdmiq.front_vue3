@@ -128,7 +128,6 @@ const ImagePreviewModal = defineAsyncComponent(
 import { getParamsFromUrl } from '@/utils/url-helpers';
 import IdleTimer from '@/utils/IdleTimer';
 import { Lang } from '@/localization';
-import { useEventHandler } from '@/composables/mixins/useEmitter';
 
 const { tt } = Lang;
 
@@ -145,10 +144,6 @@ const globalStore = useGlobalStore();
 const {
 	viewContentComponentKey,
 	overlayData,
-	editModal,
-	editModalSecond,
-	editModalClassic,
-	editModalClassicSecond,
 	redirectTo,
 	isSidebarCollapse,
 	mainPreloader,
@@ -173,10 +168,10 @@ const timer = ref(null);
 const currentPath = computed(() => route.fullPath);
 
 const enableMfaWarning = computed(() => {
-	/*if (authUser.value && !authUser.value.is_mfa_enabled) {
+	if (authUser.value && !authUser.value.is_mfa_enabled) {
 		const plantAdminsIds = [4, 5, 6, 12];
 		return plantAdminsIds.some((id) => id === authUser.value.role_id);
-	}*/
+	}
 	return false;
 });
 

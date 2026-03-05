@@ -154,8 +154,8 @@
 								show-password
 								name="new-password"
 			  				autocomplete="new-password"
-				  			/>
-				  		</PasswordCheckList>
+			  			/>
+			  		</PasswordCheckList>
 					</el-form-item>
 
 					<el-form-item 
@@ -304,7 +304,6 @@
 					</div>
 				</div>
 
-				<!-- ----------------------- -->
 				<div
 					v-show="activeTab.prop == 'notificationsTab'"
 					:class="['tab-container', { 'half-width': !fromAnotherInstance && !isMobile }]"
@@ -316,7 +315,7 @@
 							class="notifications-block"
 							ref="NotificationsBlock"
 							:rows="userNotificationItemsList"
-							:isPhoneVerified="isPhoneVerified"
+							:isPhoneVerified="isPhoneVerified"						
 						/>
 					</div>
 
@@ -326,7 +325,7 @@
 							class="notifications-block"
 							ref="NotificationsBlockRT"
 							:rows="userRealTimeNotificationItemsList"
-							:isPhoneVerified="isPhoneVerified"
+							:isPhoneVerified="isPhoneVerified"							
 						/>
 					</div>
 
@@ -336,12 +335,10 @@
 							class="notifications-block"
 							ref="NotificationsBlockRequisitions"
 							:rows="userRequisitionNotificationItemsList"
-							:isPhoneVerified="isPhoneVerified"
 						/>
 					</div>
 				</div>
 
-				<!-- ----------------------- -->
 				<div
 					v-if="itemId"
 					v-show="activeTab.prop == 'reportsTab'"
@@ -410,11 +407,11 @@ export default {
 	components: {
 		PhoneInput: () => import('@/components/form/PhoneInput.vue'),
 		NotificationsBlock: () => import('./NotificationsBlock.vue'),
+		ReportsList: () => import('../UserReports/ItemsList.vue'),
 		MFABlock: () => import('./MFABlock.vue'),
 		PhoneVerificationBlock: () =>	import('./PhoneVerificationBlock.vue'),
 
 		PasswordCheckList: () => import('@/components/pages/PasswordCheckList.vue'),
-		ReportsList: () => import('../UserReports/ItemsList.vue'),
 		ProdlinesSelectItem: () => import('./ProdlinesSelectItem.vue'),
 	},
 
@@ -497,7 +494,7 @@ export default {
 				notifiable_production_lines: []
 				// is_amplitude_alarm_notifiable: false,
 			},
-			
+
 			submitUserFormData: {},
 
 			rules: {
@@ -763,6 +760,10 @@ export default {
 
 			this.doFetchAction('fetch_sensors', 'sensorsList', 'sensorsLoading', payload);
 		},
+
+		/*handlePlantsChange(ids) {
+			this.formData.notifiable_plants = ids;
+		},*/
 
 		validatePassword(rule, value, callback) {
 			// console.log('validatePassword', rule)

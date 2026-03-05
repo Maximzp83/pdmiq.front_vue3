@@ -1,4 +1,4 @@
-We are about to restart the Codex session.
+1) We are about to restart the Codex session.
 
   Create a minimal but sufficient context snapshot to resume work in a new session.
   Include only:
@@ -14,9 +14,12 @@ We are about to restart the Codex session.
   Update a file called SESSION_CONTEXT.md with this summary.
 
 ==================================================
-  At New Session:
+2)  At New Session:
   Read docs/session-collaboration-rules.md, docs/new-session-handoff.md,
   docs/migration-progress.md, and docs/migration-todos.md.
   Briefly confirm the current rules, SESSION_CONTEXT.md, keeping the mode: no code/diff output,
   one step at a time, and after each step provide the result and the path to the
   newly created file in plain text.
+
+
+3)  codex resume 019c9e46-4545-7511-a226-6138ff5b2521

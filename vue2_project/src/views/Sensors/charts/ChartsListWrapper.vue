@@ -506,13 +506,13 @@ export default {
 		handleOverlayChartWrapperReady({ hasStatistics }) {
 			// console.log('updateOverlayChartOptions')
 			this.overlayChartshasStatistics = hasStatistics;
+			this.overlayChartsListWrapperLoading = false;
 			this.callMethodInAllCharts({
 				ids: getValues('chart_id', this.ChartsListInstance.getCharts()),
 				methodName: 'updateOverlayChartOptions',
 				fromInstance: true,
 				payload: this.OverlayChartsListInstance.chartsInstancesList[0].getChartOptions()
 			});
-			this.overlayChartsListWrapperLoading = false;
 		},
 
 		buildOverlayCharts(data = {}) {

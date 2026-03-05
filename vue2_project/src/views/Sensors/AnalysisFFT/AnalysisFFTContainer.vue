@@ -80,7 +80,7 @@
 							:item-index="idx"
 							fromFFTPage
 							:rpm_source_value="currentRpmSource && currentRpmSource.value"
-							@save="handleSaveForm"
+							@save="handleSaveForm({clearSelectedChildComponentsOnCharts: true})"
 							:savingInProgress="savingInProgress"
 						/>
 					</div>
@@ -134,6 +134,7 @@
 			<SimpleSpinner :active="loadingRPM" />
 
 			<RPMSettingsDialog
+				v-if="showRpmSettingsDialog"
 				:sensorData="sensorData"
 				:currentRpmSource="currentRpmSource"
 				@save="saveRpmParams"
@@ -175,7 +176,8 @@ export default {
 			type: Object,
 			required: true
 		},
-		selectedChildComponentIds: Array
+		selectedChildComponentIds: Array,
+		rootFilters: Object,
 	},
 
 	data() {
@@ -283,7 +285,8 @@ export default {
 			return getCurrentRpmSource({
 				fftItem: this.fftItem,
 				sensorData: this.sensorData,
-				rpm_source_item: this.formData.rpm_source_item
+				rpm_source_item: this.formData.rpm_source_item,
+				rootFilters: this.rootFilters,
 			})
 		},
 
@@ -525,18 +528,18 @@ export default {
 			}
 		},
 
-		handleSaveForm() {
-			this.handleValidationResult([]);
+		handleSaveForm(settings) {
+			this.handleValidationResult([], settings);
 		},
 
-		localSubmit(formData) {
+		localSubmit(formData, settings) {
 			let payload = {
 				data: formData,
 				itemName: this.tt('Item'),
 			};
 			/*if (process.env.NODE_ENV === 'development') {
 				if (payload) {
-					console.log(payload)
+					console.log(payload, settings = {})
 					return;
 				}
 			}*/
@@ -544,7 +547,7 @@ export default {
 			this.$emit('event', { eventName: 'toggleEquipmentSaving', data: true });
 
 			this.save_equipment(payload)
-				.then(({value}) => {
+				.then((response) => {
 					// const { data, updateRoute } = answer;
 					this.showOptionValuesDialog = false;
 
@@ -560,10 +563,18 @@ export default {
 						})
 					}
 
-					this.$emit('event', {
-						eventName: 'updateEquipmentAndFFT',
-						data: {equipmentItem: value}
-					});
+					if (settings.clearSelectedChildComponentsOnCharts) {
+						this.$emit('event', {
+							eventName: 'clearSelectedChildComponentsOnCharts',
+						})
+					}
+					if (response && response.data && response.data.data) {
+						this.$emit('event', {
+							eventName: 'updateEquipmentAndFFT',
+							data: {equipmentItem: response.data.data}
+						});
+					}
+					
 					this.$emit('event', { eventName: 'toggleEquipmentSaving', data: false });	
 					this.savingInProgress = false;
 				})

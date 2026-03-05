@@ -350,8 +350,9 @@ export default {
 		currentFaultsType() {
 			const { isSDTsensor, isUltrasound, isNCDSDT, isBannerV2_1 } = this.currentSensorType;
 
-			if (isUltrasound || this.isLubeMatrixV3) return 'lubematrix';
 			if (isBannerV2_1) return 'banner_V2_1';
+
+			if (isUltrasound || this.isLubeMatrixV3) return 'lubematrix';
 			if (isSDTsensor || isNCDSDT) return 'ultrasoundSDT';
 			// if (isHumiditySensor) return 'humidity';
 			return 'banner';

@@ -1297,6 +1297,10 @@ export default {
 			});
 		},*/
 
+		handleEquipmentTypeChange() {
+			this.formData.equipment_subtype_id = null;
+		},
+
 		handleStatusChange(id) {
 			this.formData.is_limbo = false;
 			this.formData.is_store_room = 0;
@@ -1310,13 +1314,6 @@ export default {
 			} else if (id === this.STATUSES_TYPES.ASSET) {
 				this.rules.asset_id = required;
 			}
-		},
-
-		handleEquipmentTypeChange() {
-			this.formData.equipment_subtype_id = null;
-			// -----------------
-			// this.equipmentTypeHasChanged = true;
-			// this.fetchVibrationAnalysis(id);
 		},
 
 		// ----------------------
@@ -1333,7 +1330,6 @@ export default {
 				payload
 			);
 		},
-		// -------------------
 
 		localGetFormDataCallback(data) {
 			const { status_id, childEquipmentType } = this;

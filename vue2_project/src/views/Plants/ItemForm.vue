@@ -325,23 +325,23 @@
 			</el-form-item>
 
 			<el-form-item
-				v-if="$hasAccessTo(['archive_plants'])"
-				:label="tt('Archive')"
-				prop="is_archived"
-			>	
+				:label="tt('Commissioning')"
+				prop="is_commissioning"
+			>
 				<el-switch
-					v-model="formData.is_archived"
+					v-model="formData.is_commissioning"
 					:active-value="1"
 					:inactive-value="0"
 				/>
 			</el-form-item>
 
 			<el-form-item
-				:label="tt('Commissioning')"
-				prop="is_commissioning"
-			>
+				v-if="$hasAccessTo(['archive_plants'])"
+				:label="tt('Archive')"
+				prop="is_archived"
+			>	
 				<el-switch
-					v-model="formData.is_commissioning"
+					v-model="formData.is_archived"
 					:active-value="1"
 					:inactive-value="0"
 				/>
@@ -517,9 +517,9 @@ export default {
 				is_amplitude_alarm_tracking: false,
 				amplitude_alarm_threshold_multiplier: 2.5,
 				is_equipment_runtime_tracking: false,
+				is_commissioning: false,
 
 				is_archived: false,
-				is_commissioning: false,
 				joined_at: '',
 				zoho_id: '',
 				// workStations: []

@@ -1600,8 +1600,8 @@ export const hexToRgba = (hex, alpha = 1) => {
   const b = parseInt(hex.slice(5, 7), 16);
 
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
- };
- 
+};
+
 const buildFormula1 = (formula) => {
   // заменяем {key} → data.key
   const expression = formula.replace(
@@ -1614,8 +1614,6 @@ const buildFormula1 = (formula) => {
     `return ${expression};`
   );
 };
-
-
 
 export const findItemBy = (property, value, itemsList, settings) =>
 	findItemBy1(property, value, itemsList, settings);

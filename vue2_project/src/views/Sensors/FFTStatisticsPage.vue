@@ -68,6 +68,7 @@
 								:fftItem="currentFFTItem"
 								@event="handleEventNew"
 								:selectedChildComponentIds="selectedChildComponentIds"
+								:rootFilters="{ measurement }"
 							/>
 						</div>
 					</div>
@@ -426,7 +427,7 @@ export default {
 		},
 
 		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload, updateRpmValue}) {
-			// console.log('reFetchEquipment', skipFFTReload)
+			// console.log('reFetchEquipment', equipmentItem, fftItem, skipFFTReload, updateRpmValue)
 			// this.fetchEquipment(this.itemData.equipment_id);
 			/*if (callChartsMethod) {
 				if (this.$refs.FFTChartsListWrapper) {
@@ -543,6 +544,10 @@ export default {
 			} else {
 				this.selectedChildComponents = this.selectedChildComponents.filter(item => item.id !== component.id);
 			}
+		},
+
+		clearSelectedChildComponentsOnCharts() {
+			this.selectedChildComponents = [];
 		},
 
 		handleRpmCursorDrop(data) {

@@ -174,7 +174,7 @@ export default {
 
 		isBannerTempVibe2: that =>
 			that.currentSensorType && (that.currentSensorType.isBannerTempVibe2 || that.currentSensorType.isBannerV2_1 || that.currentSensorType.isBannerV2Generic),
-		isBannerM25: that => that.currentSensorType && that.currentSensorType.isBannerM25,
+		isBannerM25: that =>	that.currentSensorType && that.currentSensorType.isBannerM25,
 
 		LANGUAGE_TYPES: () => LANGUAGE_TYPES,
 

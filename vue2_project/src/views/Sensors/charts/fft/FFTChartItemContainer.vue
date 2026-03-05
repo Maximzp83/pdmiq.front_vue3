@@ -447,7 +447,8 @@ export default {
 			return getCurrentRpmSource({
 				fftItem: this.currentFFTItem,
 				sensorData: this.ChartInstance.sensorItem,
-				rpm_source_item: this.additionalProps.equipmentData.rpm_source_item
+				rpm_source_item: this.additionalProps.equipmentData.rpm_source_item,
+				rootFilters: this.rootFilters
 			})
 		},
 	},

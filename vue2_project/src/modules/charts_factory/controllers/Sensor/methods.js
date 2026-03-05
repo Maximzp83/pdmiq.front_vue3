@@ -822,7 +822,7 @@ const getZoneMinMaxPoint = (
 const getUnitType1 = ({ parameterItem, measurement, returnItem }) => {
 	if (parameterItem && !parameterItem.skipUnit) {
 		const metricKeysTableName = parameterItem.metricKeysTableName || 'default';
-		// console.log( metricKeysTable, metricKeysTableName, parameterItem, 	[measurement])
+		// console.log( metricKeysTable, metricKeysTableName, [measurement])
 		const unitTypeId = metricKeysTable(metricKeysTableName, measurement)[parameterItem.id];
 		const unitTypeItem = findItemBy('id', unitTypeId, unitTypesList());
 		// console.log(system_type, parameter, metricKeysTableName, unitTypeId)

@@ -981,7 +981,7 @@ class SensorChart extends SensorChartBase {
 			resources.chart_config.YAxisList = [ this.requestsList[0], rpmYAxis ];
 		}
 	}
-	
+
 	finalSetupReadyCallback() {
 		var { transformator_settings } = this;
 		if (transformator_settings) {
@@ -2488,7 +2488,6 @@ class MultiViewChart extends ChartBase {
 	}
 
 	setupUnitTypeName(payload) {
-		// console.log('setupUnitTypeName', payload)
 		return getUnitType(payload);
 	}
 

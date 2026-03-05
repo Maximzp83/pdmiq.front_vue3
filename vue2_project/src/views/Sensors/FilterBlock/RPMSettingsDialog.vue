@@ -37,19 +37,20 @@ import {
 	ITEM_SPEED_OPTIONS
 } from '@/constants/global';
 
+
 export default {
 	props: {
 		sensorData: {
 			type: Object,
 			default: () => ({})
 		},
-		fftItem: {
-			type: Object,
-			default: () => null
-		},
 		rootFilters: {
 			type: Object,
 			default: () => ({})
+		},
+		fftItem: {
+			type: Object,
+			default: () => null
 		},
 		currentRpmSource: null
 	},
@@ -64,12 +65,15 @@ export default {
 
 	computed: {
 		itemSpeedOptionsList: () => itemSpeedOptionsList(),
-		preparedItemSpeedOptionsList: that => setupItemSpeedOptionsList({
-			sensorData: that.sensorData,
-			measurement: that.rootFilters.measurement,
-			itemSpeedOptionsList: that.itemSpeedOptionsList,
-			fftItem: that.fftItem
-		}),
+		preparedItemSpeedOptionsList: that => {
+			return setupItemSpeedOptionsList({
+				sensorData: that.sensorData,
+				itemSpeedOptionsList: that.itemSpeedOptionsList,
+				fftItem: that.fftItem,
+				rootFilters: that.rootFilters
+			})
+
+		},
 
 		radioSettings: () =>
 			Object.freeze({

@@ -241,8 +241,9 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				}
 				// --------------------
 				if (actualSpecification.setupPointsData) {
-					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
 					let zonesList;
+
+					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
 
 					if (enableZones) {
 						zonesList = setupZonesList({
@@ -268,6 +269,11 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						...settings,
 						...actualSpecification.setupPointsData,
 					});
+					/*console.log(parameter_item.id, {
+						...settings,
+						...actualSpecification.setupPointsData,						
+					})*/
+
 
 					// statistics_result.pointsData.statsData = statistics_result.pointsData.statsData || {};
 

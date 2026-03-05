@@ -3861,32 +3861,6 @@
 	.item-action-button {padding: 0 5px;}
 }
 
-.add-to-favorites-button-content {
-	.el-icon-star-on {
-		font-size: 22px;
-		color: $primary-color;
-	}
-	.el-icon-star-off {font-size: 18px;}
-}
-
-.reorder-button {
-	position: absolute;
-	left: 5px;
-	z-index: 1002;
-	visibility: hidden;
-	opacity: 0;
-	// margin-left: auto;
-	cursor: grab;
-	margin-left: 5px;
-	border-radius: 3px;
-	background-color: #f0f2f5;
-	padding: 5px;
-	box-sizing: border-box;
-	width: 32px;
-	height: 32px;
-	transition: all .2s;
-}
-
 .one-chart-page-legend {
 	position: absolute;
 	top: 20px;
@@ -3924,6 +3898,14 @@
 	width: 32px;
 	height: 32px;
 	transition: all .2s;
+}
+
+.add-to-favorites-button-content {
+	.el-icon-star-on {
+		font-size: 22px;
+		color: $primary-color;
+	}
+	.el-icon-star-off {font-size: 18px;}
 }
 
 @keyframes horizontal-move {

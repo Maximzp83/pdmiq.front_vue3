@@ -2102,16 +2102,41 @@
 
 			.checkbox-part .el-form-item__content {margin-left: 220px !important;}
 		}
-	}
 
-	&.user-report-form {
+		.reports-tab {
+			max-width: 850px;
+			min-width: 572px;
+			margin-left: 10px;
+		}
 
-		.radio-container {
-			.mrow {
-				margin: -5px;
+		.reports-list-container {
+		
+			& > .el-form-item__content {
+				margin-left: 0 !important;
 			}
-			.radio-item {
-				padding: 5px;
+
+			.card {
+				background-color: #f6fafd;
+			}
+
+			.report-item-form {
+				.radio-item {
+					padding: 4px;
+				}
+			}
+
+			.create-button-container .el-button {
+				width: 100%;
+				border: 1px #c6c6c6 dotted !important;
+
+				span  {vertical-align: middle;}
+				
+				.icon-plus {
+					font-size: 17px;
+					font-weight: 600;
+					margin-left: 10px;
+					color: #adb5bc;
+				}
 			}
 		}
 	}
@@ -2129,6 +2154,17 @@
 				margin-top: 20px;
 				padding-top: 20px;
 				border-top: 1px solid #c4c4c4;
+			}
+		}
+	}
+	&.user-report-form {
+
+		.radio-container {
+			.mrow {
+				margin: -5px;
+			}
+			.radio-item {
+				padding: 5px;
 			}
 		}
 	}

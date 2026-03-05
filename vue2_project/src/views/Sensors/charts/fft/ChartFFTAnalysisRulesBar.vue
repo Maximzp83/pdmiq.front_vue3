@@ -90,7 +90,7 @@ export default {
 		rulesList() {
 			if (this.componentItem.vibration_analysis_rules) {
 				// console.log('1', this.componentItem.vibration_analysis_rules)
-				return this.componentItem.vibration_analysis_rules.filter(ri => ri.custom_value || ri.option_value_id || ri.vibration_analysis_value || ri.vibration_analysis_custom_value ).map(ri => ({
+				return this.componentItem.vibration_analysis_rules.filter(ri => ri.custom_value || ri.option_value_id /*|| ri.vibration_analysis_value || ri.vibration_analysis_custom_value */).map(ri => ({
 					...ri,
 					isActive: this.selectedAnalysisRules.some(sri => sri.id === ri.id),
 					borderColor: ri.color,

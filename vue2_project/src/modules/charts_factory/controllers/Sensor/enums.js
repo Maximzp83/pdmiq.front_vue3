@@ -773,7 +773,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_hi_frequency_RMS_acceleration',
-		short_name: 'Ahf',
+		short_name: 'short_name.hi_freq_accel',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -810,7 +810,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_full_band_rms_acceleration',
-		short_name: 'Alf',
+		short_name: 'short_name.full_band_accel',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -828,7 +828,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.x_rms_velocity_mm',
-		short_name: 'Vx',
+		short_name: 'short_name.x_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -837,7 +837,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.y_rms_velocity_mm',
-		short_name: 'Vy',
+		short_name: 'short_name.y_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -846,7 +846,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.z_rms_velocity_mm',
-		short_name: 'Vz',
+		short_name: 'short_name.z_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'

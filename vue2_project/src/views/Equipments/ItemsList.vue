@@ -101,7 +101,7 @@ import { standardTableOperations, ITEMS_GRID_TYPES } from '@/constants/table';
 import { findItemBy, getValues, cloneDeep } from '@/helpers';
 import { equipmentCardTitle } from '@/helpers/specialHelpers';
 import { LUBE_PROCESSING_STATUSES, LUBE_CYCLE_STATUSES } from '@/constants/ultrasound';
-import { SUBJECT_TYPES, FFT_LOCK_STATUSES } from '@/constants/global';
+import { FFT_LOCK_STATUSES, SUBJECT_TYPES } from '@/constants/global';
 
 import {
 	itemsDataMixin,

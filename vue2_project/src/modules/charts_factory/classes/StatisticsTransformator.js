@@ -9,6 +9,7 @@ export default class StatisticsTransformatorBase {
 			// chart_id: this.chart_id,
 			statistics_result: {}
 		};
+		this.requestsList = [];
 	}
 
 	getStatisticsKeys() {
@@ -21,7 +22,6 @@ export default class StatisticsTransformatorBase {
 
 	setupDataAccessor(parameterId) {
 		let data_accessor;
-		
 		const finalParameterId = parameterId || this.requestsList[0]?.id;
 		if (finalParameterId) {
 			data_accessor = `statistics_result.parameter_${finalParameterId}`;				

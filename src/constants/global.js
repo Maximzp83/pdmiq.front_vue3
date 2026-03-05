@@ -1611,11 +1611,11 @@ export const ITEM_SPEED_OPTIONS = {
 };
 
 const itemSpeedOptionsList1 = [
-	{ id: ITEM_SPEED_OPTIONS.LINESPEED_RPM, name: 'constants.linespeed_rpm', source_key: 'line_speed_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.SPECIFICATION_RPM, name: 'constants.specification_rpm', source_key: 'specification_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated', hasInput: true },
-	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', [`source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`]: 'max_peak_frequency_at_imperial_evaluated', [`source_key_${METRIC_SYSTEM_TYPES.METRIC}`]: 'max_peak_frequency_at_metric_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.EXTERNAL, name: 'constants.external_input', source_key: 'external_rpm_evaluated' },
+	{ id: ITEM_SPEED_OPTIONS.LINESPEED_RPM, name: 'constants.linespeed_rpm', source_key: 'line_speed_rpm_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.SPECIFICATION_RPM, name: 'constants.specification_rpm', source_key: 'specification_rpm_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated', hasInput: true, draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', [`source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`]: 'max_peak_frequency_at_imperial_evaluated', [`source_key_${METRIC_SYSTEM_TYPES.METRIC}`]: 'max_peak_frequency_at_metric_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.EXTERNAL, name: 'constants.external_input', source_key: 'external_rpm_evaluated', draggable: true },
 ];
 
 export const USER_REPORT_TYPES = {

@@ -357,7 +357,7 @@ export const DATASET = {
 	NCD_4_20MA: 22,
 	BANNER_V2_GENERIC: 23,
 	BANNER_TEMP_VIBE_V2_1: 24,
-	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25, // lubematrix v3
+	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25,
 	BANNER_M25: 26,
 
 	// LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
@@ -1611,21 +1611,11 @@ export const ITEM_SPEED_OPTIONS = {
 };
 
 const itemSpeedOptionsList1 = [
-	{ id: ITEM_SPEED_OPTIONS.LINESPEED_RPM, name: 'constants.linespeed_rpm', source_key: 'line_speed_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.SPECIFICATION_RPM, name: 'constants.specification_rpm', source_key: 'specification_rpm_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated', hasInput: true },
-	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', [`source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`]: 'max_peak_frequency_at_imperial_evaluated', [`source_key_${METRIC_SYSTEM_TYPES.METRIC}`]: 'max_peak_frequency_at_metric_evaluated' },
-	{ id: ITEM_SPEED_OPTIONS.EXTERNAL, name: 'constants.external_input', source_key: 'external_rpm_evaluated' },
-];
-
-export const USER_REPORT_TYPES = {
-	COMPARE: 1,
-	BASELINING: 2,
-};
-
-const userReportTypesList1 = [
-	{	id: USER_REPORT_TYPES.COMPARE, name: 'compare' },
-	{	id: USER_REPORT_TYPES.BASELINING, name: 'Baselining' },
+	{ id: ITEM_SPEED_OPTIONS.LINESPEED_RPM, name: 'constants.linespeed_rpm', source_key: 'line_speed_rpm_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.SPECIFICATION_RPM, name: 'constants.specification_rpm', source_key: 'specification_rpm_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.MANUAL_RPM, name: 'constants.manual_rpm', source_key: 'manual_rpm_evaluated', hasInput: true, draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY, name: 'constants.max_peak_frequency', [`source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`]: 'max_peak_frequency_at_imperial_evaluated', [`source_key_${METRIC_SYSTEM_TYPES.METRIC}`]: 'max_peak_frequency_at_metric_evaluated', draggable: true },
+	{ id: ITEM_SPEED_OPTIONS.EXTERNAL, name: 'constants.external_input', source_key: 'external_rpm_evaluated', draggable: true },
 ];
 
 export const METRIC_UNIT_TYPES = {
@@ -1638,6 +1628,16 @@ const metricUnitTypesList1 = [
 	{ id: METRIC_UNIT_TYPES.SECONDS, name: 'Seconds' },
 	{ id: METRIC_UNIT_TYPES.MINUTES, name: 'Minutes' },
 	{ id: METRIC_UNIT_TYPES.HOURS, name: 'Hours' },
+];
+
+export const USER_REPORT_TYPES = {
+	COMPARE: 1,
+	BASELINING: 2,
+};
+
+const userReportTypesList1 = [
+	{	id: USER_REPORT_TYPES.COMPARE, name: 'compare' },
+	{	id: USER_REPORT_TYPES.BASELINING, name: 'Baselining' },
 ];
 
 export const CONTROLLER_TOPIC_TYPES = {
@@ -1804,13 +1804,13 @@ export const userRequisitionNotificationTypesList = () =>
 	Lang.translate(userRequisitionNotificationTypesList1);
 export const rpmSourcesTypesList = () => Lang.translate(rpmSourcesTypesList1);
 export const itemSpeedOptionsList = () => Lang.translate(itemSpeedOptionsList1);
-export const userReportTypesList = () => Lang.translate(userReportTypesList1);
 export const metricUnitTypesList = () => Lang.translate(metricUnitTypesList1);
+export const userReportTypesList = () => Lang.translate(userReportTypesList1);
 export const controllerTopicTypesList = () => controllerTopicTypesList1;
 export const sensorClassesList = () => Lang.translate(sensorClassesList1);
 export const sensorAlarmTypesList = () => Lang.translate(sensorAlarmTypesList1);
-export const sensorThresholdsTypesList = () => Lang.translate(sensorThresholdsTypesList1);
 export const multiviewAlarmTypesList = () => Lang.translate(multiviewAlarmTypesList1);
+export const sensorThresholdsTypesList = () => Lang.translate(sensorThresholdsTypesList1);
 export const fftLockStatusesList = () => Lang.translate(fftLockStatusesList1);
 export const subjectTypesList = () => Lang.translate(Lang.translate(subjectTypesList1), { key: 'alt_label' });
 // -----------------

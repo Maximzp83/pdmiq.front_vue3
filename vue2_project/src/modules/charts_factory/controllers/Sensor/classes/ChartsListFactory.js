@@ -323,10 +323,30 @@ class SensorChartsListFactory extends ChartsListFactoryBase {
 class FFTChartsListFactory extends ChartsListFactoryBase {
 	constructor(resources) {
 		super();
-		// this.sensorItem = resources.payload_1.sensorItem;
+
+		this.events = {
+			rpmCursorDragFactoryHandler: payload =>
+				this.syncRpmCursorsInCharts(payload)
+		};
+		// console.log('FFTChartsListFactory', resources, this)
 		this.useResources(resources);
-		// console.log('SensorChartsListFactory', resources, this)
 	}
+
+	syncRpmCursorsInCharts({point, isDrop}) {
+
+		this.chartsInstancesList.forEach(Chart => {
+		// console.log('syncRpmCursorsInCharts', isDrop);
+			Chart.handleRpmCursorDrag({
+				target: {
+					serieId: point.series.userOptions.id,
+					pointId: point.id,
+					x: point.x,
+				}
+			},
+			{ isUpdateOnly: true, isDrop })
+		})
+	}
+
 }
 
 class SensorAlarmsChartsListFactory extends ChartsListFactoryBase {

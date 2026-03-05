@@ -192,6 +192,35 @@ const actions = {
 		return multipurpose_response(storeArgs, `/equipments/${payload.itemId}/rpm-params`, extendedPayload);
 	},
 
+	//-------------
+	fetch_metric_multi_views(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'GET',
+			notNotify: true,
+		};
+		return multipurpose_response(storeArgs, `/equipments/${payload.equipmentId}/metric-multi-views`, extendedPayload);
+	},
+
+	save_metric_multi_views(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'POST',
+			resultMessage: { text: 'multi-view saved' }
+		};
+		return multipurpose_response(storeArgs, `/equipments/${payload.equipmentId}/metric-multi-views`, extendedPayload);
+	},
+
+	save_metric_multi_views_thresholds(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			method: 'POST',
+			resultMessage: { text: 'thresholds updated' }
+		};
+		const {multiViewId, graphId} = payload;
+		return multipurpose_response(storeArgs, `/metric-multi-views/${multiViewId}/graphs/${graphId}/thresholds`, extendedPayload);
+	},
+
 	// -------------------------
 
 	fetch_vibration_analysis_rules(storeArgs, payload = {}) {
@@ -233,35 +262,6 @@ const actions = {
 		);
 	},
 
-
-	//-------------
-	fetch_metric_multi_views(storeArgs, payload) {
-		const extendedPayload = {
-			...payload,
-			method: 'GET',
-			notNotify: true,
-		};
-		return multipurpose_response(storeArgs, `/equipments/${payload.equipmentId}/metric-multi-views`, extendedPayload);
-	},
-
-	save_metric_multi_views(storeArgs, payload) {
-		const extendedPayload = {
-			...payload,
-			method: 'POST',
-			resultMessage: { text: 'multi-view saved' }
-		};
-		return multipurpose_response(storeArgs, `/equipments/${payload.equipmentId}/metric-multi-views`, extendedPayload);
-	},
-
-	save_metric_multi_views_thresholds(storeArgs, payload) {
-		const extendedPayload = {
-			...payload,
-			method: 'POST',
-			resultMessage: { text: 'thresholds updated' }
-		};
-		const {multiViewId, graphId} = payload;
-		return multipurpose_response(storeArgs, `/metric-multi-views/${multiViewId}/graphs/${graphId}/thresholds`, extendedPayload);
-	},
 
 	// ----------
 

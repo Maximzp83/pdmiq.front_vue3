@@ -1048,8 +1048,9 @@ export default {
 						title: `${item.name}: ${item.formula} ${item.units}`,
 						name: item.name,
 						units: item.units,
-						formula: '{value}',
 						graph_type: item.graph_type,
+						formula: item.formula,
+						// isDefaultValues: true
 					};
 				});				
 			}
