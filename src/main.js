@@ -22,7 +22,7 @@ Highcharts.setOptions({
 // import 'element-plus/theme-chalk/el-input.css'
 // import 'element-plus/theme-chalk/el-select-v2.css'
 // import 'element-plus/dist/index.css';
-
+	
 import './assets/sass/app.scss';
 
 
