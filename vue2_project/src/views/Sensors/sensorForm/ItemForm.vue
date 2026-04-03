@@ -286,6 +286,7 @@
 						:key="`subtype_item-${item.id}`"
 						:item-data="item"
 						:item-index="idx"
+						:measurementUnitsList="measurementUnitsList"
 						fromModal
 					/>
 				</div>
@@ -834,6 +835,7 @@ export default {
 			},
 
 			sensor_item_lube_version: null,
+			measurementUnitsList: [],
 
 			rules: {
 				// location_in_equipment: required,
@@ -1035,6 +1037,10 @@ export default {
 								id: item.id,
 								name: subItem.name,
 								units: item.units,
+								measurement_unit_id:
+									subItem.measurement_unit_id != null
+										? subItem.measurement_unit_id
+										: item.measurement_unit_id,
 								formula: subItem.formula,
 								graph_type: subItem.graph_type,
 								title: `${subItem.name}: ${item.formula} ${item.units}`,
@@ -1048,6 +1054,7 @@ export default {
 						title: `${item.name}: ${item.formula} ${item.units}`,
 						name: item.name,
 						units: item.units,
+						measurement_unit_id: item.measurement_unit_id,
 						graph_type: item.graph_type,
 						formula: item.formula,
 						// isDefaultValues: true
@@ -1061,6 +1068,12 @@ export default {
 			{ ref: 'SubTypeParameterItem', targetProp: 'banner_v2_subtype_parameters' },
 			{ ref: 'RunningThresholdItem', targetProp: 'running_thresholds' },
 			{ ref: 'ItemFormUltraSound', targetProp: 'ultrasound_formData' }
+		]),
+		requestsList: () => Object.freeze([
+			{
+				action: 'fetch_measurement_units',
+				localProp: 'measurementUnitsList',
+			}
 		]),
 
 		showRunningThresholds() {
@@ -1130,6 +1143,7 @@ export default {
 			fetch_dataset_formulas: 'sensors/fetch_dataset_formulas',
 			gain_adjustment: 'sensors/gain_adjustment',
 			fetch_banner_subtypes: 'banner_v2_subtypes/fetch_subtypes',
+			fetch_measurement_units: 'measurement_units/fetch_measurement_units',
 			// fetch_equipments: 'equipments/fetch_equipments'
 		}),
 
@@ -1608,6 +1622,8 @@ export default {
 				onward: true
 			});
 		}
+
+		this.operateRequestsList(this.requestsList);
 	},
 
 	beforeMount() {

@@ -425,6 +425,36 @@ const actions = {
 		);
 	},
 
+	save_fft_vibration_analysis_rule_override(storeArgs, payload) {
+		const extendedPayload = {
+			method: 'POST',
+			notNotify: true,
+			...payload
+		};
+		const { sensorId, fftId } = payload;
+
+		return multipurpose_response(
+			storeArgs,
+			`/sensors/${sensorId}/ncd/fft/${fftId}/vibration-analysis-rules`,
+			extendedPayload
+		);
+	},
+
+	delete_fft_vibration_analysis_rule_override(storeArgs, payload) {
+		const extendedPayload = {
+			method: 'DELETE',
+			notNotify: true,
+			...payload
+		};
+		const { sensorId, fftId, originalRuleId } = payload;
+
+		return multipurpose_response(
+			storeArgs,
+			`/sensors/${sensorId}/ncd/fft/${fftId}/vibration-analysis-rules/${originalRuleId}`,
+			extendedPayload
+		);
+	},
+
 	unlock_fft(storeArgs, payload) {
 		const extendedPayload = {
 			method: 'POST',

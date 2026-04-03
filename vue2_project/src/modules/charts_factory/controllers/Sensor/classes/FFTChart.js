@@ -169,6 +169,28 @@ class FFTChartBase extends ChartBase {
 	isUpdateSeries(resources) {
 		return this.measurement !== resources.filters.measurement;
 	}
+
+	isMetricXAxis() {
+		return this.measurement === METRIC_SYSTEM_TYPES.METRIC;
+	}
+
+	convertRpmToXAxisValue(rpmValue) {
+		const value = +rpmValue;
+		if (isNaN(value)) return rpmValue;
+		return this.isMetricXAxis() ? value / 60 : value;
+	}
+
+	convertXAxisValueToRpm(xValue) {
+		const value = +xValue;
+		if (isNaN(value)) return xValue;
+		return this.isMetricXAxis() ? value * 60 : value;
+	}
+
+	convertFormulaResultToXAxisValue(value) {
+		const preparedValue = +value;
+		if (isNaN(preparedValue)) return value;
+		return this.isMetricXAxis() ? preparedValue / 60 : preparedValue;
+	}
 }
 
 class FFTChart extends FFTChartBase {
@@ -280,16 +302,17 @@ class FFTChart extends FFTChartBase {
 			let result = '';
 
 			if (requestsList && requestsList.length) {
-				const { parameterItem } = this;
+				const { parameterItem, currentSensorType } = this;
+				const { isBannerM25 } = currentSensorType;
 				const axisItem = findItemBy('id', parameterItem.axis_id, ncdAxisList);
 				// result = `${parameterItem.name} ${axisItem.type_key}`;
 
 				if (axisItem && axisItem.type_key) {
-					let axisType = axisItem.type_key;
+					let axisType = isBannerM25 ? axisItem.ultrasound_fft_name_full : axisItem.type_key;
 					let vertical = '';
 
-					if (sensorItem.ncd_active_axial_axis) {
-						axisType =
+					if (!isBannerM25 && sensorItem.ncd_active_axial_axis) {
+						axisType = 
 							parameterItem.axis_id == sensorItem.ncd_active_axial_axis
 								? 'axial'
 								: 'radial';
@@ -657,6 +680,7 @@ class FFTChart extends FFTChartBase {
 			return;
 		}
 		const {value, draggable} = rpmSourceValue;
+		const cursorX = this.convertRpmToXAxisValue(value);
 		// console.log('addRpmCursor', value, draggable, this.hasCursorFlagConfig())
 		const serieId = 'rpm-cursor-flag-serie';
 		const { index } = findItemBy('id', serieId, this.options.series, {
@@ -676,7 +700,7 @@ class FFTChart extends FFTChartBase {
 			this.options.series[index].data = this.options.series[index].data || [];
 
 			const cursor_item = setupFFTCursorItem({
-				x: value,
+				x: cursorX,
 				id: 'rpm-cursor',
 				serie_idx: index,
 				point_idx: 0,
@@ -712,7 +736,7 @@ class FFTChart extends FFTChartBase {
 				// console.log(serieIdx, this.ChartAPI.series[serieIdx])
 			if (!point) return;
 
-			this.updateAnnotationsFromFFTAnalysisRules({rpmValue: x});
+			this.updateAnnotationsFromFFTAnalysisRules({xValue: x});
 
 			if (settings.isUpdateOnly) {
 				const	title = `<div class="fft-cursor"><b>${getRoundedValue(x, 0, 3)} ${point.units_x}</b></div>`;
@@ -831,7 +855,10 @@ class FFTChart extends FFTChartBase {
 			const calcFormula = buildFormula(rule_item.original_rule.formula);
 			this.options.annotations[idx].customSettings = { calcFormula };
 			// console.log('generateAnnotationsFromFFTAnalysisRules', rule_item)
-			const { harmonics, name } = rule_item.original_rule;
+			const { name } = rule_item.original_rule;
+			const harmonics = rule_item.active_harmonics != null
+				? rule_item.active_harmonics
+				: rule_item.original_rule.harmonics;
 			let activeValue = /*rule_item.vibration_analysis_custom_value || rule_item.vibration_analysis_value ||*/ (rule_item.option_value_id && rule_item.option_value.value) || rule_item.custom_value;
 			// console.log(activeValue, rule_item)
 			this.options.annotations[idx].customSettings.harmonics = harmonics;
@@ -839,8 +866,10 @@ class FFTChart extends FFTChartBase {
 			let start = calcFormula({ rpm: rpmValue, value: +activeValue });
 			start = +start;
 			const step = +start;
+			const startX = this.convertFormulaResultToXAxisValue(start);
+			const stepX = this.convertFormulaResultToXAxisValue(step);
 
-			const isValidData = !isNaN(start) && !isNaN(step) && /*start > 0 &&*/ step > 0;	
+			const isValidData = !isNaN(startX) && !isNaN(stepX) && /*start > 0 &&*/ stepX > 0;	
 			// console.log(rule_item, start, step, isValidData)
 
 			if (isValidData) {
@@ -852,14 +881,14 @@ class FFTChart extends FFTChartBase {
 				
 				// this.options.series[evenIdx].data = [];
 
-				let x_value = start;
+				let x_value = startX;
 				const max_steps = +harmonics;
 				let step_pos = 1;
 				// const y = -(250 - ruleIdx * 20);
 				// console.log(x_value, lastPointXvalue)
 				if (lastPointXvalue) {
 
-					while (x_value < lastPointXvalue && step_pos <= max_steps) {
+					while (/*x_value < lastPointXvalue &&*/ step_pos <= max_steps) {
 						this.options.annotations[idx].labels.push({
 							shape: 'connector',
 							borderColor: rule_item.color || '#000',
@@ -881,7 +910,7 @@ class FFTChart extends FFTChartBase {
 								`
 						});
 
-						x_value += step;
+						x_value += stepX;
 						step_pos++;
 					}
 				}
@@ -891,18 +920,21 @@ class FFTChart extends FFTChartBase {
 		this.emitChartOptionsUpdate();
 	}
 
-	updateAnnotationsFromFFTAnalysisRules({ rpmValue }) {
+	updateAnnotationsFromFFTAnalysisRules({ xValue }) {
+		const rpmValue = this.convertXAxisValueToRpm(xValue);
 		this.ChartAPI.annotations.forEach((annotation) => {
 		// console.log('updateAnnotationsFromFFTAnalysisRules', annotation, rpmValue)
 			const start = annotation.userOptions.customSettings.calcFormula({ rpm: rpmValue, value: annotation.userOptions.customSettings.value });
 			const step = +start;
-			let x_value = start;
+			const startX = this.convertFormulaResultToXAxisValue(start);
+			const stepX = this.convertFormulaResultToXAxisValue(step);
+			let x_value = startX;
 			const newLabels = [];
 			annotation.labels.forEach(() => {
 				newLabels.push({
 					point: { x: x_value	}
 				})
-				x_value += step;
+				x_value += stepX;
 			})
 			// console.log(newLabels)
 			annotation.update({ labels: newLabels });

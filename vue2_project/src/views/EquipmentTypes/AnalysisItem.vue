@@ -10,9 +10,16 @@
 				<CustomInput v-model="formData.name" :placeholder="tt('name')"/>
 			</el-form-item>
 
-			<el-form-item prop="unit" class="mcol-xs-2">
-				<label>{{ tt('Unit') }}</label>
-				<CustomInput v-model="formData.unit" :placeholder="tt('unit')"/>
+			<el-form-item prop="measurement_unit_id" class="mcol-xs-2">
+				<label>Measurement Unit</label>
+				<CustomSelect
+					clearable
+					filterable
+					:optionsLoading="measurementUnitsLoading"
+					:optionsList="measurementUnitsOptions"
+					placeholder="Select Measurement Unit"
+					v-model="formData.measurement_unit_id"
+				/>
 			</el-form-item>
 
 			<el-form-item prop="crossover_tags" class="mcol-xs-3" required>
@@ -64,16 +71,25 @@
 </template>
 
 <script>
+import { getMeasurementUnitsOptions } from '@/helpers/measurementUnits';
 import { subItemMixin } from '@/mixins';
 
 export default {
 	mixins: [subItemMixin()],
+	props: {
+		measurementUnitsList: {
+			type: Array,
+			default: () => []
+		},
+		measurementUnitsLoading: Boolean
+	},
 	data() {
 		return {
 			formData: {
 				id: null,
 				name: '',
 				unit: '',
+				measurement_unit_id: null,
 				crossover_tags: '',
 				is_visible: 0,
 				is_editable: 0,
@@ -85,7 +101,18 @@ export default {
 	},
 
 	computed: {
-		deleteNewId: () => true
+		deleteNewId: () => true,
+		measurementUnitsOptions() {
+			return Object.freeze(getMeasurementUnitsOptions(this.measurementUnitsList));
+		}
+	},
+
+	methods: {
+		localGetFormDataCallback(formData) {
+			const newFormData = { ...formData };
+			delete newFormData.unit;
+			return newFormData;
+		}
 	}
 };
 </script>

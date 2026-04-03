@@ -933,6 +933,11 @@ const getDateRange1 = (range_name, options = {}) => {
 			// start.setTime(start.getTime() - 3600 * 1000 * 24 * 30 * 3);
 			break;
 
+		case 'last_6_months':
+			start.setFullYear(start.getFullYear(), start.getMonth() - 6, start.getDate());
+
+			break;
+
 		case 'last_12_months':
 			start.setFullYear(start.getFullYear(), start.getMonth() - 12, start.getDate());
 
@@ -1569,4 +1574,3 @@ export const setupTableCellImage = (picturesList, settings) =>
 	setupTableCellImage1(picturesList, settings);
 export const getFileName = str => getFileName1(str);
 export const getRandomInt = (min, max) => getRandomInt1(min, max);
-

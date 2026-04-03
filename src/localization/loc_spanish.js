@@ -574,6 +574,7 @@ export default {
 		component: 'Componente',
 		components: 'Componentes',
 		allow: 'Permitir',
+		favorites: 'Favoritos',
 	},
 
 	sidebar_menu: {
@@ -654,6 +655,9 @@ export default {
 		repair_cost_avoidance: 'Prevención de Costos de Reparaciones',
 		contractor_markup: 'Margen del Contratista',
 		contractor_hourly_rate: 'Tarifa por hora del contratista',
+		dt_per_hour: 'DT/Hora',
+		hours_saved_or_lead_time: 'Horas Ahorradas / Tiempo de Entrega',
+		contractor_quote: 'Cotización del Contratista',
 		tech_hours: 'Horas de Tecnología',
 		date_selection: 'Selección de Fecha',
 		date_sent: 'Fecha de Envío',
@@ -1110,6 +1114,8 @@ export default {
 		lube_based_device_address_id: 'ID de dirección de dispositivo de lubricación',
 		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
 		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
+		silence_mode: 'Modo Silencio',
+		visible_by_default: 'Visible por defecto',
 		flat_data_anomaly: 'Anomalia de datos Plano',
 	},
 
@@ -1135,6 +1141,8 @@ export default {
 		mult_fft_confirm: '¿Realmente desea solicitar una FFT para todos los sensores del controlador',
 		mult_rebaseline_confirm: 'Realmente desea restablecer la línea base de todos los sensores en el controlador',
 		anomaly1: 'Anomalia de datos de metrica',
+		api_secret_warn: 'Es la única vez que podrás ver el secreto',
+		frequency_reset: 'La configuración de frecuencia se ha restablecido correctamente antes de guardar debido a que el método de lubricación ha cambiado. Configure los nuevos ajustes de frecuencia y guarde.',
 	},
 
 	constants: {
@@ -1387,6 +1395,9 @@ export default {
 		'second_quarter': 'Segundo trimestre',
 		'third_quarter': 'Tercer trimestre',
 		'fourth_quarter': 'Cuarto trimestre',
+		last_1_month: 'Último mes',
+		last_6_months: 'Últimos 6 meses',
+		last_12_months: 'Últimos 12 meses',
 		// ------------new------------
 		'all_in_one_aa_battery': 'Todo en uno - Batería AA',
 		'all_in_one_c_battery': 'Todo en uno - Batería C',

@@ -272,9 +272,9 @@ const actions = {
 			notNotify: true,
 			stateProp: 'itemData',
 			prepareData: 'prepareEquipmentsList',
-			prepareDataSettings: {
+			/*prepareDataSettings: {
 				addSettingItems: [{ key: 'equipmentSubType', val_key: 'equipmentSubType' }]
-			}
+			}*/
 		};
 		return multipurpose_response(
 			storeArgs,

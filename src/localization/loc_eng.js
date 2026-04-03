@@ -581,6 +581,7 @@ export default {
 		components: 'Components',
 		allow: 'Allow',
 		luber: 'Luber',
+		favorites: 'Favorites',
 	},
 
 	sidebar_menu: {
@@ -863,6 +864,9 @@ export default {
 		repair_cost_avoidance: 'Repair Cost Avoidance',
 		contractor_markup: 'Contractor Markup',
 		contractor_hourly_rate: 'Contractor hourly rate',
+		dt_per_hour: 'Down Time/Hour',
+		hours_saved_or_lead_time: 'Hours Saved / Lead Time',
+		contractor_quote: 'Contractor Quote',
 		tech_hours: 'Tech Hours',
 		date_selection: 'Date Selection',
 		date_sent: 'Date Sent',
@@ -1091,6 +1095,8 @@ export default {
 		lube_based_device_address_id: 'Lube Based Device Address ID',
 		lube_based_physical_sensor_id: 'Lube Based Physical Sensor ID',
 		lube_trigger_metric_type: 'Lube Trigger Metric Type',
+		silence_mode: 'Silence Mode',
+		visible_by_default: 'Visible by default',
 		flat_data_anomaly: 'Flat Data Anomaly',
 	},
 
@@ -1116,6 +1122,8 @@ export default {
 	  	mult_rebaseline_confirm: 'Do you really want to Rebaseline for sensor on controller',
 		skip_mfa_check: 'Trust this device and dont ask MFA code next 7 days',
 		anomaly1: 'Flat metric data anomaly',
+		api_secret_warn: 'Is the only time You will be able to see the secret',
+		frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
 	},
 
 	constants: {
@@ -1389,6 +1397,9 @@ export default {
 		'second_quarter': 'Second Quarter',
 		'third_quarter': 'Third Quarter',
 		'fourth_quarter': 'Fourth Quarter',
+		last_1_month: 'Last 1 Month',
+		last_6_months: 'Last 6 Months',
+		last_12_months: 'Last 12 Months',
 
 		'psig_0_50': 'PSIG 0-50',
 		'psig_0_150': 'PSIG 0-150',

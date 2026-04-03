@@ -1,5 +1,6 @@
 <template>
-	<div class="" v-show="chartLoading || hasStatistics || showDisableChartButton">
+	<!-- <div class="" v-show="chartLoading || showDisableChartButton"> -->
+	<div class="">
 		<VueElementLoadingWrapper
 			:isLoading="chartLoading /*|| chartRendering*/"
 			:itemsName="tt('chart')"
@@ -10,7 +11,7 @@
 			:style="`backgroundColor: ${color}; width: 20px; display: inline-block; height: 20px;`"
 		></span> -->
 
-		<div class="card-header chart-card-header flex mrow wrap" v-show="hasStatistics">
+		<div class="card-header chart-card-header">
 			<!-- <button @click="zoomYAxis">+</button> -->
 			<div class="flex mrow wrap align-center left-part ">
 				<div class="title-block ellipsis capitalize" v-text="chartTitle"></div>
@@ -38,7 +39,7 @@
 				<div
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto capitalize fft-chart-actions"
 					v-if="ChartAPI"
-					v-show="!chartIsHidden"
+					v-show="!chartIsHidden && hasStatistics"
 				>
 					<div class="chart-actions-block">
 						<div class="flex wrap mrow">
@@ -55,7 +56,7 @@
 
 				<div
 					class="zoom-block-container mcol-xs-6 mcol-lg-8 mcol-xlg-auto fft-chart-actions capitalize"
-					v-show="!chartIsHidden"
+					v-show="!chartIsHidden && hasStatistics"
 				>
 					<!-- v-if="ChartInstance.parameterItem.type !== 'waveform'" -->
 					<ChartOperationsBar
@@ -70,7 +71,7 @@
 
 				<div
 					class="mcol-xs-12 mcol-lg-auto fft-chart-actions fft-analysis-bar-container capitalize"
-					v-show="!chartIsHidden"
+					v-show="!chartIsHidden && hasStatistics"
 					v-for="component in selectedChildComponents"
 					:key="`fft-analysis-rules-bar-${component.id}`"
 				>
@@ -78,13 +79,15 @@
 						ref="ChartFFTAnalysisRulesBar"
 						:componentItem="component"
 						:equipmentData="additionalProps.equipmentData"
+						:currentFFTItem="currentFFTItem"
+						:sensorId="chartMainData.sensorItem.id"
 						:selectedAnalysisRules="selectedAnalysisRules"
 						@event="handleEventNew"
 					/>
 				</div>
 
 				<div
-					v-show="!chartIsHidden"
+					v-show="!chartIsHidden && hasStatistics"
 					class="zoom-block-container hover-data-block-wrapper mcol-xs-6 mcol-lg-4 mcol-xlg-auto"
 				>
 					<div class="chart-actions-block hover-data-block" v-show="hoverData.x">
@@ -126,7 +129,15 @@
 			</div>
 		</div>
 
-		<div v-show="!initialFetch && !hasStatistics" class="chart-mock card">
+		<div v-show="!initialFetch && !hasStatistics" class="">
+			<div class="caption text-center semi-bold">
+				<div class="text-item">{{ tt('phrases.There_are') }}</div>
+				<div class="text-item central">{{ tt('phrases.no_statistics') }}</div>
+				<!-- <div class="text-item">{{ `${tt('for')} ${chartTitle}` }}</div> -->
+			</div>
+		</div>
+
+		<!-- <div v-show="!initialFetch && !hasStatistics" class="chart-mock card">
 			<div
 				class="content-container inlineImg"
 				style="background-image: url(/static/img/background/graph.svg)"
@@ -137,7 +148,7 @@
 					<div class="text-item">{{ `${tt('for')} ${chartTitle}` }}</div>
 				</div>
 			</div>
-		</div>
+		</div> -->
 
 		<el-dialog
 			:title="`${tt('Waterfall')} ${tt('Graphs')}`"
@@ -166,6 +177,7 @@ import { getRoundedValue, findItemBy, /*countDecimalOrder*/ } from '@/helpers';
 import { getCurrentRpmSource } from '@/helpers/specialHelpers';
 
 import { BANNER_REQUEST_TYPES } from '@/constants/global';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { eventHandler } from '@/mixins';
 // import { NCD_AXIS } from '@/modules/charts_factory/controllers/Sensor/enums';
@@ -419,14 +431,21 @@ export default {
 
 		selectedChildComponents() {
 			let colorIndex = 0;
+			const fftOverrides = this.currentFFTItem && this.currentFFTItem.vibration_analysis_rules
+				? this.currentFFTItem.vibration_analysis_rules
+				: [];
 
 			return this.additionalProps.selectedChildComponents.map(ci => {
 
 				return {
 					...ci,
 					vibration_analysis_rules: ci.vibration_analysis_rules.map(rule => {
+						const overrideRule = findItemBy('original_rule_id', rule.original_rule_id, fftOverrides);
 						const item = {
 							...rule,
+							active_harmonics: overrideRule && overrideRule.harmonics != null
+								? overrideRule.harmonics
+								: rule.original_rule.harmonics,
 							color: this.colorsList[colorIndex] || '#000',
 							y_position: -(250 - colorIndex * 20)
 						}
@@ -451,9 +470,22 @@ export default {
 				rootFilters: this.rootFilters
 			})
 		},
+
+		isUltrasoundFFT: that => that.additionalProps.isUltrasoundFFT,
+		isDefaultVisible: that => that.isUltrasoundFFT && that.ChartInstance.parameterItem.type === 'acceleration',
 	},
 
 	methods: {
+		emitChartVisibilityChange() {
+			this.$emit('event', {
+				eventName: 'handleChartVisibilityChange',
+				data: {
+					chartId: this.ChartInstance.chart_id,
+					isHidden: this.chartIsHidden
+				}
+			});
+		},
+
 		updateLocalStorageValue(value) {
 			var localStorageHiddenChartsData = JSON.parse(localStorage.getItem('banner_fft_hidden_charts')) || {};
 			localStorageHiddenChartsData[this.currentFFTItem.id] = localStorageHiddenChartsData[this.currentFFTItem.id] || {};
@@ -471,6 +503,7 @@ export default {
 			this.chartIsHidden = !this.chartIsHidden;
 			// this.ChartInstance.toggleChart(this.chartIsHidden);
 			this.updateLocalStorageValue(this.chartIsHidden);
+			this.emitChartVisibilityChange();
 
 			if (!this.chartIsHidden &&
 					(!this.chartIsInit || !this.hasStatistics || this.refetchChartData)
@@ -654,10 +687,13 @@ export default {
 		},
 
 		handleRpmCursorDrop({ x }) {
+			const rpmValue = this.rootFilters.measurement === METRIC_SYSTEM_TYPES.METRIC
+				? x * 60
+				: x;
 			this.$emit('event', {
 				eventName: 'handleRpmCursorDrop',
 				data: {
-					rpm_value: getRoundedValue(x, 0, 0),
+					rpm_value: getRoundedValue(rpmValue, 0, 0),
 					isFFTRPM: true
 				},
 				onward: true
@@ -686,6 +722,30 @@ export default {
 			this.ChartInstance.generateAnnotationsFromFFTAnalysisRules(this.selectedAnalysisRules);
 		},
 
+		updateEquipmentAndFFT(data) {
+			if (data && data.fftItem) {
+				const nextFFTOverrides = data.fftItem.vibration_analysis_rules || [];
+
+				this.selectedAnalysisRules = this.selectedAnalysisRules.map(rule => {
+					const overrideRule = findItemBy('original_rule_id', rule.original_rule_id, nextFFTOverrides);
+					return {
+						...rule,
+						active_harmonics: overrideRule && overrideRule.harmonics != null
+							? overrideRule.harmonics
+							: rule.original_rule.harmonics
+					};
+				});
+
+				this.ChartInstance.generateAnnotationsFromFFTAnalysisRules(this.selectedAnalysisRules);
+			}
+
+			this.$emit('event', {
+				eventName: 'updateEquipmentAndFFT',
+				data,
+				onward: true
+			});
+		},
+
 		/*handleCursorClick({point}) {
 			this.ChartInstance.removeCursor(point);
 		},
@@ -705,6 +765,9 @@ export default {
 				// console.log('watch rootFilters', this.ChartInstance.chart_id)
 				this.ChartInstance.updateChartByMetric(filters);
 				this.ChartInstance.resetZoom();
+				if (this.selectedAnalysisRules.length) {
+					this.ChartInstance.generateAnnotationsFromFFTAnalysisRules(this.selectedAnalysisRules);
+				}
 				if (this.activeButtonValues.showPeaksActive) {
 					this.showPeaks();
 				}
@@ -759,9 +822,15 @@ export default {
 			}
 		}
 
+		if (this.isUltrasoundFFT && this.isDefaultVisible) {
+			this.chartIsHidden = false;
+		}
+
 		if (!this.chartIsHidden) {
 			this.fetchChartData();
 		}
+
+		this.emitChartVisibilityChange();
 	},
 
 	created() {

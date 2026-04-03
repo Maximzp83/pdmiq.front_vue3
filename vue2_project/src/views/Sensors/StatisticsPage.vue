@@ -905,6 +905,7 @@ export default {
 			set_sensor_state: 'sensors/set_sensor_state',
 			fetch_sensor: 'sensors/fetch_sensor',
 			set_sensor: 'sensors/set_sensor',
+			fetch_measurement_units: 'measurement_units/fetch_measurement_units',
 
 			set_filters: 'sensors/set_statistics_filters',
 			forceRerender: 'forceRerender',
@@ -982,6 +983,21 @@ export default {
 			}
 		},
 
+		loadMeasurementUnitsIfNeeded(sensor) {
+			const hasMeasurementUnit = sensor &&
+				sensor.bannerV2Subtype &&
+				sensor.bannerV2Subtype.parameters &&
+				sensor.bannerV2Subtype.parameters.some(
+					item => item.measurement_unit_id != null
+				);
+
+			if (!hasMeasurementUnit || this.$store.state.measurement_units.itemsList.length) {
+				return Promise.resolve();
+			}
+
+			return this.fetch_measurement_units({ params: { max: -1 }, notNotify: true, setToStore:1 });
+		},
+
 		initSensors(sensors) {
 			if (sensors && sensors.length) {
 				// console.log('initSensors', sensors)
@@ -1001,7 +1017,8 @@ export default {
 
 		fetchSensorsAction(ids, sensorIdx) {
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
-				.then(({ value }) => {
+				.then(async ({ value }) => {
+					await this.loadMeasurementUnitsIfNeeded(value);
 					const dashboardSensors = this.equipmentData
 						? this.equipmentData.dashboardSensors
 						: [];

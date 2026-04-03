@@ -48,6 +48,7 @@ import roi_one_pagers from './modules/roi_one_pagers';
 import library from './modules/library';
 import user_roles from './modules/user_roles';
 import banner_v2_subtypes from './modules/banner_v2_subtypes';
+import measurement_units from './modules/measurement_units';
 
 import { getObjectVal } from '@/helpers';
 
@@ -97,7 +98,8 @@ export const store = new Vuex.Store({
 		maintenance_categories,
 		library,
 		user_roles,
-		banner_v2_subtypes
+		banner_v2_subtypes,
+		measurement_units
 	}
 });
 

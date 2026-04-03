@@ -90,6 +90,12 @@ const subItemsListMixin = {
 		},
 
 		applyDataUpdate(context) {
+			if (context.settings.onCollectDataCallback) {
+				context = context.settings.onCollectDataCallback(context);
+
+				if (context.itemIsReady) return;
+			}
+			
 			let { targetProp, returnArray, concatData, skipReturnData } = context.settings;
 			let { collectedValue, collectedData, formData } = context;
 

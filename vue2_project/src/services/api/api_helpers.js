@@ -302,7 +302,7 @@ const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'brand_model_name', val_key: 'model.name' },
 		{ key: 'brand_model_img', val_key: 'model.full_file_name' },
 		{
-			key: 'brand__model_is_crossover_excluded',
+			key: 'brand_model_is_crossover_excluded',
 			val_key: 'model.is_crossover_excluded'
 		},
 		{ key: 'equipment_type_name', val_key: 'equipmentType.name' },
@@ -325,7 +325,7 @@ const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'typeOptions', val_key: 'typeOptions' },
 		{ key: 'pictures', val_key: 'pictures' },
 		{ key: 'histories', val_key: 'histories' },
-		// { key: 'equipmentSubType', val_key: 'equipmentSubType' },
+		{ key: 'equipmentSubType', val_key: 'equipmentSubType' },
 		// { key: 'subtypeBrand', val_key: 'subtypeBrand' },
 		// { key: 'subtypeModel', val_key: 'subtypeModel' },
 		{ key: 'equipment_subtype_id', val_key: 'equipment_subtype_id' },
@@ -360,17 +360,16 @@ const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'prodline_rpm_node_parameter', val_key: 'asset.machine.productionLine.rpm_node_parameter' },
 		{ key: 'prodline_rpm_node_id', val_key: 'asset.machine.productionLine.rpm_node_id' },		
 		{ key: 'metric_multi_views', val_key: 'metric_multi_views' },
+		{ key: 'is_my_favorite', val_key: 'is_my_favorite' },
+		{ key: 'is_company_favorite', val_key: 'is_company_favorite' },
 		{ key: 'child_components', val_key: 'child_components' },		
 		{ key: 'vibration_analysis_rules', val_key: 'vibration_analysis_rules' },		
 		{ key: 'option_values', val_key: 'option_values' },
-		{ key: 'is_my_favorite', val_key: 'is_my_favorite' },
-		{ key: 'is_company_favorite', val_key: 'is_company_favorite' },
 	];
 
 	if (settings.addSettingItems) {
 		settingsList = settingsList.concat(settings.addSettingItems);
 	}
-
 	for (let i = 0; i < newData.length; i++) {
 		let resultItem = {};
 		const equipment = newData[i];

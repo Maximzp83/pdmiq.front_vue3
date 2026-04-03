@@ -314,15 +314,16 @@ export default {
 	},
 
 	created() {
-		// console.log('created', this.ChartInstance)
+		// console.log('created', this.graphItem);
 		if (this.graphItem) {
 			this.setupNotesItems(this.graphItem);
+			this.ChartInstance.setValue('chartIsDisabled', this.graphItem.is_hidden);
 		}
 
 		// this.initStatisticsData();
-		this.ChartInstance.injectProps('events', this.chartInstanceEventsList);
-		this.ChartInstance.setValue('chartIsDisabled', this.graphItem.is_hidden);
 
+		this.ChartInstance.injectProps('events', this.chartInstanceEventsList);
+		
 		if (!this.chartIsDisabled) {
 			this.fetchChartData();
 		}

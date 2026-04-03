@@ -592,6 +592,7 @@ export default {
 		high: 'High',
 		areaspline: 'Areaspline',
 		luber: 'Luber',
+		favorites: 'Favorites',
 		analysis: 'Analysis',
 		vibration_analysis: 'Vibration Analysis',
 		unit: 'Unit',
@@ -602,7 +603,6 @@ export default {
 		components: 'Components',
 		harmonics: 'Harmonics',
 		editable: 'Editable',
-		favorites: 'Favorites',
 	},
 
 	sidebar_menu: {
@@ -886,6 +886,10 @@ export default {
 		repair_cost_avoidance: 'Repair Cost Avoidance',
 		contractor_markup: 'Contractor Markup',
 		contractor_hourly_rate: 'Contractor hourly rate',
+		dt_per_hour: 'Down Time/Hour',
+		hours_saved_or_lead_time: 'Hours Saved / Lead Time',
+		contractor_quote: 'Contractor Quote',
+		
 		tech_hours: 'Tech Hours',
 		date_selection: 'Date Selection',
 		date_sent: 'Date Sent',
@@ -1136,6 +1140,8 @@ export default {
 		lube_based_device_address_id: 'Lube Based Device Address ID',
 		lube_based_physical_sensor_id: 'Lube Based Physical Sensor ID',
 		lube_trigger_metric_type: 'Lube Trigger Metric Type',
+		silence_mode: 'Silence Mode',
+		visible_by_default: 'Visible by default',
 	},
 
 	aliases: {
@@ -1162,11 +1168,13 @@ export default {
 		mfa_warn_1: 'Keep your account safe',
 		mfa_warn_2: 'Two-Factor Authentication (2FA) will be required to login starting October 1st 2025 for all Plant Admin access users',
 		mfa_warn_link: 'Set up 2FA today',
-  	prodline_warn_1: 'Please select at least one notifiable production line',
-  	creation_link_exp: 'The Password Creation Link has expired. Please enter your email below and click send. <b>A new link will then be sent to your inbox momentarily</b>',
-  	to_clipboard_msg: 'Link was copied to the clipboard',
-  	mfa_warn_3: 'If You want to change Phone Number - Please disable MFA or change it to Authenticator',
-  	anomaly1: 'Flat metric data anomaly',
+	  	prodline_warn_1: 'Please select at least one notifiable production line',
+	  	creation_link_exp: 'The Password Creation Link has expired. Please enter your email below and click send. <b>A new link will then be sent to your inbox momentarily</b>',
+	  	to_clipboard_msg: 'Link was copied to the clipboard',
+	  	mfa_warn_3: 'If You want to change Phone Number - Please disable MFA or change it to Authenticator',
+	  	anomaly1: 'Flat metric data anomaly',
+	  	api_secret_warn: 'Is the only time You will be able to see the secret',
+	  	frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
 	},
 
 	constants: {
@@ -1440,6 +1448,9 @@ export default {
 		'second_quarter': 'Second Quarter',
 		'third_quarter': 'Third Quarter',
 		'fourth_quarter': 'Fourth Quarter',
+		last_1_month: 'Last 1 Month',
+		last_6_months: 'Last 6 Months',
+		last_12_months: 'Last 12 Months',
 
 		'psig_0_50': 'PSIG 0-50',
 		'psig_0_150': 'PSIG 0-150',

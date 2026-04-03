@@ -626,6 +626,7 @@ export default {
 			if (this.activeTab.prop == 'fileTabActive') {
 				formData.issues = [];
 				formData.cost_avoidance_plan = [];
+				delete formData.graphs;
 			}
 
 			if (!formData.sensor_id) {
@@ -633,6 +634,15 @@ export default {
 			}
 
 			delete formData.sensors_alarms;
+
+
+			if (formData.graphs) {
+				formData.graphs = formData.graphs.map(g => {
+					g.is_hidden = g.is_hidden ? 1 : 0;
+					return g;
+				})
+			}
+			// console.log('localPrepareSubmitData', formData.graphs);
 			return formData;
 		},
 

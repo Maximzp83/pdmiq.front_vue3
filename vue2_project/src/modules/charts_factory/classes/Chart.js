@@ -498,7 +498,6 @@ export default class ChartBase {
 				isTransform = next;
 			}
 
-			// console.log(isTransform)
 			if (isTransform) {
 				if (settings.sortStatisticKeys && this.sortStatisticKeys) {
 					this.fetched_statistics_data = this.sortStatisticKeys(

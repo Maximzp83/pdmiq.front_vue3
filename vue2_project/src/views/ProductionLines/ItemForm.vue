@@ -202,6 +202,17 @@
 				</div>
 			</el-form-item>
 
+			<el-form-item
+				:label="tt('phrases.Silence_Mode')"
+				prop="is_silence_mode"
+			>
+				<el-switch
+					v-model="formData.is_silence_mode"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="tt('Order')" v-if="itemData && itemData.id">
 				<CustomSelect
 					filterable
@@ -293,7 +304,8 @@ export default {
 				rpm_source_type: null,
 				rpm_value: null,
 				rpm_node_id: null,
-				rpm_node_parameter: null
+				rpm_node_parameter: null,
+				is_silence_mode: 0
 			}
 		};
 	},

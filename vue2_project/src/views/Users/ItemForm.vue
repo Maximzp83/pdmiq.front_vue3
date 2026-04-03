@@ -1,7 +1,5 @@
 <template>
-	<div
-		class="edit-form-container user-form"
-	>
+	<div class="edit-form-container user-form">
 		<!-- :validate="" -->
 		<el-form
 			class="item-edit-form"
@@ -15,7 +13,10 @@
 			<CustomTransition :startingElementIdx="startingElementIdx">
 				<div
 					v-show="activeTab.prop == 'mainTab'"
-					:class="['tab-container', { 'half-width': !fromAnotherInstance && !isMobile }]"
+					:class="[
+						'tab-container',
+						{ 'half-width': !fromAnotherInstance && !isMobile }
+					]"
 					key="tab-0"
 				>
 					<el-form-item :label="tt('phrases.First_name')" prop="first_name">
@@ -101,19 +102,22 @@
 					</el-form-item>
 
 					<el-form-item :label="tt('Email')" prop="email">
-						<el-input v-model="formData.email" type="email" autocomplete="new-email" />
+						<el-input
+							v-model="formData.email"
+							type="email"
+							autocomplete="new-email"
+						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('Phone')" prop="phone_number"
-						v-if="itemId"
-					>
+					<el-form-item :label="tt('Phone')" prop="phone_number" v-if="itemId">
 						<PhoneInput ref="PhoneInput" v-model="formData" />
 					</el-form-item>
 
 					<PhoneVerificationBlock
 						class="el-form-item"
-						v-if="itemId && 
-							(!formData.is_mfa_enabled || formData.mfa_type !== MFA_TYPES.SMS)
+						v-if="
+							itemId &&
+								(!formData.is_mfa_enabled || formData.mfa_type !== MFA_TYPES.SMS)
 						"
 						@phoneVerified="handlePhoneVerified"
 						:isPhoneVerified="isPhoneVerified"
@@ -122,7 +126,8 @@
 
 					<!-- <input autocomplete="false" name="hidden" type="text" style="display: none;" > -->
 
-					<el-form-item :label="`${tt('Old')} ${tt('Password')}`"
+					<el-form-item
+						:label="`${tt('Old')} ${tt('Password')}`"
 						v-if="itemId"
 						prop="current_password"
 					>
@@ -153,12 +158,12 @@
 								type="password"
 								show-password
 								name="new-password"
-			  				autocomplete="new-password"
-			  			/>
-			  		</PasswordCheckList>
+								autocomplete="new-password"
+							/>
+						</PasswordCheckList>
 					</el-form-item>
 
-					<el-form-item 
+					<el-form-item
 						:label="tt('phrases.confirm_password')"
 						prop="password_confirmation"
 						v-if="itemId"
@@ -211,7 +216,10 @@
 						/>
 					</el-form-item>
 
-					<div class="el-form-item" v-if="!formData.is_monitoring_all_notifiable_plants">
+					<div
+						class="el-form-item"
+						v-if="!formData.is_monitoring_all_notifiable_plants"
+					>
 						<ProdlinesSelectItem
 							ref="ProdlinesSelectItem"
 							v-for="plantId in selectedPlantIds"
@@ -235,11 +243,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item
-						v-if="isIndustrialMatrix"
-						class=""
-						:label="`IM CSM`"
-					>
+					<el-form-item v-if="isIndustrialMatrix" class="" :label="`IM CSM`">
 						<el-switch
 							v-model="formData.is_im_csm"
 							:active-value="1"
@@ -247,10 +251,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item
-						label="MFA"
-						prop="is_mfa_enabled"
-					>
+					<el-form-item label="MFA" prop="is_mfa_enabled">
 						<el-switch
 							@change="formData.mfa_type = null"
 							:disabled="disableMfaSwitcher"
@@ -306,7 +307,10 @@
 
 				<div
 					v-show="activeTab.prop == 'notificationsTab'"
-					:class="['tab-container', { 'half-width': !fromAnotherInstance && !isMobile }]"
+					:class="[
+						'tab-container',
+						{ 'half-width': !fromAnotherInstance && !isMobile }
+					]"
 					key="tab-1"
 				>
 					<div class="el-form-item notifications-block">
@@ -315,7 +319,7 @@
 							class="notifications-block"
 							ref="NotificationsBlock"
 							:rows="userNotificationItemsList"
-							:isPhoneVerified="isPhoneVerified"						
+							:isPhoneVerified="isPhoneVerified"
 						/>
 					</div>
 
@@ -325,7 +329,7 @@
 							class="notifications-block"
 							ref="NotificationsBlockRT"
 							:rows="userRealTimeNotificationItemsList"
-							:isPhoneVerified="isPhoneVerified"							
+							:isPhoneVerified="isPhoneVerified"
 						/>
 					</div>
 
@@ -350,16 +354,31 @@
 						preventSetNavbar
 						:userId="itemId"
 						:isCSM="!!formData.is_im_csm"
-						:enableBaselineReport="currentUserisIndustrialMatrix && itemId === authUser.id"
-
+						:enableBaselineReport="
+							currentUserisIndustrialMatrix && itemId === authUser.id
+						"
 						:sensorsListProps="sensorsList"
 						:plantsListProps="formData.company_id ? plantsList : allPlantsList"
+					/>
+				</div>
+
+				<div
+					v-if="itemId && hasApiTab"
+					v-show="activeTab.prop == 'apiTab'"
+					:class="['tab-container reports-tab']"
+					key="tab-3"
+				>
+					<ClientApiCredentialsList
+						insideOtherPage
+						preventSetNavbar
+						:userId="itemId"
+						:canManageCredentials="isEditingOwnAccount"
 					/>
 				</div>
 			</CustomTransition>
 
 			<FormOperationsButtons
-				v-if="!fromModal && (activeTab.prop !== 'reportsTab')"
+				v-if="!fromModal && !['reportsTab', 'apiTab'].includes(activeTab.prop)"
 				@onCancel="handleCancel"
 				@onSave="validateForm"
 			/>
@@ -381,38 +400,31 @@ import {
 } from '@/constants/global';
 
 import { LANGUAGE_TYPES, languagesList } from '@/localization/utils';
+// import { MENU_TYPES } from '@/constants/menuItems';
 
 import { required } from '@/constants/validation';
-import {
-	itemFormMixin,
-	requestsListMixin,
-	subItemsListMixin
-} from '@/mixins';
+import { itemFormMixin, requestsListMixin, subItemsListMixin } from '@/mixins';
 import {
 	removeObjProps,
-	setupLabel,
+	setupLabel
 	// findItemBy
 } from '@/helpers';
 import { timeZonesList } from '@/constants/date_time';
-
 import { isPasswordStrong } from '@/helpers/specialHelpers';
 
 export default {
-	mixins: [
-		itemFormMixin(),
-		requestsListMixin(),
-		subItemsListMixin()
-	],
+	mixins: [itemFormMixin(), requestsListMixin(), subItemsListMixin()],
 
 	components: {
 		PhoneInput: () => import('@/components/form/PhoneInput.vue'),
 		NotificationsBlock: () => import('./NotificationsBlock.vue'),
 		ReportsList: () => import('../UserReports/ItemsList.vue'),
+		ClientApiCredentialsList: () => import('./ClientApiCredentialsList.vue'),
 		MFABlock: () => import('./MFABlock.vue'),
-		PhoneVerificationBlock: () =>	import('./PhoneVerificationBlock.vue'),
+		PhoneVerificationBlock: () => import('./PhoneVerificationBlock.vue'),
 
 		PasswordCheckList: () => import('@/components/pages/PasswordCheckList.vue'),
-		ProdlinesSelectItem: () => import('./ProdlinesSelectItem.vue'),
+		ProdlinesSelectItem: () => import('./ProdlinesSelectItem.vue')
 	},
 
 	props: {
@@ -437,7 +449,7 @@ export default {
 			showPassTooltip: false,
 			country_code_item: null,
 			daily_summary_notify_enabled: false,
-			
+
 			confirmedPhoneNumber: '',
 
 			userRolesList: [],
@@ -501,11 +513,9 @@ export default {
 				first_name: required,
 				last_name: required,
 				email: required,
-				password: [
-					{ validator: this.validatePassword, trigger: 'blur', }
-				],
+				password: [{ validator: this.validatePassword, trigger: 'blur' }],
 				password_confirmation: [
-					{ validator: this.validateConfirmPassword, trigger: 'blur', }
+					{ validator: this.validateConfirmPassword, trigger: 'blur' }
 				]
 
 				// hourly_rate: required
@@ -523,15 +533,16 @@ export default {
 				state.auth.isIndustrialMatrix || state.auth.isDeveloper,
 			currentUserIsCustomer: state => state.auth.isCustomer,
 			currentUserIsDeveloper: state => state.auth.isDeveloper,
-			globalFilters: state => state.global.globalFilters,
+			globalFilters: state => state.global.globalFilters
 		}),
 
-		subItemsSettings: () => Object.freeze([
-			{ ref: 'NotificationsBlock', targetProp: 'notification_rules' },
-			{ ref: 'NotificationsBlockRT', targetProp: 'notification_rules'	},
-			{ ref: 'NotificationsBlockRequisitions', targetProp: 'notification_rules'	},
-			{ ref: 'ProdlinesSelectItem', targetProp: 'notifiable_production_lines' }
-		]),
+		subItemsSettings: () =>
+			Object.freeze([
+				{ ref: 'NotificationsBlock', targetProp: 'notification_rules' },
+				{ ref: 'NotificationsBlockRT', targetProp: 'notification_rules' },
+				{ ref: 'NotificationsBlockRequisitions', targetProp: 'notification_rules' },
+				{ ref: 'ProdlinesSelectItem', targetProp: 'notifiable_production_lines' }
+			]),
 		timeZonesList: () => Object.freeze(timeZonesList()),
 		MFA_TYPES: () => Object.freeze(MFA_TYPES),
 
@@ -544,14 +555,18 @@ export default {
 		disableMfaSwitcher() {
 			return (
 				this.itemId &&
-				(this.authUser &&	this.authUser.id !== this.itemId) &&
-				(this.itemData && !this.formData.is_mfa_enabled)
+				this.authUser &&
+				this.authUser.id !== this.itemId &&
+				this.itemData &&
+				!this.formData.is_mfa_enabled
 			);
 		},
 
 		disableMfaBlock() {
 			return (
-				!this.itemId || this.disableMfaSwitcher || (this.authUser &&	this.authUser.id !== this.itemId)
+				!this.itemId ||
+				this.disableMfaSwitcher ||
+				(this.authUser && this.authUser.id !== this.itemId)
 			);
 		},
 
@@ -559,10 +574,9 @@ export default {
 			// return false
 			const { itemId, itemData, formData, confirmedPhoneNumber } = this;
 			return (
-				itemId && (
-					(itemData.phone_number && itemData.phone_number == formData.phone_number) ||
-					(confirmedPhoneNumber && confirmedPhoneNumber == formData.phone_number)
-				)
+				itemId &&
+				((itemData.phone_number && itemData.phone_number == formData.phone_number) ||
+					(confirmedPhoneNumber && confirmedPhoneNumber == formData.phone_number))
 			);
 		},
 
@@ -606,6 +620,8 @@ export default {
 		isCustomer: that =>
 			that.selectedRole && that.selectedRole.type === USER_ROLES_TYPES.CUSTOMER,
 		isTechnician: that => that.selectedRole && that.selectedRole.is_technic,
+		isEditingOwnAccount: that =>
+			!!that.itemId && !!that.authUser && that.itemId === that.authUser.id,
 
 		setupLabel: () => setupLabel,
 
@@ -618,6 +634,7 @@ export default {
 		isHideCompany: that =>
 			that.hideCompany || that.settings.hideCompany || that.currentUserIsCustomer,
 
+		hasApiTab: that => that.tabsList && that.tabsList.some(t => t.prop === 'apiTab'),
 		/*reportsListFilters: that => that.itemId && Object.freeze({ 
 			userId: that.itemId,
 		}),*/
@@ -642,7 +659,7 @@ export default {
 					action: 'fetch_plants',
 					localProp: 'allPlantsList',
 					localLoadProp: 'allPlantsLoading',
-					payload: { params: { max:-1, archived: true }}
+					payload: { params: { max: -1, archived: true } }
 				},
 				{
 					action: 'fetch_user_roles',
@@ -689,7 +706,7 @@ export default {
 
 		selectedPlantIds() {
 			return this.formData.plants_ids;
-		},
+		}
 
 		/*selectedPlant() {
 			const { plantsList, formData } = this;
@@ -738,7 +755,7 @@ export default {
 			fetch_plants: 'plants/fetch_plants',
 			fetch_sensors: 'sensors/fetch_sensors',
 
-			save_item: 'users/save_user',
+			save_item: 'users/save_user'
 		}),
 
 		handlePhoneVerified() {
@@ -774,7 +791,7 @@ export default {
 					callback();
 				}
 			} else {
-				if ( !isPasswordStrong(value.trim()).isStrong || this.equalsToAccountName) {
+				if (!isPasswordStrong(value.trim()).isStrong || this.equalsToAccountName) {
 					callback(new Error(this.$t(`aliases.password_validation`)));
 				}
 
@@ -842,7 +859,6 @@ export default {
 				if (this.routeQuery && this.routeQuery.enableMfa == 'true') {
 					this.formData.is_mfa_enabled = 1;
 				}
-
 			} else {
 				// this.rules.password.push(required)
 			}
@@ -871,11 +887,14 @@ export default {
 				this.formData.plants_ids = [];
 				this.formData.company_id = null;
 			}
+
+			this.$emit('updateApiTabVisibility', this.canViewApiTab);
 		},
 
 		localValidationHook() {
-			if (!this.isIndustrialMatrix &&
-				!this.formData.is_monitoring_all_notifiable_plants && 
+			if (
+				!this.isIndustrialMatrix &&
+				!this.formData.is_monitoring_all_notifiable_plants &&
 				!this.formData.notifiable_production_lines.length
 			) {
 				this.$notify({
@@ -887,10 +906,9 @@ export default {
 			}
 
 			if (
-				!this.isPhoneVerified && (
-					this.formData.is_mfa_enabled && 
-					this.formData.mfa_type === MFA_TYPES.SMS
-				)
+				!this.isPhoneVerified &&
+				this.formData.is_mfa_enabled &&
+				this.formData.mfa_type === MFA_TYPES.SMS
 			) {
 				this.$notify({
 					type: 'warning',
@@ -908,7 +926,11 @@ export default {
 			// data.country_code = data.country_code == 'other' ? null : data.country_code;
 
 			if (!this.itemId) {
-				data = removeObjProps(data, ['password', 'password_confirmation', 'current_password']);
+				data = removeObjProps(data, [
+					'password',
+					'password_confirmation',
+					'current_password'
+				]);
 			}
 
 			if (this.isIndustrialMatrix) {
@@ -923,7 +945,7 @@ export default {
 					// 'is_sms_sensor_job_notify',
 					// 'daily_summary_notify_at',
 				]);
-			}	else {
+			} else {
 				data = removeObjProps(data, ['notifiable_plants']);
 				data.is_im_csm = 0;
 			}
@@ -971,9 +993,9 @@ export default {
 				});
 			} else {
 				// console.log('submit', data)
-				this.$emit('submit', data);					
+				this.$emit('submit', data);
 			}
-		},
+		}
 	},
 
 	watch: {
@@ -989,7 +1011,7 @@ export default {
 		},*/
 		'formData.password'(val) {
 			this.rules.current_password = this.itemId && val ? required : null;
-		},
+		}
 
 		/*'formData.report_notifiable_plants'() {
 			this.formData.reporting_plants = [];
@@ -997,6 +1019,6 @@ export default {
 		/*'formData.is_im_csm'() {
 			this.formData.reporting_plants = [];
 		}*/
-	},
+	}
 };
 </script>

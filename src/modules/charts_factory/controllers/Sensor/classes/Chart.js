@@ -54,6 +54,17 @@ import {
 import { createDraggablePlotline } from './DraggablePlotline';
 
 class SensorChartBase extends ChartBase {
+	resolveUnitTypeName(parameterItem) {
+		if (!parameterItem) return '';
+
+		if (parameterItem.units) return parameterItem.units;
+
+		return this.setupUnitTypeName({
+			parameterItem,
+			measurement: this.measurement
+		});
+	}
+
 	constructor() {
 		super();
 		this.generateSeriesByStatistics = false;
@@ -62,7 +73,7 @@ class SensorChartBase extends ChartBase {
 		// console.log('constructor', resources)
 		// resources.payload_3 = {
 		let options = {
-			chart: { type: 'column' /*animation: false*/ },
+			chart: { type: 'column', zoomType: 'xy' /*animation: false*/ },
 			/*xAxis: {
 				type: 'datetime',
 				ordinal: false,
@@ -74,7 +85,21 @@ class SensorChartBase extends ChartBase {
 					type: 'datetime',
 					ordinal: false,
 					minRange: 60000,
-					plotBands: []
+					plotBands: [],
+					events: {
+						afterSetExtremes: e => {
+							if (
+								(e.trigger == 'navigator' || e.trigger == 'zoom') &&
+								this.events.navigatorChangeHandler
+							) {
+								this.events.navigatorChangeHandler({
+									min: e.min,
+									max: e.max,
+									chart_id: this.chart_id
+								});
+							}
+						}
+					}
 				},
 				{
 					type: 'datetime',
@@ -185,10 +210,48 @@ class SensorChartBase extends ChartBase {
 
 	handleChartInitiatedEvent({ target }) {
 		this.ChartAPI = target;
+		this.syncHistorySeriesVisibility(this.resources.payload_1.showHistory, { redraw: false });
 		setTimeout(() => {
 			this.lastInitialRedrawComplete = true;
+			this.syncHistorySeriesVisibility(this.resources.payload_1.showHistory, { redraw: false });
 			this.ChartAPI.redraw(false);
 		}, 100);
+	}
+
+	isHistorySerie(serie) {
+		return !!(
+			serie &&
+			serie.userOptions &&
+			(
+				serie.userOptions.className?.includes('history-line') ||
+				serie.userOptions.id?.includes('_history-serie') ||
+				serie.userOptions.id?.includes('-history-serie')
+			)
+		);
+	}
+
+	setShowHistory(showHistory) {
+		this.resources.payload_1.showHistory = !!showHistory;
+		this.syncHistorySeriesVisibility(showHistory);
+	}
+
+	syncHistorySeriesVisibility(showHistory = this.resources.payload_1.showHistory, settings = {}) {
+		if (!this.ChartAPI || !this.ChartAPI.series) return;
+
+		const shouldShowHistory = !!showHistory;
+		let shouldRedraw = false;
+
+		this.ChartAPI.series.forEach(serie => {
+			if (!this.isHistorySerie(serie)) return;
+			if (serie.visible === shouldShowHistory) return;
+
+			serie.setVisible(shouldShowHistory, false);
+			shouldRedraw = true;
+		});
+
+		if (shouldRedraw && settings.redraw !== false) {
+			this.ChartAPI.redraw(false);
+		}
 	}
 
 	setupChartTitle(resources) {
@@ -309,21 +372,24 @@ class SensorChartBase extends ChartBase {
 			const yAxisOptions = resources.chart_config.yAxisOptions || {};
 			// const { customYAxisTickPositioner } = resources.chart_config;
 			// console.log('localSetupYAxis', requestsList[0])
-			const units = requestsList[0] && requestsList[0].units;
-			let unit_type_name = units || this.setupUnitTypeName({
-				parameterItem: requestsList[0],
-				measurement: this.measurement
-			});
+			const unit_type_name = this.resolveUnitTypeName(requestsList[0]);
 
 			this.options.yAxis = [];
 			YAxisList.forEach((axisSettings = {}) => {
+				const axisParameterItem = axisSettings.parameterItem || axisSettings;
+				const axisUnitTypeName =
+					this.resolveUnitTypeName(axisParameterItem) || unit_type_name;
 				let axis = {
 					max: -9999999,
 					min: 0,
 					softMax: 1,
 					title: {
 						// useHTML: true,
-						text: unit_type_name || ''
+						text: axisUnitTypeName || ''
+					},
+					customSettings: {
+						parameterItem: axisParameterItem,
+						unit_type_name: axisUnitTypeName || ''
 					},
 					startOnTick: true,
 					opposite: false,
@@ -454,16 +520,12 @@ class SensorChartBase extends ChartBase {
 	// seriesConfig - step 3
 	modifySeriesConfig({ requestsList, resources, seriesConfig }) {
 		const { filters, chart_config } = resources;
-		const units = requestsList[0] && requestsList[0].units;
 
 		this.measurement = filters.measurement;
 		const { ncd_active_axial_axis } = this.sensorItem;
 			// console.log('requestsList', requestsList)
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = units || this.setupUnitTypeName({
-				parameterItem,
-				measurement: this.measurement
-			});
+			const unit_type_name = this.resolveUnitTypeName(parameterItem);
 			seriesConfig.pointsData.seriesConfigsList[
 				idx
 			] = seriesConfig.pointsData.seriesConfigsList[idx].map(item => {
@@ -578,6 +640,12 @@ class SensorChartBase extends ChartBase {
 
 	setupAdditionalOptionsForSeries() {
 		return {};
+	}
+
+	syncNavigatorPosition({chart_id, min, max}) {
+		if (chart_id !== this.chart_id && this.ChartAPI && this.ChartAPI.xAxis?.[0]) {
+			this.ChartAPI.xAxis[0].setExtremes(min, max);
+		}
 	}
 
 	assignDataToSeriesReadyCallback() {
@@ -1300,6 +1368,8 @@ class SensorChart extends SensorChartBase {
 
 	// -----------------
 	calculateThresholdsBySelectedPoints(e) {
+		if (this.options.chart.zoomType == 'xy') return;
+
 		const selectedPoints = selectPointsByChartSelection(e, this.options.series);
 
 		this.setOption(
@@ -1991,7 +2061,7 @@ class SensorAlarmsChart extends SensorChartBase {
 
 		this.chartIsDisabled = null;
 		this.formData = {
-			is_hidden: false,
+			is_hidden: 0,
 			sensor_id: null,
 			parameter: null,
 			notes: [],
@@ -2012,6 +2082,7 @@ class SensorAlarmsChart extends SensorChartBase {
 
 	toggleChart(val) {
 		this.formData.is_hidden = val === undefined ? !this.formData.is_hidden : val;
+		this.formData.is_hidden = this.formData.is_hidden ? 1 : 0;
 		this.setValue('chartIsDisabled', this.formData.is_hidden);
 	}
 
@@ -2030,7 +2101,7 @@ class SensorAlarmsChart extends SensorChartBase {
 
 	localStatisticsResponsesReady() {
 		if (!this.hasStatistics) {
-			this.formData.remove_this_graph = true;
+			this.formData.remove_this_graph = 1;
 			this.setValue('isRemoveChart', this.formData.remove_this_graph);
 		}
 	}
@@ -2367,6 +2438,17 @@ class SensorOverlayChart extends SensorChartBase {
 
 // --------------------
 class MultiViewChart extends ChartBase {
+	resolveUnitTypeName(parameterItem) {
+		if (!parameterItem) return '';
+
+		if (parameterItem.units) return parameterItem.units;
+
+		return this.setupUnitTypeName({
+			parameterItem,
+			measurement: this.measurement
+		});
+	}
+
 	constructor(resources) {
 		super();
 		// console.log('resources', resources)
@@ -2375,7 +2457,7 @@ class MultiViewChart extends ChartBase {
 		this.measurement = resources.filters.measurement;
 
 		let options = {
-			chart: { type: 'spline', },
+			chart: { type: 'spline', zoomType: 'xy' },
 			boost: {
 				enabled: true,
 				useGPUTranslations: false
@@ -2506,11 +2588,8 @@ class MultiViewChart extends ChartBase {
 			this.options.yAxis = [];
 
 			YAxisList.forEach((axisSettings = {}, idx) => {
-				const units = axisSettings && axisSettings.units;
-				let unit_type_name = units || this.setupUnitTypeName({
-					parameterItem: axisSettings,
-					measurement: this.measurement
-				});
+				const axisParameterItem = axisSettings.parameterItem || axisSettings;
+				let unit_type_name = this.resolveUnitTypeName(axisParameterItem);
 
 				let axis = {
 					max: -9999999,
@@ -2522,7 +2601,10 @@ class MultiViewChart extends ChartBase {
 					},
 					startOnTick: true,
 					opposite: !!idx,	
-					customSettings: { parameterItem: axisSettings },
+					customSettings: {
+						parameterItem: axisParameterItem,
+						unit_type_name: unit_type_name || ''
+					},
 					...yAxisOptions,
 				};
 				// console.log('axisSettings', axisSettings)
@@ -2604,10 +2686,7 @@ class MultiViewChart extends ChartBase {
 		// const { ncd_active_axial_axis } = this.sensorItem;
 		// console.log('modifySeriesConfig', this.measurement, this.options.yAxis)
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = this.setupUnitTypeName({
-				parameterItem,
-				measurement: this.measurement
-			});
+			const unit_type_name = this.resolveUnitTypeName(parameterItem);
 			const { sensor_id } = parameterItem;
 			let actualAxisIdx = 0;
 

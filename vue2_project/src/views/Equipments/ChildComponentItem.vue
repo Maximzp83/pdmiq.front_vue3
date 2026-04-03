@@ -3,7 +3,7 @@
 		v-if="fromFFTPage"
 	>
 		<!-- <div class="content-row">
-			<b class="capitalize">Rules For {{ childEquipmentType.name }}:</b>
+			<b class="capitalize">Rules For {{ equipmentType.name }}:</b>
 		</div> -->
 		<!-- <div class="card-header">dfgdfg</div> -->
 		<div class="article-title">{{childOriginalComponent.name}}</div>
@@ -15,7 +15,7 @@
 			<div class="card-content">
 				<div class="flex align-center">
 					<div class="imgWrapper equipmentTypeImg div-block">
-						<img :src="childEquipmentType && childEquipmentType.full_file_name" alt="">
+						<img :src="equipmentType && equipmentType.full_file_name" alt="">
 					</div>
 					<div class="div-block text-values">
 						<div class="semi-bold" v-if="brandName">{{ brandName }}</div>
@@ -282,7 +282,7 @@ export default {
 
 		childOriginalComponent: that => that.itemData.original_component,
 		// childEquipmentType: that => that.childOriginalComponent.child,
-		childEquipmentType: that => that.itemData.child_equipment_type,
+		equipmentType: that => that.itemData.isParentComponent ? that.itemData : that.itemData.child_equipment_type,
 
 		// ------new feature---
 		childsEquipmentTypesList: that => that.childOriginalComponent.child_types || [],
@@ -457,7 +457,7 @@ export default {
 
 			// -------new (temp)-----
 			if (item) {
-				if (!item.child_equipment_type_id && item.original_component && item.original_component.child_type_ids.length) {
+				if (!item.child_equipment_type_id && item.original_component && item.original_component.child_type_ids && item.original_component.child_type_ids.length) {
 					this.formData.child_equipment_type_id = item.original_component.child_type_ids[0];
 				}
 			}
@@ -466,12 +466,13 @@ export default {
 			}*/
 		},
 
-		/*localGetFormDataCallback(formData) {
-			if (!formData.vibration_analysis_rules.length) {
+		localGetFormDataCallback(formData) {
+			/*if (!formData.vibration_analysis_rules.length) {
 				delete formData.vibration_analysis_rules;
-			}
+			}*/
+			formData.isParentComponent = this.itemData.isParentComponent;
 			return formData;
-		},*/
+		},
 
 		handleSave() {
 			this.$emit('save');
@@ -492,7 +493,7 @@ export default {
 					} else {
 						this.fetchAnalysisRuleCrossoverOptions({
 							ruleId: rule.original_rule_id,
-							equipmentTypeId: this.formData.child_equipment_type_id,
+							equipmentTypeId: this.formData.child_equipment_type_id || this.itemData.original_component_id,
 						}).then(() => {	
 							responses++;
 							if (responses >= this.preparedVibrationAnalysisItems.length) {
@@ -560,12 +561,14 @@ export default {
 	},
 
 	created() {
+		const { itemData } = this;
 		if (
-			this.itemData.child_equipment_type_id && (
-				!this.itemData.vibration_analysis_rules || !this.itemData.vibration_analysis_rules.length
-			)
+			(itemData.child_equipment_type_id || itemData.isParentComponent)
+			/*&& (
+				!itemData.vibration_analysis_rules || !itemData.vibration_analysis_rules.length
+			)*/
 		) {
-			this.fetchVibrationAnalysis(this.itemData.child_equipment_type_id);
+			this.fetchVibrationAnalysis(itemData.isParentComponent ? itemData.id : itemData.child_equipment_type_id);
 		}
 	},
 

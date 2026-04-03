@@ -578,6 +578,14 @@ const copyToClipboard1 = (string, settings = {}) => {
 const setupItemSpeedOptionsList1 = ({rootFilters, sensorData, itemSpeedOptionsList, fftItem}) => {
 	const {rpmSources} = sensorData;
 	let list = [];
+	const setupRpmOptionValues = value => {
+		const rpmValue = value != null ? +value : value;
+		return {
+			value: rpmValue,
+			rpmValue,
+			hzValue: rpmValue != null && !isNaN(rpmValue) ? rpmValue / 60 : null
+		};
+	};
 
 	Object.keys(rpmSources).forEach(source_key => {
 		let key = 'source_key';
@@ -599,7 +607,7 @@ const setupItemSpeedOptionsList1 = ({rootFilters, sensorData, itemSpeedOptionsLi
 			list.push({
 				id: option.id,
 				name: option.name,
-				value: rpmSources[source_key],
+				...setupRpmOptionValues(rpmSources[source_key]),
 				hasInput: option.hasInput,
 				draggable: option.draggable
 			});
@@ -610,7 +618,7 @@ const setupItemSpeedOptionsList1 = ({rootFilters, sensorData, itemSpeedOptionsLi
 		list.push({
 			id: 'fft-rpm',
 			name: 'FFT',
-			value: fftItem.rpm_value,
+			...setupRpmOptionValues(fftItem.rpm_value),
 			hasInput: true
 		});
 	}

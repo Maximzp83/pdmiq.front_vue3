@@ -73,7 +73,6 @@
 					:optionsList="equipmentTypesList"
 					:placeholder="`${tt('Select')} ${tt('type')}`"
 					v-model="formData.equipment_type_id"
-					@change="handleEquipmentTypeChange"
 				/>
 			</el-form-item>
 
@@ -1296,10 +1295,6 @@ export default {
 				return composedList.some(ci => ci.equipment_type_id === e_type.id);
 			});
 		},*/
-
-		handleEquipmentTypeChange() {
-			this.formData.equipment_subtype_id = null;
-		},
 
 		handleStatusChange(id) {
 			this.formData.is_limbo = false;

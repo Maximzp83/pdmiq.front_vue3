@@ -165,7 +165,7 @@
 				prop="periods"
 				v-if="
 					(parameterItem.id === SENSOR_PARAMETERS_TYPES.TEMPERATURE ||
-						isHumiditySensor) &&
+						isHumiditySensor || isBannerV2Generic) &&
 						!isOffAlarm
 					// !isHumiditySensor
 				"
@@ -181,7 +181,6 @@
 					:item-index="idx"
 					@onRemove="id => removeFormItem(id, 'thresholdPeriodsItemsList')"
 					@selectMonth="handleSelectMonth"
-					:isMobile="isMobile"
 					:isOffAlarm="isOffAlarm"
 					:selectedMonths="selectedMonths"
 					:isHumiditySensor="isHumiditySensor"
@@ -290,6 +289,7 @@ export default {
 		isBannerPressure: that => that.currentSensorType.isBannerPressure,
 		isHumiditySensor: that =>
 			that.currentSensorType.isHumiditySensor || that.currentSensorType.isNCDEnv,
+		isBannerV2Generic: that => that.currentSensorType.isBannerV2Generic,
 
 		isLowHighZones() {
 			const {

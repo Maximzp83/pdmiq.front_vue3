@@ -123,8 +123,7 @@ const fetch_sensor_statistics1 = payload => {
 };
 
 const fetch_ncd_sensor_fft_statistics1 = payload => {
-	let baseURL =
-		'https://7i4l4qqai25gqquke4teubtkt40hjcaw.lambda-url.ca-central-1.on.aws';
+	let baseURL = 'https://7i4l4qqai25gqquke4teubtkt40hjcaw.lambda-url.ca-central-1.on.aws';
 	// let baseURL = 'https://graph.industrialmatrix.com/fft';
 	
 	if (process.env.VUE_APP_FFT_STATISTICS_API_URL) {

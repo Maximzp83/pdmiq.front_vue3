@@ -89,7 +89,7 @@
 					:placeholder="`${tt('select')} ${tt('part_number')}`"
 				/>
 			</el-form-item>
-
+			
 			<el-form-item prop="child_components">
 				<div class="semi-bold article-title uppercase">
 					{{ tt('Components') }}:

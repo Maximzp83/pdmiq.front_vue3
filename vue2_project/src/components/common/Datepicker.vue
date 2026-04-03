@@ -16,6 +16,7 @@
 			:picker-options="finalPickerOptions"
 			:default-time="defaultTime"
 			:x-placement="xPlacement"
+			@blur="$emit('blur')"
 		/>
 	</div>
 </template>

@@ -521,6 +521,8 @@ export default {
 		},
 
 		handleChartRendered(e, Chart) {
+			this.ChartInstance.syncHistorySeriesVisibility(this.additionalProps.showHistory);
+
 			if (!this.chartIsRendered && Chart.lastInitialRedrawComplete) {
 				this.chartIsRendered = true;
 				window.isGraphMounted = true;
@@ -546,6 +548,14 @@ export default {
 
 		toggleEditPlotlinesManual() {
 			this.editPlotlines = !this.editPlotlines;
+	
+			this.ChartInstance.injectProps(
+				'options',
+				{
+					chart: { zoomType: this.editPlotlines ? '' : 'xy' }
+				},
+				{ emitChartOptionsUpdate: true }
+			);
 		},
 		zoomYAxis(data) {
 			this.ChartInstance.ChartAPI.yAxis[0].setExtremes(...data);
@@ -639,7 +649,7 @@ export default {
 			this.ChartInstance.injectProps(
 				'options',
 				{
-					chart: { zoomType: this.calculateThresholdsIsActive ? 'x' : null }
+					chart: { zoomType: this.calculateThresholdsIsActive ? 'x' : 'xy' }
 				},
 				{ emitChartOptionsUpdate: true }
 			);
@@ -679,16 +689,21 @@ export default {
 	},
 
 	watch: {
-		ChartAPI(api) {
+		/*ChartAPI(api) {
 			if (api) {
 				window['ChartAPI'] = api;
+				this.$nextTick(() => this.ChartInstance.syncHistorySeriesVisibility(this.additionalProps.showHistory));
 			}
-		},
+		},*/
 
 		rootFilters() {
 			// console.log('rootFilters')
 			this.refetchChartData = true;
 		},
+
+		/*chartOptionsUpdate() {
+			this.$nextTick(() => this.ChartInstance.syncHistorySeriesVisibility(this.additionalProps.showHistory));
+		},*/
 
 		isSidebarCollapse() {
 			setTimeout(() => {
@@ -703,6 +718,8 @@ export default {
 		},
 
 		'additionalProps.showHistory'() {
+			this.ChartInstance.setShowHistory(this.additionalProps.showHistory);
+
 			if (this.$refs.ChartZoom) {
 				// this.chartOptionsUpdate++;
 				setTimeout(() => {

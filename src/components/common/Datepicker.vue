@@ -16,6 +16,7 @@
 			:picker-options="finalPickerOptions"
 			:default-time="defaultTime"
 			:x-placement="xPlacement"
+			@blur="emit('blur')"
 			show-confirm
 			:size="size"
 		/>
@@ -71,7 +72,7 @@ const finalPickerOptions = computed(() => {
 });
 
 // ========== Methods ===========
-const emit = defineEmits(['update:modelValue', 'input']);
+const emit = defineEmits(['update:modelValue', 'input', 'blur']);
 
 const prepareDateRange = (range, currentValue) => {
 	let result_value = range ? [...range] : null;

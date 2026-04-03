@@ -17,22 +17,39 @@
 			:label="tt('name')"
 			prop="name"
 			class="mcol-xs-9 label_pt-5 mini"
-		>	
+		>
 			<CustomInput v-model="formData.name" :placeholder="tt('name')" />
 		</el-form-item>
 
 		<el-form-item
+			label="Measurement Unit"
+			prop="measurement_unit_id"
+			class="mcol-xs-9 label_pt-5 mini"
+		>
+			<CustomSelect
+				class="mini"
+				clearable
+				filterable
+				:optionsList="measurementUnitsOptions"
+				placeholder="Select Measurement Unit"
+				v-model="formData.measurement_unit_id"
+			/>
+		</el-form-item>
+
+		<!--
+		<el-form-item
 			:label="tt('units')"
 			prop="units"
 			class="mcol-xs-9 label_pt-5 mini"
-		>	
+		>
 			<CustomInput v-model="formData.units" :placeholder="tt('units')" />
 		</el-form-item>
+		-->
 
 		<el-form-item
 			prop="formula"
 			class="mcol-xs-9 label_pt-5 mini"
-		>	
+		>
 			<template v-slot:label>
 				<span class="span-block">{{ tt('formula') }}</span>
 				<span class="span-block">
@@ -74,16 +91,18 @@
 </template>
 
 <script>
-// import { updateFormData } from '@/helpers';
 import { chartTypesList } from '@/constants/global';
-
 import { subItemMixin } from '@/mixins';
+import { getMeasurementUnitsOptions } from '@/helpers/measurementUnits';
 
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		// isMobile: Boolean,
-		fromModal: Boolean
+		fromModal: Boolean,
+		measurementUnitsList: {
+			type: Array,
+			default: () => []
+		}
 	},
 
 	data() {
@@ -92,6 +111,7 @@ export default {
 				id: null,
 				name: '',
 				units: '',
+				measurement_unit_id: null,
 				formula: '',
 				graph_type: null,
 				is_line_speed: false
@@ -101,26 +121,20 @@ export default {
 
 	computed: {
 		chartTypesList: () => Object.freeze(chartTypesList()),
+		measurementUnitsOptions() {
+			return Object.freeze(getMeasurementUnitsOptions(this.measurementUnitsList));
+		},
 		tooltipContent() {
-			/*`Use {value} as the input from the IO. <br/>
-			Example: {value} * 60 + 500 <br/>
-			NB: The original formula will be applied before this formula`*/
 			return this.$t('aliases.subtype_formula_tooltip');
 		}
 	},
 
 	methods: {
-		/*localGetFormDataCallback(formData) {
-			// if (!formData.name) delete formData.name;
-			if (this.itemData.isDefaultValues) {
-				const { itemData } = this;
-				if (formData.name === itemData.name) formData.name = '';
-				if (formData.units === itemData.units) formData.units = '';
-				if (formData.formula === itemData.formula) formData.formula = '';
-			}
-
-			return formData;
-		}*/
+		localGetFormDataCallback(formData) {
+			const newFormData = { ...formData };
+			delete newFormData.units;
+			return newFormData;
+		}
 	}
 };
 </script>

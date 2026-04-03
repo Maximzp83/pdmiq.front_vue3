@@ -22,6 +22,12 @@ import {
 import { cloneDeep, validateBySettings, findItemBy, mergeObjects } from '@/helpers';
 import { CHART_TYPES, chartTypesList, SENSOR_THRESHOLD_TYPES, NCD_ALARM_TYPES } from '@/constants/global';
 import { METRIC_SYSTEM_TYPES } from './enums';
+import { storeGetter } from '@/store';
+import {
+	buildMeasurementUnitFormula,
+	resolveMeasurementUnitObject,
+	shouldConvertMeasurementUnit
+} from '@/helpers/measurementUnits';
 const { METRIC, IMPERIAL } = METRIC_SYSTEM_TYPES;
 
 import { Lang } from '@/localization';
@@ -1677,31 +1683,69 @@ const chartsListsConfig1 = {
 const generateListsConfig = (config_key, settings) => {
 	if (config_key == 'banner_v2_generic') {
 		const { sensorItem } = settings.resources.payload_1;
+		const measurement =
+			(settings.resources.filters && settings.resources.filters.measurement) ||
+			storeGetter('sensors.statistics_filters').measurement ||
+			METRIC;
+		const measurementUnitsList = storeGetter('measurement_units.itemsList') || [];
 
 		// console.log(sensorItem.bannerV2Subtype)
 		if (sensorItem.bannerV2Subtype) {
 			const { bannerV2SubtypeParameters } = sensorItem;
 			// console.log(sensorItem)
 			return sensorItem.bannerV2Subtype.parameters.map(param => {
-				const { node_parameter, graph_type, id } = param;
+				const { node_parameter, graph_type, id, is_visible_by_default } = param;
 				let units = param.units,
 						name = param.name;
-
+				let measurement_unit_id = param.measurement_unit_id;
+				let measurementUnit = resolveMeasurementUnitObject({
+					unit: param.measurement_unit,
+					measurementUnitId: measurement_unit_id,
+					items: measurementUnitsList
+				});
+				let y_formula = shouldConvertMeasurementUnit({
+					unit: measurementUnit,
+					measurement
+				})
+					? buildMeasurementUnitFormula(measurementUnit.to_secondary_formula)
+					: null;
+				// console.log(measurementUnit, y_formula);
 				const overwritingParam = findItemBy('parent_id', id, bannerV2SubtypeParameters);
 				
 				if (overwritingParam) {
 					units = overwritingParam.units;
 					name = overwritingParam.name;
+					measurement_unit_id =
+						overwritingParam.measurement_unit_id != null
+							? overwritingParam.measurement_unit_id
+							: measurement_unit_id;
+					measurementUnit = resolveMeasurementUnitObject({
+						unit:
+							overwritingParam.measurement_unit || param.measurement_unit,
+						measurementUnitId: measurement_unit_id,
+						items: measurementUnitsList
+					});
+					/*y_formula = shouldConvertMeasurementUnit({
+						unit: measurementUnit,
+						measurement
+					})
+						? buildMeasurementUnitFormula(measurementUnit.to_secondary_formula)
+						: null;*/
 				}
 
 				let chart = {
 					chart_id: `chart-${node_parameter}`,
 					parameter_id: node_parameter,
+					canBeHidden: true,
+					setValue: ['chartIsHidden', !is_visible_by_default],
 					customSettings: { parameterItem: param },
 					config_settings: { showCalculateThresholdsButton: true },
 					transformator_settings: {
 						specification: {
-							setupFlagsData: { enable_fft: 1, enable_runtime_tracker: 1 }
+							setupFlagsData: { enable_fft: 1, enable_runtime_tracker: 1 },
+							setupPointsData: {
+								yKey: 'unit'
+							}
 						}
 					},
 					applyColorSchemeOnSeriesReady: true,
@@ -1711,10 +1755,12 @@ const generateListsConfig = (config_key, settings) => {
 						id: node_parameter,
 						icon: 'icon-acceleration',
 						name,
-						units
+						units,
+						measurement_unit_id,
+						measurementUnit,
+						y_formula
 					}]
 				}
-
 				if (graph_type === CHART_TYPES.LINE || graph_type === CHART_TYPES.AREASPLINE) {
 					let type = findItemBy('id', graph_type, chartTypesList());
 					
@@ -1725,6 +1771,10 @@ const generateListsConfig = (config_key, settings) => {
 						// chart: { type: 'column' },
 						navigator: { series: { type: type.chart_type } }
 					}
+
+					/*if (y_formula) {
+						chart.transformator_settings.specification.setupPointsData.y_formula = y_formula;
+					}*/
 
 					if (graph_type === CHART_TYPES.AREASPLINE) {
 						chart.inject_options.plotOptions = {
@@ -1748,10 +1798,12 @@ const generateListsConfig = (config_key, settings) => {
 						}
 					}
 
-					chart = { ...chart, ...settingsForSplineChartsWithSplittedSeries };
+					chart = mergeObjects(chart, settingsForSplineChartsWithSplittedSeries);
 					chart.seriesConfigSettings = getSplineSeriesConfigSettings(param.alarm_type);
 					// console.log(chart.seriesConfigSettings)
 				}
+				// console.log('chart', chart)
+
 				return chart;
 			});
 		}

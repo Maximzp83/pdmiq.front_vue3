@@ -117,6 +117,18 @@
 				/>
 			</el-form-item>
 
+			<el-form-item
+				:label="tt('phrases.silence_mode')"
+				prop="is_silence_mode"
+				class="half-width"
+			>
+				<el-switch
+					v-model="formData.is_silence_mode"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="`${tt('Custom')} ${tt('Fields')}`" prop="characters">
 				<div class="options-container">
 					<div v-if="charactersItemsList.length" class="content-row">
@@ -263,8 +275,8 @@ export default {
 				characters: [],
 				downtime_cost: 0,
 				libraries: [],
-
-				linespeed_sensor_id: null
+				linespeed_sensor_id: null,
+				is_silence_mode: 0
 			}
 		};
 	},

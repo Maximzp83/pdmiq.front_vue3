@@ -439,6 +439,11 @@ export default {
 			this.click_re_baseline();
 		},
 
+		localBeforeMount() {
+			this.preventFetch = true;
+			this.setFilters({	page: 1	})
+		}
+
 		/*handleExportToExel() {
 			this.handleExportItem({
 				url: 'sensors/export',

@@ -20,6 +20,13 @@ const report_filters_init = {
 	orderByMethod: ''
 };
 
+const client_api_credentials_filters_init = {
+	max: -1,
+	page: 1,
+	orderByColumn: '',
+	orderByMethod: ''
+};
+
 const scopedState = {
 	filters: localStorageFilters
 		? { ...localStorageFilters }
@@ -27,6 +34,7 @@ const scopedState = {
 	reports_filters: localStorageReportsFilters
 		? { ...localStorageReportsFilters }
 		: { ...report_filters_init },
+	client_api_credentials_filters: { ...client_api_credentials_filters_init },
 
 	fetchedMeta: { ...filtersState.fetchedMeta }
 };
@@ -104,6 +112,25 @@ const actions = {
 		);
 	},
 
+	fetch_client_api_credentials(storeArgs, payload = {}) {
+		const extendedPayload = { ...payload };
+
+		return fetch_items(storeArgs, `/client-api-credentials`, extendedPayload);
+	},
+
+	create_client_api_credential(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			notNotify: true
+		};
+
+		return save_data(storeArgs, `/client-api-credentials`, extendedPayload);
+	},
+
+	delete_client_api_credential(storeArgs, payload) {
+		return delete_item(storeArgs, `/client-api-credentials`, payload);
+	},
+
 	// --------------------
 	get_phone_number_verification_code(storeArgs, payload) {
 		const extendedPayload = {
@@ -125,7 +152,7 @@ const actions = {
 			...payload,
 			method: 'POST',
 			resultMessage: Lang.tt('aliases.verification_ok'),
-			returnResponseOnly: 1	
+			returnResponseOnly: 1
 		};
 
 		return multipurpose_response(
@@ -157,6 +184,15 @@ const actions = {
 			stateProp: 'reports_filters',
 			prefix: 'users_reports',
 			value: filters || { ...report_filters_init }
+		};
+		commit('SET_FILTERS', payload);
+	},
+
+	set_client_api_credentials_filters({ commit }, filters) {
+		const payload = {
+			stateProp: 'client_api_credentials_filters',
+			prefix: 'users_client_api_credentials',
+			value: filters || { ...client_api_credentials_filters_init }
 		};
 		commit('SET_FILTERS', payload);
 	}

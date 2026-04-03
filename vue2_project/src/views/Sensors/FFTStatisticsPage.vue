@@ -33,7 +33,8 @@
 
 							<div class="mcol-xs-12 flex">
 								<div class="card filled_4 request-type-block">
-									<span>{{ requestType }} - </span>
+									<span v-if="isUltrasoundFFT">Fmax = </span>
+									<span v-else>{{ requestType }} - </span>
 									<span class="no-margin">{{ requestFMax }}</span>
 								</div>
 								
@@ -147,6 +148,7 @@
 							:prevFFTItems="prevFFTPreparedItems"
 							:currentFFTItem="currentFFTItem"
 							:additionalProps="chartsAdditionalProps"
+							:getParamsByIds="getParamsByIds"
 						/>
 					</div>
 
@@ -206,7 +208,9 @@ import {
 	sensorParametersListNCD,
 	ncdAxisList,
 	metricSystemsList,
-	METRIC_SYSTEM_TYPES
+	METRIC_SYSTEM_TYPES,
+	NCD_SENSOR_PARAMETERS_TYPES,
+	SENSOR_PARAMETERS_TYPES
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { initPageDataMixin, sensorTypeMixin, fetchItemsHelper, eventHandler } from '@/mixins';
@@ -291,16 +295,16 @@ export default {
 					is_hidden_ncd_active_vertical_axis
 				} = this.itemData;
 
-				const { isBannerM25 } = this.currentSensorType;
+				const { isUltrasoundFFT } = this;
 
 				ncdAxisList.forEach(axis => {
-					const axis_name = isBannerM25 ? this.tt(axis.banner_m25_name) : axis.name;
+					const axis_name = isUltrasoundFFT ? axis.ultrasound_fft_name : axis.name;
 					if (ncd_active_vertical_axis === axis.id) {
 						if (!is_hidden_ncd_active_vertical_axis) {
 							result.push({ ...axis, name: axis_name + ' (V)' });
 						}
 					} else {
-						result.push(axis);
+						result.push({ ...axis, name: axis_name });
 					}
 				});
 			}
@@ -363,6 +367,26 @@ export default {
 			return '';
 		},
 
+		isUltrasoundFFT: that => that.currentSensorType.isBannerM25,
+
+		getParamsByIds() {
+			if(this.isUltrasoundFFT) {
+				return [
+					NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM,
+					NCD_SENSOR_PARAMETERS_TYPES.Y_WAVEFORM,
+					// NCD_SENSOR_PARAMETERS_TYPES.X_TRANSFORM_ACCELERATION,
+					SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION,
+					// NCD_SENSOR_PARAMETERS_TYPES.Y_TRANSFORM_ACCELERATION,
+					NCD_SENSOR_PARAMETERS_TYPES.Y_AXIS_ACCELERATION,
+					// NCD_SENSOR_PARAMETERS_TYPES.Z_TRANSFORM_ACCELERATION,
+					SENSOR_PARAMETERS_TYPES.Z_AXIS_ACCELERATION,
+					NCD_SENSOR_PARAMETERS_TYPES.Z_WAVEFORM,
+					SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY
+				]
+			}
+			return [];
+		},
+
 		requestType() {
 			if (this.itemData && this.currentFFTItem) {
 				const { banner_request_type } = this.currentFFTItem;
@@ -402,7 +426,8 @@ export default {
 		chartsAdditionalProps() {
 			return {
 				selectedChildComponents: this.selectedChildComponents,
-				equipmentData: this.equipmentData
+				equipmentData: this.equipmentData,
+				isUltrasoundFFT: this.isUltrasoundFFT
 			}
 		},
 
@@ -426,7 +451,7 @@ export default {
 			this.$refs.DropdownFilterbar.toggleFilterbar(e);
 		},
 
-		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload, updateRpmValue}) {
+		updateEquipmentAndFFT({equipmentItem, fftItem, skipFFTReload, updateRpmValue, updateVibrationAnalysisRules}) {
 			// console.log('reFetchEquipment', equipmentItem, fftItem, skipFFTReload, updateRpmValue)
 			// this.fetchEquipment(this.itemData.equipment_id);
 			/*if (callChartsMethod) {
@@ -450,6 +475,10 @@ export default {
 					this.currentFFTItem.rpm_value = fftItem.rpm_value;
 				}
 
+				if (updateVibrationAnalysisRules) {
+					this.currentFFTItem.vibration_analysis_rules = fftItem.vibration_analysis_rules;
+				}
+
 				if (!skipFFTReload) {
 					this.fftReady = false;	
 					setTimeout(() => {
@@ -463,6 +492,12 @@ export default {
 		fetchEquipment(id) {
 			this.doFetchAction('fetch_equipment', 'equipmentData', 'equipmentLoading', {
 				itemId: id,
+				prepareDataSettings: {
+					addSettingItems: [
+						{ key: 'brand', val_key: 'brand' },
+						{ key: 'brand_model', val_key: 'model' },
+					]
+				}
 				/*params: {
 					rpm: 1000
 				}*/

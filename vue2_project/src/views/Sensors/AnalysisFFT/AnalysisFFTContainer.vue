@@ -51,7 +51,7 @@
 					</div>
 				</div>
 
-				<AnalysisRuleItem
+				<!-- <AnalysisRuleItem
 					class="mcol-xs-auto"
 					ref="AnalysisRuleItem"
 					v-for="(rule, idx) in preparedVibrationAnalysisItems"
@@ -63,7 +63,7 @@
 					fromFFTPage					
 					@save="handleSaveForm"
 					:savingInProgress="savingInProgress"
-				/>
+				/> -->
 
 				<div
 					class="content-row paint child-components-wrapper"
@@ -140,6 +140,7 @@
 				@save="saveRpmParams"
 				@close="showRpmSettingsDialog = false"
 				:fftItem="fftItem"
+				:rootFilters="rootFilters"
 			/>
 		</el-dialog>
 	</div>
@@ -158,7 +159,7 @@ export default {
 	components: {
 		// OptionValuesDialog: () => import('./OptionValuesDialog.vue'),
 		TypeOptionValueItem: () => import('./TypeOptionValueItem.vue'),
-		AnalysisRuleItem: () => import('@/views/Equipments/AnalysisRuleItem.vue'),
+		// AnalysisRuleItem: () => import('@/views/Equipments/AnalysisRuleItem.vue'),
 		ChildComponentItem: () => import('@/views/Equipments/ChildComponentItem.vue'),
 		RPMSettingsDialog: () => import('@/views/Sensors/FilterBlock/RPMSettingsDialog.vue'),
 	},
@@ -241,9 +242,9 @@ export default {
 	},
 
 	computed: {
-		subItemsSettings: () => Object.freeze([
-			{ ref: 'AnalysisRuleItem', targetProp: 'vibration_analysis_rules' },
-			{ ref: 'ChildComponentItem', targetProp: 'child_components' },
+		subItemsSettings: that => Object.freeze([
+			// { ref: 'AnalysisRuleItem', targetProp: 'vibration_analysis_rules' },
+			{ ref: 'ChildComponentItem', targetProp: 'child_components', onCollectDataCallback: that.collectChildComponentsData },
 			{ ref: 'TypeOptionValueItem', targetProp: 'option_values' },
 		]),
 		brandModelTypeOptionValues() {
@@ -314,32 +315,59 @@ export default {
 		},
 
 		preparedChildComponentsItems() {
-			if (this.equipmentTypeHasChanged) {
+			/*if (this.equipmentTypeHasChanged) {
 				return this.childComponentsForSelectedEquipmentType;
-			} else {
+			} else {*/
 				// console.log(this.itemData)
-				if (this.itemData && this.itemData.child_components && this.itemData.child_components.length) {
-					if (this.equipmentTypesList.length) {
-						return this.itemData.child_components.map(ci => {
-							const childItem = findItemBy('id', ci.original_component.child_id, this.equipmentTypesList);
+			if (this.selectedEquipmentType) {
+				const {
+					id, 
+				} = this.selectedEquipmentType;
+				const {itemData: equipmentData} = this;
+				const parentComponent = {
+					id,
+					isParentComponent: true,
+					original_component_id: id,
+					brand: equipmentData.brand,
+					brand_model: equipmentData.brand_model,
+					brand_id: equipmentData.brand_id,
+					brand_model_id: equipmentData.brand_model_id,
+					full_file_name: this.selectedEquipmentType.full_file_name,
+					vibration_analysis_rules: equipmentData.vibration_analysis_rules,
+					original_component: {
+						...this.selectedEquipmentType,
+						// id: null,
+						original_component_id: this.selectedEquipmentType.id,
+						child_components: []
+					}
+				};
 
-							return {
-								...ci,
-								original_component: {
-									...ci.original_component,
-									child: childItem
+				if (equipmentData && equipmentData.child_components && equipmentData.child_components.length) {
+					if (this.equipmentTypesList.length) {
+						return [parentComponent].concat(
+							equipmentData.child_components.map(ci => {
+								const childItem = findItemBy('id', ci.original_component.child_id, this.equipmentTypesList);
+								return {
+									...ci,
+									original_component: {
+										...ci.original_component,
+										child: childItem
+									}
 								}
-							}
-						});
+							})
+						);
 					}
 					return [];
 				} else {
-					return this.childComponentsForSelectedEquipmentType;
-				}
+					return [parentComponent].concat(this.childComponentsForSelectedEquipmentType);
+				}				
 			}
+
+			return [];
+			// }
 		},
 
-		preparedVibrationAnalysisItems() {
+		/*preparedVibrationAnalysisItems() {
 			if (this.vibrationAnalysisList.length) {
 				return this.vibrationAnalysisList.map(rule => ({
 					original_rule: {...rule},
@@ -350,7 +378,7 @@ export default {
 				return this.itemData.vibration_analysis_rules;
 			}
 			return [];
-		},
+		},*/
 
 		preparedTypeOptionValueItems() {
 			const { brandModelTypeOptionValues, itemData } = this;
@@ -448,13 +476,28 @@ export default {
 			);
 		},*/
 
-		fetchVibrationAnalysis(equipmentTypeId) {
+		/*fetchVibrationAnalysis(equipmentTypeId) {
 			this.doFetchAction(
 				'fetch_vibration_analysis_rules',
 				'vibrationAnalysisList',
 				'vibrationAnalysisLoading',
 				{ equipmentTypeId }
 			);
+		},*/
+
+		collectChildComponentsData(context) {
+			if (context.collectedValue && context.collectedValue.isParentComponent) {
+				context.itemIsReady = true;
+				let { collectedValue, collectedData } = context;
+
+				collectedData.brand_id = collectedValue.brand_id;
+				collectedData.brand_model_id = collectedValue.brand_model_id;
+				collectedData.vibration_analysis_rules = collectedValue.vibration_analysis_rules;
+				
+				// console.log('collectChildComponentsData', context)
+			}
+
+			return context;
 		},
 
 		showOptionValues() {
@@ -517,16 +560,16 @@ export default {
 
 		// ---------------
 
-		localSetupPage(equipmentData) {
+		/*localSetupPage(equipmentData) {
 			// this.typeOptionValueItems = this.setupFormSubItemsList(equipmentData.option_values, 'to_i');
 
 			if (
 				(!equipmentData.vibration_analysis_rules || !equipmentData.vibration_analysis_rules.length) 
 				&& equipmentData.equipment_type_id
 			) {
-				this.fetchVibrationAnalysis(equipmentData.equipment_type_id)
+				// this.fetchVibrationAnalysis(equipmentData.equipment_type_id)
 			}
-		},
+		},*/
 
 		handleSaveForm(settings) {
 			this.handleValidationResult([], settings);
@@ -551,11 +594,11 @@ export default {
 					// const { data, updateRoute } = answer;
 					this.showOptionValuesDialog = false;
 
-					if (this.$refs.AnalysisRuleItem) {
+					/*if (this.$refs.AnalysisRuleItem) {
 						this.$refs.AnalysisRuleItem.forEach(ref => {
 							ref.showAnalysisRuleFormDialog = false;
 						})
-					}
+					}*/
 
 					if (this.$refs.ChildComponentItem) {
 						this.$refs.ChildComponentItem.forEach(ref => {

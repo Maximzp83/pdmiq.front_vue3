@@ -7,15 +7,14 @@
 				<div
 					class="text-center"
 					v-if="
-						!chartsListWrapperLoading && chartsListWrapperReady && !hasStatistics
+						!chartsListWrapperLoading && chartsListWrapperReady && !hasStatistics && !someChartsIsHidden
 					"
 				>
 					{{ tt('phrases.FFT_data_is_not_valid') }}
 				</div>
-
 				<div
 					:class="['charts-list']"
-					v-show="!(chartsListWrapperReady && !hasStatistics)"
+					v-show="!(!chartsListWrapperLoading && chartsListWrapperReady && !hasStatistics && !someChartsIsHidden)"
 				>
 					<div
 						:class="['chart-container-wrapper content-row']"
@@ -72,7 +71,7 @@ export default {
 		splitCharts: Boolean,
 		prevFFTItems: Array,
 		currentFFTItem: Object,
-
+		getParamsByIds: Array
 	},
 
 	data: () => ({
@@ -81,7 +80,8 @@ export default {
 
 		hasStatistics: false,
 		chartsListWrapperReady: false,
-		chartsListWrapperLoading: false
+		chartsListWrapperLoading: false,
+		hiddenChartsMap: {}
 	}),
 
 	computed: {
@@ -173,10 +173,19 @@ export default {
 			}
 			// console.log(settings)
 			return Object.freeze(settings);
+		},
+
+		someChartsIsHidden() {
+			return this.chartsList.some(chart => this.hiddenChartsMap[chart.chart_id]);
 		}
 	},
 
 	methods: {
+		handleChartVisibilityChange({ chartId, isHidden }) {
+			if (chartId === undefined) return;
+			this.$set(this.hiddenChartsMap, chartId, isHidden);
+		},
+
 		callChartsMethod(payload) {
 			if (this.ChartsListInstance) {
 				this.ChartsListInstance.callChartsMethod(payload);
@@ -201,6 +210,11 @@ export default {
 			}
 
 			this.updateChartsList++;
+			const nextHiddenChartsMap = {};
+			this.chartsList.forEach(chart => {
+				nextHiddenChartsMap[chart.chart_id] = this.hiddenChartsMap[chart.chart_id] || false;
+			});
+			this.hiddenChartsMap = nextHiddenChartsMap;
 			// console.log(this.chartsContainerIdx)
 			if (window.location.origin === 'http://localhost:8080') {
 				window[`ChartsListInstance_0`] = this.ChartsListInstance;

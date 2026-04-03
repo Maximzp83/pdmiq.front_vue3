@@ -244,7 +244,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 					let zonesList;
 
 					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
-
+					// console.log('setupPointsData', actualSpecification.setupPointsData)
 					if (enableZones) {
 						zonesList = setupZonesList({
 							zonesKeysList: this.zonesKeysList,

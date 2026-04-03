@@ -88,11 +88,12 @@ class SensorChartsListFactory extends ChartsListFactoryBase {
 		this.sensorItem = resources.payload_1.sensorItem;
 		this.currentSensorType = resources.payload_1.currentSensorType;
 		this.localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		
+
 		if (this.currentSensorType.isBannerV2_1) {
 			this.events.checkRequestForDuplicates = e => this.handleCheckRequestForDuplicates(e);
 			this.events.duplicateRequestResponse = e => this.handleDuplicateRequestResponse(e);
 		}
+		this.events.navigatorChangeHandler = e => this.syncNavigatorPositionInCharts(e);
 
 		this.useResources(resources);
 		// console.log('SensorChartsListFactory', resources, this)
@@ -317,18 +318,24 @@ class SensorChartsListFactory extends ChartsListFactoryBase {
 			});
 		}
 	}
-	
+
+	syncNavigatorPositionInCharts(payload) {
+		this.chartsInstancesList.forEach(Chart => {	
+			Chart.syncNavigatorPosition(payload);
+		})
+	}	
 }
 
 class FFTChartsListFactory extends ChartsListFactoryBase {
 	constructor(resources) {
 		super();
 
+		// console.log('FFTChartsListFactory', resources, this.events)
 		this.events = {
+			...this.events,
 			rpmCursorDragFactoryHandler: payload =>
 				this.syncRpmCursorsInCharts(payload)
 		};
-		// console.log('FFTChartsListFactory', resources, this)
 		this.useResources(resources);
 	}
 
@@ -355,6 +362,7 @@ class SensorAlarmsChartsListFactory extends ChartsListFactoryBase {
 		this.sensorItem = resources.payload_1.sensorItem;
 		this.currentSensorType = resources.payload_1.currentSensorType;
 		this.localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		// console.log('1', this.currentSensorType)
 		
 		if (this.currentSensorType.isBannerV2_1) {
 			this.events.checkRequestForDuplicates = e => this.handleCheckRequestForDuplicates(e);
@@ -371,6 +379,25 @@ class SensorAlarmsChartsListFactory extends ChartsListFactoryBase {
 
 	localChartsListDataReady(payload) {
 		return localChartsListDataReady(this, payload);
+	}
+
+	handleCheckRequestForDuplicates(requestItem) {
+		return this.chartsInstancesList.some(Chart => {
+			return Chart.requestsList.some(request => {
+				// console.log('request', request.id, requestItem.id, request.alreadyInUse)
+				return request.id === requestItem.id && request.alreadyInUse;
+			})
+		});
+	}
+
+	handleDuplicateRequestResponse({requestItem, response}) {
+		this.chartsInstancesList.forEach(Chart => {
+			Chart.requestsList.forEach(request => {
+				if (request.id === requestItem.id && request.waitingForDuplicateResponse) {
+					Chart.resolveDuplicateResponse({request, response});
+				}
+			})
+		})
 	}
 }
 

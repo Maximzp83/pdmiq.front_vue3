@@ -70,10 +70,10 @@ export default {
 
 		disableCrossoverBlock() {
 			const {
-				brand__model_is_crossover_excluded,
+				brand_model_is_crossover_excluded,
 				brand_is_crossover_excluded
 			} = this.equipmentData;
-			return !!brand__model_is_crossover_excluded || !!brand_is_crossover_excluded;
+			return !!brand_model_is_crossover_excluded || !!brand_is_crossover_excluded;
 		}
 	},
 

@@ -16,7 +16,7 @@
 					:savingInProgress="savingInProgress"
 					fromFFTPage
 					insideChartAnalysisRulesBar
-					@save="handleSaveRuleItem"
+					@save="validateRuleItem(idx)"
 				/>
 			</div>
 		</div>
@@ -26,8 +26,8 @@
 <script>
 import { mapActions } from 'vuex';
 
-import { updateFormData, findItemBy, prepareSubmitData } from '@/helpers';
-import { RPM_SOURCES_TYPES } from '@/constants/global';
+import { cloneDeep } from 'lodash';
+import { findItemBy } from '@/helpers';
 
 import { subItemsListMixin } from '@/mixins';
 
@@ -38,6 +38,8 @@ export default {
 		// activeButtonValues: { type: Object, default: () => ({}) },
 		componentItem: { type: Object, required: true },
 		equipmentData: { type: Object, required: true },
+		currentFFTItem: { type: Object, default: null },
+		sensorId: { type: Number, required: true },
 		selectedAnalysisRules: Array
 	},
 
@@ -47,39 +49,6 @@ export default {
 
 	data: () => ({
 		savingInProgress: false,
-		// analysisRuleFormData: {},
-
-		formData: { // equipment form
-			id: null,
-			plant_id: null,
-			asset_id: null,
-			brand_id: null,
-			brand_model_id: null,
-			equipment_type_id: null,
-			drive_type_id: null,
-			is_limbo: false,
-			loc_on_machine: '',
-			is_store_room: 0,
-			store_room_id: null,
-			libraries: [],
-			pictures: [],
-
-			equipment_subtype_id: null,
-			subtype_brand_id: null,
-			subtype_brand_model_id: null,
-			rpm_formula: '',
-
-			rpm_value: '',
-			rpm_option_value_id: null,
-			rpm_external_node_id: null,
-			rpm_external_node_parameter: null,
-			rpm_external_source_type: RPM_SOURCES_TYPES.EXTERNAL_INPUT,
-			rpm_source_item: null,
-
-			vibration_analysis_rules: [],
-			child_components: [],
-			option_values: []
-		},
 	}),
 
 	computed: {
@@ -121,7 +90,8 @@ export default {
 
 	methods: {
 		...mapActions({
-			save_equipment: 'equipments/save_equipment',
+			save_fft_vibration_analysis_rule_override: 'sensors/save_fft_vibration_analysis_rule_override',
+			delete_fft_vibration_analysis_rule_override: 'sensors/delete_fft_vibration_analysis_rule_override',
 		}),
 
 		event(name, data) {
@@ -132,69 +102,198 @@ export default {
 			this.event('addAnalysisRuleToSelected', rule);
 		},
 
-		calcBorderColor(rule) {
-			const ruleItem = findItemBy('id', rule.id, this.selectedAnalysisRules);
-			// console.log(this.selectedAnalysisRules, ruleItem)
-			return ruleItem ? ruleItem.color : '';
+		validateRuleItem(idx) {
+			if ( this.validateSubItemsForm(this.subItemsSettings) ) {
+				const { analysisRules } = this.collectDataFromSubItems(this.subItemsSettings);
+				this.handleSaveRuleItem(  analysisRules[idx] );	
+			} else {
+				this.$notify({
+					type: 'warning',
+					title: this.$t('phrases.form_isnt_ready'),
+					message: this.$t(`phrases.Please_check_fields_errors_first`)
+				});
+				return false;
+			}
 		},
 
-		handleSaveRuleItem() {
-			// this.formData = updateFormData(this.equipmentData, this.formData);
-			
+
+		handleSaveRuleItem(currentRuleData) {
+			if (currentRuleData) {
+				const rule = findItemBy('original_rule_id', currentRuleData.original_rule_id, this.rulesList);
+
+				const harmonics = currentRuleData && currentRuleData.harmonics != null ? `${currentRuleData.harmonics}`.trim() : '';
+				/*const defaultHarmonics = rule.original_rule && rule.original_rule.harmonics != null
+					? `${rule.original_rule.harmonics}`.trim()
+					: '';*/
+				const shouldDeleteOverride = !harmonics //|| harmonics === defaultHarmonics;
+				const payload = {
+					sensorId: this.sensorId,
+					fftId: this.currentFFTItem.id,
+					originalRuleId: rule.original_rule_id
+				};
+
+
+				const action = shouldDeleteOverride
+					? this.delete_fft_vibration_analysis_rule_override(payload)
+					: this.save_fft_vibration_analysis_rule_override({
+						...payload,
+						data: {
+							original_rule_id: rule.original_rule_id,
+							harmonics
+						}
+					});
+
+					/*if (process.env.NODE_ENV === 'development') {
+						if (payload) {
+							console.log(shouldDeleteOverride ? payload : {
+						...payload,
+								data: {
+									original_rule_id: rule.original_rule_id,
+									harmonics
+								}
+							})
+							return;
+						}
+					}*/
+				this.savingInProgress = true;
+
+				action
+					.then(() => {
+						this.emitUpdatedFFTItem({
+							originalRuleId: rule.original_rule_id,
+							harmonics,
+							shouldDeleteOverride
+						});
+						if (this.$refs.AnalysisRuleItem) {
+							this.$refs.AnalysisRuleItem.forEach(ref => {
+								ref.showAnalysisRuleFormDialog = false;
+							})
+						}
+						this.savingInProgress = false;
+					})
+					.catch(() => {
+						this.savingInProgress = false;
+					});
+			}
+			/*const ruleRef = this.$refs.AnalysisRuleItem && this.$refs.AnalysisRuleItem[idx];
+			const rule = this.rulesList[idx];
+
+			if (!ruleRef || !rule) return;
+
+			if (!ruleRef.validateItemForm()) return;
+			if (!this.currentFFTItem) return;
+
+			let currentRuleData = null;
 			if (this.subItemsSettings) {
 				if (this.collectDataFromSubItems) {
 					let { analysisRules } = this.collectDataFromSubItems(this.subItemsSettings);
 					if (analysisRules) {
-						const { index } = findItemBy('id', this.componentItem.id, this.equipmentData.child_components, {returnIndex:1});
-
-						if (index != null) {
-							this.formData = {
-								...updateFormData(this.equipmentData, this.formData),
-							};
-							this.formData.child_components[index].vibration_analysis_rules = analysisRules;
-
-							// console.log(this.formData)
-							this.submitEquipment({...this.formData, });
-						}
+						console.log(analysisRules, this.componentItem.id, this.equipmentData.child_components)
+						currentRuleData = findItemBy('id', rule.id, analysisRules);
 					}
 				}
 			}
-		},
+			if (!currentRuleData) return;
 
-		submitEquipment(formData) {
-			let payload = {
-				data: prepareSubmitData(formData),
-				itemName: this.tt('Item'),
+			const harmonics = currentRuleData && currentRuleData.harmonics != null ? `${currentRuleData.harmonics}`.trim() : '';
+			const defaultHarmonics = rule.original_rule && rule.original_rule.harmonics != null
+				? `${rule.original_rule.harmonics}`.trim()
+				: '';
+			const shouldDeleteOverride = !harmonics || harmonics === defaultHarmonics;
+			const payload = {
+				sensorId: this.sensorId,
+				fftId: this.currentFFTItem.id,
+				originalRuleId: rule.original_rule_id
 			};
-			/*if (process.env.NODE_ENV === 'development') {
-				if (payload) {
-					console.log(payload)
-					return;
-				}
-			}*/
-			this.savingInProgress = true;
-			this.$emit('event', { eventName: 'toggleEquipmentSaving', data: true, onward:1 });
 
-			this.save_equipment(payload)
-				.then(({value}) => {
-					// const { data, updateRoute } = answer;
+
+			const action = shouldDeleteOverride
+				? this.delete_fft_vibration_analysis_rule_override(payload)
+				: this.save_fft_vibration_analysis_rule_override({
+					...payload,
+					data: {
+						original_rule_id: rule.original_rule_id,
+						harmonics
+					}
+				});
+
+				if (process.env.NODE_ENV === 'development') {
+					if (payload) {
+						console.log(shouldDeleteOverride ? payload : {
+					...payload,
+							data: {
+								original_rule_id: rule.original_rule_id,
+								harmonics
+							}
+						})
+						return;
+					}
+				}
+			this.savingInProgress = true;
+
+			action
+				.then(() => {
+					this.emitUpdatedFFTItem({
+						originalRuleId: rule.original_rule_id,
+						harmonics,
+						shouldDeleteOverride
+					});
 					if (this.$refs.AnalysisRuleItem) {
 						this.$refs.AnalysisRuleItem.forEach(ref => {
 							ref.showAnalysisRuleFormDialog = false;
 						})
 					}
-					this.savingInProgress = false;					
-					this.$emit('event', {
-						eventName: 'updateEquipmentAndFFT',
-						data: {equipmentItem: value},
-						onward:1
-					});
-					this.$emit('event', { eventName: 'toggleEquipmentSaving', data: false, onward:1 });	
+					this.savingInProgress = false;
 				})
 				.catch(() => {
-					this.savingInProgress = false;					
-					this.$emit('event', { eventName: 'toggleEquipmentSaving', data: false, onward:1 });	
-				});
+					this.savingInProgress = false;
+				});*/
+		},
+
+		emitUpdatedFFTItem({ originalRuleId, harmonics, /*shouldDeleteOverride*/ }) {
+			const fftItem = cloneDeep(this.currentFFTItem);
+			const {index} = findItemBy('original_rule_id', originalRuleId, fftItem.vibration_analysis_rules, {returnIndex: true});
+
+			if (index == null) {
+				fftItem.vibration_analysis_rules.push({
+					original_rule_id: originalRuleId,
+					harmonics
+				})
+			} else {
+				fftItem.vibration_analysis_rules[index] = {
+					original_rule_id: originalRuleId,
+					harmonics
+				}
+			}
+
+			/*const overrides = Array.isArray(fftItem.vibration_analysis_rules)
+				? [...fftItem.vibration_analysis_rules]
+				: [];
+			const overrideIndex = overrides.findIndex(item => item.original_rule_id === originalRuleId);
+
+			if (shouldDeleteOverride) {
+				if (overrideIndex !== -1) {
+					overrides.splice(overrideIndex, 1);
+				}
+			} else {
+				const nextItem = {
+					original_rule_id: originalRuleId,
+					harmonics
+				};
+
+				if (overrideIndex === -1) {
+					overrides.push(nextItem);
+				} else {
+					overrides.splice(overrideIndex, 1, nextItem);
+				}
+			}
+			*/
+
+			this.$emit('event', {
+				eventName: 'updateEquipmentAndFFT',
+				data: { fftItem, updateVibrationAnalysisRules:1, skipFFTReload:1 },
+				onward: 1
+			});
 		},
 	},
 };

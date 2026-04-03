@@ -26,6 +26,8 @@
 							:item-data="item"
 							:item-index="idx"
 							:showLabelsIndex="showLabelsIndex"
+							:measurementUnitsList="measurementUnitsList"
+							:measurementUnitsLoading="measurementUnitsLoading"
 							@onRemove="id => removeFormItem(id, 'vibrationAnalysisItems')"
 						/>
 					</div>
@@ -83,6 +85,8 @@ export default {
 			vibrationAnalysisLoading: false,
 			vibrationAnalysisList: [],
 			vibrationAnalysisItems: [],
+			measurementUnitsList: [],
+			measurementUnitsLoading: false,
 
 			isLoading: false,
 
@@ -105,7 +109,8 @@ export default {
 	methods: {
 		...mapActions({
 			fetch_vibration_analysis_rules: 'equipments/fetch_vibration_analysis_rules',
-			update_vibration_analysis_rules: 'equipments/update_vibration_analysis_rules',		
+			update_vibration_analysis_rules: 'equipments/update_vibration_analysis_rules',
+			fetch_measurement_units: 'measurement_units/fetch_measurement_units',
 		}),
 
 		fetchVibrationAnalysis() {
@@ -119,6 +124,15 @@ export default {
 				'vibrationAnalysisList',
 				'vibrationAnalysisLoading',
 				payload
+			);
+		},
+
+		fetchMeasurementUnits() {
+			this.doFetchAction(
+				'fetch_measurement_units',
+				'measurementUnitsList',
+				'measurementUnitsLoading',
+				{ params: { max: -1 }, notNotify: true }
 			);
 		},
 
@@ -170,6 +184,7 @@ export default {
 
 	created() {
 		this.fetchVibrationAnalysis();
+		this.fetchMeasurementUnits();
 	}
 };
 </script>

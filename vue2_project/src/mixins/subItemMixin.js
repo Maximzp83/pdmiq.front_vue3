@@ -32,7 +32,6 @@ const subItemMixin = {
 		},
 
 		setupPage(item) {
-			// console.log(item)
 			if (item && Object.keys(item).length) {
 				this.new = item.new || this.isNew || false;
 				this.itemId = item.id;

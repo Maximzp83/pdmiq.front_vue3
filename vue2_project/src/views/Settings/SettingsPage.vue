@@ -88,6 +88,7 @@ export default {
 				title: 'Industrial Services',
 				path: '/settings/industrial-services'
 			},
+			{ id: 14, title: 'Measurement Units', path: '/settings/measurement-units' },
 			{ id: 12, title: 'Statistics', path: '/settings/statistics' },
 			{ id: 13, title: 'Banner V2 Subtypes', path: '/settings/banner-v2-subtypes' }
 		]

@@ -16,12 +16,29 @@
 		</el-form-item>
 
 		<el-form-item
+			label="Measurement Unit"
+			prop="measurement_unit_id"
+			:class="{ 'mcol-xs-6': !fromModal }"
+		>
+			<CustomSelect
+				clearable
+				filterable
+				:optionsLoading="measurementUnitsLoading"
+				:optionsList="measurementUnitsOptions"
+				placeholder="Select Measurement Unit"
+				v-model="formData.measurement_unit_id"
+			/>
+		</el-form-item>
+
+		<!--
+		<el-form-item
 			:label="tt('units')"
 			prop="units"
 			:class="{ 'mcol-xs-6': !fromModal }"
 		>
 			<CustomInput v-model="formData.units" :placeholder="tt('units')" />
 		</el-form-item>
+		-->
 
 		<el-form-item
 			:label="tt('formula')"
@@ -77,6 +94,17 @@
 			/>
 		</el-form-item>
 
+		<el-form-item
+			:label="tt('phrases.Visible_by_default')"
+			prop="is_visible_by_default"
+		>
+			<el-switch
+				v-model="formData.is_visible_by_default"
+				:active-value="1"
+				:inactive-value="0"
+			/>
+		</el-form-item>
+
 		<el-form-item label=" ">
 			<el-button
 				class="ml-auto action-button remove-button"
@@ -90,16 +118,21 @@
 </template>
 
 <script>
-// import { updateFormData } from '@/helpers';
 import { ncdAlarmTypesList, chartTypesList } from '@/constants/global';
 import { required } from '@/constants/validation';
 import { subItemMixin } from '@/mixins';
+import { getMeasurementUnitsOptions } from '@/helpers/measurementUnits';
 
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		isMobile: Boolean,
-		fromModal: Boolean
+		// isMobile: Boolean,
+		fromModal: Boolean,
+		measurementUnitsList: {
+			type: Array,
+			default: () => []
+		},
+		measurementUnitsLoading: Boolean
 	},
 
 	data() {
@@ -108,11 +141,13 @@ export default {
 				id: null,
 				name: '',
 				units: '',
+				measurement_unit_id: null,
 				formula: '',
 				alarm_type: null,
 				graph_type: null,
 				is_customizable: 0,
-				is_signed: 0
+				is_signed: 0,
+				is_visible_by_default: 0
 			}
 		};
 	},
@@ -120,6 +155,9 @@ export default {
 	computed: {
 		ncdAlarmTypesList: () => Object.freeze(ncdAlarmTypesList()),
 		chartTypesList: () => Object.freeze(chartTypesList()),
+		measurementUnitsOptions() {
+			return Object.freeze(getMeasurementUnitsOptions(this.measurementUnitsList));
+		},
 
 		rules: () => ({
 			name: required,
@@ -128,6 +166,14 @@ export default {
 		}),
 
 		deleteNewId: () => true,
+	},
+
+	methods: {
+		localGetFormDataCallback(formData) {
+			const newFormData = { ...formData };
+			delete newFormData.units;
+			return newFormData;
+		}
 	}
 };
 </script>

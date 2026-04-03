@@ -701,7 +701,7 @@
 					<div class="mcol-xs-12 flex">
 						<el-button
 							v-show="frequencyBlockDisabled"
-							@click="resetFrequencySettings"
+							@click="hanldeResetFrequencySettings"
 							type="primary"
 							native-type="button"
 							class="ml-auto item-action-button inverted small"
@@ -711,7 +711,7 @@
 					</div>
 
 					<div class="mcol-xs-12 mcol-md-6">
-						<el-form-item :label="tt('Period')" prop="lube_period">
+						<el-form-item :label="tt('Period')" prop="lube_period" required>
 							<el-select
 								v-model="formData.lube_period"
 								:disabled="frequencyBlockDisabled"
@@ -1035,10 +1035,14 @@ export default {
 				equipment_id: required,
 				controller_id: required,
 				data_set: required,
-				lube_cycle: required,
-				lube_cycle_dwell_time: required,
-				lube_cycle_set: required,
-				lube_cycle_set_dwell_time: required,
+				lube_cycle: [{ validator: this.validatePositiveNumber, trigger: 'change' }],
+				lube_cycle_dwell_time: [
+					{ validator: this.validatePositiveNumber, trigger: 'change' }
+				],
+				lube_cycle_set: [{ validator: this.validatePositiveNumber, trigger: 'change' }],
+				lube_cycle_set_dwell_time: [
+					{ validator: this.validatePositiveNumber, trigger: 'change' }
+				],
 				// lube_cycle_warm_up_minutes: required,
 				// lube_cycle_cool_down_minutes: required,
 				// lube_cycle_percent_danger_points: required,
@@ -1144,24 +1148,31 @@ export default {
 			}
 		}),
 
-		timePickerOptions: that => {
-			const todayEnd = new Date().setHours(23, 59, 59);
+		timePickerOptions() {
+			const fullRange = {
+				selectableRange: '00:00:00 - 23:59:59',
+			};
 
-			if (that.selected_lube_date) {
-				if (Date.parse(that.selected_lube_date) < todayEnd + 1000) {
-					return {
-						selectableRange: `${getYmdDateString({
-							dateObj: new Date(),
-							withTime: true,
-							timeOnly: true
-						})} - '23:59:59'`
-					};
-				}
+			if (!this.selected_lube_date) {
+				return fullRange;
 			}
 
-			return {
-				selectableRange: '00:00:00 - 23:59:59'
-			};
+			const now = new Date();
+
+			const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+			const selectedDate = new Date(this.selected_lube_date + 'T00:00:00');
+
+			if (selectedDate.getTime() === today.getTime()) {
+				return {
+					selectableRange: `${getYmdDateString({
+						dateObj: now,
+						withTime: true,
+						timeOnly: true,
+					})} - 23:59:59`,
+				};
+			}
+
+			return fullRange;
 		},
 
 		// --------------
@@ -1277,6 +1288,15 @@ export default {
 	},
 
 	methods: {
+		validatePositiveNumber(rule, value, callback) {
+			if (value === null || value === undefined || value === '' || Number(value) <= 0) {
+				callback(new Error('Value should be greater than 0'));
+				return;
+			}
+
+			callback();
+		},
+
 		...mapActions({
 			save_item: 'sensors/save_sensor',
 			save_level_zone: 'sensors/save_sensor_level_zones',
@@ -1456,6 +1476,19 @@ export default {
 				next.push(false);
 			}
 			// console.log('next us', next, this.fromBannerSensorForm)
+			if (this.formData.lube_method === LUBE_METHODS.FREQUENCY) {
+				if (!this.selected_lube_date || !this.selected_lube_time) {
+					setTimeout(() => {
+						this.$notify({
+							type: 'warning',
+							title: this.$t('phrases.form_isnt_ready'),
+							message: this.$t(`phrases.Scheduled_start_date_and_time_required`)
+						});
+					}, 0);
+					return false;
+				}
+			}
+
 			if (next.every(v => v)) {
 				return true;
 			} else {
@@ -1499,15 +1532,6 @@ export default {
 				]);
 			} else {
 				data.lube_cycle_dwell_time = data.lube_cycle_dwell_time * 60;
-
-				if (!this.selected_lube_date || !this.selected_lube_time) {
-					this.$notify({
-						type: 'warning',
-						title: this.$t('phrases.form_isnt_ready'),
-						message: this.$t(`phrases.Scheduled_start_date_and_time_required`)
-					});
-					return;
-				}
 
 				data.lube_cycle_scheduled_start_time = `${this.selected_lube_date} ${this.selected_lube_time}`;
 			}
@@ -1601,11 +1625,6 @@ export default {
 				? (payload.levelZonesFormData = this.levelZoneForm)
 				: null;
 
-			if (this.isResetFrequencySettingsBeforeSubmit) {
-				this.resetFrequencySettings().then(() => {
-					return payload;
-				});
-			} else {
 				if (this.fromBannerSensorForm) {
 					delete payload.formData.location_in_equipment;
 					delete payload.formData.controller_id;
@@ -1613,11 +1632,31 @@ export default {
 					// console.log('us loc submit', payload)
 				}
 				return payload;
-			}
+			
 		},
 
 		localSubmit(payloadData) {
-			// console.log('localSubmit', payloadData);
+			// console.log('localSubmit', payloadData);		
+
+			if (this.isResetFrequencySettingsBeforeSubmit) {
+				this.resetFrequencySettings().then(() => {
+					this.isResetFrequencySettingsBeforeSubmit = false;
+					this.sensorSave(payloadData);
+
+					/*setTimeout(() => {
+						this.$notify({
+							type: 'warning',
+							title: this.$t('phrases.form_isnt_ready'),
+							message: this.$t(`aliases.frequency_reset`)
+						});
+					}, 0);*/
+				});
+			} else {
+				this.sensorSave(payloadData);
+			}
+		},
+
+		sensorSave(payloadData) {
 			const { formData, pumpFormData, levelZonesFormData } = payloadData;
 			let successCounter = 0,
 					resposeQuantity = Object.keys(payloadData).length;
@@ -1629,7 +1668,6 @@ export default {
 				console.log('ultrasound', formData, pumpFormData);
 				return;
 			}*/
-
 			this.toggleSubmitRequestResult({isLoading:1});
 
 			this.save_item({
@@ -1727,12 +1765,12 @@ export default {
 				confirmButtonText: this.$t('Reset')
 			})
 				.then(() => {
-					this.resetFrequencySettings();
+					this.resetFrequencySettings({resetFormDataFields: true});
 				})
 				.catch(() => {});
 		},
 
-		resetFrequencySettings() {
+		resetFrequencySettings(settings={}) {
 			return new Promise((resolve, reject) => {
 				const payload = {
 					method: 'PUT',
@@ -1760,12 +1798,14 @@ export default {
 
 				this.toggle_ultrasound_command(payload)
 					.then(() => {
-						this.formData.lube_period = null;
-						this.formData.lube_period_time = 0;
-						this.formData.lube_cycle = 0;
-						this.formData.lube_cycle_dwell_time = 0;
-						this.selected_lube_date = '';
-						this.selected_lube_time = '';
+						if (settings.resetFormDataFields) {
+							this.formData.lube_period = null;
+							this.formData.lube_period_time = 0;
+							this.formData.lube_cycle = 0;
+							this.formData.lube_cycle_dwell_time = 0;
+							this.selected_lube_date = '';
+							this.selected_lube_time = '';
+						}
 						this.frequencyBlockDisabled = false;
 						this.$emit('event', { eventName: 'toggleSaving', data: false });
 						resolve();
@@ -1817,6 +1857,12 @@ export default {
 			this.pumpRules.lubricant_amount = type === PUMP_TYPES.PERMA ? required : null;
 			this.pumpRules.lube_cycle_max_count =
 				type === PUMP_TYPES.PULSAR ? required : null;
+		},
+
+		selected_lube_date() {
+			if (!this.isInitialSetup) {
+				this.selected_lube_time = '';
+			}
 		}
 	},
 

@@ -532,9 +532,17 @@ const isPasswordStrong1 = password => {
   return { isStrong, isLength, hasLowercase, hasUppercase,	hasDigit,	hasSpecialChar };
 };
 
-const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList}) => {
+const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem}) => {
 	const {rpmSources} = sensorData;
 	let list = [];
+	const setupRpmOptionValues = value => {
+		const rpmValue = value != null ? +value : value;
+		return {
+			value: rpmValue,
+			rpmValue,
+			hzValue: rpmValue != null && !isNaN(rpmValue) ? rpmValue / 60 : null
+		};
+	};
 
 	Object.keys(rpmSources).forEach(source_key => {
 		const option = findItemBy('source_key', source_key, itemSpeedOptionsList);
@@ -543,10 +551,21 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList}) => {
 			list.push({
 				id: option.id,
 				name: option.name,
-				value: rpmSources[source_key]
+				...setupRpmOptionValues(rpmSources[source_key]),
+				hasInput: option.hasInput,
+				draggable: option.draggable
 			});
 		}
-	})
+	});
+
+	if (fftItem && fftItem.rpm_value != null) {
+		list.push({
+			id: 'fft-rpm',
+			name: 'FFT',
+			...setupRpmOptionValues(fftItem.rpm_value),
+			hasInput: true
+		});
+	}
 
 	return Object.freeze(list);
 };

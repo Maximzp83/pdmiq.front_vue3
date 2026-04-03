@@ -588,13 +588,13 @@ export default {
 		low: 'Bajo',
 		high: 'Alto',
 		areaspline: 'Área-Espline',
+		favorites: 'Favoritos',
 		child: 'subtipo',
 		childs: 'subtipos',
 		component: 'Componente',
 		components: 'Componentes',
 		harmonics: 'Harmónicos',
 		editable: 'Editable',
-		favorites: 'Favoritos',
 	},
 
 	sidebar_menu: {
@@ -676,6 +676,9 @@ export default {
 		repair_cost_avoidance: 'Prevención de Costos de Reparaciones',
 		contractor_markup: 'Margen del Contratista',
 		contractor_hourly_rate: 'Tarifa por hora del contratista',
+		dt_per_hour: 'DT/Hora',
+		hours_saved_or_lead_time: 'Horas Ahorradas / Tiempo de Entrega',
+		contractor_quote: 'Cotización del Contratista',
 		tech_hours: 'Horas de Tecnología',
 		date_selection: 'Selección de Fecha',
 		date_sent: 'Fecha de Envío',
@@ -1155,6 +1158,8 @@ export default {
 		lube_based_device_address_id: 'ID de dirección de dispositivo de lubricación',
 		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
 		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
+		silence_mode: 'Modo Silencio',
+		visible_by_default: 'Visible por defecto',
 	},
 
 	aliases: {
@@ -1181,11 +1186,13 @@ export default {
 		mfa_warn_1: 'Mantenga su cuenta segura',
 		mfa_warn_2: 'La autenticación de dos factores (2FA) será requerida para iniciar sesión a partir del 1 de octubre de 2025 para todos los usuarios con acceso de administrador de planta',
 		mfa_warn_link: 'Configure 2FA hoy',		
-	  prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
-  	creation_link_exp: 'El enlace para crear la contraseña ha expirado. Ingrese su correo electrónico a continuación y haga clic en enviar. <b>Recibirá un nuevo enlace en su bandeja de entrada en breve.</b>',
-  	to_clipboard_msg: 'El enlace fue copiado al portapapeles',
-  	mfa_warn_3: 'Si desea cambiar el número de teléfono, desactive 2FA o cámbielo a Authenticator',
-  	anomaly1: 'Anomalia de datos de metrica',
+	  	prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
+	  	creation_link_exp: 'El enlace para crear la contraseña ha expirado. Ingrese su correo electrónico a continuación y haga clic en enviar. <b>Recibirá un nuevo enlace en su bandeja de entrada en breve.</b>',
+	  	to_clipboard_msg: 'El enlace fue copiado al portapapeles',
+	  	mfa_warn_3: 'Si desea cambiar el número de teléfono, desactive 2FA o cámbielo a Authenticator',
+	  	anomaly1: 'Anomalia de datos de metrica',
+	  	api_secret_warn: 'Es la única vez que podrás ver el secreto',
+	  	frequency_reset: 'La configuración de frecuencia se ha restablecido correctamente antes de guardar debido a que el método de lubricación ha cambiado. Configure los nuevos ajustes de frecuencia y guarde.',
 	},
 
 	constants: {
@@ -1438,6 +1445,9 @@ export default {
 		'second_quarter': 'Segundo trimestre',
 		'third_quarter': 'Tercer trimestre',
 		'fourth_quarter': 'Cuarto trimestre',
+		last_1_month: 'Último mes',
+		last_6_months: 'Últimos 6 meses',
+		last_12_months: 'Últimos 12 meses',
 		// ------------new------------
 		'all_in_one_aa_battery': 'Todo en uno - Batería AA',
 		'all_in_one_c_battery': 'Todo en uno - Batería C',

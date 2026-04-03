@@ -40,6 +40,12 @@ ol.decimal {
 span.capitalize-first {display: inline-block;}
 .capitalize { text-transform: capitalize; }
 .uppercase { text-transform: uppercase; }
+.lowercase { 
+	text-transform: lowercase;
+	&.el-input__inner::placeholder {
+		text-transform: lowercase;	
+	}
+}
 .text-right {text-align: right;}
 .text-center {text-align: center;}
 .text-middle {

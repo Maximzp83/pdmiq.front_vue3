@@ -59,6 +59,25 @@
 				:sensorData="sensorData"
 			/>
 		</div>
+
+		<div class="button-item chart-switcher text-right">
+			<div class="relative flex">
+				<el-button-group>
+					<!-- :disabled="itemsLoading" -->
+					<!-- :loading="itemsLoading" -->
+					<el-button
+						v-for="item in metricSystemsList"
+						:key="`metricSystem-${item.id}`"
+						@click="switchMetricSystem(item)"
+						type="primary"
+						native-type="button"
+						v-text="item.name"
+						:class="{ active: filters.measurement === item.id }"
+						class="inverted"
+					/>
+				</el-button-group>
+			</div>
+		</div>
 	</div>
 </template>
 

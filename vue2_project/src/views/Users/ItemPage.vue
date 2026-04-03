@@ -42,6 +42,8 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import { navigation, itemPageMixin, initPageDataMixin, tabsMixin } from '@/mixins';
+import { MENU_TYPES } from '@/constants/menuItems';
+import { hasAccessTo } from '@/utils/hasAccessTo';
 
 export default {
 	mixins: [navigation(), itemPageMixin(), initPageDataMixin(), tabsMixin()],
@@ -67,13 +69,24 @@ export default {
 		tabsList() {
 			let list = [
 				{ title: this.tt('Personal'), prop: 'mainTab' },
-				{ title: this.tt('Notifications'), prop: 'notificationsTab' },
+				{ title: this.tt('Notifications'), prop: 'notificationsTab' }
 			];
 
 			if (this.itemData) {
-				list.push({ title: this.tt('Reports'), prop: 'reportsTab' })
+				list.push({ title: this.tt('Reports'), prop: 'reportsTab' });
 			}
-			
+
+			if (this.itemData) {
+				const role = this.itemData.role;
+				//console.log('role', role, this.$hasAccessTo(['edit_users']), hasAccessTo({ role, permissionKeys: ['view_client_api']}));
+				if (
+					(this.$hasAccessTo(['edit_users']) || this.authUser.id == this.itemData.id ) &&
+					hasAccessTo({ role, permissionKeys: ['view_client_api']})
+				) {
+					list.push({ title: 'API', prop: 'apiTab' });
+				}
+			}
+
 			return Object.freeze(list);
 		}
 	},
@@ -85,6 +98,15 @@ export default {
 			get_auth_user: 'auth/get_auth_user'
 		}),
 
+		resolveApiTabVisibility(itemData) {
+			const role = itemData && (itemData.temp_role || itemData.role);
+			const permissions = role && role.permissions ? role.permissions : [];
+			const apiPermission = permissions.find(
+				item => item.app_section === MENU_TYPES.CLIENT_API
+			);
+			return !!(apiPermission && apiPermission.is_viewing);
+		},
+
 		successSubmitCallback({ data }) {
 			// console.log(data.data)
 			if (data.data && data.data.id === this.authUser.id) {
@@ -94,6 +116,13 @@ export default {
 	},
 
 	watch: {
+		itemData: {
+			immediate: true,
+			handler(itemData) {
+				this.apiTabVisible = this.resolveApiTabVisibility(itemData);
+			}
+		},
+
 		$route(route) {
 			this.initialPageSetup(route);
 		}

@@ -12,7 +12,7 @@
 			]">
 				<SimpleSpinner :active="ruleOptionsLoading" />
 				<div class="value" v-if="showRuleItemTextValue">{{selectedRuleItemTextValue}}</div>
-				<div class="unit">{{original_rule.unit}}</div>
+				<div class="unit">{{originalRuleUnit}}</div>
 				<el-button
 					@click.stop="handleShowAnalysisRuleFormDialog"
 					native-type="button"
@@ -32,19 +32,34 @@
 			class="small dialog-decorate-header title-center fft-analysis-values-dialog"
 			title="Settings"
 			:visible.sync="showAnalysisRuleFormDialog"
-		>	
-			<el-form
-				ref="itemForm"
-				:class="['option-item-container']"
-				:model="formData"
-				label-width="200px"
-				:label-position="isMobile ? 'top' : 'left'"
 			>
-				<el-form-item
-					:label="original_rule.name"
-					prop="option_value_id"
-					class=""
+				<el-form
+					ref="itemForm"
+					:class="['option-item-container']"
+					:model="formData"
+					:rules="formRules"
+				label-width="200px"
+					:label-position="isMobile ? 'top' : 'left'"
 				>
+					<el-form-item
+						v-if="showFFTAnalysisHarmonicsSettings"
+						:label="tt('harmonics')"
+						prop="harmonics"
+						class=""
+					>
+						<CustomInput
+							class="mcol-xs-11 span-block"
+							:placeholder="tt('harmonics')"
+							v-model="formData.harmonics"
+						/>
+					</el-form-item>
+
+					<el-form-item
+						v-else
+						:label="original_rule.name"
+						prop="option_value_id"
+						class=""
+					>
 					<div class="flex align-center">
 						<CustomInput
 							class="mcol-xs-11 span-block"
@@ -67,7 +82,7 @@
 							labelKey="value"
 						/>
 					
-						<span class="span-block mcol-xs-1"> {{original_rule.unit}}</span>
+						<span class="span-block mcol-xs-1"> {{originalRuleUnit}}</span>
 					</div>
 				</el-form-item>
 			</el-form>
@@ -96,6 +111,7 @@
 		ref="itemForm"
 		:class="['option-item-container']"
 		:model="formData"
+		:rules="formRules"
 		label-width="150px"
 		:label-position="isMobile ? 'top' : 'left'"
 	>
@@ -125,7 +141,7 @@
 					labelKey="value"
 				/>
 					<!-- labelKey="vibration_analysis_value" -->
-				<span class="mcol-xs-2 text-center"> {{original_rule.unit}}</span>
+				<span class="mcol-xs-2 text-center"> {{originalRuleUnit}}</span>
 				
 				<div v-if="original_rule.is_editable"
 					class="pointer mcol-xs-2 ml-auto"
@@ -173,6 +189,7 @@ export default {
 				id: null,
 				original_rule_id: null,
 				option_value_id: null,
+				harmonics: '',
 				custom_value: null,
 				// vibration_analysis_value: null,
 			}
@@ -182,6 +199,50 @@ export default {
 	computed: {
 		deleteNewId: () => true,
 		original_rule: that => that.itemData.original_rule,
+		originalRuleUnit() {
+			const { original_rule } = this;
+			if (!original_rule) return '';
+
+			if (original_rule.unit) {
+				return original_rule.unit;
+			}
+
+			if (original_rule.measurement_unit) {
+				return original_rule.measurement_unit.metric_name || original_rule.measurement_unit.imperial_name || '';
+			}
+
+			return '';
+		},
+		showFFTAnalysisHarmonicsSettings: that => that.fromFFTPage && that.insideChartAnalysisRulesBar,
+		formRules() {
+			return {
+				harmonics: [
+					{
+						validator: (rule, value, callback) => {
+							if (!this.showFFTAnalysisHarmonicsSettings) {
+								callback();
+								return;
+							}
+
+							const normalizedValue = value == null ? '' : `${value}`.trim();
+
+							if (!normalizedValue) {
+								callback();
+								return;
+							}
+
+							if (!/^[1-9]\d*$/.test(normalizedValue)) {
+								callback(new Error('Harmonics must be a positive integer'));
+								return;
+							}
+
+							callback();
+						},
+						trigger: ['blur', 'change']
+					}
+				]
+			};
+		},
 
 		selectedRuleItemTextValue() {
 			const { custom_value, option_value_id } = this.itemData;
@@ -209,6 +270,10 @@ export default {
 		},
 
 		handleSave() {
+			if (this.showFFTAnalysisHarmonicsSettings && !this.validateItemForm()) {
+				return;
+			}
+
 			this.$emit('save');
 		},
 
@@ -229,9 +294,20 @@ export default {
 
 		localSetupPageActions() {
 			this.isCustomEnabled = this.original_rule.is_editable && this.itemData.custom_value;
+
+			if (this.showFFTAnalysisHarmonicsSettings) {
+				this.formData.harmonics = this.itemData.active_harmonics || this.original_rule.harmonics || '';
+			}
 		},
 
 		localGetFormDataCallback(formData) {
+			if (this.showFFTAnalysisHarmonicsSettings) {
+				formData.harmonics = formData.harmonics == null ? '' : `${formData.harmonics}`.trim();
+				delete formData.option_value_id;
+				delete formData.custom_value;
+				return formData;
+			}
+
 			if (this.isCustomEnabled) {
 				formData.option_value_id = null;
 			} else {
