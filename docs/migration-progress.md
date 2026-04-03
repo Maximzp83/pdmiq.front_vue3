@@ -258,6 +258,16 @@ await fetchUsers({ page: 1 });
     - `src/components/common/Datepicker.vue` (fixed date-range compare value path)
   - Notes:
     - Checked all mapped migrated components under `src/components/**`
+- [x] Sync update from latest `vue2_project` changes for already migrated files
+  - Updated:
+    - `src/components/table/CustomDataListTable.vue`
+    - `src/components/table/Row.vue`
+    - `src/components/table/TableHeader.vue`
+    - `src/views/Machines/ItemForm.vue`
+  - Notes:
+    - Restored row-select restrictions and disabled `check all` when no selectable rows are available
+    - Added `silence_mode_until` UI + submit normalization for Machines form
+    - Skipped Vue2 changes for files that are not yet migrated in Vue3
     - Applied only functional sync updates where logic drift was detected
     - ESLint check passed for updated files
 - [x] Chunk C-005: router unblock for missing Plants view targets

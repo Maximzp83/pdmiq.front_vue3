@@ -2,7 +2,8 @@
 	<div class="card">
 		<div class="one-chart-page-legend" v-if="oneChartPageLegend">
 			<!-- <div class="chart-title bold">{{ ChartInstance.chartTitle }}</div> -->
-			<div class="item flex align-center"
+			<div
+				class="item flex align-center"
 				v-for="(item, index) in oneChartPageLegend"
 				:key="index"
 			>
@@ -25,11 +26,20 @@
 			v-show="hasStatistics"
 		>
 			<!-- <button @click="zoomYAxis">+</button> -->
-			<div :class="['mcol-xs-10 mcol-sm-9 flex mrow wrap align-center left-part',
-				{'mcol-lg-7': !additionalProps.isCompare},
-				{'mcol-lg-auto fluid': additionalProps.isCompare}
-			]">
-				<div :class="['title-block ellipsis', {'mcol-xs-12': additionalProps.isCompare}]" v-text="chartTitle"></div>
+			<div
+				:class="[
+					'mcol-xs-10 mcol-sm-9 flex mrow wrap align-center left-part',
+					{ 'mcol-lg-7': !additionalProps.isCompare },
+					{ 'mcol-lg-auto fluid': additionalProps.isCompare }
+				]"
+			>
+				<div
+					:class="[
+						'title-block ellipsis',
+						{ 'mcol-xs-12': additionalProps.isCompare }
+					]"
+					v-text="chartTitle"
+				></div>
 				<div
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto"
 					v-if="enableZoomBlock && ChartAPI"
@@ -78,7 +88,9 @@
 								:instanceLabel="tt('Luber')"
 								:sensorData="sensorData"
 								:chartOptionsUpdate="chartOptionsUpdate"
-								:passedTimeValue="sensorData.lube_cycle_updated_at || sensorData.lube_shot_updated_at"
+								:passedTimeValue="
+									sensorData.lube_cycle_updated_at || sensorData.lube_shot_updated_at
+								"
 							/>
 
 							<UnlockBlock
@@ -90,15 +102,20 @@
 								instanceLabel="FFT"
 								:sensorData="sensorData"
 								:chartOptionsUpdate="chartOptionsUpdate"
-								:passedTimeValue="sensorData.last_fft_lock && sensorData.last_fft_lock.created_at"
+								:passedTimeValue="
+									sensorData.last_fft_lock && sensorData.last_fft_lock.created_at
+								"
 							/>
-								<!-- :chartIsInit="chartRendering" -->
+							<!-- :chartIsInit="chartRendering" -->
 						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="flex align-center mcol-xs-2 mcol-sm-auto ml-auto" v-if="showDisableChartButton">
+			<div
+				class="flex align-center mcol-xs-2 mcol-sm-auto ml-auto"
+				v-if="showDisableChartButton"
+			>
 				<div class="header-item">
 					<el-button
 						@click="toggleChart"
@@ -119,10 +136,10 @@
 				class="mcol-xs-2 mcol-sm-auto ml-auto align-center buttons-container"
 				v-if="enableColorPickerBlock && ChartAPI"
 				:ChartInstance="ChartInstance"
-				:sensorId="sensorData.id"				
+				:sensorId="sensorData.id"
 				:hasStatistics="hasStatistics"
 			/>
-				<!-- :ChartAPI="ChartAPI" -->
+			<!-- :ChartAPI="ChartAPI" -->
 
 			<HeaderRightPart
 				class="mcol-xs-2 mcol-sm-auto ml-auto align-center"
@@ -170,7 +187,7 @@
 						:statsData="statsData"
 						:chartsListWrapperReadyCounter="chartsListWrapperReadyCounter"
 					/>
-						<!-- :statisticsResponsesReadyCounter="statisticsResponsesReadyCounter" -->
+					<!-- :statisticsResponsesReadyCounter="statisticsResponsesReadyCounter" -->
 				</div>
 			</div>
 			<!-- :constructorType="constructorType" -->
@@ -207,6 +224,25 @@
 				:enableContinueButton="isWarningThresholdLessThanAlarm"
 			/>
 		</el-dialog>
+
+		<el-dialog
+			append-to-body
+			center
+			title="Warning"
+			:visible.sync="showMeasurementTypeWarningDialog"
+			width="420px"
+		>
+			<div>{{ measurementTypeWarningText }}</div>
+
+			<div slot="footer" class="dialog-footer text-center">
+				<el-button
+					type="primary"
+					@click="showMeasurementTypeWarningDialog = false"
+				>
+					Ok
+				</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
@@ -215,7 +251,11 @@ import {
 	SENSOR_PARAMETERS_TYPES,
 	NCD_SENSOR_PARAMETERS_TYPES
 } from '@/modules/charts_factory/controllers/Sensor/enums';
-import { LUBE_PROCESSING_STATUSES, LUBE_CYCLE_STATUSES, LUBE_VERSIONS } from '@/constants/ultrasound';
+import {
+	LUBE_PROCESSING_STATUSES,
+	LUBE_CYCLE_STATUSES,
+	LUBE_VERSIONS
+} from '@/constants/ultrasound';
 import { FFT_LOCK_STATUSES } from '@/constants/global';
 import { eventHandler } from '@/mixins';
 
@@ -229,7 +269,7 @@ export default {
 		HeaderRightPart: () => import('./HeaderRightPart.vue'),
 		ChartColorShemeBlock: () => import('./ChartColorShemeBlock.vue'),
 		UpdateThresholdsDialog: () => import('./UpdateThresholdsDialog.vue'),
-		StatsTable: () => import('./StatsTable.vue'),
+		StatsTable: () => import('./StatsTable.vue')
 	},
 	props: {
 		ChartInstance: {
@@ -281,24 +321,28 @@ export default {
 		chartThresholdsUpdate: 0,
 		updateThresholdsDialogOpen: false,
 		chartIsRendered: false,
+		showMeasurementTypeWarningDialog: false,
+		measurementTypeWarningText: '',
 	}),
 
 	computed: {
-		// hcInstance: that => that.additionalProps.hcInstance,		
+		// hcInstance: that => that.additionalProps.hcInstance,
 		// hcInstanceNew: that => that.additionalProps.hcInstanceNew,
-		chartIsHidden: that => that.chartToggled && that.ChartInstance.chartIsHidden && !that.oneChartOnly,
+		chartIsHidden: that =>
+			that.chartToggled && that.ChartInstance.chartIsHidden && !that.oneChartOnly,
 
 		oneChartPageLegend() {
 			const { oneChartOnly, ChartInstance } = this;
 
 			if (oneChartOnly && ChartInstance) {
 				if (
-					ChartInstance.requestsList.length > 1 && (
-						ChartInstance.options.chart.type == 'spline' ||
-						ChartInstance.options.chart.type == 'line'
-					)
+					ChartInstance.requestsList.length > 1 &&
+					(ChartInstance.options.chart.type == 'spline' ||
+						ChartInstance.options.chart.type == 'line')
 				) {
-					return ChartInstance.options.series.filter(si => si.custom_id == 'base_series')
+					return ChartInstance.options.series.filter(
+						si => si.custom_id == 'base_series'
+					);
 				}
 			}
 			return null;
@@ -310,25 +354,29 @@ export default {
 
 			if (higchartInstances) {
 				const {
-					hcInstanceNew, hcInstance,
-					stockInit, boost, stockInitNew, boostNew
+					hcInstanceNew,
+					hcInstance,
+					stockInit,
+					boost,
+					stockInitNew,
+					boostNew
 				} = higchartInstances;
 
-					// if (ChartInstance.chart_id !== 'displacement' && inject_options) {
-					if (ChartInstance.generateSeriesByStatistics) {
-						/*if (inject_options.navigator &&
+				// if (ChartInstance.chart_id !== 'displacement' && inject_options) {
+				if (ChartInstance.generateSeriesByStatistics) {
+					/*if (inject_options.navigator &&
 								inject_options.navigator.series.type == 'spline') {*/
-							stockInitNew(hcInstanceNew);
-							boostNew(hcInstanceNew);
-							return hcInstanceNew;
-						// }
-					}
+					stockInitNew(hcInstanceNew);
+					boostNew(hcInstanceNew);
+					return hcInstanceNew;
+					// }
+				}
 
 				stockInit(hcInstance);
 				boost(hcInstance);
 				return hcInstance;
 			}
-			
+
 			return undefined;
 		},
 
@@ -358,18 +406,25 @@ export default {
 
 		hideChartHeader: that => that.additionalProps.hideChartHeader,
 		enableZoomBlock: that => !that.additionalProps.hideZoomBlock,
-		isLubeMatrixV3: that => that.sensorData && that.sensorData.lube_version === LUBE_VERSIONS.V3,
+		isLubeMatrixV3: that =>
+			that.sensorData && that.sensorData.lube_version === LUBE_VERSIONS.V3,
 		enableLubeUnlockBlock: that =>
-			that.sensorData && (that.currentSensorType.isUltrasound || that.isLubeMatrixV3) &&
+			that.sensorData &&
+			(that.currentSensorType.isUltrasound || that.isLubeMatrixV3) &&
 			(that.sensorData.lube_cycle_status === LUBE_CYCLE_STATUSES.BLOCKED ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNSUCCESSFUL ||
-				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT ||
+				that.sensorData.lube_shot_status ===
+					LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.BLOCKED ||
-				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.LOSS_CONNECTION ||
-				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_COMMAND_RESPONSE ||
+				that.sensorData.lube_shot_status ===
+					LUBE_PROCESSING_STATUSES.LOSS_CONNECTION ||
+				that.sensorData.lube_shot_status ===
+					LUBE_PROCESSING_STATUSES.NO_COMMAND_RESPONSE ||
 				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.UNKNOWN ||
-				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE ||
-				that.sensorData.lube_shot_status === LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE),
+				that.sensorData.lube_shot_status ===
+					LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE ||
+				that.sensorData.lube_shot_status ===
+					LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE),
 
 		enableFFTUnlockBlock() {
 			const { sensorData } = this;
@@ -379,8 +434,9 @@ export default {
 			return false;
 		},
 
-		disableAnimationAndSpinner: that =>	that.additionalProps.disableAnimationAndSpinner,
-		
+		disableAnimationAndSpinner: that =>
+			that.additionalProps.disableAnimationAndSpinner,
+
 		statsThresholdsActive: that => that.additionalProps.statsThresholdsActive,
 		oneChartOnly: that => that.additionalProps.oneChartOnly,
 
@@ -450,7 +506,7 @@ export default {
 				chartDataReady: value => (this.chartDataReady = value),
 				chartOptionsReady: () => this.chartOptionsUpdate++,
 				chartOptionsUpdate: () => this.chartOptionsUpdate++,
-				chartThresholdsUpdate: options => this.handleChartThresholdsUpdate(options),
+				chartThresholdsUpdate: options => this.handleChartThresholdsUpdate(options)
 				// onPlotlineDragChange: event => this.handlePlotlineDragChange(event),
 				// onPlotlineDragFinish: event => this.handlePlotlineDragFinish(event),
 				// emitChartOptionsFinalReady: options => this.handleChartOptionsReady(options),
@@ -478,13 +534,14 @@ export default {
 		},
 
 		// -------------------
-		chartTitle: that => that.chartOptionsUpdate != null ? that.ChartInstance.chartTitle : null,
-		
+		chartTitle: that =>
+			that.chartOptionsUpdate != null ? that.ChartInstance.chartTitle : null,
+
 		problems() {
 			if (this.chartOptions && this.statisticsResponsesReady !== undefined) {
 				// console.log('problems')
 				return (
-					this.ChartInstance.getTransformedStatistics({ 
+					this.ChartInstance.getTransformedStatistics({
 						data_key: 'problems',
 						parameterId: this.parameterTypeItems[0]?.id
 					}) || []
@@ -511,17 +568,27 @@ export default {
 		/*handleChartEvent(e) {
 			console.log(e)
 		},*/
+		handleMeasurementTypeMismatchWarning() {
+			return false;
+		},
+
 		handleHasStatisticsChange(value) {
 			this.hasStatistics = value;
 
-			if (this.additionalProps.setIsGraphMountedToWindow && !value && !this.chartIsRendered) {
+			if (
+				this.additionalProps.setIsGraphMountedToWindow &&
+				!value &&
+				!this.chartIsRendered
+			) {
 				this.chartIsRendered = true;
-				window.isGraphMounted = true;			
+				window.isGraphMounted = true;
 			}
 		},
 
 		handleChartRendered(e, Chart) {
-			this.ChartInstance.syncHistorySeriesVisibility(this.additionalProps.showHistory);
+			this.ChartInstance.syncHistorySeriesVisibility(
+				this.additionalProps.showHistory
+			);
 
 			if (!this.chartIsRendered && Chart.lastInitialRedrawComplete) {
 				this.chartIsRendered = true;
@@ -536,7 +603,10 @@ export default {
 		toggleChart() {
 			this.ChartInstance.toggleChart();
 
-			if (!this.chartIsHidden && (!this.chartIsInit || !this.hasStatistics || this.refetchChartData)) {
+			if (
+				!this.chartIsHidden &&
+				(!this.chartIsInit || !this.hasStatistics || this.refetchChartData)
+			) {
 				this.fetchChartData();
 				this.refetchChartData = false;
 			}
@@ -547,8 +617,12 @@ export default {
 		},
 
 		toggleEditPlotlinesManual() {
+			if (this.handleMeasurementTypeMismatchWarning()) {
+				return;
+			}
+
 			this.editPlotlines = !this.editPlotlines;
-	
+
 			this.ChartInstance.injectProps(
 				'options',
 				{
@@ -613,12 +687,17 @@ export default {
 
 		// ----------------------
 		handleSetupThresholds() {
+			if (this.handleMeasurementTypeMismatchWarning()) {
+				return;
+			}
+
 			const { chart_id, requestsList, resources } = this.ChartInstance;
 
 			var { levelZoneDataParameterId } = resources.chart_config;
 
 			const {
 				levelZoneData,
+				primaryLevelZoneData,
 				levelZones
 			} = this.ChartInstance.getTransformedStatistics({
 				parameterId: levelZoneDataParameterId,
@@ -634,6 +713,7 @@ export default {
 							chartTitle: this.chartTitle,
 							chart_id,
 							levelZoneData,
+							primaryLevelZoneData,
 							levelZones,
 							parameterItem: requestsList[0]
 						}
@@ -656,17 +736,17 @@ export default {
 		},
 
 		handleUnlockLube() {
-			this.$emit('event', { 
+			this.$emit('event', {
 				eventName: 'handleUnlockLube',
-				data: {chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id},
+				data: { chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id },
 				onward: true
 			});
 		},
 
 		handleUnlockFFT() {
-			this.$emit('event', { 
+			this.$emit('event', {
 				eventName: 'handleUnlockFFT',
-				data: {chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id},
+				data: { chartId: this.ChartInstance.chart_id, sensorId: this.sensorData.id },
 				onward: true
 			});
 		},
@@ -696,7 +776,7 @@ export default {
 			}
 		},*/
 
-		rootFilters() {
+		'rootFilters'() {
 			// console.log('rootFilters')
 			this.refetchChartData = true;
 		},
@@ -705,7 +785,7 @@ export default {
 			this.$nextTick(() => this.ChartInstance.syncHistorySeriesVisibility(this.additionalProps.showHistory));
 		},*/
 
-		isSidebarCollapse() {
+		'isSidebarCollapse'() {
 			setTimeout(() => {
 				const ChartRef = this.$refs.ChartWrapper;
 				if (ChartRef) {
@@ -744,7 +824,7 @@ export default {
 		// console.log('created Chart')
 		this.ChartInstance.injectProps('events', this.chartInstanceEventsList);
 		this.ChartInstance.setValue('seriesEvents', this.chartPointsEventsList);
-		
+
 		if (this.ChartInstance['chartIsHidden'] !== undefined) {
 			this.showDisableChartButton = true;
 			// this.chartIsHidden = this.ChartInstance.chartIsHidden;

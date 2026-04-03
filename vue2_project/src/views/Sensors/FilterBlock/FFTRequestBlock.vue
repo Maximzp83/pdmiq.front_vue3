@@ -437,7 +437,7 @@ export default {
 
 								this.$emit('event', {
 									eventName: 'handleUnlockFFTSuccess',
-									data: value,
+									data: { fft_lock_item: value, sensorId },
 									onward: true
 								});
 							}

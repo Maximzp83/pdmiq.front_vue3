@@ -434,7 +434,7 @@ export default {
 				sensor.bannerV2Subtype &&
 				sensor.bannerV2Subtype.parameters &&
 				sensor.bannerV2Subtype.parameters.some(
-					item => item.measurement_unit_id != null
+					item => item.metric_unit_id != null || item.imperial_unit_id != null
 				);
 
 			if (!hasMeasurementUnit || this.$store.state.measurement_units.itemsList.length) {

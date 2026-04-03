@@ -4,7 +4,7 @@
 		:class="{ 'half-width': !fromAnotherInstance && !isMobile }"
 	>
 		<el-form
-			class="item-edit-form"
+			:class="['item-edit-form', {'showJustInfo': formData.is_locked}]"
 			label-width="150px"
 			ref="itemForm"
 			:model="formData"
@@ -25,22 +25,18 @@
 				/>
 			</el-form-item>
 
-			<el-form-item label="Primary System" prop="primary_system">
-				<el-radio-group v-model="formData.primary_system">
-					<el-radio-button
-						v-for="item in metricSystemsList"
-						:key="`measurement-system-${item.id}`"
-						:label="item.id"
-					>
-						{{ item.name }}
-					</el-radio-button>
-				</el-radio-group>
-			</el-form-item>
-
-			<el-form-item label="Conversion Formula" prop="to_secondary_formula">
+			<el-form-item :label="tt('phrases.Metric_To_imperial_formula')" prop="to_imperial_formula">
 				<CustomInput
 					className="lowercase"
-					v-model="formData.to_secondary_formula"
+					v-model="formData.to_imperial_formula"
+					placeholder="{value} * 2.20462"
+				/>
+			</el-form-item>
+
+			<el-form-item :label="tt('phrases.Imperial_To_Metric_formula')" prop="to_metric_formula">
+				<CustomInput
+					className="lowercase"
+					v-model="formData.to_metric_formula"
 					placeholder="{value} * 2.20462"
 				/>
 			</el-form-item>
@@ -58,10 +54,6 @@
 import { mapActions } from 'vuex';
 import { required } from '@/constants/validation';
 import { itemFormMixin } from '@/mixins';
-import {
-	metricSystemsList,
-	METRIC_SYSTEM_TYPES
-} from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [itemFormMixin()],
@@ -71,8 +63,9 @@ export default {
 			formData: {
 				metric_name: '',
 				imperial_name: '',
-				primary_system: METRIC_SYSTEM_TYPES.METRIC,
-				to_secondary_formula: ''
+				to_metric_formula: '',
+				to_imperial_formula: '',
+				is_locked: 0
 			}
 		};
 	},
@@ -81,10 +74,9 @@ export default {
 		rules: () => ({
 			metric_name: required,
 			imperial_name: required,
-			primary_system: required
-		}),
-
-		metricSystemsList: () => Object.freeze(metricSystemsList()),
+			to_metric_formula: required,
+			to_imperial_formula: required,
+		})
 	},
 
 	methods: {
@@ -93,13 +85,7 @@ export default {
 		}),
 
 		localPrepareSubmitData(data) {
-			const newData = { ...data };
-
-			if (!newData.to_secondary_formula) {
-				newData.to_secondary_formula = null;
-			}
-
-			return newData;
+			return { ...data };
 		}
 	}
 };

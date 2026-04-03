@@ -6,6 +6,7 @@
 					@change="handleCheckAllChange"
 					:model-value="checkAll"
 					:indeterminate="isIndeterminate"
+					:disabled="disableCheckAll"
 				/>
 			</div>
 
@@ -44,6 +45,7 @@ const props = defineProps({
 	itemsName: { type: Object, required: true },
 	className: { type: String, default: '' },
 	disableSelection: Boolean,
+	disableCheckAll: Boolean,
 	checkAll: Boolean,
 	isIndeterminate: Boolean,
 	operationsWidth: { type: String, default: '0' },

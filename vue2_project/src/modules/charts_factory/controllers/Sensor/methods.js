@@ -46,6 +46,9 @@ import {
 import { storeGetter } from '@/store';
 import {
 	buildMeasurementUnitFormula,
+	getMeasurementUnitDefaultMeasurement,
+	getMeasurementUnitFormulaForMeasurement,
+	getMeasurementUnitIdByMeasurement,
 	resolveMeasurementUnitName,
 	resolveMeasurementUnitObject,
 	shouldConvertMeasurementUnit
@@ -1716,10 +1719,19 @@ const get_sensor_parameter_item1 = ({sensor, parameter_id, graph_item}) => {
 		if (sensorType) {
 			if (sensorType.isBannerV2Generic) {
 				const {metric_type} = graph_item;
-				const { units, name, measurement_unit_id } = graph_item.banner_v2_subtype_parameter;
+				const { units, name } = graph_item.banner_v2_subtype_parameter;
 				const measurementUnitsList = storeGetter('measurement_units.itemsList') || [];
+				const defaultMeasurement = getMeasurementUnitDefaultMeasurement(
+					graph_item.banner_v2_subtype_parameter
+				);
+				const measurement_unit_id = getMeasurementUnitIdByMeasurement({
+					parameterItem: graph_item.banner_v2_subtype_parameter,
+					measurement: defaultMeasurement
+				});
 				const unit = resolveMeasurementUnitObject({
-					unit: graph_item.banner_v2_subtype_parameter.measurement_unit,
+					unit:
+						graph_item.banner_v2_subtype_parameter.metric_unit ||
+						graph_item.banner_v2_subtype_parameter.imperial_unit,
 					measurementUnitId: measurement_unit_id,
 					items: measurementUnitsList
 				});
@@ -1729,8 +1741,17 @@ const get_sensor_parameter_item1 = ({sensor, parameter_id, graph_item}) => {
 				const resolvedUnits = unit
 					? resolveMeasurementUnitName({ unit, measurement })
 					: units;
-				const y_formula = shouldConvertMeasurementUnit({ unit, measurement })
-					? buildMeasurementUnitFormula(unit.to_secondary_formula)
+				const y_formula = shouldConvertMeasurementUnit({
+					unit,
+					measurement,
+					defaultMeasurement
+				})
+					? buildMeasurementUnitFormula(
+						getMeasurementUnitFormulaForMeasurement({
+							unit,
+							measurement
+						})
+					)
 					: null;
 				
 				return {
@@ -1738,7 +1759,10 @@ const get_sensor_parameter_item1 = ({sensor, parameter_id, graph_item}) => {
 					icon: 'icon-acceleration',
 					name,
 					units: resolvedUnits,
+					defaultMeasurement,
 					measurement_unit_id,
+					metric_unit_id: graph_item.banner_v2_subtype_parameter.metric_unit_id,
+					imperial_unit_id: graph_item.banner_v2_subtype_parameter.imperial_unit_id,
 					measurementUnit: unit,
 					y_formula
 				}

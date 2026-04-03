@@ -106,6 +106,16 @@ export default {
 			return Object.freeze(events);
 		},
 
+		isNCDSensor() {
+			const {
+				isNCDTempVibe,
+				isNCDWiredTempVibe,
+				isNCDTempVibeCurr
+			} = this.currentSensorType;
+
+			return isNCDTempVibe || isNCDWiredTempVibe || isNCDTempVibeCurr;
+		},
+
 		ChartsListInstance() {
 			// console.log('ChartsListInstance')
 			return executeChartsListFactory('FFTChartsListFactory', {
@@ -144,6 +154,15 @@ export default {
 					prop: 'type',
 					method: '!=',
 					value: 'velocity'
+				});
+			}
+
+			// console.log('isNCDSensor', this.currentSensorType, this.isNCDSensor)
+			if (!this.isNCDSensor) {
+				settings.setupChartsConfigsListSettings.filterParamsBy.push({
+					prop: 'type',
+					method: '!=',
+					value: 'transformed_acceleration'
 				});
 			}
 

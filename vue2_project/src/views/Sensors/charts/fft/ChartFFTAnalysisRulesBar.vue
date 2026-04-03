@@ -17,6 +17,7 @@
 					fromFFTPage
 					insideChartAnalysisRulesBar
 					@save="validateRuleItem(idx)"
+					:rootFilters="rootFilters"
 				/>
 			</div>
 		</div>
@@ -40,7 +41,8 @@ export default {
 		equipmentData: { type: Object, required: true },
 		currentFFTItem: { type: Object, default: null },
 		sensorId: { type: Number, required: true },
-		selectedAnalysisRules: Array
+		selectedAnalysisRules: Array,
+		rootFilters: Object,
 	},
 
 	components: {

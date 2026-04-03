@@ -66,8 +66,6 @@
 </template>
 
 <script>
-import { validateBySettings } from '@/helpers';
-
 import { /*navigation,*/ eventHandler } from '@/mixins';
 
 export default {
@@ -86,6 +84,7 @@ export default {
 		expandedRowSettings: null,
 		disableSelection: Boolean,
 		selectedIds: Array,
+		canSelect: { type: Boolean, default: true },
 		itemsSaving: Boolean,
 		canDeleteSettings: Boolean,
 		operationsWidth: String
@@ -112,39 +111,6 @@ export default {
 			}
 
 			return [];
-		},
-
-		canSelect() {
-			const { actionsList } = this;
-
-			if (actionsList.length) {
-				const deleteActions = actionsList.filter(
-					ai =>
-						(ai.name == 'handleDeleteItems' ||
-							ai.name == 'handleDeleteWorkOrders') &&
-						ai.conditionSettings
-				);
-
-				if (deleteActions.length) {
-					let q = 0;
-
-					deleteActions.forEach(di => {
-						// console.log(di)
-						if (di.conditionSettings) {
-							validateBySettings({
-								...di.conditionSettings,
-								dataObj: this.rowData
-							})
-								? q++
-								: null;
-						}
-					});
-					return q > 0;
-				} else {
-					return true;
-				}
-			}
-			return true;
 		}
 	},
 

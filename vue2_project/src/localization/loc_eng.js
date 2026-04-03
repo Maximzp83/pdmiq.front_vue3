@@ -1142,6 +1142,9 @@ export default {
 		lube_trigger_metric_type: 'Lube Trigger Metric Type',
 		silence_mode: 'Silence Mode',
 		visible_by_default: 'Visible by default',
+		silence_mode_until: 'Silence Mode Until',
+		metric_to_imperial_formula: 'Metric to Imperial Formula',
+		imperial_to_metric_formula: 'Imperial to Metric Formula',
 	},
 
 	aliases: {
@@ -1175,6 +1178,7 @@ export default {
 	  	anomaly1: 'Flat metric data anomaly',
 	  	api_secret_warn: 'Is the only time You will be able to see the secret',
 	  	frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
+	  	measurement_warn: 'Change measurement type to default',
 	},
 
 	constants: {
@@ -1616,6 +1620,7 @@ export default {
 		no_fft_response: 'No FFT Response',
 		node_offline: 'Node Offline',
 		unconfirmed_fft_request: 'Unconfirmed FFT Request',
+		usg: 'USg',
 	},
 
 	short_name: {

@@ -3,33 +3,35 @@
 		<VueElementLoadingWrapper :isLoading="itemsLoading" :itemsName="itemsName.mult" />
 
 		<div v-if="tableData.length" class="flex-table custom-table-container">
-			<TableHeader
-				v-if="!hideHeader"
-				:columns="tableSettings.columns"
-				:isIndeterminate="isIndeterminate"
-				:checkAll="checkAll"
-				:itemsName="itemsName"
-				:operationsWidth="operationsWidth"
-				:disableSelection="disableSelection"
-				:activeSortingFilters="activeSortingFilters"
-				@event="handleEvent"
-			/>
+				<TableHeader
+					v-if="!hideHeader"
+					:columns="tableSettings.columns"
+					:isIndeterminate="isIndeterminate"
+					:checkAll="checkAll"
+					:disableCheckAll="isAllRowsSelectionDisabled"
+					:itemsName="itemsName"
+					:operationsWidth="operationsWidth"
+					:disableSelection="disableSelection"
+					:activeSortingFilters="activeSortingFilters"
+					@event="handleEvent"
+				/>
 
-			<Row
-				v-for="(row, rowIndex) in tableData"
-				:key="`table-row-${row.id || row.name || row.label || row[tableSettings.rowIdKey]}-index-${rowIndex}`"
-				:rowData="row"
-				:rowIndex="rowIndex"
-				:columns="tableSettings.columns"
-				:operations="showOperations ? tableSettings.operations : null"
-				:expandedRowSettings="tableSettings.expandedRowSettings"
-				:selectedIds="selectedIds"
-				:itemsSaving="itemsSaving"
-				:operationsWidth="operationsWidth"
-				:disableSelection="disableSelection"
-				:canDeleteSettings="canDeleteSettings"
-				@event="handleEvent"
-			/>
+				<Row
+					v-for="(row, rowIndex) in tableData"
+					:key="`table-row-${row.id || row.name || row.label || row[tableSettings.rowIdKey]}-index-${rowIndex}`"
+					:rowData="row"
+					:rowIndex="rowIndex"
+					:columns="tableSettings.columns"
+					:operations="showOperations ? tableSettings.operations : null"
+					:expandedRowSettings="tableSettings.expandedRowSettings"
+					:selectedIds="selectedIds"
+					:canSelect="selectableRowIds.some((id) => id === row.id)"
+					:itemsSaving="itemsSaving"
+					:operationsWidth="operationsWidth"
+					:disableSelection="disableSelection"
+					:canDeleteSettings="canDeleteSettings"
+					@event="handleEvent"
+				/>
 		</div>
 
 		<div v-else-if="!itemsLoading" class="errors-block">
@@ -47,8 +49,9 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
+import { validateBySettings } from '@/helpers';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -103,21 +106,74 @@ const operationsWidth = computed(() => {
 	return '0';
 });
 
+const canSelectRow = (rowData) => {
+	const actions =
+		showOperations.value && props.tableSettings?.operations?.actions
+			? props.tableSettings.operations.actions
+			: [];
+
+	if (actions.length) {
+		const deleteActions = actions.filter(
+			(action) =>
+				(action.name === 'handleDeleteItems' ||
+					action.name === 'handleDeleteWorkOrders') &&
+				action.conditionSettings
+		);
+
+		if (deleteActions.length) {
+			let allowedActionsCount = 0;
+
+			deleteActions.forEach((action) => {
+				if (
+					action.conditionSettings &&
+					validateBySettings({
+						...action.conditionSettings,
+						dataObj: rowData,
+					})
+				) {
+					allowedActionsCount++;
+				}
+			});
+
+			return allowedActionsCount > 0;
+		}
+	}
+
+	return true;
+};
+
+const selectableRowIds = computed(() =>
+	(props.tableData || [])
+		.filter((row) => canSelectRow(row))
+		.map((row) => row.id)
+);
+
+const isAllRowsSelectionDisabled = computed(() => !selectableRowIds.value.length);
+
+const syncSelectionState = () => {
+	selectedIds.value = selectedIds.value.filter((id) =>
+		selectableRowIds.value.some((selectableId) => selectableId === id)
+	);
+
+	const checkedCount = selectedIds.value.length;
+	checkAll.value =
+		!!selectableRowIds.value.length && checkedCount === selectableRowIds.value.length;
+	isIndeterminate.value =
+		checkedCount > 0 && checkedCount < selectableRowIds.value.length;
+};
+
 const handleChecked = (id) => {
-	const tableData = props.tableData || [];
 	if (id) {
 		selectedIds.value.some((sid) => sid === id)
 			? (selectedIds.value = selectedIds.value.filter((sid) => sid !== id))
 			: selectedIds.value.push(id);
 	} else {
 		selectedIds.value = isIndeterminate.value || !selectedIds.value.length
-			? tableData.map((row) => row.id)
+			? [...selectableRowIds.value]
 			: [];
 	}
 
-	const checkedCount = selectedIds.value.length;
-	checkAll.value = checkedCount === tableData.length;
-	isIndeterminate.value = checkedCount > 0 && checkedCount < tableData.length;
+	syncSelectionState();
 };
 
 const calcOperationsWidth = (num) => {
@@ -132,6 +188,14 @@ const methodsMap = {
 };
 
 const { handleEvent } = useEventHandler(methodsMap, emit);
+
+watch(
+	() => props.tableData,
+	() => {
+		syncSelectionState();
+	},
+	{ deep: true }
+);
 
 void Lang;
 </script>

@@ -93,7 +93,7 @@
 							type="success"
 							@click="addFormItem('ioParametersItemsList', 'p_i-')"
 						>
-							<span class="capitalize" v-text="`${tt('Add')} ${tt('constants.Metric')}`"></span>
+							<span class="capitalize" v-text="`${tt('Add')} ${tt('parameter')}`"></span>
 							<i class="icomoon icon-plus"></i>
 						</el-button>
 					</div>

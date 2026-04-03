@@ -3,6 +3,19 @@ import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor
 
 const { METRIC, IMPERIAL } = METRIC_SYSTEM_TYPES;
 
+const MEASUREMENT_UNIT_SYSTEM_KEYS = Object.freeze({
+	[METRIC]: {
+		id: 'metric_unit_id',
+		name: 'metric_name',
+		formula: 'to_metric_formula'
+	},
+	[IMPERIAL]: {
+		id: 'imperial_unit_id',
+		name: 'imperial_name',
+		formula: 'to_imperial_formula'
+	}
+});
+
 export const getMeasurementUnitLabel = unit =>
 	unit ? `${unit.metric_name || '-'} / ${unit.imperial_name || '-'}` : '';
 
@@ -17,9 +30,27 @@ export const resolveMeasurementUnitName = ({ unit, measurement }) => {
 	return measurement === IMPERIAL ? unit.imperial_name : unit.metric_name;
 };
 
-export const resolveMeasurementUnitByPrimary = unit => {
-	if (!unit) return '';
-	return unit.primary_system === IMPERIAL ? unit.imperial_name : unit.metric_name;
+export const getMeasurementUnitSystemConfig = measurement =>
+	MEASUREMENT_UNIT_SYSTEM_KEYS[measurement] || MEASUREMENT_UNIT_SYSTEM_KEYS[METRIC];
+
+export const getMeasurementUnitSystemIdKey = measurement =>
+	getMeasurementUnitSystemConfig(measurement).id;
+
+export const getMeasurementUnitSystemNameKey = measurement =>
+	getMeasurementUnitSystemConfig(measurement).name;
+
+export const getMeasurementUnitSystemFormulaKey = measurement =>
+	getMeasurementUnitSystemConfig(measurement).formula;
+
+export const getMeasurementUnitsOptionsBySystem = (units, measurement) => {
+	const { id: idKey, name: nameKey } = getMeasurementUnitSystemConfig(measurement);
+
+	return (units || []).map(unit => ({
+		id: unit[idKey] != null ? unit[idKey] : unit.id,
+		name: unit[nameKey] || '',
+		unit,
+		measurement
+	}));
 };
 
 export const getMeasurementUnitById = (measurementUnitId, items = []) =>
@@ -43,8 +74,29 @@ export const buildMeasurementUnitFormula = formula => {
 	}
 };
 
-export const shouldConvertMeasurementUnit = ({ unit, measurement }) =>
+export const getMeasurementUnitDefaultMeasurement = parameterItem => {
+	if (!parameterItem) return null;
+	if (parameterItem.defaultMeasurement != null) return parameterItem.defaultMeasurement;
+	if (parameterItem.metric_unit_id != null) return METRIC;
+	if (parameterItem.imperial_unit_id != null) return IMPERIAL;
+	return null;
+};
+
+export const getMeasurementUnitIdByMeasurement = ({ parameterItem, measurement }) => {
+	if (!parameterItem) return null;
+
+	const idKey = getMeasurementUnitSystemIdKey(measurement);
+	return parameterItem[idKey] != null ? parameterItem[idKey] : null;
+};
+
+export const getMeasurementUnitFormulaForMeasurement = ({ unit, measurement }) => {
+	if (!unit) return null;
+	return unit[getMeasurementUnitSystemFormulaKey(measurement)] || null;
+};
+
+export const shouldConvertMeasurementUnit = ({ unit, measurement, defaultMeasurement }) =>
 	!!unit &&
-	!!unit.to_secondary_formula &&
-		((measurement === IMPERIAL && unit.primary_system === METRIC) ||
-			(measurement === METRIC && unit.primary_system === IMPERIAL));
+	defaultMeasurement != null &&
+	measurement != null &&
+	measurement !== defaultMeasurement &&
+	!!getMeasurementUnitFormulaForMeasurement({ unit, measurement });

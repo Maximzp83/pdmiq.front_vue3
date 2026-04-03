@@ -25,7 +25,9 @@ import {
 
 import { sensorThresholdsTypesList } from '@/constants/global';
 import { Lang } from '@/localization';
-import { resolveMeasurementUnitName } from '@/helpers/measurementUnits';
+import {
+	resolveMeasurementUnitName
+} from '@/helpers/measurementUnits';
 
 import {
 	prepareFilters,
@@ -42,8 +44,8 @@ import {
 	setupAnnotationSelectionData,
 	collect_specific_points
 } from '../methods';
-import { METRIC_SYSTEM_TYPES } from '../enums';
 import { colorsList } from '../../../enums';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums.js';
 
 import { setupYAxisPlotlines } from '../../../helpers/series_generator';
 // import { setupStatisticsTransformator } from '../StatisticsTransformatorDispatcher';
@@ -61,7 +63,12 @@ class SensorChartBase extends ChartBase {
 		if (
 			this.currentSensorType &&
 			this.currentSensorType.isBannerV2Generic &&
-			(parameterItem.measurementUnit || parameterItem.measurement_unit_id != null)
+			(
+				parameterItem.measurementUnit ||
+				parameterItem.measurement_unit_id != null ||
+				parameterItem.metric_unit_id != null ||
+				parameterItem.imperial_unit_id != null
+			)
 		) {
 			return resolveMeasurementUnitName({
 				unit: parameterItem.measurementUnit,
@@ -75,6 +82,10 @@ class SensorChartBase extends ChartBase {
 			parameterItem,
 			measurement: this.measurement
 		});
+	}
+
+	getMeasurementTypeMismatchWarning() {
+		return null;
 	}
 
 	constructor() {
@@ -339,9 +350,9 @@ class SensorChartBase extends ChartBase {
 				this.sensorItem.chart_unit_label ||
 				`${Lang.tt('has')} ${Lang.tt('no')} ${Lang.tt('units')}`
 			);
-		} else {
-			return getUnitType(payload);
 		}
+		
+		return getUnitType(payload);
 	}
 
 	checkIsHasStatistics() {
@@ -1641,6 +1652,11 @@ class SensorChart extends SensorChartBase {
 							zonesData: levelZoneData,
 							value: new_val
 						};
+						const parameterItem = requestsList[0];
+						const value = getZoneValue(
+							plotLine.customSettings.data_path,
+							getZoneSettings
+						);
 
 						const requestPayload = {
 							sensorId: sensorItem.id,
@@ -1648,12 +1664,9 @@ class SensorChart extends SensorChartBase {
 							method: 'PUT',
 							data: {
 								metric_system_type: this.measurement,
-								parameter_type: requestsList[0].id,
+								parameter_type: parameterItem.id,
 								level: plotLine.zone_id,
-								value: getZoneValue(
-									plotLine.customSettings.data_path,
-									getZoneSettings
-								)
+								value
 							}
 						};
 

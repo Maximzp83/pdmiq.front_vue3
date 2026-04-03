@@ -1,31 +1,43 @@
 import axios from 'axios';
-let apiUrl = '';
-let devApiUrl = 'https://api.testmatrix.assetmatrix.com/api';
-// let devApiUrl = 'https://api.pdmmatrix.assetmatrix.com/api';
 
-// console.log('API URL:', process.env.VUE_APP_SENSOR_STATISTICS_API_URL);
-if (process.env.VUE_APP_API_URL) {
-	apiUrl = process.env.VUE_APP_API_URL;
-	// devApiUrl = process.env.VUE_APP_API_URL;
-} else {
-	if (
-		window.location.origin === 'https://testmatrix.assetmatrix.com'
-		// || window.location.origin === 'https://newcharts.industrialmatrix.com'
-	) {
-		apiUrl = 'https://api.testmatrix.assetmatrix.com/api';
-	} else if (
-		window.location.origin === 'https://app.industrialmatrix.com'
-		|| window.location.origin === 'https://newcharts.industrialmatrix.com'
-	) {
-		apiUrl = 'https://api.pdmmatrix.assetmatrix.com/api';
+// const DEFAULT_DEV_API_URL = 'https://api.pdmmatrix.assetmatrix.com/api';
+const DEFAULT_DEV_API_URL = 'https://api.testmatrix.assetmatrix.com/api';
+
+const HOST_API_URL_MAP = {
+	'https://testmatrix.assetmatrix.com': 'https://api.testmatrix.assetmatrix.com/api',
+	'https://app.industrialmatrix.com': 'https://api.pdmmatrix.assetmatrix.com/api',
+	'https://newcharts.industrialmatrix.com':	'https://api.pdmmatrix.assetmatrix.com/api'
+};
+
+const normalizeBaseUrl = url => (url ? url.replace(/\/+$/, '') : '');
+
+const resolveApiBaseUrl = () => {
+	const envApiUrl = normalizeBaseUrl(process.env.VUE_APP_API_URL);
+
+	if (envApiUrl) {
+		return envApiUrl;
 	}
-}
-// console.log(window.location.origin, devApiUrl, apiUrl)
 
-axios.defaults.headers['X-Requested-With'] = 'XMLHttpRequest';
-axios.defaults.headers['X-Timezone-Offset'] = -new Date().getTimezoneOffset();
-axios.defaults.headers.Accept = 'application/json';
-axios.defaults.headers['Content-Type'] = 'application/json;charset=UTF-8';
-axios.defaults.baseURL = process.env.NODE_ENV === 'development' ? devApiUrl : apiUrl;
+	if (process.env.NODE_ENV === 'development') {
+		return DEFAULT_DEV_API_URL;
+	}
 
-export default axios;
+	if (typeof window !== 'undefined') {
+		return HOST_API_URL_MAP[window.location.origin] || '';
+	}
+
+	return '';
+};
+
+const apiClient = axios.create({
+	baseURL: resolveApiBaseUrl(),
+	// timeout: 30000,
+	headers: {
+		'Accept': 'application/json',
+		'Content-Type': 'application/json;charset=UTF-8',
+		'X-Requested-With': 'XMLHttpRequest',
+		'X-Timezone-Offset': -new Date().getTimezoneOffset()
+	}
+});
+
+export default apiClient;

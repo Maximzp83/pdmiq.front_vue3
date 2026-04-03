@@ -23,6 +23,11 @@
   - `src/assets/sass/common/layout.scss`
   - `src/assets/sass/common/common-content.scss`
   - `src/assets/sass/common/common-blocks.scss`
+- Latest follow-up sync from changed `vue2_project` files was applied to:
+  - `src/components/table/CustomDataListTable.vue`
+  - `src/components/table/Row.vue`
+  - `src/components/table/TableHeader.vue`
+  - `src/views/Machines/ItemForm.vue`
 - `SESSION_CONTEXT.md` is now refreshed and the git worktree is currently clean.
 
 ## Files already modified
@@ -33,6 +38,10 @@
   - `src/assets/sass/common/layout.scss`
   - `src/assets/sass/common/common-content.scss`
   - `src/assets/sass/common/common-blocks.scss`
+  - `src/components/table/CustomDataListTable.vue`
+  - `src/components/table/Row.vue`
+  - `src/components/table/TableHeader.vue`
+  - `src/views/Machines/ItemForm.vue`
 - Process/support files:
   - `docs/session-collaboration-rules.md`
   - `codex_session_end_prompts.yaml`

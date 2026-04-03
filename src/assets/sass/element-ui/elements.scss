@@ -38,11 +38,12 @@ body {
 	}
 
 	.datepicker-container .el-date-editor.el-input,
+	.el-date-editor.el-input__wrapper.el-range-editor,
 	.el-input__inner {
 		border: 1px solid $formElementsBorderColor;
 		border-radius: 4px;
 		padding: 1px 12px;
-
+		box-sizing: border-box;
 		&:focus, &.is-focus {
 			border-color: $primary-color;	
 		}
@@ -56,21 +57,24 @@ body {
 			box-shadow: none !important;
 		}
 
-		.el-date-editor.el-input {
+		.el-date-editor {
 			width: 100%;
-			box-sizing: border-box;
-			height: $formElementsHeight;		
+			&.el-input {
+				width: 100%;
+				box-sizing: border-box;
+				height: $formElementsHeight;		
 
-			.el-input__icon {
-				line-height: 37px;
-				font-size: 16px !important;
-			}
+				.el-input__icon {
+					line-height: 37px;
+					font-size: 16px !important;
+				}
 
-			.el-input__inner {
-				border: none;
-				padding-left: 8px;
+				.el-input__inner {
+					border: none;
+					padding-left: 8px;
+				}
+				.el-range-separator {line-height: 36px !important;}
 			}
-			.el-range-separator {line-height: 36px !important;}
 		}
 		
 		&:not(.no-min-width) {min-width: 222px;}
@@ -153,7 +157,7 @@ body {
 	}
 
 	.el-select {
-		width: inherit;
+		width: 100%;
 
 		&:not(.small):not(.multiple-select):not(.mini) {
 			.el-select__wrapper {

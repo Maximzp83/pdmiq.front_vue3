@@ -25,6 +25,9 @@ import { METRIC_SYSTEM_TYPES } from './enums';
 import { storeGetter } from '@/store';
 import {
 	buildMeasurementUnitFormula,
+	getMeasurementUnitDefaultMeasurement,
+	getMeasurementUnitFormulaForMeasurement,
+	getMeasurementUnitIdByMeasurement,
 	resolveMeasurementUnitObject,
 	shouldConvertMeasurementUnit
 } from '@/helpers/measurementUnits';
@@ -1697,40 +1700,72 @@ const generateListsConfig = (config_key, settings) => {
 				const { node_parameter, graph_type, id, is_visible_by_default } = param;
 				let units = param.units,
 						name = param.name;
-				let measurement_unit_id = param.measurement_unit_id;
+				let metric_unit_id = param.metric_unit_id;
+				let imperial_unit_id = param.imperial_unit_id;
+				let defaultMeasurement = getMeasurementUnitDefaultMeasurement(param);
+				let measurement_unit_id = getMeasurementUnitIdByMeasurement({
+					parameterItem: { metric_unit_id, imperial_unit_id },
+					measurement: defaultMeasurement
+				});
 				let measurementUnit = resolveMeasurementUnitObject({
-					unit: param.measurement_unit,
+					unit: param.metric_unit || param.imperial_unit,
 					measurementUnitId: measurement_unit_id,
 					items: measurementUnitsList
 				});
 				let y_formula = shouldConvertMeasurementUnit({
 					unit: measurementUnit,
-					measurement
+					measurement,
+					defaultMeasurement
 				})
-					? buildMeasurementUnitFormula(measurementUnit.to_secondary_formula)
+					? buildMeasurementUnitFormula(
+						getMeasurementUnitFormulaForMeasurement({
+							unit: measurementUnit,
+							measurement
+						})
+					)
 					: null;
-				// console.log(measurementUnit, y_formula);
 				const overwritingParam = findItemBy('parent_id', id, bannerV2SubtypeParameters);
 				
 				if (overwritingParam) {
 					units = overwritingParam.units;
 					name = overwritingParam.name;
-					measurement_unit_id =
-						overwritingParam.measurement_unit_id != null
-							? overwritingParam.measurement_unit_id
-							: measurement_unit_id;
+					metric_unit_id =
+						overwritingParam.metric_unit_id != null
+							? overwritingParam.metric_unit_id
+							: metric_unit_id;
+					imperial_unit_id =
+						overwritingParam.imperial_unit_id != null
+							? overwritingParam.imperial_unit_id
+							: imperial_unit_id;
+					defaultMeasurement =
+						getMeasurementUnitDefaultMeasurement(overwritingParam) != null
+							? getMeasurementUnitDefaultMeasurement(overwritingParam)
+							: defaultMeasurement;
+					measurement_unit_id = getMeasurementUnitIdByMeasurement({
+						parameterItem: { metric_unit_id, imperial_unit_id },
+						measurement: defaultMeasurement
+					});
 					measurementUnit = resolveMeasurementUnitObject({
 						unit:
-							overwritingParam.measurement_unit || param.measurement_unit,
+							overwritingParam.metric_unit ||
+							overwritingParam.imperial_unit ||
+							param.metric_unit ||
+							param.imperial_unit,
 						measurementUnitId: measurement_unit_id,
 						items: measurementUnitsList
 					});
-					/*y_formula = shouldConvertMeasurementUnit({
+					y_formula = shouldConvertMeasurementUnit({
 						unit: measurementUnit,
-						measurement
+						measurement,
+						defaultMeasurement
 					})
-						? buildMeasurementUnitFormula(measurementUnit.to_secondary_formula)
-						: null;*/
+						? buildMeasurementUnitFormula(
+							getMeasurementUnitFormulaForMeasurement({
+								unit: measurementUnit,
+								measurement
+							})
+						)
+						: null;
 				}
 
 				let chart = {
@@ -1756,7 +1791,10 @@ const generateListsConfig = (config_key, settings) => {
 						icon: 'icon-acceleration',
 						name,
 						units,
+						defaultMeasurement,
 						measurement_unit_id,
+						metric_unit_id,
+						imperial_unit_id,
 						measurementUnit,
 						y_formula
 					}]

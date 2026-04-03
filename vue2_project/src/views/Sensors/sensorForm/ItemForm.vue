@@ -1037,10 +1037,14 @@ export default {
 								id: item.id,
 								name: subItem.name,
 								units: item.units,
-								measurement_unit_id:
-									subItem.measurement_unit_id != null
-										? subItem.measurement_unit_id
-										: item.measurement_unit_id,
+								metric_unit_id:
+									subItem.metric_unit_id != null
+										? subItem.metric_unit_id
+										: item.metric_unit_id,
+								imperial_unit_id:
+									subItem.imperial_unit_id != null
+										? subItem.imperial_unit_id
+										: item.imperial_unit_id,
 								formula: subItem.formula,
 								graph_type: subItem.graph_type,
 								title: `${subItem.name}: ${item.formula} ${item.units}`,
@@ -1054,7 +1058,8 @@ export default {
 						title: `${item.name}: ${item.formula} ${item.units}`,
 						name: item.name,
 						units: item.units,
-						measurement_unit_id: item.measurement_unit_id,
+						metric_unit_id: item.metric_unit_id,
+						imperial_unit_id: item.imperial_unit_id,
 						graph_type: item.graph_type,
 						formula: item.formula,
 						// isDefaultValues: true

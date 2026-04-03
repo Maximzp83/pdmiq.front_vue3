@@ -2,7 +2,7 @@ import ChartBase from '../../../classes/Chart';
 
 import { fetch_ncd_sensor_fft_statistics } from '../api/index.js';
 import { mergeObjects, cloneDeep, findItemBy, buildFormula, getRoundedValue } from '@/helpers';
-import { METRIC_SYSTEM_TYPES } from '../enums';
+import { METRIC_SYSTEM_TYPES, NCD_SENSOR_PARAMETERS_TYPES, SENSOR_PARAMETERS_TYPES } from '../enums';
 
 // import { ncdAxisList } from '@/constants/global';
 import {
@@ -74,6 +74,19 @@ class FFTChartBase extends ChartBase {
 
 	setupUnitTypeName(payload) {
 		// const { requestsList } = this;
+		if (this.currentSensorType.isBannerM25) {
+			if (
+				// name == 'g' && (
+					this.parameterItem.id === NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM ||
+					this.parameterItem.id === NCD_SENSOR_PARAMETERS_TYPES.X_TRANSFORM_ACCELERATION ||
+					this.parameterItem.id === SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION
+				// )
+			) {
+				return 'USg';
+			}
+			// console.log(this.parameterItem, name);
+		}
+
 		return getUnitType(payload);
 	}
 

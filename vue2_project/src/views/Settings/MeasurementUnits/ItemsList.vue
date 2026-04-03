@@ -38,7 +38,7 @@ import { mapState, mapActions } from 'vuex';
 import { itemsDataMixin, eventHandler, navigation } from '@/mixins';
 
 import { standardTableOperations } from '@/constants/table';
-import { metricSystemsList } from '@/modules/charts_factory/controllers/Sensor/enums';
+// import { metricSystemsList } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [itemsDataMixin(), eventHandler(), navigation()],
@@ -93,8 +93,21 @@ export default {
 				actions.push(standardTableOperations.edit);
 			}
 			if (this.hasAccesToDelete) {
-				actions.push(standardTableOperations.delete);
+				actions.push({					
+					...standardTableOperations.delete,
+					conditionSettings: {
+						conditions: [
+							{
+								prop: 'is_locked',
+								method: '==',
+								control_value: false,
+							}
+						]
+					}
+				});
 			}
+
+			const { tt } = this;
 
 			return Object.freeze({
 				columns: [
@@ -109,15 +122,12 @@ export default {
 						sortable: true
 					},
 					{
-						prop: 'primary_system',
-						label: 'Primary System',
-						meta: {
-							getItemValue: { prop: 'name', list: metricSystemsList() }
-						}
+						prop: 'to_imperial_formula',
+						label: tt('phrases.Metric_To_imperial_formula')
 					},
 					{
-						prop: 'to_secondary_formula',
-						label: 'Conversion Formula'
+						prop: 'to_metric_formula',
+						label: tt('phrases.Imperial_To_metric_formula')
 					}
 				],
 				operations: {
@@ -149,7 +159,14 @@ export default {
 			delete_item: 'measurement_units/delete_measurement_unit',
 
 			set_filters: 'measurement_units/set_measurement_units_filters'
-		})
+		}),
+
+		localModalSettingsHook({modalSettings, itemData}) {
+			if (itemData && itemData.is_locked) {
+				modalSettings.hideSubmitButtons = true;
+			}
+			return modalSettings;
+		},
 
 		// localRouteQueryHandler:()=>null,
 

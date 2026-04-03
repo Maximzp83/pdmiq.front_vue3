@@ -16,17 +16,34 @@
 		</el-form-item>
 
 		<el-form-item
-			label="Measurement Unit"
-			prop="measurement_unit_id"
+			label="Metric Unit"
+			prop="metric_unit_id"
 			:class="{ 'mcol-xs-6': !fromModal }"
 		>
 			<CustomSelect
 				clearable
 				filterable
 				:optionsLoading="measurementUnitsLoading"
-				:optionsList="measurementUnitsOptions"
-				placeholder="Select Measurement Unit"
-				v-model="formData.measurement_unit_id"
+				:optionsList="metricMeasurementUnitsOptions"
+				placeholder="Select Metric Unit"
+				v-model="formData.metric_unit_id"
+				@change="handleMetricUnitChange"
+			/>
+		</el-form-item>
+
+		<el-form-item
+			label="Imperial Unit"
+			prop="imperial_unit_id"
+			:class="{ 'mcol-xs-6': !fromModal }"
+		>
+			<CustomSelect
+				clearable
+				filterable
+				:optionsLoading="measurementUnitsLoading"
+				:optionsList="imperialMeasurementUnitsOptions"
+				placeholder="Select Imperial Unit"
+				v-model="formData.imperial_unit_id"
+				@change="handleImperialUnitChange"
 			/>
 		</el-form-item>
 
@@ -121,7 +138,10 @@
 import { ncdAlarmTypesList, chartTypesList } from '@/constants/global';
 import { required } from '@/constants/validation';
 import { subItemMixin } from '@/mixins';
-import { getMeasurementUnitsOptions } from '@/helpers/measurementUnits';
+import {
+	getMeasurementUnitsOptionsBySystem
+} from '@/helpers/measurementUnits';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [subItemMixin()],
@@ -141,7 +161,8 @@ export default {
 				id: null,
 				name: '',
 				units: '',
-				measurement_unit_id: null,
+				metric_unit_id: null,
+				imperial_unit_id: null,
 				formula: '',
 				alarm_type: null,
 				graph_type: null,
@@ -155,8 +176,21 @@ export default {
 	computed: {
 		ncdAlarmTypesList: () => Object.freeze(ncdAlarmTypesList()),
 		chartTypesList: () => Object.freeze(chartTypesList()),
-		measurementUnitsOptions() {
-			return Object.freeze(getMeasurementUnitsOptions(this.measurementUnitsList));
+		metricMeasurementUnitsOptions() {
+			return Object.freeze(
+				getMeasurementUnitsOptionsBySystem(
+					this.measurementUnitsList,
+					METRIC_SYSTEM_TYPES.METRIC
+				)
+			);
+		},
+		imperialMeasurementUnitsOptions() {
+			return Object.freeze(
+				getMeasurementUnitsOptionsBySystem(
+					this.measurementUnitsList,
+					METRIC_SYSTEM_TYPES.IMPERIAL
+				)
+			);
 		},
 
 		rules: () => ({
@@ -169,6 +203,18 @@ export default {
 	},
 
 	methods: {
+		handleMetricUnitChange(value) {
+			if (value != null) {
+				this.formData.imperial_unit_id = null;
+			}
+		},
+
+		handleImperialUnitChange(value) {
+			if (value != null) {
+				this.formData.metric_unit_id = null;
+			}
+		},
+
 		localGetFormDataCallback(formData) {
 			const newFormData = { ...formData };
 			delete newFormData.units;

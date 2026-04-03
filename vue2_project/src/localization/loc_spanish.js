@@ -1160,6 +1160,9 @@ export default {
 		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
 		silence_mode: 'Modo Silencio',
 		visible_by_default: 'Visible por defecto',
+		silence_mode_until: 'Modo Silencio hasta',
+		metric_to_imperial_formula: 'Fórmula de métrica a imperiales',
+		imperial_to_metric_formula: 'Fórmula imperial a métrica',
 	},
 
 	aliases: {
@@ -1186,13 +1189,14 @@ export default {
 		mfa_warn_1: 'Mantenga su cuenta segura',
 		mfa_warn_2: 'La autenticación de dos factores (2FA) será requerida para iniciar sesión a partir del 1 de octubre de 2025 para todos los usuarios con acceso de administrador de planta',
 		mfa_warn_link: 'Configure 2FA hoy',		
-	  	prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
+		prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
 	  	creation_link_exp: 'El enlace para crear la contraseña ha expirado. Ingrese su correo electrónico a continuación y haga clic en enviar. <b>Recibirá un nuevo enlace en su bandeja de entrada en breve.</b>',
 	  	to_clipboard_msg: 'El enlace fue copiado al portapapeles',
 	  	mfa_warn_3: 'Si desea cambiar el número de teléfono, desactive 2FA o cámbielo a Authenticator',
 	  	anomaly1: 'Anomalia de datos de metrica',
 	  	api_secret_warn: 'Es la única vez que podrás ver el secreto',
 	  	frequency_reset: 'La configuración de frecuencia se ha restablecido correctamente antes de guardar debido a que el método de lubricación ha cambiado. Configure los nuevos ajustes de frecuencia y guarde.',
+	  	measurement_warn: 'Cambiar el tipo de medición a predeterminado',
 	},
 
 	constants: {
@@ -1620,7 +1624,7 @@ export default {
 		full_band_kurtosis: 'Curtosis de Banda Completa',
 		peak_velocity_frequency_component: 'Componente de Frecuencia de Velocidad Pico',
 		ultrasound_impact_index: 'Índice de Impacto de Ultrasonido',
-		banner_m25: 'Banner S22UVT',
+		banner_m25: 'Banner M25',
 		no_start_lubrication_command_response: 'No hay respuesta de comando de inicio de lubricación',
 		no_lubrication_status_response: 'No hay respuesta de estado de lubricación',
 		controller_timeout: 'Tiempo de espera del controlador',
@@ -1637,6 +1641,7 @@ export default {
 		no_fft_response: 'Sin respuesta FFT',
 		node_offline: 'Nodo fuera de línea',
 		unconfirmed_fft_request: 'Petición de FFT no confirmada',
+		usg: 'USg',
 	},
 
 	short_name: {

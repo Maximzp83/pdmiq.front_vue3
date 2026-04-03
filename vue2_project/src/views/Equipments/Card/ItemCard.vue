@@ -422,6 +422,13 @@ export default {
 			})) {
 				console.log('isBannerV2Generic', this.cardData.machine_name, this.cardData.asset_name);
 			}*/
+
+			/*if (this.dashboardSensors.some(sensor=>{
+				// const type = this.getType(sensor);
+				return sensor.lube_version === 3
+			})) {
+				console.log('isLubeMatrixV3', this.cardData.machine_name, this.cardData.asset_name);
+			}*/
 		}
 
 		// this.fetchMultiViews(this.cardData.id);

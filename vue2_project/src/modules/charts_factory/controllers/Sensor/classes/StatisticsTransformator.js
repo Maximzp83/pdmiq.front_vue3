@@ -61,18 +61,23 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 		return getEdgeStatisticsItems(payload, filters, settings);
 	}
 
-	actualizeSpecificationFor({statisticsKey, configKey, baseSpecification}) {
+	actualizeSpecificationFor({ statisticsKey, configKey, baseSpecification }) {
 		// Helper function to find and extract specification
-		const findSpecification = (seriesConfigSource) => {
+		const findSpecification = seriesConfigSource => {
 			// console.log(seriesConfigSource, configKey)
 			if (!seriesConfigSource) return null;
 
-			const seriesConfigsList = getObjectVal(seriesConfigSource, `${configKey}.seriesConfigsList`);
+			const seriesConfigsList = getObjectVal(
+				seriesConfigSource,
+				`${configKey}.seriesConfigsList`
+			);
 
 			if (!seriesConfigsList) return null;
 
 			for (const configItems of Object.values(seriesConfigsList)) {
-				const found = configItems.find(item => item.responseDataKey == statisticsKey);
+				const found = configItems.find(
+					item => item.responseDataKey == statisticsKey
+				);
 				if (found?.transformator_settings?.specification) {
 					return found.transformator_settings.specification;
 				}
@@ -82,17 +87,23 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 		};
 
 		// Get specifications from different sources (ordered by priority)
-		const chartConfigSpecification = findSpecification(this.resources.chart_config.seriesConfig);
+		const chartConfigSpecification = findSpecification(
+			this.resources.chart_config.seriesConfig
+		);
 		const seriesSpecification = findSpecification(this.seriesConfig);
 
 		let result = baseSpecification;
 
 		if (chartConfigSpecification) {
-			result = result ? mergeObjects(result, chartConfigSpecification) : chartConfigSpecification;
+			result = result
+				? mergeObjects(result, chartConfigSpecification)
+				: chartConfigSpecification;
 		}
 
 		if (seriesSpecification) {
-			result = result ? mergeObjects(result, seriesSpecification) : seriesSpecification;
+			result = result
+				? mergeObjects(result, seriesSpecification)
+				: seriesSpecification;
 		}
 
 		return result;
@@ -134,6 +145,8 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 		for (const statisticsKey in statistics_data) {
 			let {
 				levelZone,
+				current_threshold,
+				primary_threshold,
 				statistics,
 				// problems,
 				history,
@@ -152,12 +165,16 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 			} = statistics_data[statisticsKey];
 			// console.log('parameter', statistics_data[statisticsKey])
 
+			const currentLevelZone = current_threshold || levelZone;
+			const primaryLevelZone = primary_threshold || levelZone;
+
 			let statistics_result = resultData.statistics_result[statisticsKey] || {
 				edgeStatisticsItems: {},
-				levelZoneData: levelZone,
-				levelZones: levelZone
+				levelZoneData: currentLevelZone,
+				primaryLevelZoneData: primaryLevelZone,
+				levelZones: primaryLevelZone
 					? sensor.levelZones.filter(
-							lz => lz.parameter_type === levelZone.parameter_type
+							lz => lz.parameter_type === primaryLevelZone.parameter_type
 					  )
 					: [],
 				stat_max_value: undefined,
@@ -169,14 +186,14 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				statsData: {
 					alarm_level: null,
 					warning_level: null,
-					average_metric_value: null,
+					average_metric_value: null
 				}
 			};
 
 			// statistics_result.levelZones = sensor ? sensor.levelZones : [];
 			// console.log(statistics_result )
 
-			try {				
+			try {
 				const actualSpecification = this.actualizeSpecificationFor({
 					statisticsKey,
 					configKey: 'pointsData',
@@ -187,14 +204,28 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 
 				let enableOffAlarm = false;
 
-				if (currentSensorType && (currentSensorType.isBannerCM1L || currentSensorType.isBanner)) {
+				if (
+					currentSensorType &&
+					(currentSensorType.isBannerCM1L || currentSensorType.isBanner)
+				) {
 					if (this.requestsList[0].type != 'temperature') {
 						enableOffAlarm = true;
 					}
 				}
 
+				statistics_result.levelZoneData = currentLevelZone;
+				statistics_result.primaryLevelZoneData = primaryLevelZone;
+				statistics_result.levelZones = primaryLevelZone
+					? sensor.levelZones.filter(
+							lz => lz.parameter_type === primaryLevelZone.parameter_type
+					  )
+					: [];
+
 				if (statistics_result.levelZoneData && !enableOffAlarm) {
-					statistics_result.levelZoneData.off_alarm_zone = undefined;
+					statistics_result.levelZoneData = {
+						...statistics_result.levelZoneData,
+						off_alarm_zone: undefined
+					};
 				}
 
 				if (actualSpecification.getEdgeStatisticsItems) {
@@ -203,7 +234,8 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						this.filters,
 						{
 							// lube_statistics: newData.lube_statistics,
-							controllerTimeZone: sensor && sensor.controller ? sensor.controller.time_zone : 0
+							controllerTimeZone:
+								sensor && sensor.controller ? sensor.controller.time_zone : 0
 						}
 					);
 				}
@@ -211,7 +243,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				if (actualSpecification.setupPlotlinesData) {
 					// console.log('transform', actualSpecification.setupPlotlinesData)
 					// let setupPlotlinesData =
-					if (levelZone) {
+					if (currentLevelZone) {
 						const {
 							first_statistics_item,
 							last_statistics_item
@@ -228,7 +260,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 							first_statistics_item: first_statistics_item || [],
 							last_statistics_item: last_statistics_item || [],
 							plotLinesSettings: actualSpecification.setupPlotlinesData,
-							...levelZone
+							...currentLevelZone
 						});
 
 						statistics_result.plotlinesSeriesData = plotlinesSeriesData;
@@ -236,19 +268,26 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.historyMinValues = historyMinValues;
 						statistics_result.historyMaxValues = historyMaxValues;
 						statistics_result.plotlinesMaxValues = plotlinesMaxValues;
-						statistics_result.statsData = {...statistics_result.statsData, ...statsData};
+						statistics_result.statsData = {
+							...statistics_result.statsData,
+							...statsData
+						};
 					}
 				}
 				// --------------------
 				if (actualSpecification.setupPointsData) {
 					let zonesList;
 
-					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
+					const {
+						method,
+						enableZones,
+						skipMaxMinValues
+					} = actualSpecification.setupPointsData;
 					// console.log('setupPointsData', actualSpecification.setupPointsData)
 					if (enableZones) {
 						zonesList = setupZonesList({
 							zonesKeysList: this.zonesKeysList,
-							levelZone,
+							levelZone: currentLevelZone,
 							historyData: statistics_result.historyData
 						});
 					}
@@ -262,27 +301,31 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						filters: this.filters || {},
 						edgeStatisticsItems: statistics_result.edgeStatisticsItems,
 						plotLinesSettings: actualSpecification.setupPlotlinesData,
-						generateSeriesByStatistics: actualSpecification.generateSeriesByStatistics,
+						generateSeriesByStatistics:
+							actualSpecification.generateSeriesByStatistics,
 						history: history,
 						parameter_item,
 						flat_metric_data_anomalies,
 						...settings,
-						...actualSpecification.setupPointsData,
+						...actualSpecification.setupPointsData
 					});
 					/*console.log(parameter_item.id, {
 						...settings,
 						...actualSpecification.setupPointsData,						
 					})*/
 
-
 					// statistics_result.pointsData.statsData = statistics_result.pointsData.statsData || {};
 
-					statistics_result.stat_max_value = skipMaxMinValues ? undefined : statistics_result.pointsData.max_value;
-					statistics_result.stat_min_value = skipMaxMinValues ? undefined : statistics_result.pointsData.min_value;
+					statistics_result.stat_max_value = skipMaxMinValues
+						? undefined
+						: statistics_result.pointsData.max_value;
+					statistics_result.stat_min_value = skipMaxMinValues
+						? undefined
+						: statistics_result.pointsData.min_value;
 					statistics_result.statsData = {
-						...statistics_result.statsData,
+						...statistics_result.statsData
 						// ...statistics_result.pointsData.statsData
-					}
+					};
 					// console.log(parameter_item.id, parameter_item.name, skipMaxMinValues, statistics_result.pointsData.max_value)
 				}
 				// ---------------------
@@ -319,12 +362,18 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 							pumpData: this.sensorItem.pump
 						});
 
-						statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(si => si.isSuccess)
-						statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(si => !si.isSuccess)
+						statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(
+							si => si.isSuccess
+						);
+						statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(
+							si => !si.isSuccess
+						);
 					}
 
 					if (enable_lube && lube.lock_log.length) {
-						statistics_result.flagsData.lube_lock_logs_statistics = this.setupLubeLockLogStatistics({	lubeData: lube });
+						statistics_result.flagsData.lube_lock_logs_statistics = this.setupLubeLockLogStatistics(
+							{ lubeData: lube }
+						);
 					}
 
 					if (enable_notes && notes.length) {
@@ -361,7 +410,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						);
 					}
 
-					if (enable_issue_alerts && (issue_alerts && issue_alerts.length)) {
+					if (enable_issue_alerts && issue_alerts && issue_alerts.length) {
 						statistics_result.flagsData = {
 							...this.setupCrashesStatistics(
 								issue_alerts,
@@ -371,8 +420,9 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 					}
 
 					if (flat_metric_data_anomalies && flat_metric_data_anomalies.length) {
-						statistics_result.flagsData.flat_metric_data_anomaly_statistics =
-							this.setupFlatMetricDataAnomalyFlags(flat_metric_data_anomalies);
+						statistics_result.flagsData.flat_metric_data_anomaly_statistics = this.setupFlatMetricDataAnomalyFlags(
+							flat_metric_data_anomalies
+						);
 					}
 				}
 				// ---------------------
@@ -407,16 +457,22 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				console.warn(e);
 			}
 		}
-		
+
 		Object.keys(resultData.statistics_result).forEach(key => {
 			var { chart_first_statistics_item } = resultData.statistics_result[key];
-			
-			if (chart_first_statistics_item != null && chart_first_statistics_item.length) {
-				if (!resultData.chart_first_statistics_item || chart_first_statistics_item[0] < resultData.chart_first_statistics_item[0]) {
-					resultData.chart_first_statistics_item = chart_first_statistics_item;					
+
+			if (
+				chart_first_statistics_item != null &&
+				chart_first_statistics_item.length
+			) {
+				if (
+					!resultData.chart_first_statistics_item ||
+					chart_first_statistics_item[0] < resultData.chart_first_statistics_item[0]
+				) {
+					resultData.chart_first_statistics_item = chart_first_statistics_item;
 				}
 			}
-		})
+		});
 		// console.log(`resultData-${this.chart_id}`, resultData.chart_first_statistics_item)
 		return resultData;
 	}

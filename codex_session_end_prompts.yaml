@@ -21,5 +21,8 @@
   one step at a time, and after each step provide the result and the path to the
   newly created file in plain text.
 
+3) в папку vue2_project были внесены изменения, проанализируй эти изменения и внеси эти зменения в 
+  уже мигрированные файлы. если некоторые изменения касаются еще не мигрированных файлов то пропусти это.
+  
 
 3)  codex resume 019c9e46-4545-7511-a226-6138ff5b2521

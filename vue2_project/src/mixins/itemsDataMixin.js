@@ -337,7 +337,7 @@ const itemsDataMixin = {
 				if (this.localModalSettingsHook) {
 					modalSettings = this.localModalSettingsHook({
 						itemData: itemData,
-						modalSettings: modalSettings
+						modalSettings: modalSettings,
 					});
 				}
 				// console.log(modalSettings);
@@ -358,6 +358,10 @@ const itemsDataMixin = {
 				const refName = this.tableRefName || 'ItemsTableContainer';
 				ids = this.$refs[refName].selectedIds;
 			}
+
+			/*if (this.preDeleteItemsHook) {
+				ids = this.preDeleteItemsHook({ data, ids });
+			}*/
 
 			const confirmButtonText = settings.confirmButtonText || this.tt('Delete');
 			const methodName = settings.methodName || 'deleteItem';

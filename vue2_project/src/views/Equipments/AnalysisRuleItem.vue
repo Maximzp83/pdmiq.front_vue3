@@ -157,6 +157,7 @@
 
 <script>
 import { mapActions } from 'vuex';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { subItemMixin, fetchItemsHelper } from '@/mixins';
 
@@ -171,7 +172,8 @@ export default {
 		savingInProgress: Boolean,
 		rpm_source_value: null,
 		crossoverRulesList: null,
-		showRuleItemTextValue: Boolean
+		showRuleItemTextValue: Boolean,
+		rootFilters: { type: Object, default: () => ({}) },
 	},
 
 	data() {
@@ -208,7 +210,15 @@ export default {
 			}
 
 			if (original_rule.measurement_unit) {
-				return original_rule.measurement_unit.metric_name || original_rule.measurement_unit.imperial_name || '';
+				const { measurement } = this.rootFilters;
+				let key;
+
+				if (measurement === METRIC_SYSTEM_TYPES.METRIC) {
+					key = 'metric_name';
+				} else if (measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+					key = 'imperial_name';					
+				}
+				return original_rule.measurement_unit[key] || '';
 			}
 
 			return '';
