@@ -35,6 +35,8 @@
 - DONE (sync): applied relevant updates from latest `vue2_project` changes to already migrated files:
   `src/components/table/CustomDataListTable.vue`, `src/components/table/Row.vue`,
   `src/components/table/TableHeader.vue`, `src/views/Machines/ItemForm.vue`.
+- DONE (entity): migrated `Applications` views (`ItemsList`, `ItemForm`, `ItemPage`) and enabled routes in `src/router/index.js`.
+- DONE (entity): migrated `Processes` views (`ItemsList`, `ItemForm`, `ItemPage`, `ItemCard`, `BreakTimeItem`, `WorkDateItem`, `FaultItem`).
 - Next priority (components-first rule): migrate missing components required by current imports:
 
 - Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.

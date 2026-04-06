@@ -75,7 +75,7 @@ const setupMultipartFormData = (obj, form, namespace) => {
  */
 const apiInstance = axios.create({
 	baseURL: getBaseURL(),
-	timeout: 30000,
+	// timeout: 30000,
 	headers: {
 		'Content-Type': 'application/json',
 		'Accept': 'application/json',

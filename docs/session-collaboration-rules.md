@@ -8,6 +8,7 @@
 - After each single-file migration, stop and wait for the next user instruction.
 - For the coupled-files exception above, stop after the combined step and wait for the next user instruction.
 - Continue migrating all components from `vue2_project/src/components` and update already migrated ones if needed.
+- For migrations of entities from `vue2_project/src/views` to `src/views`, use `src/views/Plants` as the reference example/pattern.
 - During migration, replace all `@event="handleEventNew"` with `@event="handleEvent"`.
 - During migration, replace all `<CustomSelect` usages with `<CustomSelectV2`.
 - Do not display code/diff in terminal responses unless there is a risky or ambiguous point that requires discussion.

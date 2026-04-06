@@ -219,24 +219,24 @@ const routes = [
 			// 	component: () => import('@/views/Brands/ItemPage.vue'),
 			// 	meta: { auth: true, permissions: ['edit_brands'] },
 			// },
-			// {
-			// 	path: 'applications',
-			// 	name: 'Applications',
-			// 	component: () => import('@/views/Applications/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_applications'] },
-			// },
-			// {
-			// 	path: 'applications/create',
-			// 	name: 'ApplicationCreate',
-			// 	component: () => import('@/views/Applications/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['create_applications'] },
-			// },
-			// {
-			// 	path: 'applications/:id',
-			// 	name: 'ApplicationEdit',
-			// 	component: () => import('@/views/Applications/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_applications'] },
-			// },
+			{
+				path: 'applications',
+				name: 'Applications',
+				component: () => import('@/views/Applications/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_applications'] },
+			},
+			{
+				path: 'applications/create',
+				name: 'ApplicationCreate',
+				component: () => import('@/views/Applications/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_applications'] },
+			},
+			{
+				path: 'applications/:id',
+				name: 'ApplicationEdit',
+				component: () => import('@/views/Applications/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_applications'] },
+			},
 			// {
 			// 	path: 'store-rooms',
 			// 	name: 'StoreRooms',

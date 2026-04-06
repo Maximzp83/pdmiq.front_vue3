@@ -372,10 +372,10 @@ const menuItems1 = [
 	// 	]
 	// },
 
-	// {
-	// 	name: 'sidebar_menu.asset_management',
-	// 	category_label: 'asset_management'
-	// },
+	{
+		name: 'sidebar_menu.asset_management',
+		category_label: 'asset_management'
+	},
 	// {
 	// 	name: 'sidebar_menu.Library',
 	// 	belongs_to_label: 'asset_management',
@@ -423,14 +423,14 @@ const menuItems1 = [
 	// 		}
 	// 	]
 	// },
-	// {
-	// 	name: 'Applications',
-	// 	belongs_to_label: 'asset_management',
-	// 	id: MENU_TYPES.APPLICATIONS,
-	// 	icon: 'icon-applications2',
-	// 	path: '/applications',
-	// 	meta: { permissions: ['view_applications'] }
-	// },
+	{
+		name: 'Applications',
+		belongs_to_label: 'asset_management',
+		id: MENU_TYPES.APPLICATIONS,
+		icon: 'icon-applications2',
+		path: '/applications',
+		meta: { permissions: ['view_applications'] }
+	},
 	// {
 	// 	name: 'storerooms',
 	// 	belongs_to_label: 'asset_management',

@@ -268,6 +268,31 @@ await fetchUsers({ page: 1 });
     - Restored row-select restrictions and disabled `check all` when no selectable rows are available
     - Added `silence_mode_until` UI + submit normalization for Machines form
     - Skipped Vue2 changes for files that are not yet migrated in Vue3
+- [x] Entity migration: `Applications` from `vue2_project/src/views` to `src/views`
+  - Added:
+    - `src/views/Applications/ItemsList.vue`
+    - `src/views/Applications/ItemForm.vue`
+    - `src/views/Applications/ItemPage.vue`
+  - Updated:
+    - `src/router/index.js`
+  - Notes:
+    - Migrated as one coupled step using `src/views/Plants` as the reference pattern
+    - Preserved page flow and modal form support for creation from Machines
+    - ESLint check passed
+- [x] Entity migration: `Processes` from `vue2_project/src/views` to `src/views`
+  - Added:
+    - `src/views/Processes/ItemsList.vue`
+    - `src/views/Processes/ItemForm.vue`
+    - `src/views/Processes/ItemPage.vue`
+    - `src/views/Processes/ItemCard.vue`
+    - `src/views/Processes/BreakTimeItem.vue`
+    - `src/views/Processes/WorkDateItem.vue`
+    - `src/views/Processes/FaultItem.vue`
+  - Notes:
+    - Migrated as one coupled step using `src/views/Plants` as the reference pattern
+    - Preserved grid list, websocket live updates, delete flow, and sub-item form blocks
+    - `Details` action currently routes to `/processes/:id` because legacy `/processes/:id/details` is not migrated yet
+    - ESLint check passed
     - Applied only functional sync updates where logic drift was detected
     - ESLint check passed for updated files
 - [x] Chunk C-005: router unblock for missing Plants view targets

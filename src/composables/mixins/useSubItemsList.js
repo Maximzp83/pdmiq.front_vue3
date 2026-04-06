@@ -2,9 +2,28 @@ import uniqid from 'uniqid';
 import { validateBySettings } from '@/helpers';
 import isEmpty from 'lodash/isEmpty';
 
-export function useSubItemsList({ formData, refsMap } = {}) {
+export function useSubItemsList({ formData, refsMap, state } = {}) {
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+
+	const resolveListTarget = (list) => {
+		if (list && typeof list === 'object' && 'value' in list && Array.isArray(list.value)) {
+			return { list: list.value, ref: list, key: null };
+		}
+
+		if (Array.isArray(list)) {
+			return { list, ref: null, key: null };
+		}
+
+		if (typeof list === 'string') {
+			const localState = resolve(state);
+			if (localState && Array.isArray(localState[list])) {
+				return { list: localState[list], ref: null, key: list };
+			}
+		}
+
+		return { list: null, ref: null, key: null };
+	};
 
 	const setupFormSubItemsList = (dataList, uniqidPrefix) => {
 		const itemsList = [];
@@ -29,24 +48,37 @@ export function useSubItemsList({ formData, refsMap } = {}) {
 			...localFormData,
 		};
 
-		const target = resolve(list);
-		if (Array.isArray(target)) {
-			target[method](newItem);
-		} else {
+		const { list: targetList, ref } = resolveListTarget(list);
+		if (!targetList) {
 			console.warn('[useSubItemsList] List not found');
+			return;
+		}
+
+		if (ref) {
+			ref.value[method](newItem);
+		} else {
+			targetList[method](newItem);
 		}
 	};
 
 	const removeFormItem = (id, list) => {
-		const target = resolve(list);
-		if (Array.isArray(target)) {
-			const filtered = target.filter((o) => o.id !== id);
-			if (list && 'value' in list) {
-				list.value = filtered;
-			} else {
-				target.length = 0;
-				Array.prototype.push.apply(target, filtered);
+		const { list: targetList, ref, key } = resolveListTarget(list);
+		if (!targetList) {
+			console.warn('[useSubItemsList] List not found');
+			return;
+		}
+
+		const filtered = targetList.filter((o) => o.id !== id);
+		if (ref) {
+			ref.value = filtered;
+		} else if (key) {
+			const localState = resolve(state);
+			if (localState) {
+				localState[key] = filtered;
 			}
+		} else {
+			targetList.length = 0;
+			Array.prototype.push.apply(targetList, filtered);
 		}
 	};
 
@@ -78,6 +110,12 @@ export function useSubItemsList({ formData, refsMap } = {}) {
 	};
 
 	const applyDataUpdate = (context) => {
+		if (context.settings.onCollectDataCallback) {
+			context = context.settings.onCollectDataCallback(context);
+
+			if (context?.itemIsReady) return;
+		}
+
 		const { targetProp, returnArray, concatData, skipReturnData } = context.settings;
 		const { collectedValue, collectedData } = context;
 		const currentFormData = resolve(formData) || {};
@@ -167,7 +205,7 @@ export function useSubItemsList({ formData, refsMap } = {}) {
 		let refsList = refs[settingsItem.ref];
 		if (refsList) {
 			refsList = Array.isArray(refsList) ? refsList : [refsList];
-			refsList.forEach((Instance) => operation(Instance));
+			refsList.filter(Boolean).forEach((Instance) => operation(Instance));
 		}
 	};
 

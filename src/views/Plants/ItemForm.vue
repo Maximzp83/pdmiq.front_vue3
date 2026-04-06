@@ -9,7 +9,7 @@
 			:label-position="isMobile ? 'top' : 'left'"
 		>
 			<el-form-item v-if="!hideCompanies && isIndustrialMatrix" :label="tt('Company')" prop="company_id">
-				<CustomSelectV
+				<CustomSelectV2
 					v-model="formData.company_id"
 					filterable
 					:optionsLoading="companiesLoading"
@@ -19,7 +19,7 @@
 			</el-form-item>
 
 			<el-form-item v-if="isIndustrialMatrix || adminsList.length" label="IM CSM" prop="im_csms">
-				<CustomSelectV
+				<CustomSelectV2
 					v-model="formData.im_csms"
 					filterable
 					multiple
@@ -32,7 +32,7 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('Champions')" prop="champions">
-				<CustomSelectV
+				<CustomSelectV2
 					v-model="formData.champions"
 					filterable
 					multiple
@@ -110,7 +110,7 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('Measurement')" prop="metric_system_type">
-				<CustomSelectV
+				<CustomSelectV2
 					v-model="formData.metric_system_type"
 					:optionsList="metricSystems"
 					:placeholder="`${tt('select')} ${tt('system')}`"
@@ -118,7 +118,7 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('phrases.industrial_services')" prop="industrial_service_ids">
-				<CustomSelectV
+				<CustomSelectV2
 					v-model="formData.industrial_service_ids"
 					filterable
 					multiple
@@ -216,7 +216,6 @@ import { useItemForm } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
-import CustomInput from '@/components/form/CustomInput.vue';
 import Datepicker from '@/components/common/Datepicker.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';

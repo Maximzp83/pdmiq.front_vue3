@@ -27,12 +27,12 @@ import './assets/sass/app.scss';
 
 
 import CustomInput from '@/components/form/CustomInput.vue';
-import CustomSelectV from '@/components/form/CustomSelectV2.vue';
+import CustomSelectV2 from '@/components/form/CustomSelectV2.vue';
 
 const app = createApp(App);
 
 app.component('CustomInput', CustomInput);
-app.component('CustomSelectV', CustomSelectV);
+app.component('CustomSelectV2', CustomSelectV2);
 
 app.use(createPinia());
 app.use(router);
