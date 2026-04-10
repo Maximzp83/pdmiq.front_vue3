@@ -56,13 +56,6 @@ export default {
 		}
 	},
 
-	data() {
-		return {
-			// openCreateForm: false,
-			// collectedData: []
-		};
-	},
-
 	computed: {
 		...mapState({
 			filters: state => state.measurement_units.filters
@@ -93,14 +86,14 @@ export default {
 				actions.push(standardTableOperations.edit);
 			}
 			if (this.hasAccesToDelete) {
-				actions.push({					
+				actions.push({
 					...standardTableOperations.delete,
 					conditionSettings: {
 						conditions: [
 							{
 								prop: 'is_locked',
 								method: '==',
-								control_value: false,
+								control_value: false
 							}
 						]
 					}
@@ -128,6 +121,15 @@ export default {
 					{
 						prop: 'to_metric_formula',
 						label: tt('phrases.Imperial_To_metric_formula')
+					},
+					{
+						prop: 'last_event',
+						label: 'Created By',
+						meta: {
+							cellComponent: {
+								componentPath: 'views/Settings/MeasurementUnits/CreatedInfoTableCell'
+							}
+						}
 					}
 				],
 				operations: {
@@ -161,12 +163,12 @@ export default {
 			set_filters: 'measurement_units/set_measurement_units_filters'
 		}),
 
-		localModalSettingsHook({modalSettings, itemData}) {
+		localModalSettingsHook({ modalSettings, itemData }) {
 			if (itemData && itemData.is_locked) {
 				modalSettings.hideSubmitButtons = true;
 			}
 			return modalSettings;
-		},
+		}
 
 		// localRouteQueryHandler:()=>null,
 

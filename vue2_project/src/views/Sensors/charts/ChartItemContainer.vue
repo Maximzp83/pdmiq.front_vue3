@@ -55,6 +55,7 @@
 								:chartIsInit="chartRendering"
 								:showHistory="additionalProps.showHistory"
 							/>
+								<!-- :ChartAPI="ChartAPI" -->
 
 							<ChartThresholdsOperations
 								v-if="
@@ -632,6 +633,7 @@ export default {
 			);
 		},
 		zoomYAxis(data) {
+			// console.log(data)
 			this.ChartInstance.ChartAPI.yAxis[0].setExtremes(...data);
 		},
 

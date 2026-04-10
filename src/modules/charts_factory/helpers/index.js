@@ -137,14 +137,52 @@ const yAxisTickPositioner1 = (min, max, settings = {}) => {
 		const { withoutRoundExtremes } = settings;
 
 		if (min !== undefined && max !== undefined) {
-			const firstPosition = withoutRoundExtremes
-				? min
-				: getRoundedValue(min, 0, countDecimalOrder(min) + 1);
+			const diff = (max - min) / 4;
+
+			if (withoutRoundExtremes) {
+				const positions = [min];
+				const roundTickValue = value => {
+					if (diff > 3) {
+						return roundNearest(5, value);
+					} else if (diff > 1) {
+						return Math.round(value);
+					} else if (diff > 0.5) {
+						return roundNearest(0.5, value) || 0.5;
+					} else if (diff > 0.1) {
+						return roundNearest(0.1, value) || 0.1;
+					} else if (diff > 0.01) {
+						return roundNearest(0.05, value) || 0.01;
+					} else if (diff > 0.001) {
+						return roundNearest(0.005, value) || 0.001;
+					}
+
+					return value;
+				};
+
+				for (let idx = 1; idx < 4; idx++) {
+					positions.push(roundTickValue(min + diff * idx));
+				}
+
+				const lastStep = positions[positions.length - 1] - positions[positions.length - 2];
+				let lastTick = positions[positions.length - 1] + lastStep;
+
+				if (lastTick < max) {
+					lastTick = roundTickValue(max);
+				}
+
+				if (lastTick < max) {
+					lastTick = max;
+				}
+
+				positions.push(lastTick);
+				return positions;
+			}
+
+			const firstPosition = getRoundedValue(min, 0, countDecimalOrder(min) + 1);
 			// console.log('min', min, 'max', max)
 			let positions = [firstPosition],
-				tick = withoutRoundExtremes ? min : roundNearest(5, Math.floor(min));
+				tick = roundNearest(5, Math.floor(min));
 
-			const diff = (max - min) / 4;
 			let incr_rounded;
 
 			if (diff > 3) {
@@ -166,16 +204,10 @@ const yAxisTickPositioner1 = (min, max, settings = {}) => {
 
 			if (increment !== 0 && max !== null && min !== null) {
 				for (tick; tick - increment <= max; tick += increment) {
-					// console.log('tick', tick, increment)
-
 					if (tick > min) {
 						positions.push(getRoundedValue(tick, 0, countDecimalOrder(tick) + 1));
 					}
 				}
-			}
-
-			if (withoutRoundExtremes) {
-				positions.splice(-1, 1, max);
 			}
 
 			return positions;

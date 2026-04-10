@@ -12,19 +12,22 @@
 - Replace `@event="handleEventNew"` with `@event="handleEvent"` during migration.
 - Replace `<CustomSelect...>` usages with `<CustomSelectV2...>` during migration.
 - For migrations from `vue2_project/src/views` to `src/views`, use `src/views/Plants` as the reference pattern.
-- Work one step at a time; exception allowed only for tightly coupled parent/child or structurally linked files.
+- Work one step at a time; only use combined multi-file steps for tightly coupled files.
 - Apply changes only after user confirmation; ask first on risky or ambiguous points.
 
 ## Current task status
-- Vue2 -> Vue3 migration is active across `src/components/*` and `src/views/*`.
-- Recently completed `src/views` entity migrations:
+- Vue2 -> Vue3 migration is active across `src/components/*`, `src/views/*`, and shared runtime files.
+- Recently migrated `src/views` entities:
   - `Applications`
   - `Processes`
-- Recent sync from changed legacy files was applied to:
+- Latest sync from changed `vue2_project` was applied only to already migrated/shared files:
   - `src/components/table/CustomDataListTable.vue`
   - `src/components/table/Row.vue`
   - `src/components/table/TableHeader.vue`
   - `src/views/Machines/ItemForm.vue`
+  - `src/modules/charts_factory/helpers/index.js`
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
+  - `src/helpers/eventLogs.js`
 
 ## Files already modified
 - `src/views/Plants/ItemForm.vue`
@@ -48,6 +51,9 @@
 - `src/views/Processes/WorkDateItem.vue`
 - `src/views/Processes/FaultItem.vue`
 - `src/router/index.js`
+- `src/modules/charts_factory/helpers/index.js`
+- `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
+- `src/helpers/eventLogs.js`
 
 ## Unresolved issues
 - Runtime verification is still needed for `/plants` and `/dashboard/plant`.
@@ -56,6 +62,7 @@
 - `src/views/Plants/Details/DetailsPage.vue` is still unfinished relative to legacy behavior.
 - `src/components/layout/TopNavbar.vue` still needs a final functional verification pass.
 - In `Processes`, the legacy details target `/processes/:id/details` is not migrated yet; current `Details` action routes to `/processes/:id`.
+- Legacy has new not-yet-migrated settings/event-log files under `vue2_project/src/views/Settings/EventLogs` plus related route/store changes; these were intentionally not ported because the corresponding Vue3 views are not migrated yet.
 
 ## Next actionable step
 1. Run runtime checks for `/plants`, `/dashboard/plant`, `/applications`, and `/processes`.

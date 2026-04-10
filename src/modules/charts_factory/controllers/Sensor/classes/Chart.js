@@ -73,7 +73,7 @@ class SensorChartBase extends ChartBase {
 		// console.log('constructor', resources)
 		// resources.payload_3 = {
 		let options = {
-			chart: { type: 'column', zoomType: 'xy' /*animation: false*/ },
+			chart: { type: 'column' /*zoomType: 'xy'*/ /*animation: false*/ },
 			/*xAxis: {
 				type: 'datetime',
 				ordinal: false,
@@ -164,11 +164,15 @@ class SensorChartBase extends ChartBase {
 		this.lastInitialRedrawComplete;
 
 		// ----------- yAxis custom min values ----------------
+		// console.log(sensorType, currentSensorType)
 		if (sensorType == 'ultrasound') {
 			const { isUltrasoundDB, isUltrasoundFullSpectrum } = currentSensorType;
 			if (!isUltrasoundDB) {
 				chart_config.yAxisOptions = { min: isUltrasoundFullSpectrum ? 19 : 32 };
 			}
+			chart_config.yAxisOptions.startOnTick = false;
+			chart_config.customYAxisTickPositioner = (min, max) =>
+				yAxisTickPositioner(min, max, { withoutRoundExtremes: true });
 		}
 
 		if (sensorType == 'banner_sdt_decibell') {
@@ -183,11 +187,17 @@ class SensorChartBase extends ChartBase {
 			} else {
 				chart_config.yAxisOptions = { min: 36 };
 			}
+			chart_config.yAxisOptions.startOnTick = false;
+			chart_config.customYAxisTickPositioner = (min, max) =>
+				yAxisTickPositioner(min, max, { withoutRoundExtremes: true });
 		}
 
 		if (sensorType == 'ncd_ultrasound') {
 			this.transformator_settings.specification.setupFlagsData.enable_adjustments = true;
 			chart_config.yAxisOptions = { min: 19 };
+			chart_config.yAxisOptions.startOnTick = false;
+			chart_config.customYAxisTickPositioner = (min, max) =>
+				yAxisTickPositioner(min, max, { withoutRoundExtremes: true });
 		}
 
 		if (
@@ -196,6 +206,7 @@ class SensorChartBase extends ChartBase {
 		) {
 			chart_config.yAxisOptions = { min: 0 };
 		}
+		// console.log('yAxisOptions', chart_config.yAxisOptions)
 
 		resources.y_filters = resources.y_filters || {};
 		// console.log('1', resources.y_filters, chart_id, resources.y_filters[chart_id])
@@ -370,7 +381,7 @@ class SensorChartBase extends ChartBase {
 			// -----------------
 			const YAxisList = resources.chart_config.YAxisList || [requestsList[0]];
 			const yAxisOptions = resources.chart_config.yAxisOptions || {};
-			// const { customYAxisTickPositioner } = resources.chart_config;
+			const { customYAxisTickPositioner } = resources.chart_config;
 			// console.log('localSetupYAxis', requestsList[0])
 			const unit_type_name = this.resolveUnitTypeName(requestsList[0]);
 
@@ -393,10 +404,10 @@ class SensorChartBase extends ChartBase {
 					},
 					startOnTick: true,
 					opposite: false,
-					/*tickPositioner:
+					tickPositioner:
 						customYAxisTickPositioner !== undefined
 							? customYAxisTickPositioner
-							: yAxisTickPositioner,*/
+							: undefined,
 					// alignTicks: false,
 					...yAxisOptions,
 					// ...injectOptions

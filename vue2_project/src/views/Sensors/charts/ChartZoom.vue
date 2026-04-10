@@ -42,9 +42,6 @@ export default {
 	methods: {
 		zoomYAxis(multiplier) {
 			try {
-				// const yAxis = this.ChartAPI.yAxis[0];
-				// debugger
-				// const { min } = yAxis.getExtremes();
 				this.initialChartYAxisMin = this.initialChartYAxisMin || 0;
 
 				let newMin = this.currentChartYAxisMin;
@@ -124,12 +121,20 @@ export default {
 					chart_points_max_value,
 					chart_all_data_min_value
 				} = this.ChartInstance.getTransformedStatistics();
+
+				const { yAxis } = this.ChartInstance.options;
+				const { min } = yAxis[0];
 				// const { min, max, dataMax } = this.ChartAPI.yAxis[0].getExtremes();
 				// console.log(this.showHistory)
 				// this.initialChartYAxisMax = dataMax > max ? dataMax : max;
 				this.initialChartYAxisMax = this.showHistory ? chart_all_data_max_value : chart_points_max_value;
 				this.initialChartYAxisMin = chart_all_data_min_value < 0 ?
-					chart_all_data_min_value : 0;
+					chart_all_data_min_value : min;
+
+				// debugger
+					/*this.ChartAPI.yAxis[0].setExtremes(this.initialChartYAxisMin, this.initialChartYAxisMax, true);*/
+				/*const { min: factMin } = this.ChartAPI.yAxis[0].getExtremes();
+				console.log('min', factMin, this.initialChartYAxisMin)*/
 			}
 		},
 

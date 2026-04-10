@@ -1189,7 +1189,7 @@ export default {
 		},
 
 		'filters.isShowList'(isShow) {
-			console.log('filters.isShowList', isShow)
+			// console.log('filters.isShowList', isShow)
 
 			if (isShow && !this.equipmentTypesList.length) {
 				this.fetchEquipmentTypes();
@@ -1197,7 +1197,7 @@ export default {
 		},
 
 		'filters.storeroomId'(id) {
-			console.log('filters.storeroomId', id)
+			// console.log('filters.storeroomId', id)
 			if (!id) {
 				this.preventFetch = true;
 				this.setFilters({ storeroomLocationId: null });
@@ -1205,7 +1205,7 @@ export default {
 		},
 
 		'filters.hasSensors'(has) {
-			console.log('filters.hasSensors', has)
+			// console.log('filters.hasSensors', has)
 			if (!has) {
 				this.preventFetch = true;
 				this.setFilters({ archivedNodes: null, sensor_class: null });

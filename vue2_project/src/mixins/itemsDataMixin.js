@@ -337,7 +337,7 @@ const itemsDataMixin = {
 				if (this.localModalSettingsHook) {
 					modalSettings = this.localModalSettingsHook({
 						itemData: itemData,
-						modalSettings: modalSettings,
+						modalSettings: modalSettings
 					});
 				}
 				// console.log(modalSettings);
