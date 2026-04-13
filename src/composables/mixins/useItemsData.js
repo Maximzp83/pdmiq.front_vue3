@@ -1,4 +1,4 @@
-import { ref, shallowReactive, watch, onBeforeMount, onMounted } from 'vue';
+import { ref, shallowReactive, watch, onBeforeMount } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
@@ -29,7 +29,8 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
  * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, itemRoute, filters: filtersRef, options = {}, itemsName }) {
+export function useItemsData({ apiRoute, itemRoute, filters, options = {}, itemsName, itemStore, itemFiltersName }) { 
+
 	const route = useRoute();
 	const globalStore = useGlobalStore();
 	const { set_value: set_global_store } = globalStore;
@@ -43,6 +44,7 @@ export function useItemsData({ apiRoute, itemRoute, filters: filtersRef, options
 	const meta = ref({});
 	const itemData = ref(null);
 	const preventFetch = ref(false);
+	const filtersRef = itemStore ? storeToRefs(itemStore).filters : filters;
 
 	const {
 		manual = false,
@@ -215,13 +217,35 @@ export function useItemsData({ apiRoute, itemRoute, filters: filtersRef, options
 	const setFilters = (newFiltersValues, settings = {}) => {
 		if (!filtersRef) return;
 
+		for (let item in newFiltersValues) {
+			// console.log( item, filters[item], typeof item, filters[item] instanceof Array )
+			if (newFiltersValues[item] instanceof Array) {
+				//
+			} else {
+				if (typeof newFiltersValues[item] != 'boolean') {
+					const new_value = newFiltersValues[item] ? +newFiltersValues[item] : newFiltersValues[item];
+					// console.log(new_value, newFiltersValues[item])
+					newFiltersValues[item] =
+						!!new_value && !Number.isNaN(new_value) ? new_value : newFiltersValues[item];
+				}
+			}
+		}
+
 		let newFilters = { ...filtersRef.value, ...newFiltersValues };
 
 		if (!settings.preventResetPage) {
 			newFilters.page = 1;
 		}
 
-		filtersRef.value = newFilters;
+		settings = {
+			toLocalStorage: { prop: itemFiltersName },
+			...settings
+		}
+
+		itemStore.set_value('filters', newFilters, settings);
+
+
+		// filtersRef.value = newFilters;
 	};
 
 	/**

@@ -192,6 +192,10 @@ await fetchUsers({ page: 1 });
   - `useItemsData.createItem()` opens `${itemRoute}/new`
   - `src/views/Plants/ItemPage.vue` now treats `route.params.id === 'new'` as create mode
   - Create mode opens empty form with `itemData = null` and skips item fetch
+- [x] `useItemsData` filters watcher restored after store `set_value` migration
+  - Root cause: `ref(itemStore.filters)` captured the old filters object and stopped tracking replacements
+  - Fixed by binding `filtersRef` to `storeToRefs(itemStore).filters`
+  - Kept backward compatibility for views that still pass plain `filters`
 - [x] useActionButtons (from actionButtonsMixin)
 - [x] useEventEmitter/useEventHandler (normalized event payloads)
 - [x] useCreateFormItem (from createFormItemMixin)

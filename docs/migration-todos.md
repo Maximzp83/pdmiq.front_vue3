@@ -36,6 +36,7 @@
 - DONE (single-file): aligned `src/composables/mixins/useItemsData.js` to use top-level `itemRoute` for create/edit and `apiRoute` for delete; removed `resolveRoutePath`.
 - DONE (coupled step): aligned `handleDeleteItems -> deleteItem` to legacy `ids` flow and passed `itemsTableRef` from `src/views/Plants/ItemsList.vue` into `useItemsData`.
 - DONE (coupled step): aligned create flow to legacy `/new` pattern by handling `route.params.id === 'new'` in `src/views/Plants/ItemPage.vue` and keeping `itemData` empty without fetch.
+- DONE (single-file): restored `useItemsData` filters watcher after switching entity filter updates to store `set_value`.
 - DONE (batch): migrated missing `src/views/Plants` files and replaced `ItemPage.vue` stub.
 - DONE (single-file): migrated `src/views/Plants/ItemsList.vue` to full list page behavior.
 - DONE (single-file): modernized `src/components/common/PaginationContainer.vue` to remove ElPagination deprecated usage.

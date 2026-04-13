@@ -12,7 +12,7 @@ export const commonStoreMixin = {
   actions: {
     set_value(key, value, settings = {}) {
       this[key] = value;
-      // console.log('set_value', value, this[key])
+      // console.log('set_value', key, value, settings)
       if (settings.toLocalStorage) {
         const { prop } = settings.toLocalStorage;
         localStorage.setItem(prop, JSON.stringify(value));

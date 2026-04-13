@@ -93,7 +93,8 @@ const { changeRoute } = useNavigation();
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	apiRoute: '/plants',
 	itemRoute: '/plants',
-	filters,
+	itemFiltersName: 'plants_filters',
+	itemStore: plantsStore,
 	itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
