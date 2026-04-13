@@ -44,7 +44,7 @@ const loadContent = ref(false);
 
 const itemsName = computed(() => ({ one: Lang.tt('Plant'), mult: Lang.tt('Plants') }));
 
-const isCreateMode = computed(() => route.name === 'PlantCreate');
+const isCreateMode = computed(() => route.params.id === 'new');
 
 const setupNavbar = () => {
 	globalStore.setup_navbar({
@@ -54,46 +54,50 @@ const setupNavbar = () => {
 	});
 };
 
-const fetchItem = async () => {
+const fetchItem = () => {
 	if (isCreateMode.value) {
+		itemData.value = null;
 		loadContent.value = true;
 		setupNavbar();
-		return;
+		return Promise.resolve(null);
 	}
 
 	itemLoading.value = true;
-	try {
-		const { value } = await api_request.get(`/plants/${route.params.id}`, {
+	return api_request
+		.get(`/plants/${route.params.id}`, {
 			notNotify: true,
+		})
+		.then(({ value }) => {
+			itemData.value = value;
+			loadContent.value = true;
+			setupNavbar();
+			return value;
+		})
+		.finally(() => {
+			itemLoading.value = false;
 		});
-		itemData.value = value;
-		loadContent.value = true;
-		setupNavbar();
-	} finally {
-		itemLoading.value = false;
-	}
 };
 
-const handleSubmitForm = async (data) => {
+const handleSubmitForm = (data) => {
 	itemSaving.value = true;
-	try {
-		if (isCreateMode.value) {
-			await api_request.post('/plants', { data, itemName: itemsName.value.one });
-		} else {
-			await api_request.put(`/plants/${route.params.id}`, {
+	const request = isCreateMode.value
+		? api_request.post('/plants', { data, itemName: itemsName.value.one })
+		: api_request.put(`/plants/${route.params.id}`, {
 				data,
 				itemName: itemsName.value.one,
 			});
-		}
-
-		await globalStore.fetch_global_plants({
+	return request
+		.then(() =>
+			globalStore.fetch_global_plants({
 			params: { max: -1, orderByColumn: 'name', orderByMethod: 'asc' },
+			})
+		)
+		.then(() => {
+			changeRoute({ path: '/plants' });
+		})
+		.finally(() => {
+			itemSaving.value = false;
 		});
-
-		changeRoute({ path: '/plants' });
-	} finally {
-		itemSaving.value = false;
-	}
 };
 
 const handleCloseButton = () => {

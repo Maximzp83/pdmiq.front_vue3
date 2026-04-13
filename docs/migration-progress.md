@@ -172,6 +172,26 @@ await fetchUsers({ page: 1 });
 
 ## Phase 3 — Composables
 - [ ] Migrate mixins → composables
+- [x] `useItemsData` updated for list-action callbacks + promise-style async flow
+  - Added callback hooks for `createItem`, `editItem`, `handleDeleteItems`
+  - Exposed list-action methods from composable for view-level wiring
+  - Normalized fetch flow to `.then/.catch/.finally`
+- [x] `useItemsData` extended with built-in route/delete list actions
+  - Supports `createItemRoute`, `editItemRoute`, and `deleteItemRoute`
+  - Added shared `deleteItem()` and wired `handleDeleteItems()` through it
+  - `src/views/Plants/ItemsList.vue` now consumes composable-provided create/edit/delete actions
+- [x] `useItemsData` aligned to `itemRoute` + `apiRoute` convention
+  - `createItem()` and `editItem()` now build routes from top-level `itemRoute`
+  - `deleteItem()` now uses top-level `apiRoute`, same as `fetchItems()`
+  - Removed `resolveRoutePath` helper
+- [x] `useItemsData` delete flow aligned with legacy `itemsDataMixin`
+  - `handleDeleteItems()` now collects `ids` from row payload or table selection
+  - `deleteItem()` now works through `ids` payload instead of single-row route delete
+  - `src/views/Plants/ItemsList.vue` passes table ref into composable for bulk-delete support
+- [x] `createItem` / `ItemPage` create-mode flow aligned with legacy `/new` pattern
+  - `useItemsData.createItem()` opens `${itemRoute}/new`
+  - `src/views/Plants/ItemPage.vue` now treats `route.params.id === 'new'` as create mode
+  - Create mode opens empty form with `itemData = null` and skips item fetch
 - [x] useActionButtons (from actionButtonsMixin)
 - [x] useEventEmitter/useEventHandler (normalized event payloads)
 - [x] useCreateFormItem (from createFormItemMixin)
@@ -210,6 +230,13 @@ await fetchUsers({ page: 1 });
 ## Phase 4 — Components
 - [ ] Vue2 → Vue3 syntax
 - [ ] Element UI → Element Plus
+- [x] Single-file: added base chart component `src/components/charts/ChartWrapper.vue`
+  - Created Vue3 wrapper for global `highcharts-vue` usage
+  - ESLint check passed
+- [x] Single-file: migrated `src/views/MaintenanceCategories/ItemsList.vue`
+  - Replaced Vuex/mixins list page with `Pinia` + `useItemsData` + `useEventHandler`
+  - Preserved permissions, filterbar, table operations, pagination, and delete flow
+  - ESLint check passed
 - [x] Chunk C-001: migrated Plants sub-item components from `subItemMixin` to `useSubItem`
   - `src/views/Plants/LocationItem.vue`
   - `src/views/Plants/WorkStationItem.vue`

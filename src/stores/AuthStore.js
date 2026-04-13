@@ -46,6 +46,7 @@ export const useAuthStore = defineStore('authStore', {
 		 * @param {Object} user - User object
 		 */
 		set_auth_user(user) {
+			// console.log('set_autj_user', user)
 			const { role, temp_role } = user;
 			const actual_role = temp_role || role;
 
@@ -53,7 +54,6 @@ export const useAuthStore = defineStore('authStore', {
 
 			this.preventRequests = false;
 			this.authUser = user;
-			this.isAuthenticated = true;
 			this.isIndustrialMatrix =
 				actual_role &&
 				(actual_role.type === USER_ROLES_TYPES.INDUSTRIAL_MATRIX ||
@@ -61,6 +61,7 @@ export const useAuthStore = defineStore('authStore', {
 			this.isCustomer = actual_role && actual_role.type === USER_ROLES_TYPES.CUSTOMER;
 			this.isDeveloper =
 				actual_role && actual_role.type === USER_ROLES_TYPES.DEVELOPER;
+			this.isAuthenticated = true;
 		},
 
 		/**
@@ -185,7 +186,6 @@ export const useAuthStore = defineStore('authStore', {
 
 					// Set user language
 					Lang.set(user.language);
-
 					// Update auth store
 					this.set_auth_user(user);
 				}

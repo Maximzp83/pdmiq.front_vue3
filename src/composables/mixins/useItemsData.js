@@ -1,9 +1,12 @@
-import { ref, shallowReactive, watch, onMounted, onBeforeMount, onBeforeUnmount } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { ref, shallowReactive, watch, onBeforeMount, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { ElMessageBox } from 'element-plus';
 import { api_request } from '@/api/request_provider.js';
 import { prepareRangeParams } from '@/helpers';
+import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
+import { useNavigation } from '@/composables/mixins/useNavigation';
 
 /**
  * Composable for managing items data with API calls
@@ -26,12 +29,13 @@ import { useGlobalStore } from '@/stores/GlobalStore';
  * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, filters: filtersRef, options = {}, itemsName }) {
+export function useItemsData({ apiRoute, itemRoute, filters: filtersRef, options = {}, itemsName }) {
 	const route = useRoute();
-	const router = useRouter();
 	const globalStore = useGlobalStore();
 	const { set_value: set_global_store } = globalStore;
 	const { globalFilters } = storeToRefs(globalStore);
+	const { changeRoute } = useNavigation();
+	const { tt } = Lang;
 
 	// ========== State ==========
 	const itemsList = ref([]);
@@ -53,6 +57,11 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 		showToggleListButton = false,
 		excludeGlobFilters = [],
 		requestOptions = {},
+		tableRef,
+		localCreateItem,
+		localEditItem,
+		localDeleteItem,
+		localDeleteItems,
 	} = options;
 
 	// ========== Computed-like ==========
@@ -75,6 +84,9 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 		showFilter: true,
 		pageTitle: itemsName && itemsName.value ? itemsName.value.mult : ''
 	});
+
+	const resolve = (val) =>
+		val && typeof val === 'object' && 'value' in val ? val.value : val;
 
 	// ========== Methods ==========
 
@@ -148,7 +160,7 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 	 * @param {Object} additionalOptions - Additional request options
 	 * @returns {Promise} API response
 	 */
-	const fetchItems = async (filters = {}, additionalOptions = {}) => {
+	const fetchItems = (filters = {}, additionalOptions = {}) => {
 		// Check showToggleListButton condition
 		if (showToggleListButton && filtersRef?.value && !filtersRef.value.isShowList) {
 			return Promise.resolve([]);
@@ -166,26 +178,20 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 			...additionalOptions,
 		};
 
-		try {
-			return new Promise((resolve, reject) => {
-				api_request.get(apiRoute, payload)
-					.then(({ value, fetchedMeta }) => {
-						// console.log(value)
-						itemsList.value = value;
-						if (fetchedMeta) meta.value = fetchedMeta;
-						itemsLoading.value = false;
-						resolve({ value, meta: fetchedMeta });
-					})
-					.catch((error) => {
-						itemsLoading.value = false;
-						reject(error);
-					});
+		return api_request
+			.get(apiRoute, payload)
+			.then(({ value, fetchedMeta }) => {
+				itemsList.value = value;
+				if (fetchedMeta) meta.value = fetchedMeta;
+				return { value, meta: fetchedMeta };
+			})
+			.catch((error) => {
+				console.error(`[useItemsData] fetch error:`, error);
+				return Promise.reject(error);
+			})
+			.finally(() => {
+				itemsLoading.value = false;
 			});
-		} catch (error) {
-			itemsLoading.value = false;
-			console.error(`[useItemsData] fetch error:`, error);
-			throw error;
-		}
 	};
 
 	/**
@@ -193,7 +199,7 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 	 */
 	const refetchItemsList = () => {
 		const filters = filtersRef?.value || {};
-		fetchItems({
+		return fetchItems({
 			...globalFilters.value,
 			...filters,
 			...getPreventedFilters()
@@ -227,6 +233,90 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 	const setFiltersWithoutFetch = (newFiltersValues, settings = {}) => {
 		preventFetch.value = true;
 		setFilters(newFiltersValues, settings);
+	};
+	// -------------------------------------
+	const createItem = (payload = {}) => {
+		if (typeof localCreateItem === 'function') {
+			return Promise.resolve(localCreateItem(payload));
+		}
+
+		if (!itemRoute) {
+			return Promise.resolve(payload);
+		}
+
+		changeRoute({ path: `${itemRoute}/new` });
+		return Promise.resolve(payload);
+	};
+
+	// -------------------------------------
+	const editItem = (payload = {}) => {
+		if (typeof localEditItem === 'function') {
+			return Promise.resolve(localEditItem(payload));
+		}
+
+		if (!itemRoute || !payload?.row?.id) {
+			return Promise.resolve(payload);
+		}
+
+		changeRoute({ path: `${itemRoute}/${payload.row.id}` });
+		return Promise.resolve(payload);
+	};
+
+	// -------------------------------------
+	const handleDeleteItems = (payload = {}, settings = {}) => {
+		if (typeof localDeleteItems === 'function') {
+			return Promise.resolve(localDeleteItems(payload));
+		}
+
+		let ids = [];
+		if (payload?.row?.id) {
+			ids = [payload.row.id];
+		} else {
+			ids = [...(resolve(tableRef)?.selectedIds || [])];
+		}
+
+		return deleteItem({ ...payload, ids }, settings);
+	};
+
+	const deleteItem = (payload = {}, settings = {}) => {
+		payload = settings.payload || payload;
+		if (typeof localDeleteItem === 'function') {
+			return Promise.resolve(localDeleteItem(payload));
+		}
+
+		const ids = payload?.ids || [];
+		if (!ids.length) {
+			return Promise.resolve(payload);
+		}
+
+		if (!apiRoute) {
+			return Promise.resolve(payload);
+		}
+
+		const confirmButtonText = settings.confirmButtonText || tt('Delete');
+		// const methodName = settings.methodName || 'deleteItem';
+		const prop = ids.length > 1 ? 'mult' : 'one';
+
+		const confirmMessage =
+			settings.confirmMessage ||
+			`${tt('phrases.this_will_permanently_delete_selected')} ${
+				resolve(itemsName)[prop]
+			}. ${tt('Continue')}?`;
+
+		return ElMessageBox.confirm(
+			confirmMessage,
+			// tt('Delete') || 'Delete',
+			{
+				confirmButtonText,
+				cancelButtonText: tt('CANCEL') || 'Cancel',
+				type: 'warning',
+			},
+		).then(() =>
+			api_request.delete(apiRoute, {
+					data: { ids },
+					itemName: resolve(itemsName)?.one,
+				}).then(() => fetchItems({ ...(filtersRef?.value || {}) }))
+		)
 	};
 
 	// ========== Watchers ==========
@@ -321,6 +411,10 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 		// console.log('useItemsData beforeMount', itemsName.value)
 	});
 
+	/*onMounted(() => {
+		console.log('useItemsData mounted', tableRef.value.selectedIds)
+	});*/
+
 	return {
 		// State
 		itemsList,
@@ -336,5 +430,9 @@ export function useItemsData({ apiRoute, filters: filtersRef, options = {}, item
 		prepareFilters,
 		setFilters,
 		setFiltersWithoutFetch,
+		createItem,
+		editItem,
+		deleteItem,
+		handleDeleteItems,
 	};
 }

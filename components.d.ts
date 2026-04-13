@@ -12,6 +12,7 @@ declare module 'vue' {
     ButtonsNavbar: typeof import('./src/components/common/ButtonsNavbar.vue')['default']
     ButtonWithPopover: typeof import('./src/components/common/ButtonWithPopover.vue')['default']
     CardDroppedSection: typeof import('./src/components/gridTable/CardDroppedSection.vue')['default']
+    ChartWrapper: typeof import('./src/components/charts/ChartWrapper.vue')['default']
     CounterItem: typeof import('./src/components/itemDetails/CounterItem.vue')['default']
     CoverOverlay: typeof import('./src/components/common/CoverOverlay.vue')['default']
     CreateWOButton: typeof import('./src/components/itemDetails/CreateWOButton.vue')['default']

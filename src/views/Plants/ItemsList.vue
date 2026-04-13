@@ -45,7 +45,6 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox } from 'element-plus';
 
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
@@ -55,7 +54,6 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
 import { usePlantsStore } from '@/stores/PlantsStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
-import { api_request } from '@/api/request_provider';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
@@ -92,12 +90,14 @@ const itemsName = computed(() => ({
 
 const { changeRoute } = useNavigation();
 
-const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
+const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	apiRoute: '/plants',
+	itemRoute: '/plants',
 	filters,
 	itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
+		tableRef: itemsTableRef,
 	},
 });
 
@@ -171,41 +171,10 @@ const setupPlantName = (plant) => {
 	return result;
 };
 
-const createItem = () => {
-	changeRoute({ path: '/plants/create' });
-};
-
-const editItem = ({ row }) => {
-	if (!row?.id) return;
-	changeRoute({ path: `/plants/${row.id}` });
-};
-
 const goToDashboard = ({ row }) => {
 	if (!row?.id) return;
 	globalStore.set_global_filters({ ...globalFilters.value, plantId: row.id });
 	changeRoute({ path: '/dashboard/plant' });
-};
-
-const deletePlant = async ({ row }) => {
-	if (!row?.id) return;
-
-	await ElMessageBox.confirm(
-		tt('phrases.delete_confirmation') || 'Delete this item?',
-		tt('Delete') || 'Delete',
-		{ confirmButtonText: tt('Delete') || 'Delete', cancelButtonText: tt('CANCEL') || 'Cancel', type: 'warning' }
-	);
-
-	await api_request.delete(`/plants/${row.id}`, {
-		itemName: itemsName.value.one,
-	});
-
-	await fetchItems({ ...filters.value });
-};
-
-const handleDeleteItems = async (payload) => {
-	if (payload?.row) {
-		await deletePlant(payload);
-	}
 };
 
 const methodsMap = {

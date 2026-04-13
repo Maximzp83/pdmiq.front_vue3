@@ -26,6 +26,9 @@ export function useEmitter(emit) {
 
 export function useEventHandler(methodsMap, emit) {
 	const handleEvent = (eventOrName, payload) => {
+		/*if (eventOrName == 'handleDeleteItems') {
+			debugger
+		}*/
 		if (!eventOrName) return;
 
 		const isObjectPayload = typeof eventOrName === 'object';

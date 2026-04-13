@@ -7,6 +7,7 @@ import App from './App.vue';
 import router from './router';
 import HighchartsVue from 'highcharts-vue';
 import Highcharts from 'highcharts';
+import 'element-plus/es/components/message-box/style/css';
 
 Highcharts.setOptions({
 	lang: {

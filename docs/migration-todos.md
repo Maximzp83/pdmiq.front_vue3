@@ -29,6 +29,13 @@
 - DONE (batch): completed remaining component from `vue2_project/src/components/gridTable` (`CardDroppedSection.vue`).
 - DONE (batch): completed remaining components from `vue2_project/src/components/itemDetails`.
 - DONE (single-file): finished `src/components/layout/TopNavbar.vue` cleanup/migration alignment.
+- DONE (single-file): added `src/components/charts/ChartWrapper.vue` as the base Highcharts wrapper required by pending chart-component migration.
+- DONE (single-file): migrated `src/views/MaintenanceCategories/ItemsList.vue` without chart dependencies.
+- DONE (single-file): updated `src/composables/mixins/useItemsData.js` to support callback-based list actions and promise-style async flow.
+- DONE (coupled step): moved `Plants/ItemsList` create/edit/delete list actions into `src/composables/mixins/useItemsData.js` and rewired the view to consume composable methods.
+- DONE (single-file): aligned `src/composables/mixins/useItemsData.js` to use top-level `itemRoute` for create/edit and `apiRoute` for delete; removed `resolveRoutePath`.
+- DONE (coupled step): aligned `handleDeleteItems -> deleteItem` to legacy `ids` flow and passed `itemsTableRef` from `src/views/Plants/ItemsList.vue` into `useItemsData`.
+- DONE (coupled step): aligned create flow to legacy `/new` pattern by handling `route.params.id === 'new'` in `src/views/Plants/ItemPage.vue` and keeping `itemData` empty without fetch.
 - DONE (batch): migrated missing `src/views/Plants` files and replaced `ItemPage.vue` stub.
 - DONE (single-file): migrated `src/views/Plants/ItemsList.vue` to full list page behavior.
 - DONE (single-file): modernized `src/components/common/PaginationContainer.vue` to remove ElPagination deprecated usage.

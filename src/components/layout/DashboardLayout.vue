@@ -135,7 +135,7 @@ const { tt } = Lang;
 // -----Auth------
 import { useAuthStore } from '@/stores/AuthStore';
 const authStore = useAuthStore();
-const { authUser, isAuthenticated, authIsLoading, isAuthChecking } =
+const { authUser, isAuthenticated, authIsLoading } =
 	storeToRefs(authStore);
 
 // -----Global------
@@ -163,6 +163,7 @@ const imgPreviewOpen = ref(false);
 const imagesList = ref([]);
 const showMfaWarning = ref(true);
 const timer = ref(null);
+const isAuthChecking = ref(true);
 
 // ========== Computed ==========
 const currentPath = computed(() => route.fullPath);
@@ -334,14 +335,14 @@ watch(currentPath, (path) => {
 // ========== Lifecycle Hooks ==========
 onBeforeMount(() => {
 	setGlobalFilters({ id: null, filterName: 'companyId' });
-
+	// console.log('DashboardLayout onBeforeMount', isAuthChecking.value);
 	authStore.set_value('first_loading_app', false );
 
 	const { pathOnly } = getParamsFromUrl(currentPath.value);
 	const path = pathOnly || currentPath.value;
 
 	authStore.get_auth_user().then(() => {
-		authStore.set_value('isAuthChecking', false);
+		isAuthChecking.value = false;
 
 		if (redirectTo.value) {
 			router.push(redirectTo.value);

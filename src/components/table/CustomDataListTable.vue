@@ -187,6 +187,10 @@ const methodsMap = {
 	calcOperationsWidth,
 };
 
+defineExpose({
+  selectedIds
+});
+
 const { handleEvent } = useEventHandler(methodsMap, emit);
 
 watch(
