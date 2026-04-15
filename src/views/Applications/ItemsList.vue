@@ -35,16 +35,13 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox } from 'element-plus';
 
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
-import { api_request } from '@/api/request_provider';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useApplicationsStore } from '@/stores/ApplicationsStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -67,7 +64,6 @@ const { filters } = storeToRefs(applicationsStore);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { globalPlantsList } = storeToRefs(globalStore);
-const { changeRoute } = useNavigation();
 
 const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_applications']));
 const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_applications']));
@@ -79,10 +75,14 @@ const itemsName = computed(() => ({
 	instanceName: 'applications',
 }));
 
-const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
+const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	apiRoute: '/applications',
-	filters,
+	itemRoute: '/applications',
+	itemStore: applicationsStore,
 	itemsName,
+	options: {
+		tableRef: itemsTableRef,
+	},
 });
 
 const tableSettings = computed(() => {
@@ -94,7 +94,6 @@ const tableSettings = computed(() => {
 	if (hasAccessToDelete.value) {
 		actions.push(standardTableOperations.delete);
 	}
-
 	return {
 		columns: translate([
 			{
@@ -120,48 +119,6 @@ const tableSettings = computed(() => {
 	};
 });
 
-const ensurePlantsList = async () => {
-	if (globalPlantsList.value?.length) return;
-	await globalStore.fetch_global_plants({
-		params: { max: -1, orderByColumn: 'name', orderByMethod: 'asc' },
-	});
-};
-
-const createItem = () => {
-	changeRoute({ path: '/applications/create' });
-};
-
-const editItem = ({ row }) => {
-	if (!row?.id) return;
-	changeRoute({ path: `/applications/${row.id}` });
-};
-
-const deleteApplication = async ({ row }) => {
-	if (!row?.id) return;
-
-	await ElMessageBox.confirm(
-		tt('phrases.delete_confirmation') || 'Delete this item?',
-		tt('Delete') || 'Delete',
-		{
-			confirmButtonText: tt('Delete') || 'Delete',
-			cancelButtonText: tt('CANCEL') || 'Cancel',
-			type: 'warning',
-		},
-	);
-
-	await api_request.delete(`/applications/${row.id}`, {
-		itemName: itemsName.value.one,
-	});
-
-	await fetchItems({ ...filters.value });
-};
-
-const handleDeleteItems = async (payload) => {
-	if (payload?.row) {
-		await deleteApplication(payload);
-	}
-};
-
 const methodsMap = {
 	setFilters,
 	createItem,
@@ -170,8 +127,4 @@ const methodsMap = {
 };
 
 const { handleEvent } = useEventHandler(methodsMap);
-
-onMounted(() => {
-	ensurePlantsList();
-});
 </script>

@@ -95,6 +95,10 @@ const methodsMap = {
 	handleSelectionChange,
 };
 
+defineExpose({
+	selectedIds,
+});
+
 const { handleEvent: handleEventNew } = useEventHandler(methodsMap, emit);
 
 void Lang;

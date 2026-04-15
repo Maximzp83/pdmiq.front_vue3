@@ -37,6 +37,14 @@
 - DONE (coupled step): aligned `handleDeleteItems -> deleteItem` to legacy `ids` flow and passed `itemsTableRef` from `src/views/Plants/ItemsList.vue` into `useItemsData`.
 - DONE (coupled step): aligned create flow to legacy `/new` pattern by handling `route.params.id === 'new'` in `src/views/Plants/ItemPage.vue` and keeping `itemData` empty without fetch.
 - DONE (single-file): restored `useItemsData` filters watcher after switching entity filter updates to store `set_value`.
+- DONE (coupled step): aligned `src/views/Applications/ItemsList.vue` and `src/views/Applications/ItemPage.vue` to the `Plants` reference pattern.
+- DONE (single-file): updated `src/router/index.js` so migrated entities use explicit `/new` create routes instead of relying on `:id` edit routes.
+- DONE (coupled step): aligned `src/views/Processes/ItemsList.vue` and `src/views/Processes/ItemPage.vue` to the `Plants` reference pattern; exposed `selectedIds` from `src/components/gridTable/ItemsGridContainer.vue` for composable-driven delete flow.
+- DONE (single-file): updated `src/views/Plants/ItemPage.vue` to use `src/composables/mixins/useItemPage.js`.
+- DONE (coupled step): merged `src/composables/mixins/useInitPageData.js` into `src/composables/mixins/useItemPage.js`, removed `useInitPageData.js`, and cleaned up `src/views/Plants/ItemPage.vue`.
+- DONE (coupled step): moved generic `fetchItem` and `saveItem` behavior into `src/composables/mixins/useItemPage.js` and removed local request wrappers from `src/views/Plants/ItemPage.vue`.
+- DONE (coupled step): updated `src/views/Applications/ItemPage.vue` and `src/views/Machines/ItemPage.vue` to use shared `src/composables/mixins/useItemPage.js`.
+- DONE (single-file): updated `src/views/Processes/ItemPage.vue` to use shared `src/composables/mixins/useItemPage.js`.
 - DONE (batch): migrated missing `src/views/Plants` files and replaced `ItemPage.vue` stub.
 - DONE (single-file): migrated `src/views/Plants/ItemsList.vue` to full list page behavior.
 - DONE (single-file): modernized `src/components/common/PaginationContainer.vue` to remove ElPagination deprecated usage.

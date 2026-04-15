@@ -47,13 +47,11 @@
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElMessageBox } from 'element-plus';
 
 import { DOWNTIME_ORIGIN_TYPES } from '@/constants/global';
 import { getDateRange, getValues } from '@/helpers';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
-import { api_request } from '@/api/request_provider';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -106,12 +104,14 @@ const localPrepareFilters = (currentFilters) => ({
 	...statisticsFilters.value,
 });
 
-const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
+const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	apiRoute: '/plants/conveyor/processes',
-	filters,
+	itemRoute: '/processes',
+	itemStore: processesStore,
 	itemsName,
 	options: {
 		localPrepareFilters,
+		tableRef: itemsTableRef,
 	},
 });
 
@@ -188,42 +188,6 @@ const setupProcessSocket = (resources) => {
 const handleShowDetails = ({ row }) => {
 	if (!row?.id) return;
 	changeRoute({ path: `/processes/${row.id}` });
-};
-
-const createItem = () => {
-	changeRoute({ path: '/processes/create' });
-};
-
-const editItem = ({ row }) => {
-	if (!row?.id) return;
-	changeRoute({ path: `/processes/${row.id}` });
-};
-
-const deleteProcess = async ({ row }) => {
-	if (!row?.id) return;
-
-	await ElMessageBox.confirm(
-		tt('phrases.delete_confirmation') || 'Delete this item?',
-		tt('Delete') || 'Delete',
-		{
-			confirmButtonText: tt('Delete') || 'Delete',
-			cancelButtonText: tt('CANCEL') || 'Cancel',
-			type: 'warning',
-		}
-	);
-
-	await api_request.delete(`/plants/conveyor/processes/${row.id}`, {
-		itemName: itemsName.value.one,
-	});
-
-	await fetchItems({
-		...filters.value,
-	});
-};
-
-const handleDeleteItems = async ({ row }) => {
-	if (!row?.id) return;
-	await deleteProcess({ row });
 };
 
 const methodsMap = {

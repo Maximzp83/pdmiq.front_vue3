@@ -1,60 +1,58 @@
-# Session Context
+# Continuation Briefing
 
-## Current objective
-- Continue Vue2 -> Vue3 migration.
-- Prioritize components from `vue2_project/src/components`.
-- Migrate or sync exactly one file per step unless files are structurally coupled.
+## Project stack
+- Vue 3 with `script setup`
+- Vite 6
+- Vue Router 4
+- Pinia
+- Element Plus
+- Highcharts + `highcharts-vue`
+- ESLint + Prettier
 
-## Active workflow rules
-- Apply changes only after explicit user confirmation.
-- If there is any risk, ambiguity, or disputable point, stop and ask first.
-- Work one step at a time.
-- Do not show code or diff output unless discussion is required because of risk or ambiguity.
-- After each completed step: run local lint for the touched file when applicable, update docs, then stop.
-- After each step: reply with the result and the file path in plain text.
+## Key architecture rules
+- Continue Vue2 -> Vue3 migration one step at a time.
+- Use `src/views/Plants` as the reference pattern for entity migration.
+- Prefer shared composables over local page/list orchestration.
+- `useItemsData` owns generic list behavior: fetch, filters, create/edit/delete actions.
+- `useItemPage` owns generic item-page behavior: init/load/navbar lifecycle and fetch/save item requests.
+- Create mode should use explicit `/new` routes, not `/create`.
+- `handleDeleteItems -> deleteItem` must work through `ids`.
+- Apply changes only after user confirmation.
+- Do not show code/diff in normal replies.
 
-## Migration conventions
-- Use Vue 3 Composition API and existing Vue3 project patterns.
-- Use `api_request` for API work.
-- Use composables + Pinia; do not reintroduce Vuex runtime patterns.
-- Replace `@event="handleEventNew"` with `@event="handleEvent"` during migration.
-- Replace `<CustomSelect` with `<CustomSelectV2` during migration.
-- For `vue2_project/src/views` -> `src/views` migrations, use `src/views/Plants` as the reference pattern.
+## Current task status
+- `Plants` is the main reference entity for list/page behavior.
+- `useInitPageData` was merged into `useItemPage`; standalone file removed.
+- `useItemPage` now implements generic `fetchItem` and `saveItem` through `apiRoute` / `itemRoute`.
+- `Plants/ItemPage.vue`, `Applications/ItemPage.vue`, `Machines/ItemPage.vue`, and `Processes/ItemPage.vue` now use `useItemPage`.
+- `Applications/ItemsList.vue` and `Processes/ItemsList.vue` were aligned toward the `Plants` pattern.
+- `ItemsGridContainer.vue` now exposes `selectedIds` for composable-driven delete flow.
+- Router create routes for migrated entities were switched to explicit `/new` paths.
 
-## Latest completed migration state
-- Completed recently:
-  - `src/components/gridTable/GridItemCardHeader.vue`
-  - `src/components/table/CustomDataListTable.vue`
-  - `src/components/gridTable/ItemsGridContainer.vue`
-  - `src/components/itemDetails/CounterItem.vue`
-  - `src/components/form/uploadBlock/FileUploadBlockItem.vue`
-  - `src/components/form/uploadBlock/FileUploadBlock.vue`
-- Additional completed work recorded in docs:
-  - `src/components/itemDetails/ItemInfoBlock.vue`
-  - `src/components/itemDetails/ItemImagesBlock.vue`
-  - `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
-  - Table batch: `TableHeader`, `Row`, `TableCell`, `TableHeaderCell`
-  - `src/components/common/DynamicComponentWrapper.vue`
-  - Remaining `common`, `form` (except requested skips), `pages`, `gridTable`, and `itemDetails` component batches
-  - `src/views/Plants` migration follow-up and `Applications` / `Processes` entities
+## Files already modified
+- `src/composables/mixins/useItemsData.js`
+- `src/composables/mixins/useItemPage.js`
+- `src/composables/mixins/useInitPageData.js` (deleted)
+- `src/components/gridTable/ItemsGridContainer.vue`
+- `src/views/Plants/ItemsList.vue`
+- `src/views/Plants/ItemPage.vue`
+- `src/views/Applications/ItemsList.vue`
+- `src/views/Applications/ItemPage.vue`
+- `src/views/Processes/ItemsList.vue`
+- `src/views/Processes/ItemPage.vue`
+- `src/views/Machines/ItemPage.vue`
+- `src/router/index.js`
+- `src/main.js`
+- `docs/migration-progress.md`
+- `docs/migration-todos.md`
+- `SESSION_CONTEXT.md`
 
-## Important current notes
-- `src/views/Plants/Details/DetailsPage.vue` was restored from a previous commit.
-- `src/views/Plants/ItemPage.vue` was previously noted as a temporary stub in handoff docs.
-- Keep `docs/migration-progress.md` and `docs/migration-todos.md` aligned after each completed step.
+## Unresolved issues
+- `src/views/MaintenanceCategories/ItemPage.vue` is still pending; the user explicitly pointed to legacy `vue2_project/src/views/MaintenanceCategories/ItemPage.vue` as the next likely target.
+- `src/views/MaintenanceCategories/ItemsList.vue` still uses old local create/edit/delete orchestration and is not yet aligned to the `Plants` list pattern.
+- `src/views/Machines/ItemPage.vue` now uses `useItemPage`, but machine routes are still commented out in `src/router/index.js`.
+- `src/views/Plants/Details/DetailsPage.vue` remains unfinished and should not be treated as the reference for details-layer architecture.
 
-## Recommended next-file order from handoff
-1. `src/components/itemDetails/ItemInfoBlock.vue`
-2. `src/components/itemDetails/ItemImagesBlock.vue`
-3. `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
-4. `src/components/itemDetails/ItemWOStatisticBlock.vue`
-5. `src/components/itemDetails/MaintenanceListWrapper.vue`
-6. `src/components/table/TableHeader.vue`
-7. `src/components/table/Row.vue`
-8. `src/components/table/TableCell.vue`
-9. `src/components/table/TableHeaderCell.vue`
-
-## Reply mode to keep
-- No code/diff output.
-- One step at a time.
-- After each step, provide the result and the path in plain text.
+## Next actionable step
+- Migrate `MaintenanceCategories` page flow next:
+  start with `src/views/MaintenanceCategories/ItemPage.vue` using `useItemPage`, then align `src/views/MaintenanceCategories/ItemsList.vue` to the `Plants` / `useItemsData` pattern if routes are available.

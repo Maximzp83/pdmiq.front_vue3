@@ -8,15 +8,14 @@
 
 		<div class="view-wrapper item-page-wrapper">
 			<div class="mcontainer">
-				<!-- <h1 class="title page-title">{{ pageTitle }}</h1> -->
 				<div class="view-content-card card">
-					<div class="form-wrapper card-content" v-if="loadContent">
+					<div v-if="loadContent" class="form-wrapper card-content">
 						<ItemForm
-							ref="ItemFormComponent"
-							@submit="handleSubmitForm"
-							@onCancel="handleCloseButton"
+							ref="itemFormRef"
 							:itemData="itemData"
 							:itemsName="itemsName"
+							@submit="handleSubmitForm"
+							@onCancel="handleCloseButton"
 						/>
 					</div>
 				</div>
@@ -25,37 +24,46 @@
 	</div>
 </template>
 
-<script>
-import { mapActions } from 'vuex';
-import { navigation, itemPageMixin, initPageDataMixin } from '@/mixins';
+<script setup>
+import { computed, ref } from 'vue';
 
-export default {
-	mixins: [navigation(), itemPageMixin(), initPageDataMixin()],
+import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
+import ItemForm from './ItemForm.vue';
+
+import { useItemPage } from '@/composables/mixins/useItemPage';
+import { useNavigation } from '@/composables/mixins/useNavigation';
+import { Lang } from '@/localization';
+
+defineOptions({
 	name: 'MachinePage',
+});
 
-	components: {
-		ItemForm: () => import('./ItemForm.vue')
-	},
+const { changeRoute } = useNavigation();
+const itemFormRef = ref(null);
 
-	computed: {
-		itemsName() {
-			return {
-				one: this.$t('Machine'),
-				mult: this.$t('Machines')
-			};
-		},
+const itemsName = computed(() => ({
+	one: Lang.tt('Machine'),
+	mult: Lang.tt('Machines'),
+}));
 
-		uploadSettings: () => ({
-			fileProp: 'pictures',
-			multiple: true
-		})
-	},
-
-	methods: {
-		...mapActions({
-			fetch_item: 'machines/fetch_machine',
-			save_item: 'machines/save_machine'
-		})
-	}
+const uploadSettings = {
+	fileProp: 'pictures',
+	multiple: true,
 };
+
+const {
+	itemData,
+	itemLoading,
+	loadContent,
+	itemSaving,
+	handleSubmitForm,
+	handleCloseButton,
+} = useItemPage({
+	apiRoute: '/machines',
+	itemRoute: '/machines',
+	itemsName: itemsName.value,
+	itemFormRef,
+	changeRoute,
+	uploadSettings,
+});
 </script>

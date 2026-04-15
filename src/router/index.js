@@ -226,7 +226,7 @@ const routes = [
 				meta: { auth: true, permissions: ['view_applications'] },
 			},
 			{
-				path: 'applications/create',
+				path: 'applications/new',
 				name: 'ApplicationCreate',
 				component: () => import('@/views/Applications/ItemPage.vue'),
 				meta: { auth: true, permissions: ['create_applications'] },
@@ -375,6 +375,12 @@ const routes = [
 			// 	component: () => import('@/views/Machines/ItemPage.vue'),
 			// 	meta: { auth: true, permissions: ['edit_machines'] },
 			// },
+			{
+				path: 'plants/new',
+				name: 'PlantCreate',
+				component: () => import('@/views/Plants/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_plants'] },
+			},
 			{
 				path: 'plants/:id/details',
 				name: 'PlantDetailsPage',
@@ -533,7 +539,7 @@ const routes = [
 				meta: { auth: true, permissions: ['view_oee'] },
 			},
 			{
-				path: 'processes/create',
+				path: 'processes/new',
 				name: 'ProcessCreate',
 				component: () => import('@/views/Processes/ItemPage.vue'),
 				meta: { auth: true, permissions: ['create_oee'] },

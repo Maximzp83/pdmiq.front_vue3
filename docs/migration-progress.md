@@ -196,6 +196,35 @@ await fetchUsers({ page: 1 });
   - Root cause: `ref(itemStore.filters)` captured the old filters object and stopped tracking replacements
   - Fixed by binding `filtersRef` to `storeToRefs(itemStore).filters`
   - Kept backward compatibility for views that still pass plain `filters`
+- [x] `Applications` aligned to `Plants` list/page pattern
+  - `ItemsList` now uses store-driven `useItemsData` actions for create/edit/delete
+  - `ItemPage` now uses `/new` create-mode convention via `route.params.id`
+  - Async page flow normalized to promise-style
+- [x] Router aligned to `/new` create-mode convention for migrated entities
+  - Added explicit `/new` create routes for `Plants`, `Applications`, and `Processes`
+  - Prevents `/new` from falling into `:id` edit routes with incorrect permissions
+- [x] `Processes` aligned to `Plants` list/page pattern
+  - `ItemsList` now uses store-driven `useItemsData` actions for create/edit/delete
+  - `ItemPage` now uses `/new` create-mode convention via `route.params.id`
+  - `ItemsGridContainer` now exposes `selectedIds` for composable-driven bulk delete
+- [x] `src/views/Plants/ItemPage.vue` switched to `useItemPage`
+  - Submit/close orchestration now uses shared page composable
+  - Entity-specific save flow remains local through `saveItem`
+- [x] `useInitPageData` merged into `useItemPage`
+  - `useItemPage` now covers item-page init/load/navbar lifecycle plus submit flow
+  - Removed standalone `useInitPageData.js`
+  - Simplified `src/views/Plants/ItemPage.vue` to use the merged composable API
+- [x] `useItemPage` now owns generic fetch/save item requests
+  - Added `apiRoute`/`itemRoute` driven default `fetchItem` and `saveItem` behavior
+  - `src/views/Plants/ItemPage.vue` no longer defines local request wrappers
+  - Entity-specific post-save sync remains injectable through `successSubmitCallback`
+- [x] `Applications` and `Machines` item pages switched to shared `useItemPage`
+  - Removed local request orchestration from `Applications/ItemPage`
+  - Replaced legacy `Machines/ItemPage` mixin shell with `script setup` + `useItemPage`
+  - Preserved machine upload settings via composable config
+- [x] `src/views/Processes/ItemPage.vue` switched to shared `useItemPage`
+  - Removed local fetch/save orchestration from process item page
+  - Reused `apiRoute`/`itemRoute` driven item-page behavior
 - [x] useActionButtons (from actionButtonsMixin)
 - [x] useEventEmitter/useEventHandler (normalized event payloads)
 - [x] useCreateFormItem (from createFormItemMixin)
