@@ -204,7 +204,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 
-import { api_request } from '@/api/request_provider';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { cleanDateString } from '@/helpers';
 import { required } from '@/constants/validation';
 import { timeZonesList } from '@/constants/date_time';
@@ -235,6 +236,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['submit', 'onCancel']);
+const companiesEntity = ENTITIES.Companies;
+const usersEntity = ENTITIES.Users;
+const industrialServicesEntity = ENTITIES.IndustrialServices;
 
 const authStore = useAuthStore();
 const itemForm = ref(null);
@@ -375,21 +379,9 @@ const requestsToDoList = computed(() => {
 });
 
 const methodsMap = {
-	fetch_companies: (payload = {}) =>
-		api_request.get('/companies', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_users: (payload = {}) =>
-		api_request.get('/users', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_industrial_services: (payload = {}) =>
-		api_request.get('/settings/industrial-services', {
-			notNotify: true,
-			...payload,
-		}),
+	fetch_companies: createGetRequest(companiesEntity.apiBase),
+	fetch_users: createGetRequest(usersEntity.apiBase),
+	fetch_industrial_services: createGetRequest(industrialServicesEntity.apiBase),
 };
 
 const localSetupPage = (item) => {

@@ -23,6 +23,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { ENTITIES } from '@/config/entities';
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
@@ -35,8 +36,12 @@ const globalStore = useGlobalStore();
 const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
+const plantsEntity = ENTITIES.Plants;
 
-const itemsName = computed(() => ({ one: Lang.tt('Plant'), mult: Lang.tt('Plants') }));
+const itemsName = computed(() => ({
+	one: Lang.tt(plantsEntity.itemsName.one),
+	mult: Lang.tt(plantsEntity.itemsName.mult),
+}));
 
 const {
 	itemData,
@@ -46,8 +51,8 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: '/plants',
-	itemRoute: '/plants',
+	apiRoute: plantsEntity.apiBase,
+	itemRoute: plantsEntity.routeBase,
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

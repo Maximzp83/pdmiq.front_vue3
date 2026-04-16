@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -61,22 +62,29 @@ const equipmentTypesCategoriesStore = useEquipmentTypesCategoriesStore();
 const { filters } = storeToRefs(equipmentTypesCategoriesStore);
 
 const authStore = useAuthStore();
+const equipmentTypesCategoriesEntity = ENTITIES.EquipmentTypesCategories;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_equipment_types_categories']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_equipment_types_categories']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_equipment_types_categories']));
+const hasAccessToCreate = computed(() =>
+	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.create])
+);
+const hasAccessToEdit = computed(() =>
+	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.edit])
+);
+const hasAccessToDelete = computed(() =>
+	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.delete])
+);
 
 const itemsName = computed(() => ({
-	one: `${tt('Item_Types')} ${tt('Category')}`,
-	mult: `${tt('Item_Types')} ${tt('Categories')}`,
-	instanceName: 'equipment_types',
+	one: `${tt(equipmentTypesCategoriesEntity.itemsName.group)} ${tt(equipmentTypesCategoriesEntity.itemsName.one)}`,
+	mult: `${tt(equipmentTypesCategoriesEntity.itemsName.group)} ${tt(equipmentTypesCategoriesEntity.itemsName.mult)}`,
+	instanceName: equipmentTypesCategoriesEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/equipments/types/options/categories',
-	itemRoute: '/equipment-types-categories',
+	apiRoute: equipmentTypesCategoriesEntity.apiBase,
+	itemRoute: equipmentTypesCategoriesEntity.routeBase,
 	itemStore: equipmentTypesCategoriesStore,
-	itemFiltersName: 'equipment-types-categories_filters',
+	itemFiltersName: equipmentTypesCategoriesEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

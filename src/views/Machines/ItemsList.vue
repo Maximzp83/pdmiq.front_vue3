@@ -204,6 +204,7 @@
 </template>
 
 <script setup>
+import { ENTITIES } from '@/config/entities';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { storeToRefs } from 'pinia';
 /*import { mapState, mapActions } from 'vuex';
@@ -221,7 +222,7 @@ defineOptions({
 	name: 'MachinesList',
 });
 
-const props = defineProps({
+defineProps({
 	hideDropdownFilterbar: Boolean,
 	disableDraggingFeature: Boolean,
 	showCardHeader: Boolean,
@@ -233,11 +234,11 @@ const props = defineProps({
 
 import { useMachinesStore } from '@/stores/MachinesStore';
 const machinesStore = useMachinesStore();
-const { set_value: set_machine_store } = machinesStore;
 const { filters } = storeToRefs(machinesStore);
+const machinesEntity = ENTITIES.Machines;
 
-const { itemsList, itemsLoading, meta, activeGrid } = useItemsData({
-	apiRoute: '/machines',
+const { itemsList, itemsLoading } = useItemsData({
+	apiRoute: machinesEntity.apiBase,
 	filters: filters.value,
 });
 

@@ -46,7 +46,8 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 
-import { api_request } from '@/api/request_provider';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 
@@ -67,6 +68,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['submit', 'onCancel']);
+const plantsEntity = ENTITIES.Plants;
 
 const itemFormRef = ref(null);
 const isMobile = ref(false);
@@ -106,11 +108,12 @@ const setupForm = (item) => {
 	formData.value = { ...initialFormData };
 };
 
+const fetchPlantsRequest = createGetRequest(plantsEntity.apiBase);
+
 const fetchPlants = async () => {
 	plantsLoading.value = true;
 	try {
-		const { value } = await api_request.get('/plants', {
-			notNotify: true,
+		const { value } = await fetchPlantsRequest({
 			params: {
 				max: -1,
 				orderByColumn: 'name',

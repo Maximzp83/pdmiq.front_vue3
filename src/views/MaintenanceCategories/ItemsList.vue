@@ -39,6 +39,7 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { api_request } from '@/api/request_provider';
@@ -65,19 +66,26 @@ const { filters } = storeToRefs(maintenanceCategoriesStore);
 
 const authStore = useAuthStore();
 const { changeRoute } = useNavigation();
+const maintenanceCategoriesEntity = ENTITIES.MaintenanceCategories;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_work_order_type']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_work_order_type']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_work_order_type']));
+const hasAccessToCreate = computed(() =>
+	authStore.hasAccessTo([maintenanceCategoriesEntity.permissions.create])
+);
+const hasAccessToEdit = computed(() =>
+	authStore.hasAccessTo([maintenanceCategoriesEntity.permissions.edit])
+);
+const hasAccessToDelete = computed(() =>
+	authStore.hasAccessTo([maintenanceCategoriesEntity.permissions.delete])
+);
 
 const itemsName = computed(() => ({
-	one: tt('Work_Order_Type'),
-	mult: tt('Work_Order_Types'),
-	instanceName: 'maintenance_categories',
+	one: tt(maintenanceCategoriesEntity.itemsName.one),
+	mult: tt(maintenanceCategoriesEntity.itemsName.mult),
+	instanceName: maintenanceCategoriesEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
-	apiRoute: '/maintenance/categories',
+	apiRoute: maintenanceCategoriesEntity.apiBase,
 	filters,
 	itemsName,
 });
@@ -111,12 +119,12 @@ const tableSettings = computed(() => {
 });
 
 const createItem = () => {
-	changeRoute({ path: '/maintenance-categories/create' });
+	changeRoute({ path: `${maintenanceCategoriesEntity.routeBase}/create` });
 };
 
 const editItem = ({ row }) => {
 	if (!row?.id) return;
-	changeRoute({ path: `/maintenance-categories/${row.id}` });
+	changeRoute({ path: `${maintenanceCategoriesEntity.routeBase}/${row.id}` });
 };
 
 const deleteMaintenanceCategory = async ({ row }) => {
@@ -132,7 +140,7 @@ const deleteMaintenanceCategory = async ({ row }) => {
 		},
 	);
 
-	await api_request.delete(`/maintenance/categories/${row.id}`, {
+	await api_request.delete(`${maintenanceCategoriesEntity.apiBase}/${row.id}`, {
 		itemName: itemsName.value.one,
 	});
 

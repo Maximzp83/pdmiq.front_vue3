@@ -22,6 +22,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -32,10 +33,11 @@ import ItemForm from './ItemForm.vue';
 const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
+const equipmentTypesCategoriesEntity = ENTITIES.EquipmentTypesCategories;
 
 const itemsName = computed(() => ({
-	one: `${Lang.tt('Item_Types')} ${Lang.tt('Category')}`,
-	mult: `${Lang.tt('Item_Types')} ${Lang.tt('Categories')}`,
+	one: `${Lang.tt(equipmentTypesCategoriesEntity.itemsName.group)} ${Lang.tt(equipmentTypesCategoriesEntity.itemsName.one)}`,
+	mult: `${Lang.tt(equipmentTypesCategoriesEntity.itemsName.group)} ${Lang.tt(equipmentTypesCategoriesEntity.itemsName.mult)}`,
 }));
 
 const {
@@ -46,8 +48,8 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: '/equipments/types/options/categories',
-	itemRoute: '/equipment-types-categories',
+	apiRoute: equipmentTypesCategoriesEntity.apiBase,
+	itemRoute: equipmentTypesCategoriesEntity.routeBase,
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

@@ -71,7 +71,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 
-import { api_request } from '@/api/request_provider';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { useItemForm } from '@/composables/mixins/useItemForm';
@@ -97,6 +98,8 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'onCancel']);
 
 const globalStore = useGlobalStore();
+const plantsEntity = ENTITIES.Plants;
+const equipmentTypesEntity = ENTITIES.EquipmentTypes;
 
 const itemFormRef = ref(null);
 const plantsLoading = ref(false);
@@ -152,16 +155,8 @@ const requestsToDoList = computed(() => [
 ]);
 
 const methodsMap = {
-	fetch_plants: (payload = {}) =>
-		api_request.get('/plants', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_equipment_types: (payload = {}) =>
-		api_request.get('/equipments/types', {
-			notNotify: true,
-			...payload,
-		}),
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
+	fetch_equipment_types: createGetRequest(equipmentTypesEntity.apiBase),
 };
 
 const localSetupPage = (item) => {

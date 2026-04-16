@@ -1,59 +1,69 @@
-# Session Context
+# Continuation Briefing
 
-## Active process rules
-- Apply changes only after explicit user confirmation.
-- Work one file at a time; use a coupled multi-file step only if files are structurally tied.
-- If there is any risk, ambiguity, or disputable point, ask before changing files.
-- Diff preview is not required by default.
-- Do not show code or diff in normal replies.
-- After each migration step: lint the migrated file, update docs, then stop and wait.
-- After each completed step, report the result in plain text with the migrated file path only.
-- Do not mention docs updates after each step unless the docs themselves were the task.
-- When migrating the next entity from `vue2_project/src/views`, also find and uncomment its existing routes in `src/router/index.js` and its existing menu entries in `src/constants/menuItems.js`, if they are present there.
+## Project stack
+- Vue 3 with `script setup`
+- Vite
+- Vue Router 4
+- Pinia
+- Element Plus
+- ESLint
 
-## Migration direction
-- Continue Vue2 -> Vue3 migration with focus on `vue2_project/src/components`.
-- For `src/views` entity migration, use `src/views/Plants` as the reference pattern.
-- Replace all `@event="handleEventNew"` with `@event="handleEvent"`.
-- Replace all `<CustomSelect` usages with `<CustomSelectV2`.
+## Key architecture rules
+- Migrate one step at a time; ask first on any risk or ambiguity.
+- For migrated entities, use shared composables where possible: `useItemsData`, `useItemPage`, `useItemForm`, `useRequestsList`.
+- Use explicit `/new` routes for create mode.
+- Prefer `@event="handleEvent"` and `<CustomSelectV2`.
+- Use `src/config/entities.js` as the single source of truth for entity API/route config.
+- For auxiliary requests targeting first-class entities, reference those entity configs directly and build requests through `src/api/request_factories.js`.
 
-## Current migration snapshot
-- Latest completed component migrations include:
-  `src/components/gridTable/GridItemCardHeader.vue`,
-  `src/components/table/CustomDataListTable.vue`,
-  `src/components/gridTable/ItemsGridContainer.vue`,
-  `src/components/itemDetails/CounterItem.vue`,
-  `src/components/form/uploadBlock/FileUploadBlockItem.vue`,
-  `src/components/form/uploadBlock/FileUploadBlock.vue`.
-- Current views-first simple-entity pass completed:
-  `src/views/Brands/ItemsList.vue`,
-  `src/views/Brands/ItemForm.vue`,
-  `src/views/Brands/ItemPage.vue`.
-- `Brands` routes and sidebar menu entry are now enabled.
-- `Parts` entity migration is now completed with active routes and sidebar menu entry.
-- `EquipmentTypesCategories` entity migration is now completed with active routes; menu entry remains deferred because it depends on the not-yet-migrated `item_types` parent menu block.
-- `Teams` entity migration is now completed with active routes; menu entry remains deferred because it depends on the not-yet-migrated `Users` parent menu block.
-- `PlantsVendors` entity migration is now completed with active routes and sidebar menu entry.
-- `src/views/PlantsVendors/ItemForm.vue` is aligned to the shared `useItemForm` / `useRequestsList` item-form pattern with `localSetupPage`.
-- `src/views/Plants/Details/DetailsPage.vue` was restored from a previous commit.
-- `src/views/Plants/ItemPage.vue` is still a temporary stub and remains pending for full migration.
+## Current task status
+- Simple `vue2_project/src/views` entity migration pass is active.
+- Completed entities in current Vue3 scope: `Brands`, `Parts`, `EquipmentTypesCategories`, `Teams`, `PlantsVendors`.
+- Registry rollout is in place for migrated view entrypoints: `Brands`, `Applications`, `Parts`, `Plants`, `PlantsVendors`, `EquipmentTypesCategories`, `Teams`, `Processes`, `Machines`, `MaintenanceCategories`.
+- Shared request-factory pattern is applied to migrated forms with auxiliary fetches; no remaining `createGetRequest(...related...)` usages for first-class entities.
 
-## Recommended next-file order
-- `src/components/itemDetails/ItemInfoBlock.vue`
-- `src/components/itemDetails/ItemImagesBlock.vue`
-- `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
-- `src/components/itemDetails/ItemWOStatisticBlock.vue`
-- `src/components/itemDetails/MaintenanceListWrapper.vue`
-- `src/components/table/TableHeader.vue`
-- `src/components/table/Row.vue`
-- `src/components/table/TableCell.vue`
-- `src/components/table/TableHeaderCell.vue`
+## Files already modified
+- `src/config/entities.js`
+- `src/api/request_factories.js`
+- `src/views/Brands/ItemsList.vue`
+- `src/views/Brands/ItemPage.vue`
+- `src/views/Applications/ItemsList.vue`
+- `src/views/Applications/ItemPage.vue`
+- `src/views/Applications/ItemForm.vue`
+- `src/views/Parts/ItemsList.vue`
+- `src/views/Parts/ItemPage.vue`
+- `src/views/Parts/ItemForm.vue`
+- `src/views/Plants/ItemsList.vue`
+- `src/views/Plants/ItemPage.vue`
+- `src/views/Plants/ItemForm.vue`
+- `src/views/PlantsVendors/ItemsList.vue`
+- `src/views/PlantsVendors/ItemPage.vue`
+- `src/views/PlantsVendors/ItemForm.vue`
+- `src/views/EquipmentTypesCategories/ItemsList.vue`
+- `src/views/EquipmentTypesCategories/ItemPage.vue`
+- `src/views/Teams/ItemsList.vue`
+- `src/views/Teams/ItemPage.vue`
+- `src/views/Teams/ItemForm.vue`
+- `src/views/Processes/ItemsList.vue`
+- `src/views/Processes/ItemPage.vue`
+- `src/views/Processes/ItemForm.vue`
+- `src/views/Machines/ItemsList.vue`
+- `src/views/Machines/ItemPage.vue`
+- `src/views/MaintenanceCategories/ItemsList.vue`
+- `src/router/index.js`
+- `src/constants/menuItems.js`
+- `docs/migration-progress.md`
+- `docs/migration-todos.md`
+- `docs/session-collaboration-rules.md`
+- `SESSION_CONTEXT.md`
 
-## Notes for continuation
-- Current user priority: migrate simpler entities from `vue2_project/src/views` before returning to component backlog.
-- Keep component-first priority before returning to pending view migration.
-- `useItemsData` is the shared list-flow pattern.
-- `useItemPage` is the shared item-page pattern.
-- Create mode should use explicit `/new` routes.
-- `useItemPage` now resolves create mode from explicit `/new` path segments when no `route.params.id` exists.
-- Delete flow should continue through `ids`.
+## Unresolved issues
+- `src/views/Plants/ItemPage.vue` is still a temporary stub and not a finished target-state page.
+- `EquipmentTypesCategories` menu entry is still deferred because its legacy menu item is nested under the not-yet-migrated `item_types` parent block.
+- `Teams` menu entry is still deferred because its legacy menu item is nested under the not-yet-migrated `Users` parent block.
+- Router and menu definitions still keep local path strings; they are not yet sourced from `src/config/entities.js`.
+- Several remaining view entities from `vue2_project/src/views` are still unmigrated.
+
+## Next actionable step
+- Continue the simple entity migration pass with the next low-complexity unmigrated entity from `vue2_project/src/views`, and when migrating it:
+  use `src/config/entities.js` for API/route config, use shared composables, enable its router/menu entries if safe, and avoid duplicating first-class entity URLs in local form request config.

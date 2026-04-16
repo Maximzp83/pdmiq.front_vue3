@@ -46,6 +46,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -73,27 +74,28 @@ const { filters } = storeToRefs(plantsStore);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { globalFilters } = storeToRefs(globalStore);
+const plantsEntity = ENTITIES.Plants;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_plants']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_plants']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_plants']));
-const hasAccessToView = computed(() => authStore.hasAccessTo(['view_plants']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([plantsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([plantsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([plantsEntity.permissions.delete]));
+const hasAccessToView = computed(() => authStore.hasAccessTo([plantsEntity.permissions.view]));
 const canSeeArchivedToggle = computed(() =>
 	authStore.hasAccessTo(['archive_companies', 'archive_plants'], 'some')
 );
 
 const itemsName = computed(() => ({
-	one: tt('Plant'),
-	mult: tt('Plants'),
-	instanceName: 'plants',
+	one: tt(plantsEntity.itemsName.one),
+	mult: tt(plantsEntity.itemsName.mult),
+	instanceName: plantsEntity.itemsName.instanceName,
 }));
 
 const { changeRoute } = useNavigation();
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/plants',
-	itemRoute: '/plants',
-	itemFiltersName: 'plants_filters',
+	apiRoute: plantsEntity.apiBase,
+	itemRoute: plantsEntity.routeBase,
+	itemFiltersName: plantsEntity.filtersStorageKey,
 	itemStore: plantsStore,
 	itemsName,
 	options: {

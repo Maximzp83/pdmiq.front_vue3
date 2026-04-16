@@ -48,6 +48,7 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { DOWNTIME_ORIGIN_TYPES } from '@/constants/global';
 import { getDateRange, getValues } from '@/helpers';
 import { standardTableOperations } from '@/constants/table';
@@ -88,16 +89,17 @@ const statisticsFilters = ref({
 });
 
 const instanceName = 'Processes';
+const processesEntity = ENTITIES.Processes;
 
 const itemsName = computed(() => ({
-	one: tt('Process'),
-	mult: tt('Processes'),
-	instanceName: 'processes',
+	one: tt(processesEntity.itemsName.one),
+	mult: tt(processesEntity.itemsName.mult),
+	instanceName: processesEntity.itemsName.instanceName,
 }));
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_oee']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_oee']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_oee']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([processesEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([processesEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([processesEntity.permissions.delete]));
 
 const localPrepareFilters = (currentFilters) => ({
 	...currentFilters,
@@ -105,9 +107,10 @@ const localPrepareFilters = (currentFilters) => ({
 });
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/plants/conveyor/processes',
-	itemRoute: '/processes',
+	apiRoute: processesEntity.apiBase,
+	itemRoute: processesEntity.routeBase,
 	itemStore: processesStore,
+	itemFiltersName: processesEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		localPrepareFilters,

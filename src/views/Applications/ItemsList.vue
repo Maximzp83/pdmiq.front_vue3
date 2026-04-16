@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -64,21 +65,23 @@ const { filters } = storeToRefs(applicationsStore);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { globalPlantsList } = storeToRefs(globalStore);
+const applicationsEntity = ENTITIES.Applications;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_applications']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_applications']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_applications']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([applicationsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([applicationsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([applicationsEntity.permissions.delete]));
 
 const itemsName = computed(() => ({
-	one: tt('Application'),
-	mult: tt('Applications'),
-	instanceName: 'applications',
+	one: tt(applicationsEntity.itemsName.one),
+	mult: tt(applicationsEntity.itemsName.mult),
+	instanceName: applicationsEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/applications',
-	itemRoute: '/applications',
+	apiRoute: applicationsEntity.apiBase,
+	itemRoute: applicationsEntity.routeBase,
 	itemStore: applicationsStore,
+	itemFiltersName: applicationsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

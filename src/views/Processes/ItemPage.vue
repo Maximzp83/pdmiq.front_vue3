@@ -22,6 +22,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -32,10 +33,11 @@ import ItemForm from './ItemForm.vue';
 const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
+const processesEntity = ENTITIES.Processes;
 
 const itemsName = computed(() => ({
-	one: Lang.tt('Process'),
-	mult: Lang.tt('Processes'),
+	one: Lang.tt(processesEntity.itemsName.one),
+	mult: Lang.tt(processesEntity.itemsName.mult),
 }));
 
 const {
@@ -46,8 +48,8 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: '/plants/conveyor/processes',
-	itemRoute: '/processes',
+	apiRoute: processesEntity.apiBase,
+	itemRoute: processesEntity.routeBase,
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

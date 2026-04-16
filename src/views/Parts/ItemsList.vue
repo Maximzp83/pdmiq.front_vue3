@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -64,22 +65,23 @@ const { filters } = storeToRefs(partsStore);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { globalPlantsList } = storeToRefs(globalStore);
+const partsEntity = ENTITIES.Parts;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_misc_parts']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_misc_parts']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_misc_parts']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([partsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([partsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([partsEntity.permissions.delete]));
 
 const itemsName = computed(() => ({
-	one: tt('Part'),
-	mult: tt('Parts'),
-	instanceName: 'parts',
+	one: tt(partsEntity.itemsName.one),
+	mult: tt(partsEntity.itemsName.mult),
+	instanceName: partsEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/plants/parts',
-	itemRoute: '/parts',
+	apiRoute: partsEntity.apiBase,
+	itemRoute: partsEntity.routeBase,
 	itemStore: partsStore,
-	itemFiltersName: 'parts_filters',
+	itemFiltersName: partsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

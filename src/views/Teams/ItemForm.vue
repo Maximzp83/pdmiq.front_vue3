@@ -47,7 +47,8 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
 
-import { api_request } from '@/api/request_provider';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -72,6 +73,8 @@ const props = defineProps({
 const emit = defineEmits(['submit', 'onCancel']);
 
 const authStore = useAuthStore();
+const plantsEntity = ENTITIES.Plants;
+const usersEntity = ENTITIES.Users;
 
 const itemFormRef = ref(null);
 const isMobile = ref(false);
@@ -120,11 +123,13 @@ const setupForm = (item) => {
 	};
 };
 
+const fetchPlantsRequest = createGetRequest(plantsEntity.apiBase);
+const fetchUsersRequest = createGetRequest(usersEntity.apiBase);
+
 const fetchPlants = async () => {
 	plantsLoading.value = true;
 	try {
-		const { value } = await api_request.get('/plants', {
-			notNotify: true,
+		const { value } = await fetchPlantsRequest({
 			params: {
 				max: -1,
 				orderByColumn: 'name',
@@ -150,8 +155,7 @@ const fetchUsers = async (plantId) => {
 			params.plantId = plantId;
 		}
 
-		const { value } = await api_request.get('/users', {
-			notNotify: true,
+		const { value } = await fetchUsersRequest({
 			params,
 		});
 		usersList.value = value || [];

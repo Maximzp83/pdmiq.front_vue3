@@ -226,6 +226,23 @@ await fetchUsers({ page: 1 });
   - Replaced manual form init/validate flow with `useItemForm`
   - Replaced manual auxiliary list loading with `useRequestsList`
   - Moved item/default setup into `localSetupPage` to match established item-form pattern
+- [x] Entity registry pattern introduced for endpoint/route single source of truth
+  - Added `src/config/entities.js`
+  - First entity migrated to registry: `Brands`
+  - `src/views/Brands/ItemsList.vue` and `src/views/Brands/ItemPage.vue` now read API route, page route, permissions, and filter-storage key from registry
+- [x] Entity registry rolled out across migrated list/page entities
+  - `Applications`, `Parts`, `Plants`, `PlantsVendors`, `EquipmentTypesCategories`, `Teams`, `Processes`, `Machines`, and `MaintenanceCategories` now read their API/route base config from `src/config/entities.js`
+  - Current rollout covers migrated view/composable entrypoints first; router/menu are not yet generated from registry
+- [x] Related form-request endpoints now start using entity registry too
+  - Added `createGetRequest()` helper to `src/api/request_factories.js`
+  - `src/views/PlantsVendors/ItemForm.vue` now builds `fetch_plants` / `fetch_equipment_types` from registry config instead of hardcoded URLs
+  - `related` endpoints remain declarative config in registry; request execution now lives in shared API request factories
+- [x] Shared request-factory pattern rolled out to remaining migrated forms with auxiliary fetches
+  - `src/views/Applications/ItemForm.vue`, `src/views/Parts/ItemForm.vue`, and `src/views/Teams/ItemForm.vue` now use registry-backed `createGetRequest()` for their list-loading requests
+  - `src/views/Plants/ItemForm.vue` and `src/views/Processes/ItemForm.vue` now build `useRequestsList` methods from registry-backed request factories instead of hardcoded endpoint strings
+  - For existing first-class entities, prefer referencing their own entity config directly instead of duplicating the same URL under another entity's `related` block
+  - `src/views/PlantsVendors/ItemForm.vue` now references `ENTITIES.Plants` and `ENTITIES.EquipmentTypes` directly instead of duplicating those URLs under `PlantsVendors`
+  - There are no remaining `createGetRequest(...related...)` usages for first-class entity endpoints in migrated forms
 - [x] `useItemsData` delete flow aligned with legacy `itemsDataMixin`
   - `handleDeleteItems()` now collects `ids` from row payload or table selection
   - `deleteItem()` now works through `ids` payload instead of single-row route delete

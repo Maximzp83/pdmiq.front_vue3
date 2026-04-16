@@ -59,6 +59,14 @@
 - DONE (entity): completed `Teams` from `vue2_project/src/views/Teams` with `ItemsList`, `ItemForm`, `ItemPage`, plus enabled routes; sidebar menu intentionally deferred until parent `Users` menu is migrated.
 - DONE (entity): completed `PlantsVendors` from `vue2_project/src/views/PlantsVendors` with `ItemsList`, `ItemForm`, `ItemPage`, plus added routes and enabled sidebar menu entry.
 - DONE (single-file): refactored `src/views/PlantsVendors/ItemForm.vue` to use `useItemForm`, `useRequestsList`, and `localSetupPage` instead of manual setup/loading logic.
+- DONE (foundation): added `src/config/entities.js` as entity registry and migrated `Brands` list/page to use it as the first single-source-of-truth example for API/route config.
+- DONE (rollout): applied entity registry to the remaining migrated view entrypoints: `Applications`, `Parts`, `Plants`, `PlantsVendors`, `EquipmentTypesCategories`, `Teams`, `Processes`, `Machines`, and `MaintenanceCategories`.
+- DONE (pattern): added `createGetRequest()` helper and moved related request URLs for `src/views/PlantsVendors/ItemForm.vue` into `src/config/entities.js`.
+- DONE (cleanup): moved `createGetRequest()` into shared `src/api/request_factories.js` so `src/config/entities.js` stays declarative.
+- DONE (rollout): applied `createGetRequest()` + registry-backed related URLs to the remaining migrated forms with auxiliary fetches: `Applications`, `Parts`, `Teams`, `Plants`, and `Processes`.
+- DONE (cleanup): removed duplicated `plants` related endpoint from `PlantsVendors`; `src/views/PlantsVendors/ItemForm.vue` now references `ENTITIES.Plants` directly for plant list requests.
+- DONE (cleanup): removed duplicated `equipmentTypes` related endpoint from `PlantsVendors`; `src/views/PlantsVendors/ItemForm.vue` now references `ENTITIES.EquipmentTypes` directly for equipment-type list requests.
+- DONE (cleanup): removed all remaining `createGetRequest(...related...)` usages where the target is already a first-class entity config; migrated forms now reference those entity configs directly.
 - DONE (single-file): fixed `src/composables/mixins/useItemPage.js` so explicit `/new` routes work without `route.params.id` and fallback navigation uses existing `NotFound` route.
 - Next priority (components-first rule): migrate missing components required by current imports:
 

@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -61,22 +62,23 @@ const brandsStore = useBrandsStore();
 const { filters } = storeToRefs(brandsStore);
 
 const authStore = useAuthStore();
+const brandsEntity = ENTITIES.Brands;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_brands']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_brands']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_brands']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([brandsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([brandsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([brandsEntity.permissions.delete]));
 
 const itemsName = computed(() => ({
-	one: tt('Equipment_Brand'),
-	mult: tt('Equipment_Brands'),
-	instanceName: 'brands',
+	one: tt(brandsEntity.itemsName.one),
+	mult: tt(brandsEntity.itemsName.mult),
+	instanceName: brandsEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/equipments/brands',
-	itemRoute: '/brands',
+	apiRoute: brandsEntity.apiBase,
+	itemRoute: brandsEntity.routeBase,
 	itemStore: brandsStore,
-	itemFiltersName: 'brands_filters',
+	itemFiltersName: brandsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		excludeGetParams: ['plantId'],

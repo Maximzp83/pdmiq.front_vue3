@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -61,22 +62,23 @@ const teamsStore = useTeamsStore();
 const { filters } = storeToRefs(teamsStore);
 
 const authStore = useAuthStore();
+const teamsEntity = ENTITIES.Teams;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_users_teams']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_users_teams']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_users_teams']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([teamsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([teamsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([teamsEntity.permissions.delete]));
 
 const itemsName = computed(() => ({
-	one: tt('Team'),
-	mult: tt('Teams'),
-	instanceName: 'teams',
+	one: tt(teamsEntity.itemsName.one),
+	mult: tt(teamsEntity.itemsName.mult),
+	instanceName: teamsEntity.itemsName.instanceName,
 }));
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/team',
-	itemRoute: '/teams',
+	apiRoute: teamsEntity.apiBase,
+	itemRoute: teamsEntity.routeBase,
 	itemStore: teamsStore,
-	itemFiltersName: 'teams_filters',
+	itemFiltersName: teamsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

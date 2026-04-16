@@ -27,6 +27,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { ENTITIES } from '@/config/entities';
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
@@ -40,10 +41,11 @@ defineOptions({
 
 const { changeRoute } = useNavigation();
 const itemFormRef = ref(null);
+const machinesEntity = ENTITIES.Machines;
 
 const itemsName = computed(() => ({
-	one: Lang.tt('Machine'),
-	mult: Lang.tt('Machines'),
+	one: Lang.tt(machinesEntity.itemsName.one),
+	mult: Lang.tt(machinesEntity.itemsName.mult),
 }));
 
 const uploadSettings = {
@@ -59,8 +61,8 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: '/machines',
-	itemRoute: '/machines',
+	apiRoute: machinesEntity.apiBase,
+	itemRoute: machinesEntity.routeBase,
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

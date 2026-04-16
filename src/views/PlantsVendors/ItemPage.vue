@@ -22,6 +22,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 import { useItemPage } from '@/composables/mixins/useItemPage';
@@ -33,13 +34,17 @@ import ItemForm from './ItemForm.vue';
 const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
+const plantsVendorsEntity = ENTITIES.PlantsVendors;
 
 const itemsName = computed(() => {
-	const prefix = Lang.currentLangId === LANGUAGE_TYPES.ENGLISH ? 'Plants ' : '';
+	const prefix =
+		Lang.currentLangId === LANGUAGE_TYPES.ENGLISH
+			? plantsVendorsEntity.itemsName.englishPrefix
+			: '';
 	return {
-		one: `${prefix}${Lang.tt('Vendor')}`,
-		mult: `${prefix}${Lang.tt('Vendors')}`,
-		instanceName: 'plants_vendors',
+		one: `${prefix}${Lang.tt(plantsVendorsEntity.itemsName.one)}`,
+		mult: `${prefix}${Lang.tt(plantsVendorsEntity.itemsName.mult)}`,
+		instanceName: plantsVendorsEntity.itemsName.instanceName,
 	};
 });
 
@@ -51,8 +56,8 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: '/plants/vendors',
-	itemRoute: '/plants-vendors',
+	apiRoute: plantsVendorsEntity.apiBase,
+	itemRoute: plantsVendorsEntity.routeBase,
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

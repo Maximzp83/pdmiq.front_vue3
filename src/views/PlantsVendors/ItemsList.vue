@@ -38,6 +38,7 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
@@ -65,25 +66,29 @@ const { filters } = storeToRefs(plantsVendorsStore);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { globalPlantsList } = storeToRefs(globalStore);
+const plantsVendorsEntity = ENTITIES.PlantsVendors;
 
-const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_vendors']));
-const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_vendors']));
-const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_vendors']));
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([plantsVendorsEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([plantsVendorsEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([plantsVendorsEntity.permissions.delete]));
 
 const itemsName = computed(() => {
-	const prefix = Lang.currentLangId === LANGUAGE_TYPES.ENGLISH ? 'Plants ' : '';
+	const prefix =
+		Lang.currentLangId === LANGUAGE_TYPES.ENGLISH
+			? plantsVendorsEntity.itemsName.englishPrefix
+			: '';
 	return {
-		one: `${prefix}${tt('Vendor')}`,
-		mult: `${prefix}${tt('Vendors')}`,
-		instanceName: 'plants_vendors',
+		one: `${prefix}${tt(plantsVendorsEntity.itemsName.one)}`,
+		mult: `${prefix}${tt(plantsVendorsEntity.itemsName.mult)}`,
+		instanceName: plantsVendorsEntity.itemsName.instanceName,
 	};
 });
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: '/plants/vendors',
-	itemRoute: '/plants-vendors',
+	apiRoute: plantsVendorsEntity.apiBase,
+	itemRoute: plantsVendorsEntity.routeBase,
 	itemStore: plantsVendorsStore,
-	itemFiltersName: 'plants-vendors_filters',
+	itemFiltersName: plantsVendorsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

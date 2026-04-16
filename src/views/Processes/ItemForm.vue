@@ -273,7 +273,8 @@
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { api_request } from '@/api/request_provider';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -303,6 +304,10 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['submit', 'onCancel']);
+const plantsEntity = ENTITIES.Plants;
+const controllersEntity = ENTITIES.Controllers;
+const machinesEntity = ENTITIES.Machines;
+const productionLinesEntity = ENTITIES.ProductionLines;
 
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
@@ -488,26 +493,10 @@ const requestsToDoList = computed(() => {
 });
 
 const methodsMap = {
-	fetch_plants: (payload = {}) =>
-		api_request.get('/plants', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_controllers: (payload = {}) =>
-		api_request.get('/controllers', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_machines: (payload = {}) =>
-		api_request.get('/machines', {
-			notNotify: true,
-			...payload,
-		}),
-	fetch_production_lines: (payload = {}) =>
-		api_request.get('/production-lines', {
-			notNotify: true,
-			...payload,
-		}),
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
+	fetch_controllers: createGetRequest(controllersEntity.apiBase),
+	fetch_machines: createGetRequest(machinesEntity.apiBase),
+	fetch_production_lines: createGetRequest(productionLinesEntity.apiBase),
 };
 
 const handleStartTimeChange = () => {
