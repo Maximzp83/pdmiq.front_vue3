@@ -53,6 +53,13 @@
   `src/components/table/TableHeader.vue`, `src/views/Machines/ItemForm.vue`.
 - DONE (entity): migrated `Applications` views (`ItemsList`, `ItemForm`, `ItemPage`) and enabled routes in `src/router/index.js`.
 - DONE (entity): migrated `Processes` views (`ItemsList`, `ItemForm`, `ItemPage`, `ItemCard`, `BreakTimeItem`, `WorkDateItem`, `FaultItem`).
+- DONE (entity): completed `Brands` from `vue2_project/src/views/Brands` with `ItemsList`, `ItemForm`, `ItemPage`, plus enabled routes and sidebar menu entry.
+- DONE (entity): completed `Parts` from `vue2_project/src/views/Parts` with `ItemsList`, `ItemForm`, `ItemPage`, plus enabled routes and sidebar menu entry.
+- DONE (entity): completed `EquipmentTypesCategories` from `vue2_project/src/views/EquipmentTypesCategories` with `ItemsList`, `ItemForm`, `ItemPage`, plus enabled routes; sidebar menu intentionally deferred until parent `item_types` menu is migrated.
+- DONE (entity): completed `Teams` from `vue2_project/src/views/Teams` with `ItemsList`, `ItemForm`, `ItemPage`, plus enabled routes; sidebar menu intentionally deferred until parent `Users` menu is migrated.
+- DONE (entity): completed `PlantsVendors` from `vue2_project/src/views/PlantsVendors` with `ItemsList`, `ItemForm`, `ItemPage`, plus added routes and enabled sidebar menu entry.
+- DONE (single-file): refactored `src/views/PlantsVendors/ItemForm.vue` to use `useItemForm`, `useRequestsList`, and `localSetupPage` instead of manual setup/loading logic.
+- DONE (single-file): fixed `src/composables/mixins/useItemPage.js` so explicit `/new` routes work without `route.params.id` and fallback navigation uses existing `NotFound` route.
 - Next priority (components-first rule): migrate missing components required by current imports:
 
 - Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.

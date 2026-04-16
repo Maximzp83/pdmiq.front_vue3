@@ -9,6 +9,7 @@
 - For the coupled-files exception above, stop after the combined step and wait for the next user instruction.
 - Continue migrating all components from `vue2_project/src/components` and update already migrated ones if needed.
 - For migrations of entities from `vue2_project/src/views` to `src/views`, use `src/views/Plants` as the reference example/pattern.
+- When migrating the next entity from `vue2_project/src/views`, also find and uncomment its existing routes in `src/router/index.js` and its existing menu entries in `src/constants/menuItems.js`, if they are present there.
 - During migration, replace all `@event="handleEventNew"` with `@event="handleEvent"`.
 - During migration, replace all `<CustomSelect` usages with `<CustomSelectV2`.
 - Do not display code/diff in terminal responses unless there is a risky or ambiguous point that requires discussion.

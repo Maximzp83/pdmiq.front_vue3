@@ -45,6 +45,25 @@ export function useItemPage({
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
 
+	const getRouteItemId = () => {
+		if (paramsId) {
+			return paramsId;
+		}
+
+		if (route.params?.id) {
+			return route.params.id;
+		}
+
+		const routePathParts = route.path.split('/').filter(Boolean);
+		const lastPathPart = routePathParts[routePathParts.length - 1];
+
+		if (lastPathPart === 'new') {
+			return 'new';
+		}
+
+		return undefined;
+	};
+
 	const pageTitle = computed(() => {
 		const itemName = resolve(itemsName)?.one || 'Item';
 		if (_itemData.value) {
@@ -102,7 +121,7 @@ export function useItemPage({
 								return Promise.resolve(null);
 							}
 
-							const id = paramsId || route.params?.id;
+							const id = getRouteItemId();
 							return id === 'new'
 								? api_request.post(apiRoute, requestPayload)
 								: api_request.put(`${apiRoute}/${id}`, requestPayload);
@@ -209,10 +228,10 @@ export function useItemPage({
 			});
 	};
 
-	const initialPageSetup = ({ params, path }) => {
+	const initialPageSetup = ({ path }) => {
 		_loadContent.value = false;
 		setup_navbar(navbarSettings.value);
-		let id = paramsId || params?.id;
+		let id = getRouteItemId();
 
 		if (path === '/profile') {
 			id = authUser.value?.id;
@@ -226,7 +245,7 @@ export function useItemPage({
 				return fetchPageData(id, { notNotify: true });
 			}
 		} else {
-			router.push({ name: 'NotFoundPage' });
+			router.push({ name: 'NotFound' });
 		}
 
 		return Promise.resolve(null);

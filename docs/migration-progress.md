@@ -172,6 +172,41 @@ await fetchUsers({ page: 1 });
 
 ## Phase 3 — Composables
 - [ ] Migrate mixins → composables
+- [x] `Brands` entity migration completed for current Vue3 scope
+  - Added `src/views/Brands/ItemForm.vue`
+  - Added `src/views/Brands/ItemPage.vue`
+  - Added `src/views/Brands/ItemsList.vue`
+  - Enabled `Brands` routes in `src/router/index.js` with `/brands`, `/brands/new`, `/brands/:id`
+  - Enabled `Brands` sidebar entry in `src/constants/menuItems.js`
+- [x] `Parts` entity migration completed for current Vue3 scope
+  - Added `src/views/Parts/ItemForm.vue`
+  - Added `src/views/Parts/ItemPage.vue`
+  - Added `src/views/Parts/ItemsList.vue`
+  - Enabled `Parts` routes in `src/router/index.js` with `/parts`, `/parts/new`, `/parts/:id`
+  - Enabled `Parts` sidebar entry in `src/constants/menuItems.js`
+- [x] `EquipmentTypesCategories` entity migration completed for current Vue3 scope
+  - Added `src/views/EquipmentTypesCategories/ItemForm.vue`
+  - Added `src/views/EquipmentTypesCategories/ItemPage.vue`
+  - Added `src/views/EquipmentTypesCategories/ItemsList.vue`
+  - Enabled `EquipmentTypesCategories` routes in `src/router/index.js` with `/equipment-types-categories`, `/equipment-types-categories/new`, `/equipment-types-categories/:id`
+  - Sidebar menu entry intentionally deferred because legacy menu item is nested under not-yet-migrated parent `item_types`
+- [x] `Teams` entity migration completed for current Vue3 scope
+  - Added `src/views/Teams/ItemForm.vue`
+  - Added `src/views/Teams/ItemPage.vue`
+  - Added `src/views/Teams/ItemsList.vue`
+  - Enabled `Teams` routes in `src/router/index.js` with `/teams`, `/teams/new`, `/teams/:id`
+  - Sidebar menu entry intentionally deferred because legacy menu item is nested under not-yet-migrated parent `Users`
+- [x] `PlantsVendors` entity migration completed for current Vue3 scope
+  - Added `src/views/PlantsVendors/ItemForm.vue`
+  - Added `src/views/PlantsVendors/ItemPage.vue`
+  - Added `src/views/PlantsVendors/ItemsList.vue`
+  - Added `PlantsVendors` routes in `src/router/index.js` with `/plants-vendors`, `/plants-vendors/new`, `/plants-vendors/:id`
+  - Enabled `Vendors` sidebar entry in `src/constants/menuItems.js`
+- [x] `src/views/Brands/ItemsList.vue` added in Vue3 style
+  - Migrated from legacy `vue2_project/src/views/Brands/ItemsList.vue`
+  - Switched list page flow to `useItemsData` + `useEventHandler`
+  - Replaced legacy table event wiring with `@event="handleEvent"`
+  - Preserved brand list filters, permissions, pagination, and table columns
 - [x] `useItemsData` updated for list-action callbacks + promise-style async flow
   - Added callback hooks for `createItem`, `editItem`, `handleDeleteItems`
   - Exposed list-action methods from composable for view-level wiring
@@ -184,6 +219,13 @@ await fetchUsers({ page: 1 });
   - `createItem()` and `editItem()` now build routes from top-level `itemRoute`
   - `deleteItem()` now uses top-level `apiRoute`, same as `fetchItems()`
   - Removed `resolveRoutePath` helper
+- [x] `useItemPage` create-mode fixed for explicit `/new` routes
+  - `useItemPage` now detects create mode from the last route path segment when `route.params.id` is absent
+  - Fixed invalid fallback route push from `NotFoundPage` to existing `NotFound`
+- [x] `src/views/PlantsVendors/ItemForm.vue` aligned to shared form composables
+  - Replaced manual form init/validate flow with `useItemForm`
+  - Replaced manual auxiliary list loading with `useRequestsList`
+  - Moved item/default setup into `localSetupPage` to match established item-form pattern
 - [x] `useItemsData` delete flow aligned with legacy `itemsDataMixin`
   - `handleDeleteItems()` now collects `ids` from row payload or table selection
   - `deleteItem()` now works through `ids` payload instead of single-row route delete

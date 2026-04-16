@@ -1,4 +1,4 @@
-import { /*USER_TYPES,*/ USER_ROLES_TYPES /*, SCOPES*/ } from '@/constants/global';
+import { /*USER_TYPES, USER_ROLES_TYPES, SCOPES*/ } from '@/constants/global';
 import { Lang } from '@/localization';
 
 // import store from '@/store';
@@ -152,15 +152,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_distributors'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'Vendors',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.VENDORS,
-	// 	icon: 'icon-vendors',
-	// 	path: '/plants-vendors',
-	// 	meta: { permissions: ['view_vendors'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Vendors',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.VENDORS,
+		icon: 'icon-vendors',
+		path: '/plants-vendors',
+		meta: { permissions: ['view_vendors'] },
+		enableInCompanyMenuForm: true
+	},
 	// {
 	// 	name: 'sidebar_menu.Settings',
 	// 	belongs_to_label: 'system',
@@ -305,15 +305,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_work_order_type'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'sidebar_menu.Misc_Parts',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.MISC_PARTS,
-	// 	icon: 'icon-machines2',
-	// 	path: '/parts',
-	// 	meta: { permissions: ['view_misc_parts'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.Misc_Parts',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.MISC_PARTS,
+		icon: 'icon-machines2',
+		path: '/parts',
+		meta: { permissions: ['view_misc_parts'] },
+		enableInCompanyMenuForm: true
+	},
 	// {
 	// 	name: 'Work_Stations',
 	// 	belongs_to_label: 'cmms',
@@ -385,15 +385,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_library'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'Brands',
-	// 	belongs_to_label: 'asset_management',
-	// 	id: MENU_TYPES.BRANDS,
-	// 	icon: 'icon-brands',
-	// 	path: '/brands',
-	// 	meta: { permissions: ['view_brands'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Brands',
+		belongs_to_label: 'asset_management',
+		id: MENU_TYPES.BRANDS,
+		icon: 'icon-brands',
+		path: '/brands',
+		meta: { permissions: ['view_brands'] },
+		enableInCompanyMenuForm: true
+	},
 	// {
 	// 	name: 'part_numbers',
 	// 	belongs_to_label: 'asset_management',
