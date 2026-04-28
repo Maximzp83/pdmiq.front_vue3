@@ -13,7 +13,7 @@
 .component-scale-enter-active, .component-scale-leave-active {
   transition: opacity .3s linear, transform 0.3s ease-out;
 }
-.component-scale-enter {
+.component-scale-enter-from {
   opacity: 0;
   transform: scale(.97);
 }
@@ -38,12 +38,23 @@
 
 // --------------
 
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
 .standard-fade-enter-active, .standard-fade-leave-active {
   transition: opacity 0.25s ease;
 }
-.standard-fade-enter, .standard-fade-leave-to
-/* .component-fade-leave-active до версии 2.1.8 */ {
+.standard-fade-enter-from, .standard-fade-leave-to {
   opacity: 0;
+}
+
+.standard-fade-leave-active {
+	// position: absolute;
 }
 
 /*.standard-fade-abs-enter-active, .standard-fade-abs-leave-active {

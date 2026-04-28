@@ -63,30 +63,30 @@ const routes = [
 					},
 				],
 			},
-			// {
-			// 	path: 'companies',
-			// 	name: 'Companies',
-			// 	component: () => import('@/views/Companies/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_companies'] },
-			// },
-			// {
-			// 	path: 'companies/create',
-			// 	name: 'CompanyCreate',
-			// 	component: () => import('@/views/Companies/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['create_companies'] },
-			// },
-			// {
-			// 	path: 'companies/:id',
-			// 	name: 'CompanyEdit',
-			// 	component: () => import('@/views/Companies/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_companies'] },
-			// },
-			// {
-			// 	path: 'companies/:id/info',
-			// 	name: 'CompanyInfo',
-			// 	component: () => import('@/views/Companies/InfoPage.vue'),
-			// 	meta: { auth: true, permissions: ['view_companies'] },
-			// },
+			{
+				path: 'companies',
+				name: 'Companies',
+				component: () => import('@/views/Companies/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_companies'] },
+			},
+			{
+				path: 'companies/new',
+				name: 'CompanyCreate',
+				component: () => import('@/views/Companies/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_companies'] },
+			},
+			{
+				path: 'companies/:id',
+				name: 'CompanyEdit',
+				component: () => import('@/views/Companies/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_companies'] },
+			},
+			{
+				path: 'companies/:id/info',
+				name: 'CompanyInfo',
+				component: () => import('@/views/Companies/InfoPage.vue'),
+				meta: { auth: true, permissions: ['view_companies'] },
+			},
 			// {
 			// 	path: 'users',
 			// 	name: 'Users',
@@ -130,12 +130,6 @@ const routes = [
 				meta: { auth: true, permissions: ['view_users_teams'] },
 			},
 			{
-				path: 'teams/new',
-				name: 'TeamCreate',
-				component: () => import('@/views/Teams/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_users_teams'] },
-			},
-			{
 				path: 'teams/:id',
 				name: 'TeamEdit',
 				component: () => import('@/views/Teams/ItemPage.vue'),
@@ -164,12 +158,6 @@ const routes = [
 				name: 'PlantsVendors',
 				component: () => import('@/views/PlantsVendors/ItemsList.vue'),
 				meta: { auth: true, permissions: ['view_vendors'] },
-			},
-			{
-				path: 'plants-vendors/new',
-				name: 'PlantsVendorCreate',
-				component: () => import('@/views/PlantsVendors/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_vendors'] },
 			},
 			{
 				path: 'plants-vendors/:id',

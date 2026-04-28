@@ -58,7 +58,7 @@
 						<div class="page-top-bg-addition" />
 
 						<router-view v-slot="{ Component }">
-							<transition name="fade" mode="out-in">
+							<transition name="component-scale" mode="out-in">
 						    <component
 						    	:is="Component"
 						    	ref="viewContent"
@@ -199,34 +199,6 @@ const signIn = (token) => {
 	authStore.get_auth_user(token).then(() => {
 		router.push('/dashboard');
 	});
-};
-
-const createItem = () => {
-	const viewContent = document.querySelector('.dashboard-content-container');
-	if (viewContent && viewContent.handleCreateItem) {
-		viewContent.handleCreateItem();
-	}
-};
-
-const saveItem = () => {
-	const viewContent = document.querySelector('.dashboard-content-container');
-	if (viewContent && viewContent.handleSaveItem) {
-		viewContent.handleSaveItem();
-	}
-};
-
-const cleanForm = () => {
-	const viewContent = document.querySelector('.dashboard-content-container');
-	if (viewContent && viewContent.handleCleanForm) {
-		viewContent.handleCleanForm();
-	}
-};
-
-const deleteItems = () => {
-	const viewContent = document.querySelector('.dashboard-content-container');
-	if (viewContent && viewContent.handleDeleteItems) {
-		viewContent.handleDeleteItems();
-	}
 };
 
 const handleLayoutClick = ({ target }) => {

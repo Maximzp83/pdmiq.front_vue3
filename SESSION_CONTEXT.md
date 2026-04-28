@@ -50,6 +50,10 @@
 - `src/views/Machines/ItemsList.vue`
 - `src/views/Machines/ItemPage.vue`
 - `src/views/MaintenanceCategories/ItemsList.vue`
+- `src/views/Companies/ItemsList.vue`
+- `src/views/Companies/ItemForm.vue`
+- `src/views/Companies/ItemPage.vue`
+- `src/views/Companies/InfoPage.vue`
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `docs/migration-progress.md`

@@ -97,15 +97,15 @@ const menuItems1 = [
 		name: 'sidebar_menu.System',
 		category_label: 'system'
 	},
-	// {
-	// 	name: 'Companies',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.COMPANIES,
-	// 	icon: 'icon-companies',
-	// 	path: '/companies',
-	// 	meta: { permissions: ['view_companies'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Companies',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.COMPANIES,
+		icon: 'icon-companies',
+		path: '/companies',
+		meta: { permissions: ['view_companies'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'Plants',
 		belongs_to_label: 'system',

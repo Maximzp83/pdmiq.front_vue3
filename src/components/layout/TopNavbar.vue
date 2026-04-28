@@ -20,8 +20,9 @@
 					<i class="icomoon icon-lists" />
 				</button> -->
 
-				<TransitionGroup name="standard-fade">
+				<transition name="standard-fade" mode="out-in">
 					<div
+						key="standard-nav-title"
 						class="menu-block title-block mcol-xs-8 mcol-sm-auto"
 						v-if="navbarSettings.showStandardNavItem"
 					>
@@ -46,6 +47,7 @@
 					</div>
 
 					<div
+						key="page-title"
 						v-else-if="pageTitle"
 						class="menu-block title-block mcol-xs-8 mcol-sm-auto"
 					>
@@ -63,8 +65,11 @@
 							</div>
 						</div>
 					</div>
+				</transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="datepicker"
 						class="flex align-center mcol-xs-8 mcol-sm-5 mcol-lg-auto fluid"
 						v-if="navbarSettings.datepickerSettings"
 					>
@@ -85,16 +90,22 @@
 							size="large"
 						/>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<SearchBar
+						key="searchbar"
 						v-if="navbarSettings.showSearchbar"
 						class="menu-block search-block mcol-xs-12 mcol-sm-3"
 						@submit="searchSubmit"
 						:query="report_filters.q"
 						clearable
 					/>
-
+				</Transition>
+				
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="compare-list"
 						class="menu-block buttonWrapper flex compareList"
 						v-if="
 							navbarSettings.showCompareButton &&
@@ -117,9 +128,12 @@
 							>{{ `${tt('clear')} ${tt('compare')}` }}</el-button
 						>
 					</div>
+				</Transition>
 
-					<template v-if="!fromDashboard">
+				<template v-if="!fromDashboard">
+					<!-- <Transition	name="standard-fade" mode="out-in">
 						<div
+							key="create-table-form"
 							class="menu-block buttonWrapper"
 							v-if="navbarSettings.showCreateButtonForTableForm"
 						>
@@ -131,7 +145,26 @@
 								<i class="icomoon icon-plus"></i>
 							</el-button>
 						</div>
+					</Transition> -->
 
+					<template v-if="navbarSettings.customButtons && navbarSettings.customButtons.length">
+						<Transition	name="standard-fade" mode="out-in"
+							v-for="button in navbarSettings.customButtons"
+							:key="'custom-button-'+button.id"
+						>
+							<div :class="button.wrapper_class || 'menu-block buttonWrapper'">
+								<el-button
+									@click="button.handler"
+									:class="['el-button--secondary', button.class]"
+									native-type="button"
+								>
+									<i v-if="button.icon" :class="button.icon"></i>
+								</el-button>
+							</div>
+						</Transition>
+					</template>
+
+					<!-- <Transition	name="standard-fade" mode="out-in">
 						<div
 							class="menu-block buttonWrapper"
 							v-if="navbarSettings.navigateButton"
@@ -144,8 +177,10 @@
 								<i class="icomoon icon-path_2"></i>
 							</el-button>
 						</div>
+					</Transition>
 
-						<div class="menu-block buttonWrapper" v-if="navbarSettings.editButton">
+					<Transition	name="standard-fade" mode="out-in">
+						<div key="edit-button" class="menu-block buttonWrapper" v-if="navbarSettings.editButton">
 							<el-button
 								@click="changeRoute(navbarSettings.editButton)"
 								class="el-button--secondary shadow save-button"
@@ -154,8 +189,11 @@
 								<i class="icomoon icon-pencil"></i>
 							</el-button>
 						</div>
+					</Transition> -->
 
+					<!-- <Transition	name="standard-fade" mode="out-in">
 						<div
+							key="clean-button"
 							class="menu-block buttonWrapper"
 							v-if="navbarSettings.showCleanButton"
 						>
@@ -168,9 +206,12 @@
 								<i class="icomoon icon-clean"></i>
 							</el-button>
 						</div>
-					</template>
+					</Transition> -->
+				</template>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="role-select"
 						v-if="factUserRoleType.isIndustrialMatrix"
 						class="menu-block role-select filter-block mcol-xs-6 mcol-sm-2 text-right ml-auto relative"
 					>
@@ -189,8 +230,11 @@
 							popper-class="plant-select-dropdown"
 						/>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="plant-filter"
 						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-3 text-right ml-auto relative"
 						v-if="navbarSettings.showFilter"
 					>
@@ -212,8 +256,11 @@
 							popper-class="plant-select-dropdown"
 						/>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="company-filter"
 						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-3 text-right ml-auto relative"
 						v-if="enableCompaniesFilter"
 					>
@@ -234,15 +281,21 @@
 							popper-class="plant-select-dropdown"
 						/>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="plant-name"
 						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-auto text-right ml-auto"
 						v-if="showPlant"
 					>
 						<div class="">{{ showPlant.name }}</div>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						key="print-button"
 						class="menu-block buttonWrapper ml-auto"
 						v-if="navbarSettings.printButtonSettings"
 					>
@@ -256,13 +309,16 @@
 							></i>
 						</el-button>
 					</div>
+				</Transition>
 
+				<Transition	name="standard-fade" mode="out-in">
 					<div
+						v-if="creationMenuList.length"
+						key="creation-menu"
 						:class="[
 							'menu-block creation-button-wrapper mcol-sm-auto',
 							navbarSettings.datepickerSettings ? 'mcol-xs-1' : 'mcol-xs-2',
 						]"
-						v-if="creationMenuList.length"
 					>
 						<div class="ml-auto">
 							<el-popover
@@ -299,7 +355,7 @@
 							</el-popover>
 						</div>
 					</div>
-				</TransitionGroup>
+				</Transition>
 			</div>
 		</div>
 	</div>

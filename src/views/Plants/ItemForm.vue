@@ -202,7 +202,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, defineAsyncComponent } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
@@ -218,7 +218,10 @@ import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import Datepicker from '@/components/common/Datepicker.vue';
-import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
+const FormOperationsButtons = defineAsyncComponent(
+	() => import('@/components/form/FormOperationsButtons.vue'),
+);
+// import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
 import LocationItem from './LocationItem.vue';
 

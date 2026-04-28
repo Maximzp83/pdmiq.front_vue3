@@ -68,6 +68,10 @@
 - DONE (cleanup): removed duplicated `equipmentTypes` related endpoint from `PlantsVendors`; `src/views/PlantsVendors/ItemForm.vue` now references `ENTITIES.EquipmentTypes` directly for equipment-type list requests.
 - DONE (cleanup): removed all remaining `createGetRequest(...related...)` usages where the target is already a first-class entity config; migrated forms now reference those entity configs directly.
 - DONE (single-file): fixed `src/composables/mixins/useItemPage.js` so explicit `/new` routes work without `route.params.id` and fallback navigation uses existing `NotFound` route.
+- DONE (single-file): added `src/views/Companies/ItemsList.vue` in Vue3 style; deferred legacy `Info` table action until `Companies/InfoPage.vue` is migrated and route is enabled.
+- DONE (single-file): added `src/views/Companies/ItemForm.vue` in Vue3 style with main/menu/SSO tabs and direct SSO host generation request.
+- DONE (single-file): added `src/views/Companies/ItemPage.vue` in Vue3 style with tabbed page wrapper and multipart save flow for SSO certificate uploads.
+- DONE (single-file): added `src/views/Companies/InfoPage.vue` in Vue3 style; route enablement and Companies list `Info` action wiring remain separate next steps.
 - Next priority (components-first rule): migrate missing components required by current imports:
 
 - Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.

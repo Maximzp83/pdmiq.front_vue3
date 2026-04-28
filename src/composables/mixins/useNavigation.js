@@ -26,6 +26,7 @@ export function useNavigation() {
 			if (path) {
 				route += `/${path}`;
 			}
+			// console.log(route);
 			router.push(route);
 			return;
 		}

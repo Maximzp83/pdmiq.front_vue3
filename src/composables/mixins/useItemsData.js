@@ -1,4 +1,4 @@
-import { ref, shallowReactive, watch, onBeforeMount } from 'vue';
+import { ref, shallowReactive, watch, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
@@ -64,6 +64,9 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		localEditItem,
 		localDeleteItem,
 		localDeleteItems,
+		preventSetNavbar,
+		preventSetupNavbar,
+		preventDestroyNavbar,
 	} = options;
 
 	// ========== Computed-like ==========
@@ -438,6 +441,13 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 	/*onMounted(() => {
 		console.log('useItemsData mounted', tableRef.value.selectedIds)
 	});*/
+
+	onBeforeUnmount(() => {
+		const { preventDestroyNavbar, preventSetNavbar } = options;
+		if (!preventDestroyNavbar && !preventSetNavbar) {
+			set_global_store('navbarSettings', {});
+		}
+	});
 
 	return {
 		// State

@@ -258,6 +258,23 @@ await fetchUsers({ page: 1 });
 - [x] `Applications` aligned to `Plants` list/page pattern
   - `ItemsList` now uses store-driven `useItemsData` actions for create/edit/delete
   - `ItemPage` now uses `/new` create-mode convention via `route.params.id`
+- [x] `src/views/Companies/ItemsList.vue` added in Vue3 style
+  - Migrated from legacy `vue2_project/src/views/Companies/ItemsList.vue`
+  - Switched list page flow to `useItemsData` + `useEventHandler`
+  - Preserved list filters, pagination, sortable columns, and edit/delete table actions
+  - Deferred legacy `Info` action until `Companies/InfoPage.vue` route is migrated and enabled
+- [x] `src/views/Companies/ItemForm.vue` added in Vue3 style
+  - Migrated from legacy `vue2_project/src/views/Companies/ItemForm.vue`
+  - Preserved main/menu/SSO tabs, company-menu checkbox matrix, and SSO certificate upload field
+  - Replaced legacy host-generation/store calls with direct Vue3 request flow to `/companies/saml2/idp-host`
+- [x] `src/views/Companies/ItemPage.vue` added in Vue3 style
+  - Migrated from legacy `vue2_project/src/views/Companies/ItemPage.vue`
+  - Preserved tabbed company page flow with `TabsBar`, `useItemPage`, and dynamic `Main/Menu/SSO` tabs
+  - Enabled multipart save flow for the SSO certificate field via `uploadSettings`
+- [x] `src/views/Companies/InfoPage.vue` added in Vue3 style
+  - Migrated from legacy `vue2_project/src/views/Companies/InfoPage.vue`
+  - Preserved read-only company info page with navbar back/edit controls and basic company fields
+  - Route/menu wiring for this page remains a separate next step
   - Async page flow normalized to promise-style
 - [x] Router aligned to `/new` create-mode convention for migrated entities
   - Added explicit `/new` create routes for `Plants`, `Applications`, and `Processes`

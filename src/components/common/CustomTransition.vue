@@ -6,8 +6,9 @@
 		<slot></slot>
 	</div>
 
-	<transition-group
+	<TransitionGroup
 		v-else
+		ref="rootEl"
 		class="custom-transition-container"
 		:name="name"
 		:tag="tag"
@@ -17,7 +18,7 @@
 		@leave="onLeave"
 	>
 		<slot></slot>
-	</transition-group>
+	</TransitionGroup>
 </template>
 
 <script setup>
@@ -79,10 +80,11 @@ onMounted(() => {
 
 	nextTick(() => {
 		setTimeout(() => {
-			if (!rootEl.value) return;
+			const rootNode = rootEl.value?.$el || rootEl.value;
+			if (!rootNode?.children) return;
 			const startIdx = props.startingElementIdx || 0;
-			for (let i = 0; i < rootEl.value.children.length; i++) {
-				const el = rootEl.value.children[i];
+			for (let i = 0; i < rootNode.children.length; i++) {
+				const el = rootNode.children[i];
 				el.classList.add(props.name);
 				if (startIdx === i) {
 					el.classList.add('fade-in');

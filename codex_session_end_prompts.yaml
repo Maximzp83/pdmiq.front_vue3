@@ -16,13 +16,14 @@
 ==================================================
 2)  At New Session:
   Read docs/session-collaboration-rules.md, docs/new-session-handoff.md,
-  docs/migration-progress.md, and docs/migration-todos.md.
+  docs/migration-progress.md, docs/migration-todos.md and others.
   Briefly confirm the current rules, SESSION_CONTEXT.md, keeping the mode: no code/diff output,
   one step at a time, and after each step provide the result and the path to the
   newly created file in plain text.
 
 3) в папку vue2_project были внесены изменения, проанализируй эти изменения и внеси эти зменения в 
-  уже мигрированные файлы. если некоторые изменения касаются еще не мигрированных файлов то пропусти это.
+  уже мигрированные файлы. если некоторые изменения касаются еще не мигрированных файлов то пропусти это, только если это 
+  не файлы из constants, mixins или helpers
 
 
 3)  codex resume 019d5276-bffc-72f2-9bed-b0d77c4a700e

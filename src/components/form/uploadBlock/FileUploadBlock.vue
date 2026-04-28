@@ -69,8 +69,8 @@
 import { computed, ref, watch, onMounted, nextTick } from 'vue';
 
 import { useEventHandler } from '@/composables/mixins/useEmitter';
-import { useCreateFormItem } from '@/composables/mixins/useCreateFormItem';
 import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
+import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import FileUploadBlockItem from './FileUploadBlockItem.vue';
 
@@ -118,7 +118,7 @@ const fileUploadItemsRefs = ref([]);
 const filesList = ref([]);
 const draggingLocked = ref(false);
 
-const { setupFormSubItemsList, addFormItem, removeFormItem } = useCreateFormItem();
+const { setupFormSubItemsList, addFormItem, removeFormItem } = useSubItemsList();
 
 const enableReorder = computed(() => !!props.enableReorderFiles);
 const drag_n_drop_wrapper_selector = computed(() =>

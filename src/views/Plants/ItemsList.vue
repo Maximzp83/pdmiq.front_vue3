@@ -54,7 +54,6 @@ import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { usePlantsStore } from '@/stores/PlantsStore';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
@@ -72,8 +71,6 @@ const plantsStore = usePlantsStore();
 const { filters } = storeToRefs(plantsStore);
 
 const authStore = useAuthStore();
-const globalStore = useGlobalStore();
-const { globalFilters } = storeToRefs(globalStore);
 const plantsEntity = ENTITIES.Plants;
 
 const hasAccessToCreate = computed(() => authStore.hasAccessTo([plantsEntity.permissions.create]));
@@ -120,7 +117,7 @@ const tableSettings = computed(() => {
 
 	if (hasAccessToView.value) {
 		actions.push({
-			name: 'goToDashboard',
+			name: 'goToDetails',
 			type: 'success',
 			icon: 'icomoon icon-eye',
 			tooltip_text: 'Details',
@@ -174,17 +171,16 @@ const setupPlantName = (plant) => {
 	return result;
 };
 
-const goToDashboard = ({ row }) => {
+const goToDetails = ({ row }) => {
 	if (!row?.id) return;
-	globalStore.set_global_filters({ ...globalFilters.value, plantId: row.id });
-	changeRoute({ path: '/dashboard/plant' });
+	changeRoute({ path: `${plantsEntity.routeBase}/${row.id}/details` });
 };
 
 const methodsMap = {
 	setFilters,
 	createItem,
 	editItem,
-	goToDashboard,
+	goToDetails,
 	handleDeleteItems,
 };
 

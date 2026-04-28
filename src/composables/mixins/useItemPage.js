@@ -28,8 +28,9 @@ export function useItemPage({
 	saveItem,
 	changeRoute,
 	successSubmitCallback,
-	itemData,
 	itemFormRef,
+	localPageTitle,
+	customButtons
 } = {}) {
 	const route = useRoute();
 	const router = useRouter();
@@ -38,7 +39,7 @@ export function useItemPage({
 	const { Notify } = useNotify();
 	const itemSaving = ref(false);
 	const _loadContent = loadContent || ref(false);
-	const _itemData = itemData || ref(null);
+	const _itemData = ref(null);
 	const _itemLoading = itemLoading || ref(false);
 	const authUser = computed(() => authStore.authUser);
 
@@ -65,6 +66,9 @@ export function useItemPage({
 	};
 
 	const pageTitle = computed(() => {
+		if (localPageTitle && typeof localPageTitle === 'function') {
+			return localPageTitle(_itemData.value);
+		}
 		const itemName = resolve(itemsName)?.one || 'Item';
 		if (_itemData.value) {
 			return `${itemName}`;
@@ -72,9 +76,17 @@ export function useItemPage({
 		return `${Lang.tt('New')} ${itemName}`;
 	});
 
+	const _customButtons = computed(() => {
+		if (customButtons && typeof customButtons === 'function') {
+			return customButtons(_itemData.value);
+		}
+		return customButtons;
+	});
+
 	const navbarSettings = computed(() =>
 		Object.freeze({
 			pageTitle: pageTitle.value,
+			customButtons: _customButtons.value,
 			...(additionalNavbarSettings || {}),
 		}),
 	);
@@ -136,9 +148,7 @@ export function useItemPage({
 			saveItemAction(payload)
 				.then((answer) => {
 					if (!answer?.request_payload?.setToStore) {
-						if (_itemData && 'value' in _itemData) {
-							_itemData.value = answer.data;
-						}
+						_itemData.value = answer.data;
 					}
 
 					return Promise.resolve(
@@ -255,7 +265,7 @@ export function useItemPage({
 		setup_navbar(navbarSettings.value);
 	});
 
-	onMounted(() => {
+	onMounted(() => {		
 		initialPageSetup(route);
 	});
 

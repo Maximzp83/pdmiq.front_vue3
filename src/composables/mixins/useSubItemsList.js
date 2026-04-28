@@ -1,6 +1,12 @@
-import uniqid from 'uniqid';
 import { validateBySettings } from '@/helpers';
 import isEmpty from 'lodash/isEmpty';
+
+let localIdCounter = 0;
+
+const createLocalId = (prefix = 'id') => {
+	localIdCounter += 1;
+	return `${prefix}${Date.now()}-${localIdCounter}`;
+};
 
 export function useSubItemsList({ formData, refsMap, state } = {}) {
 	const resolve = (val) =>
@@ -29,9 +35,9 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		const itemsList = [];
 		for (const item of dataList || []) {
 			if (typeof item !== 'object') {
-				itemsList.push({ value: item, id: uniqid(`${uniqidPrefix}-`) });
+				itemsList.push({ value: item, id: createLocalId(`${uniqidPrefix}-`) });
 			} else if (item) {
-				itemsList.push({ ...item, id: item.id || uniqid(`${uniqidPrefix}-`) });
+				itemsList.push({ ...item, id: item.id || createLocalId(`${uniqidPrefix}-`) });
 			}
 		}
 		return itemsList;
@@ -42,7 +48,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		localFormData = localFormData || {};
 		const method = unshift ? 'unshift' : 'push';
 		const newItem = {
-			id: uniqid(uniqPrefix),
+			id: createLocalId(uniqPrefix),
 			new: true,
 			focus,
 			...localFormData,
