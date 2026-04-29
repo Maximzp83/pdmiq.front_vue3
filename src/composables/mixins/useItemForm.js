@@ -178,8 +178,7 @@ export function useItemForm({
 
 	const submitForm = (options = {}) => {
 		try {
-			let { formDataName, injectToBody, additionalInject } = options;
-			injectToBody = injectToBody || {};
+			let { formDataName, additionalInject } = options;
 			additionalInject = additionalInject || {};
 
 			const form = resolve(formData);
@@ -187,7 +186,6 @@ export function useItemForm({
 				id: itemId.value,
 				...(formDataName && options[formDataName] ? options[formDataName] : form),
 				...additionalInject,
-				...injectToBody,
 			};
 
 			if (localPrepareSubmitData) {

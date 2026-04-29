@@ -43,16 +43,18 @@
 					</el-form-item>
 
 					<el-form-item :label="tt('Data_Set')" prop="data_set"
-						v-if="!fromBannerSensorForm"
+						v-if="!isLubeMatrixV4"
 					>
 						<!-- <div class="1mcol-sm-6"> -->
 						<el-select
 							v-model="formData.data_set"
 							:placeholder="`${tt('Select')} ${tt('dataset')}`"
+							:class="{'showJustInfo':isLubeMatrixV3 && !isNew && !datasetChanged}"
 						>
 							<el-option
 								v-for="item in filteredDataSetsList"
 								:key="'data_set-' + item.id"
+								:disabled="isLubeMatrixV3 && !isNew && !datasetChanged"
 								:label="item.alt_label || item.label"
 								:value="item.id"
 							/>
@@ -928,7 +930,8 @@ export default {
 		lubeTypesList: Array,
 		commonItemsLoadings: Object,
 		fromBannerSensorForm: Boolean,
-
+		isLubeMatrixV3: Boolean,
+		isLubeMatrixV4: Boolean,
 		// ---From FormItemMixin-------
 		itemData: {	type: Object,	default: () => null },
 
@@ -937,6 +940,7 @@ export default {
 		editInModal: Boolean,
 		additionalSettings: { type: Object,	default: () => ({}) },
 		itemsName: { type: Object, default: () => ({}) },
+		parentDataSet: null
 	},
 
 	data() {
@@ -964,6 +968,7 @@ export default {
 			selected_lube_time: '',
 
 			isResetFrequencySettingsBeforeSubmit: false,
+			datasetChanged: false,
 
 			formData: {
 				// ----sensor-----
@@ -1326,7 +1331,7 @@ export default {
 			// console.log(item);
 			// console.log('localSetupPageActions', item)
 
-			if (this.fromBannerSensorForm) {
+			if (this.isLubeMatrixV3 || this.isLubeMatrixV4) {
 				this.formData.lube_version = LUBE_VERSIONS.V3;
 			}
 
@@ -1607,6 +1612,17 @@ export default {
 				]);
 			}
 
+			if (this.fromBannerSensorForm) {
+				delete data.location_in_equipment;
+				delete data.controller_id;
+				data.type = SENSOR_TYPES.BANNER;
+				// console.log('us loc submit', payload)
+				if (this.isLubeMatrixV4) {
+					// delete data.data_set;
+					data.data_set = this.parentDataSet;
+				}
+			}
+
 			let payload = {
 				formData: {
 					id: this.itemId,
@@ -1615,7 +1631,8 @@ export default {
 			};
 			
 			pumpFormData ? (payload.pumpFormData = pumpFormData) : null;
-			
+
+				// console.log('us payload', this.itemData.data_set , data.data_set)
 			if (this.itemData && this.itemData.data_set !== data.data_set) {
 				delete payload.formData.id;
 				delete pumpFormData.id;
@@ -1624,15 +1641,8 @@ export default {
 			this.enableLevelZonesForm
 				? (payload.levelZonesFormData = this.levelZoneForm)
 				: null;
-
-				if (this.fromBannerSensorForm) {
-					delete payload.formData.location_in_equipment;
-					delete payload.formData.controller_id;
-					delete payload.formData.data_set;
-					// console.log('us loc submit', payload)
-				}
-				return payload;
 			
+			return payload;			
 		},
 
 		localSubmit(payloadData) {
@@ -1862,6 +1872,14 @@ export default {
 		selected_lube_date() {
 			if (!this.isInitialSetup) {
 				this.selected_lube_time = '';
+			}
+		},
+
+		parentDataSet() {// для работы lubematrix V3/V4
+			// console.log('parentDataSet', data_set);
+			if (this.fromBannerSensorForm) {
+				this.formData.data_set = null;
+				this.datasetChanged = true;
 			}
 		}
 	},

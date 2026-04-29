@@ -164,6 +164,8 @@ class SensorChartBase extends ChartBase {
 		this.lastInitialRedrawComplete;
 
 		// ----------- yAxis custom min values ----------------
+		chart_config.yAxisOptions = {};
+
 		// console.log(sensorType, currentSensorType)
 		if (sensorType == 'ultrasound') {
 			const { isUltrasoundDB, isUltrasoundFullSpectrum } = currentSensorType;

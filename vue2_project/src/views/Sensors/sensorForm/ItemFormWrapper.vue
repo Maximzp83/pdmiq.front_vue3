@@ -151,7 +151,7 @@
 import { mapActions } from 'vuex';
 import { navigation, tabsMixin, eventHandler, subItemsListMixin } from '@/mixins';
 import { SENSOR_TYPES, DATASET } from '@/constants/global';
-// import { LUBE_VERSIONS } from '@/constants/ultrasound';
+import { LUBE_VERSIONS } from '@/constants/ultrasound';
 import { findItemBy, setupLabel } from '@/helpers';
 
 export default {
@@ -418,11 +418,11 @@ export default {
 	created() {
 		if (!this.isNew && this.itemData && this.itemData.id) {
 			// для работы в форме banner сенсора
-			/*const type = this.itemData.lube_version === LUBE_VERSIONS.V3
+			const type = this.itemData.lube_version === LUBE_VERSIONS.V3
 				? SENSOR_TYPES.BANNER
-				: this.itemData.type;*/
+				: this.itemData.type;
 
-			this.activeTab = findItemBy('item_type', this.itemData.type, this.tabsList);
+			this.activeTab = findItemBy('item_type', type, this.tabsList);
 			this.disableTabs = true;
 		}
 	},	

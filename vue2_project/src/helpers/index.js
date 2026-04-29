@@ -1695,7 +1695,7 @@ export const getRoundedValue = (value, multiplier, afterDot) =>
 	getRoundedValue1(value, multiplier, afterDot);
 export const countDecimalOrder = value => countDecimalOrder1(value);
 export const roundNearest5 = num => Math.round(num / 5) * 5;
-export const roundNearest = (q, num) => Math.round(num / q) * q;
+export const roundNearest = (q, num) => Math.round(num * (1 / q)) / (1 / q);
 export const getCountAfterDot = x => getCountAfterDot1(x);
 export const getFileType = str => getFileType1(str);
 export const capitalizeFirstLetter = string => capitalizeFirstLetter1(string);

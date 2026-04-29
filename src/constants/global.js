@@ -360,7 +360,7 @@ export const DATASET = {
 	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25, // lubematrix v3
 	BANNER_M25: 26,
 
-	// LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
+	LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
 };
 
 const dataSetsList1 = [

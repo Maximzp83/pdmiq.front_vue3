@@ -360,7 +360,7 @@ export const DATASET = {
 	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25,
 	BANNER_M25: 26,
 
-	// LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
+	LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
 };
 
 const dataSetsList1 = [
@@ -801,8 +801,9 @@ const sensorTypesList1 = {
 			technology: 'constants.ultrasound_sdt',
 			technology_abbr: 'constants.usound',
 			// icons: ['ultrasound'],
-			// isUltrasound: true,
-			// chartSettingsKey: 'banner_sdt_decibell',
+			isUltrasound: true,
+			isUltrasoundFullSpectrum: true,
+			chartSettingsKey: 'ultrasound',
 			filters_group: 'ultrasound',
 			group_technology: 'constants.ultrasound'
 		},
