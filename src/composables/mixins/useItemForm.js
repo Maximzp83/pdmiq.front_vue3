@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { updateFormData, prepareSubmitData, cleanObjValues } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
-import { useFormSubmit } from '@/composables/mixins/useFormSubmit';
+import { executeFormSubmit } from '@/composables/mixins/executeFormSubmit';
 import { Lang } from '@/localization';
 
 export function useItemForm({
@@ -206,7 +206,7 @@ export function useItemForm({
 				}
 
 				if (editInModal || fromModal || showSubmitButtons) {
-					useFormSubmit({
+					executeFormSubmit({
 						formData: preparedData,
 						itemName: resolve(editModal)?.itemName || resolve(itemsName)?.one || 'Item',
 						uploadSettings,

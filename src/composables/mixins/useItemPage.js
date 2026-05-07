@@ -6,7 +6,7 @@ import { api_request } from '@/api/request_provider';
 import { validateRouteParams } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
-import { useFormSubmit } from '@/composables/mixins/useFormSubmit';
+import { executeFormSubmit } from '@/composables/mixins/executeFormSubmit';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { Lang } from '@/localization';
 
@@ -116,7 +116,7 @@ export function useItemPage({
 			return;
 		}
 
-		useFormSubmit({
+		executeFormSubmit({
 			itemSaving,
 			itemId: getRouteItemId(),
 			formData: preparedData,

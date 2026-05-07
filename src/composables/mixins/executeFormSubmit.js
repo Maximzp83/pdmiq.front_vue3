@@ -1,7 +1,7 @@
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { api_request } from '@/api/request_provider';
 
-export function useFormSubmit({
+export function executeFormSubmit({
 	formData, itemsName, uploadSettings,
 	preparePayload, debug, emit,
 	localPreSubmitHook,
@@ -29,7 +29,9 @@ export function useFormSubmit({
 
 	if (localPreSubmitHook) {
 		const { next } = localPreSubmitHook(payload);
-		if (!next) return Promise.reject();
+		if (!next) {
+			return Promise.reject(new Error('[executeFormSubmit] localPreSubmitHook cancelled submit'));
+		}
 	}
 
 	let method = itemId === 'new' ? 'post' : 'put';
@@ -39,7 +41,7 @@ export function useFormSubmit({
 		if (payload) {
 			console.log('options', options);
 			console.log('payload', method, url, payload);
-			return Promise.reject('debug');
+			return Promise.reject(new Error('[executeFormSubmit] debug submit stop'));
 		}
 	}
 
@@ -73,18 +75,25 @@ export function useFormSubmit({
 					}
 					resolve(answer);
 				} catch (e) {
-					console.log('catch', e);	
+					if (itemSaving != null) {
+						itemSaving.value = false;
+					}
+					if (emit) {
+						emit('event', { eventName: 'toggleSaving', data: false, onward: true });
+					}
+					console.error('[executeFormSubmit] success callback failed', e);
+					reject(e);
 				}
 				// return answer;
 			})
-			.catch(() => {
+			.catch((error) => {
 				if (itemSaving != null) {
 					itemSaving.value = false;
 				}
 				if (emit) {
 					emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 				}
-				reject();
+				reject(error);
 			});
 
 	});
