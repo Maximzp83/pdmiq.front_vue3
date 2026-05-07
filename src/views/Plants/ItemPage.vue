@@ -51,6 +51,7 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
+	// debug: true,
 	apiRoute: plantsEntity.apiBase,
 	itemRoute: plantsEntity.routeBase,
 	itemsName: itemsName.value,

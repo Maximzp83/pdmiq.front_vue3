@@ -29,6 +29,7 @@
 			@input="({ target }) => handleInput(target)"
 			:value="inputValue"
 		/>
+			<!-- @focus="clearError('email')" -->
 
 		<input
 			ref="inputElement"

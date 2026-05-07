@@ -79,10 +79,13 @@ const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleD
 	itemRoute: brandsEntity.routeBase,
 	itemStore: brandsStore,
 	itemFiltersName: brandsEntity.filtersStorageKey,
-	itemsName,
+	itemsName: itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
 		tableRef: itemsTableRef,
+		editInModal: true,
+		formComponentFileLoader: () => import('@/views/Brands/ItemForm.vue'),
+		debug: true
 	},
 });
 

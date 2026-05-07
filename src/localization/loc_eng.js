@@ -1098,6 +1098,7 @@ export default {
 		silence_mode: 'Silence Mode',
 		visible_by_default: 'Visible by default',
 		flat_data_anomaly: 'Flat Data Anomaly',
+		successfully_logged_in: 'Successfully logged in',
 	},
 
 	aliases: {

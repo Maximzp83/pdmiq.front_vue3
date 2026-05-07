@@ -125,7 +125,8 @@ export const useAuthStore = defineStore('authStore', {
 			this.isLoading = true;
 
 			return api_request.post('/auth/login', {
-				data
+				data,
+				resultMessage: Lang.tt('phrases.Successfully_logged_in'),
 			}).then(({value}) => {
 				// console.log(value)
 				// Handle MFA verification status

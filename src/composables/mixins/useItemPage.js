@@ -1,4 +1,4 @@
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, shallowRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -6,7 +6,11 @@ import { api_request } from '@/api/request_provider';
 import { validateRouteParams } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
+import { useFormSubmit } from '@/composables/mixins/useFormSubmit';
+import { useNavigation } from '@/composables/mixins/useNavigation';
 import { Lang } from '@/localization';
+
+
 
 export function useItemPage({
 	apiRoute,
@@ -17,30 +21,30 @@ export function useItemPage({
 	preventSetupNavbar,
 	preventDestroyNavbar,
 	paramsId,
-	fetchItem,
 	successFetchItemCallback,
-	loadContent,
-	itemLoading,
 	hasAccessTo,
 	uploadSettings,
 	preparePayload,
 	localSubmit,
-	saveItem,
-	changeRoute,
 	successSubmitCallback,
+	propsSuccessSubmitCallback,
 	itemFormRef,
 	localPageTitle,
-	customButtons
+	customButtons,
+	localPreSubmitHook,
+	returnToListAfterSave,
+	debug
 } = {}) {
+	const { changeRoute } = useNavigation();
 	const route = useRoute();
 	const router = useRouter();
 	const globalStore = useGlobalStore();
 	const authStore = useAuthStore();
 	const { Notify } = useNotify();
 	const itemSaving = ref(false);
-	const _loadContent = loadContent || ref(false);
-	const _itemData = ref(null);
-	const _itemLoading = itemLoading || ref(false);
+	const _loadContent = ref(false);
+	const _itemData = shallowRef(null);
+	const _itemLoading = ref(false);
 	const authUser = computed(() => authStore.authUser);
 
 	const resolve = (val) =>
@@ -105,70 +109,34 @@ export function useItemPage({
 		}
 	};
 
-	const handleSubmitForm = (data) => {
-		let payload = {
-			data,
-			itemName: resolve(itemsName)?.one || '',
-		};
-
-		if (uploadSettings) {
-			payload = checkUploadSettings(payload, uploadSettings);
+	const handleSubmitForm = (preparedData, ) => {
+		if (!apiRoute) {
+			console.warn('[useItemPage] apiRoute is not defined');
+			itemSaving.value = false;
+			return;
 		}
 
-		if (preparePayload) {
-			payload = preparePayload(payload);
-		}
-
-		if (localSubmit) {
-			localSubmit(payload);
-		} else {
-			itemSaving.value = true;
-
-			const saveItemAction =
-				typeof saveItem === 'function'
-					? saveItem
-					: (requestPayload) => {
-							if (!apiRoute) {
-								console.warn('[useItemPage] apiRoute is not defined');
-								return Promise.resolve(null);
-							}
-
-							const id = getRouteItemId();
-							return id === 'new'
-								? api_request.post(apiRoute, requestPayload)
-								: api_request.put(`${apiRoute}/${id}`, requestPayload);
-						};
-
-			if (typeof saveItemAction !== 'function') {
-				console.warn('[useItemPage] saveItem action is not a function');
-				itemSaving.value = false;
-				return;
+		useFormSubmit({
+			itemSaving,
+			itemId: getRouteItemId(),
+			formData: preparedData,
+			itemName: resolve(itemsName)?.one || 'Item',
+			uploadSettings,
+			preparePayload,
+			localPreSubmitHook,
+			debug,
+			successSubmitCallback,
+			propsSuccessSubmitCallback,
+			apiRoute
+		})
+		.then((answer) => {
+			if (returnToListAfterSave) {
+				const path = itemRoute ? itemRoute : {parent: true};
+				changeRoute({ path });				
+			} else if (!answer?.request_payload?.setToStore) {
+				_itemData.value = answer.data;
 			}
-
-			saveItemAction(payload)
-				.then((answer) => {
-					if (!answer?.request_payload?.setToStore) {
-						_itemData.value = answer.data;
-					}
-
-					return Promise.resolve(
-						typeof successSubmitCallback === 'function'
-							? successSubmitCallback(answer)
-							: answer,
-					).then(() => {
-						if (changeRoute && itemRoute) {
-							changeRoute({ path: itemRoute });
-						} else if (changeRoute) {
-							changeRoute({ parent: true });
-						}
-						itemSaving.value = false;
-						return answer;
-					});
-				})
-				.catch(() => {
-					itemSaving.value = false;
-				});
-		}
+		})
 	};
 
 	const handleCloseButton = () => {
@@ -178,24 +146,18 @@ export function useItemPage({
 	};
 
 	const fetchPageData = (id, options) => {
-		const fetchItemAction =
-			typeof fetchItem === 'function'
-				? fetchItem
-				: (requestPayload) => {
-						if (!apiRoute) {
-							console.warn('[useItemPage] apiRoute is not defined');
-							return Promise.resolve(null);
-						}
-
-						return api_request.get(`${apiRoute}/${requestPayload.itemId}`, {
-							notNotify: true,
-							...requestPayload,
-						});
-					};
+		if (!apiRoute) {
+			console.warn('[useItemPage] apiRoute is not defined');
+			return Promise.resolve(null);
+		}
 
 		_itemLoading.value = true;
 
-		return fetchItemAction({ itemId: id, ...options })
+		return api_request.get(`${apiRoute}/${id}`, {
+			notNotify: true,
+			itemId: id,
+			...options,
+		})
 			.then((answer) => {
 				const { value, request_payload } = answer || {};
 				_loadContent.value = true;

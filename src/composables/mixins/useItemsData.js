@@ -1,4 +1,4 @@
-import { ref, shallowReactive, watch, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, shallowRef, shallowReactive, watch, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
@@ -29,7 +29,7 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
  * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, itemRoute, filters, options = {}, itemsName, itemStore, itemFiltersName }) { 
+export function useItemsData({ apiRoute, itemRoute, filters, options = {}, itemsName, itemStore, itemFiltersName, formSettings }) { 
 
 	const route = useRoute();
 	const globalStore = useGlobalStore();
@@ -38,13 +38,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 	const { changeRoute } = useNavigation();
 	const { tt } = Lang;
 
-	// ========== State ==========
-	const itemsList = ref([]);
-	const itemsLoading = ref(false);
-	const meta = ref({});
-	const itemData = ref(null);
-	const preventFetch = ref(false);
-	const filtersRef = itemStore ? storeToRefs(itemStore).filters : filters;
+	// ========== Options ==========
 
 	const {
 		manual = false,
@@ -67,7 +61,22 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		preventSetNavbar,
 		preventSetupNavbar,
 		preventDestroyNavbar,
+		fromDashboard,
+		editInModal,
+		additionalModalSettings,
+		localModalSettingsHook,
+		formComponentFileLoader,
+		debug,
+		enableDeepUpdateForList,
 	} = options;
+
+	// ========== State ==========
+	const itemsList = enableDeepUpdateForList ? ref() : shallowRef([]);
+	const itemsLoading = ref(false);
+	const meta = ref({});
+	const itemData = shallowRef(null);
+	const preventFetch = ref(false);
+	const filtersRef = itemStore ? storeToRefs(itemStore).filters : filters;
 
 	// ========== Computed-like ==========
 	const getRouteMeta = () => route.meta;
@@ -265,6 +274,44 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 	const createItem = (payload = {}) => {
 		if (typeof localCreateItem === 'function') {
 			return Promise.resolve(localCreateItem(payload));
+		}
+
+		if (fromDashboard || editInModal) {
+			let { modal_settings } = payload || {};
+			modal_settings = modal_settings || {};
+			
+			let modalSettings = {
+				show: true,
+				formComponentFileLoader,
+				itemName: resolve(itemsName)?.one || '',
+				// settings: this.settings || null,
+				formSettings: formSettings || null,
+				settings: {
+					apiRoute,					
+				},
+				debug
+			};
+			// console.log(itemsName.value.one, modalSettings)
+
+			if (additionalModalSettings) {
+				modalSettings = { ...modalSettings, ...additionalModalSettings };
+			}
+
+			/*if (this.localModalSettings) {
+				modalSettings = { ...modalSettings, ...this.localModalSettings };
+			}*/
+			modalSettings = { ...modalSettings, ...modal_settings };
+
+			if (localModalSettingsHook) {
+				modalSettings = localModalSettingsHook({
+					itemData: null,
+					modalSettings: modalSettings
+				});
+			}
+
+			console.log('modalSettings', modalSettings);
+			globalStore.show_edit_modal(modalSettings);
+			return Promise.resolve(payload);
 		}
 
 		if (!itemRoute) {

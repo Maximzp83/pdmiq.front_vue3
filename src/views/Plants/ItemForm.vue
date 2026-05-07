@@ -1,7 +1,7 @@
 <template>
 	<div class="edit-form-container" :class="{ 'half-width': !fromAnotherInstance && !isMobile }">
 		<el-form
-			ref="itemForm"
+			ref="itemFormRef"
 			class="item-edit-form"
 			:model="formData"
 			:rules="rules"
@@ -238,13 +238,13 @@ const props = defineProps({
 	fromAnotherInstance: Boolean,
 });
 
-const emit = defineEmits(['submit', 'onCancel']);
+// const emit = defineEmits(['submit', 'onCancel']);
 const companiesEntity = ENTITIES.Companies;
 const usersEntity = ENTITIES.Users;
 const industrialServicesEntity = ENTITIES.IndustrialServices;
 
 const authStore = useAuthStore();
-const itemForm = ref(null);
+const itemFormRef = ref(null);
 const fileUploadBlockRef = ref(null);
 const locationItemRefs = ref([]);
 
@@ -258,7 +258,7 @@ const industrialServicesLoading = ref(false);
 const industrialServicesList = ref([]);
 const locationsItemsList = ref([]);
 
-const initialFormData = {
+const formData = ref({
 	type: 1,
 	name: '',
 	address: '',
@@ -280,9 +280,7 @@ const initialFormData = {
 	is_commissioning: 0,
 	joined_at: '',
 	zoho_id: '',
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	name: required,
@@ -316,18 +314,6 @@ const refsMap = computed(() => ({
 	FileUploadBlock: fileUploadBlockRef.value,
 	LocationItem: locationItemRefs.value,
 }));
-
-const {
-	setupFormSubItemsList,
-	addFormItem,
-	removeFormItem,
-	validateSubItemsForm,
-	resetFormDataBySubItems,
-	collectDataFromSubItems,
-} = useSubItemsList({
-	formData,
-	refsMap,
-});
 
 const subItemsSettings = computed(() =>
 	Object.freeze([
@@ -387,6 +373,13 @@ const methodsMap = {
 	fetch_industrial_services: createGetRequest(industrialServicesEntity.apiBase),
 };
 
+const prepareSubmitDataSettings = computed(() =>
+	Object.freeze({
+		skipValueValidationProps: ['meeting_tracker_mail_list'],
+	}),
+);
+
+// ---------Form Methods Section (Before Form Composable) -------
 const localSetupPage = (item) => {
 	if (item) {
 		locationsItemsList.value = setupFormSubItemsList(item.locations || [], 'l_i');
@@ -432,22 +425,34 @@ const localPrepareSubmitData = (data) => {
 	return prepared;
 };
 
-const prepareSubmitDataSettings = computed(() =>
-	Object.freeze({
-		skipValueValidationProps: ['meeting_tracker_mail_list'],
-	}),
-);
+// --------Main Composables Section--------
+useRequestsList({
+	methodsMap,
+	requestsToDoList,
+});
+
+const {
+	setupFormSubItemsList,
+	addFormItem,
+	removeFormItem,
+	validateSubItemsForm,
+	resetFormDataBySubItems,
+	collectDataFromSubItems,
+} = useSubItemsList({
+	formData,
+	refsMap,
+});
 
 const {
 	isMobile,
 	itemId,
 	validateForm,
 	handleCancel,
+	// formData
 } = useItemForm({
 	itemData: computed(() => props.itemData),
 	formData,
-	initialFormData,
-	formRef: itemForm,
+	formRef: itemFormRef,
 	localSetupPage,
 	subItemsSettings: subItemsSettings.value,
 	validateSubItemsForm,
@@ -455,12 +460,7 @@ const {
 	resetFormDataBySubItems,
 	localPrepareSubmitData,
 	prepareSubmitDataSettings: prepareSubmitDataSettings.value,
-	emit,
-});
-
-useRequestsList({
-	methodsMap,
-	requestsToDoList,
+	// emit,
 });
 
 defineExpose({

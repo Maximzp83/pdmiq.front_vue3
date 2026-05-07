@@ -9,13 +9,13 @@
 			:label-position="isMobile ? 'top' : 'left'"
 		>
 			<el-form-item :label="`${tt('Brand')} ${tt('name')}`" prop="name">
-				<el-input v-model="formData.name" />
+				<CustomInput v-model="formData.name" />
 			</el-form-item>
 
 			<el-form-item
 				:label="tt('phrases.crossover_exluded')"
 				prop="is_crossover_excluded"
-				class="half-width"
+				class="half-width switcher"
 			>
 				<el-switch v-model="formData.is_crossover_excluded" />
 			</el-form-item>
@@ -26,11 +26,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
+// import { ENTITIES } from '@/config/entities';
+// import { api_request } from '@/api/request_provider';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
+import { useItemForm } from '@/composables/mixins/useItemForm';
 
+import CustomInput from '@/components/form/CustomInput.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 
 const { tt } = Lang;
@@ -42,65 +46,73 @@ defineOptions({
 const props = defineProps({
 	itemData: { type: Object, default: null },
 	fromModal: Boolean,
+	editModal: { type: Object, default: null },
 	fromAnotherInstance: Boolean,
+	// editModal: { type: Object, default: () => ({}) },
 });
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
+
+// const brandsEntity = ENTITIES.Brands;
 
 const itemFormRef = ref(null);
-const isMobile = ref(false);
 
-const initialFormData = {
+const formData = ref({
 	name: '',
 	is_crossover_excluded: false,
-};
+});
 
-const formData = ref({ ...initialFormData });
+// const formData = ref({ ...initialFormData });
 
 const rules = {
 	name: required,
 };
 
-const setupForm = (item) => {
-	if (item) {
-		formData.value = {
-			name: item.name ?? '',
-			is_crossover_excluded: item.is_crossover_excluded ?? false,
-		};
-		return;
+/*const localSubmit = (data) => {
+	if (props.fromModal) {
+		emit('event', { eventName: 'toggleSaving', data: true, onward: true });
+
+		const request = props.itemData?.id
+			? api_request.put(`${brandsEntity.apiBase}/${props.itemData.id}`, {
+					data,
+					itemName: tt(brandsEntity.itemsName.one),
+				})
+			: api_request.post(brandsEntity.apiBase, {
+					data,
+					itemName: tt(brandsEntity.itemsName.one),
+				});
+
+		return request
+			.then((answer) => {
+				emit('event', { eventName: 'toggleSaving', data: false, onward: true });
+				emit('event', {
+					eventName: 'successModalSubmit',
+					data: answer,
+					onward: true,
+				});
+				return answer;
+			})
+			.catch((error) => {
+				emit('event', { eventName: 'toggleSaving', data: false, onward: true });
+				return Promise.reject(error);
+			});
 	}
 
-	formData.value = { ...initialFormData };
-};
+	emit('submit', data);
+	return Promise.resolve(data);
+};*/
 
-const submitForm = () => {
-	emit('submit', { ...formData.value });
-};
-
-const validateForm = () => {
-	if (!itemFormRef.value?.validate) return;
-
-	itemFormRef.value.validate((valid) => {
-		if (valid) {
-			submitForm();
-		}
-	});
-};
-
-const handleCancel = () => {
-	emit('onCancel');
-};
-
-watch(
-	() => props.itemData,
-	(item) => {
-		setupForm(item);
-	},
-	{ immediate: true }
-);
-
-onMounted(() => {
-	isMobile.value = window.innerWidth < 768;
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	// apiRoute: brandsEntity.apiBase,
+	itemData: computed(() => props.itemData),
+	formData,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	formRef: itemFormRef,
+	emit,
+	debug: true
+	// localSubmit,
+	// emit,
 });
 
 defineExpose({

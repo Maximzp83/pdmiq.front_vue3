@@ -108,20 +108,10 @@ const editModal = computed(() => {
 });
 
 const componentFile = computed(() => {
-	const { componentPath, instanceName, componentFullPath } = editModal.value;
+	const { formComponentFileLoader } = editModal.value;
 
-	if (componentPath || instanceName || componentFullPath) {
-		let path = '';
-
-		if (componentFullPath) {
-			path = `${componentFullPath}`;
-		} else if (componentPath) {
-			path = `views/${componentPath}`;
-		} else {
-			path = `views/${instanceName}/ItemForm`;
-		}
-
-		return defineAsyncComponent(() => import(`@/${path}.vue`));
+	if (formComponentFileLoader) {
+		return defineAsyncComponent(formComponentFileLoader);
 	}
 	return null;
 });
@@ -172,12 +162,13 @@ const handleCloseEditModal = () => {
 
 const saveModalItem = () => {
 	if (ItemFormComponent.value && ItemFormComponent.value.validateForm) {
-		ItemFormComponent.value.validateForm();
+		ItemFormComponent.value.validateForm({editModal: editModal.value});
 	}
 };
 
 const handleAction = ({ data }) => {
 	const { name, callInRoot } = data;
+
 	if (callInRoot) {
 		if (typeof window[name] === 'function') {
 			window[name](data);

@@ -1117,6 +1117,7 @@ export default {
 		silence_mode: 'Modo Silencio',
 		visible_by_default: 'Visible por defecto',
 		flat_data_anomaly: 'Anomalia de datos Plano',
+		successfully_logged_in: 'Se inicio de sesión correctamente',
 	},
 
 	aliases: {

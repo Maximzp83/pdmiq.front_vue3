@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { updateFormData, prepareSubmitData, cleanObjValues } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
+import { useFormSubmit } from '@/composables/mixins/useFormSubmit';
 import { Lang } from '@/localization';
 
 export function useItemForm({
@@ -32,9 +33,9 @@ export function useItemForm({
 	ignoreLocalSubmit,
 	editInModal,
 	fromModal,
+	editModal,
 	showSubmitButtons,
 	itemsName,
-	editModal,
 	submitAction,
 	uploadSettings,
 	preparePayload,
@@ -43,7 +44,10 @@ export function useItemForm({
 	propsSuccessSubmitCallback,
 	instanceName,
 	emit,
+	debug
 } = {}) {
+	// const emit = defineEmits(['submit', 'onCancel', 'event']);
+
 	const globalStore = useGlobalStore();
 	const authStore = useAuthStore();
 	const { Notify } = useNotify();
@@ -107,7 +111,8 @@ export function useItemForm({
 			itemId.value = null;
 			if (initialFormData) {
 				initFormData();
-			} else if (cleanFormDataAfterClose && targetFormRef && 'value' in targetFormRef) {
+			}
+			if (cleanFormDataAfterClose && targetFormRef && 'value' in targetFormRef) {
 				targetFormRef.value = cleanObjValues(targetFormRef.value);
 			}
 			if (new_item_type && targetFormRef && 'value' in targetFormRef) {
@@ -178,6 +183,7 @@ export function useItemForm({
 
 	const submitForm = (options = {}) => {
 		try {
+			// debugger
 			let { formDataName, additionalInject } = options;
 			additionalInject = additionalInject || {};
 
@@ -193,106 +199,41 @@ export function useItemForm({
 			}
 
 			if (data) {
+				const preparedData = { ...prepareSubmitData(data, prepareSubmitDataSettings) };
+
 				if (localSubmit && !ignoreLocalSubmit) {
-					return localSubmit(
-						{ ...prepareSubmitData(data, prepareSubmitDataSettings) },
-						options,
-					);
+					return localSubmit(preparedData, options);
 				}
 
 				if (editInModal || fromModal || showSubmitButtons) {
-					const itemName =
-						resolve(editModal)?.itemName || resolve(itemsName)?.one || 'Item';
-					let payload = {
-						data: { ...prepareSubmitData(data, prepareSubmitDataSettings) },
-						itemName,
-					};
-
-					if (uploadSettings) {
-						payload = checkUploadSettings(payload, uploadSettings);
-					}
-					if (preparePayload) {
-						payload = preparePayload(payload);
-					}
-					if (localPreSubmitHook) {
-						const { next } = localPreSubmitHook(payload);
-						if (!next) return;
-					}
-
-					if (emit) {
-						emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-					}
-
-					if (typeof submitAction !== 'function') {
-						console.warn('[useItemForm] submitAction is not a function');
-						return;
-					}
-
-					submitAction(payload)
-						.then((answer) => {
-							if (emit) {
-								emit('event', {
-									eventName: 'toggleSaving',
-									data: false,
-									onward: true,
-								});
-							}
-							try {
-								if (emit) {
-									emit('event', {
-										eventName: 'successModalSubmit',
-										data: answer,
-										onward: true,
-									});
-								}
-
-								if (successSubmitCallback) {
-									successSubmitCallback(answer);
-								}
-
-								if (propsSuccessSubmitCallback) {
-									propsSuccessSubmitCallback(answer);
-								}
-
-								if (
-									activeItemsTable.value === instanceName ||
-									instanceName === 'Sensors'
-								) {
-									globalStore.set_global_state({
-										stateProp: 'updateItemsList',
-										value: true,
-									});
-								}
-
-								if (activeItemsTable.value || fromModal) {
-									globalStore.set_global_state({
-										stateProp: 'updateCounters',
-										value: true,
-									});
-								}
-							} catch (e) {
-								console.warn(e);
-							}
-						})
-						.catch(() => {
-							if (emit) {
-								emit('event', {
-									eventName: 'toggleSaving',
-									data: false,
-									onward: true,
-								});
-							}
-						});
+					useFormSubmit({
+						formData: preparedData,
+						itemName: resolve(editModal)?.itemName || resolve(itemsName)?.one || 'Item',
+						uploadSettings,
+						preparePayload,
+						localPreSubmitHook,
+						debug,
+						emit,
+						itemId: preparedData.id || 'new',
+						apiRoute: editModal.settings.apiRoute,
+						successSubmitCallback,
+						propsSuccessSubmitCallback,
+						options
+					}).then((answer) => {
+						if (activeItemsTable.value || fromModal) {
+							globalStore.set_global_state({
+								stateProp: 'updateCounters',
+								value: true,
+							});
+						}
+					});
 				} else {
-					const formDataPrepared = {
-						...prepareSubmitData(data, prepareSubmitDataSettings),
-					};
 					if (localPreSubmitHook) {
-						const { next } = localPreSubmitHook(formDataPrepared);
+						const { next } = localPreSubmitHook(preparedData);
 						if (!next) return;
 					}
 					if (emit) {
-						emit('submit', formDataPrepared);
+						emit('submit', preparedData);
 					}
 				}
 			}
@@ -302,7 +243,7 @@ export function useItemForm({
 	};
 
 	const handleCancel = () => {
-		if (emit) emit('onCancel');
+		emit('onCancel');
 	};
 
 	watch(
