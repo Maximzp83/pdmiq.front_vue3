@@ -68,24 +68,15 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([brandsEntity.per
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([brandsEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([brandsEntity.permissions.delete]));
 
-const itemsName = computed(() => ({
-	one: tt(brandsEntity.itemsName.one),
-	mult: tt(brandsEntity.itemsName.mult),
-	instanceName: brandsEntity.itemsName.instanceName,
-}));
-
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: brandsEntity.apiBase,
-	itemRoute: brandsEntity.routeBase,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'Brands',
 	itemStore: brandsStore,
-	itemFiltersName: brandsEntity.filtersStorageKey,
-	itemsName: itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
 		tableRef: itemsTableRef,
-		editInModal: true,
-		formComponentFileLoader: () => import('@/views/Brands/ItemForm.vue'),
-		debug: true
+		// editInModal: true,
+		// formComponentFileLoader: () => import('@/views/Brands/ItemForm.vue'),
+		// debug: true
 	},
 });
 

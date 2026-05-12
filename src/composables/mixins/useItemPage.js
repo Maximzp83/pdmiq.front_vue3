@@ -1,10 +1,11 @@
 import { ref, shallowRef, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { ENTITIES } from '@/config/entities';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { api_request } from '@/api/request_provider';
 import { validateRouteParams } from '@/helpers';
-import { checkUploadSettings } from '@/helpers/specialHelpers';
+// import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
 import { executeFormSubmit } from '@/composables/mixins/executeFormSubmit';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -13,6 +14,7 @@ import { Lang } from '@/localization';
 
 
 export function useItemPage({
+	entityKey,
 	apiRoute,
 	itemRoute,
 	itemsName,
@@ -32,7 +34,7 @@ export function useItemPage({
 	localPageTitle,
 	customButtons,
 	localPreSubmitHook,
-	returnToListAfterSave,
+	goToListAfterSave,
 	debug
 } = {}) {
 	const { changeRoute } = useNavigation();
@@ -41,6 +43,9 @@ export function useItemPage({
 	const globalStore = useGlobalStore();
 	const authStore = useAuthStore();
 	const { Notify } = useNotify();
+	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
+	const resolvedApiRoute = apiRoute || entityConfig?.apiBase || null;
+	const resolvedItemRoute = itemRoute || entityConfig?.routeBase || null;
 	const itemSaving = ref(false);
 	const _loadContent = ref(false);
 	const _itemData = shallowRef(null);
@@ -49,6 +54,25 @@ export function useItemPage({
 
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const resolvedItemsName = computed(() => {
+		const localItemsName = resolve(itemsName);
+		if (localItemsName) {
+			return localItemsName;
+		}
+
+		if (entityConfig?.itemsName) {
+			return Object.freeze({
+				one: Lang.tt(entityConfig.itemsName.one),
+				mult: Lang.tt(entityConfig.itemsName.mult),
+				instanceName: entityConfig.itemsName.instanceName,
+			});
+		}
+
+		return Object.freeze({
+			one: 'Item',
+			mult: 'Items',
+		});
+	});
 
 	const getRouteItemId = () => {
 		if (paramsId) {
@@ -73,7 +97,7 @@ export function useItemPage({
 		if (localPageTitle && typeof localPageTitle === 'function') {
 			return localPageTitle(_itemData.value);
 		}
-		const itemName = resolve(itemsName)?.one || 'Item';
+		const itemName = resolvedItemsName.value.one || 'Item';
 		if (_itemData.value) {
 			return `${itemName}`;
 		}
@@ -110,7 +134,7 @@ export function useItemPage({
 	};
 
 	const handleSubmitForm = (preparedData, ) => {
-		if (!apiRoute) {
+		if (!resolvedApiRoute) {
 			console.warn('[useItemPage] apiRoute is not defined');
 			itemSaving.value = false;
 			return;
@@ -120,18 +144,17 @@ export function useItemPage({
 			itemSaving,
 			itemId: getRouteItemId(),
 			formData: preparedData,
-			itemName: resolve(itemsName)?.one || 'Item',
+			itemName: resolvedItemsName.value.one || 'Item',
 			uploadSettings,
 			preparePayload,
 			localPreSubmitHook,
 			debug,
 			successSubmitCallback,
 			propsSuccessSubmitCallback,
-			apiRoute
-		})
-		.then((answer) => {
-			if (returnToListAfterSave) {
-				const path = itemRoute ? itemRoute : {parent: true};
+			apiRoute: resolvedApiRoute
+		}).then((answer) => {
+			if (goToListAfterSave) {
+				const path = resolvedItemRoute ? resolvedItemRoute : {parent: true};
 				changeRoute({ path });				
 			} else if (!answer?.request_payload?.setToStore) {
 				_itemData.value = answer.data;
@@ -146,14 +169,14 @@ export function useItemPage({
 	};
 
 	const fetchPageData = (id, options) => {
-		if (!apiRoute) {
+		if (!resolvedApiRoute) {
 			console.warn('[useItemPage] apiRoute is not defined');
 			return Promise.resolve(null);
 		}
 
 		_itemLoading.value = true;
 
-		return api_request.get(`${apiRoute}/${id}`, {
+		return api_request.get(`${resolvedApiRoute}/${id}`, {
 			notNotify: true,
 			itemId: id,
 			...options,
@@ -187,7 +210,7 @@ export function useItemPage({
 						Notify({
 							type: 'warning',
 							title: Lang.tt('Redirect'),
-							message: `${resolve(itemsName)?.one} ${Lang.tt('with')} id "${id}" ${Lang.tt(
+							message: `${resolvedItemsName.value.one} ${Lang.tt('with')} id "${id}" ${Lang.tt(
 								'phrases.not_found',
 							)}`,
 						});
@@ -240,6 +263,7 @@ export function useItemPage({
 	return {
 		itemSaving,
 		authUser,
+		itemsName: resolvedItemsName,
 		pageTitle,
 		navbarSettings,
 		loadContent: _loadContent,

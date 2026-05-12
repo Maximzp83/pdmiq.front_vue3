@@ -41,7 +41,7 @@ export function executeFormSubmit({
 		if (payload) {
 			console.log('options', options);
 			console.log('payload', method, url, payload);
-			return Promise.reject(new Error('[executeFormSubmit] debug submit stop'));
+			return Promise.reject();
 		}
 	}
 
@@ -74,6 +74,7 @@ export function executeFormSubmit({
 						itemSaving.value = false;
 					}
 					resolve(answer);
+
 				} catch (e) {
 					if (itemSaving != null) {
 						itemSaving.value = false;

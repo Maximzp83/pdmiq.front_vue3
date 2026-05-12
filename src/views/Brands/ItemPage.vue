@@ -20,37 +20,27 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
-import { ENTITIES } from '@/config/entities';
-import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
-
 const itemFormRef = ref(null);
-const brandsEntity = ENTITIES.Brands;
-
-const itemsName = computed(() => ({
-	one: Lang.tt(brandsEntity.itemsName.one),
-	mult: Lang.tt(brandsEntity.itemsName.mult),
-}));
 
 const {
 	itemData,
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: brandsEntity.apiBase,
-	itemRoute: brandsEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Brands',
 	itemFormRef,
-	returnToListAfterSave: true,
+	goToListAfterSave: true,
 	// debug: true,
 });
 </script>

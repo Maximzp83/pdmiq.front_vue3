@@ -1,11 +1,20 @@
 import { ref, computed, watch, onMounted, onBeforeMount } from 'vue';
+import { ENTITIES } from '@/config/entities';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { updateFormData, prepareSubmitData, cleanObjValues } from '@/helpers';
-import { checkUploadSettings } from '@/helpers/specialHelpers';
+// import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { useNotify } from '@/composables/useNotify';
 import { executeFormSubmit } from '@/composables/mixins/executeFormSubmit';
 import { Lang } from '@/localization';
+
+export const buildProps = (extra = {}) => ({
+	itemData: { type: Object, default: null },
+	fromModal: Boolean,
+	editModal: { type: Object, default: null },
+	fromAnotherInstance: Boolean,
+	...extra,
+});
 
 export function useItemForm({
 	itemData,
@@ -35,8 +44,9 @@ export function useItemForm({
 	fromModal,
 	editModal,
 	showSubmitButtons,
+	entityKey,
+	apiRoute,
 	itemsName,
-	submitAction,
 	uploadSettings,
 	preparePayload,
 	localPreSubmitHook,
@@ -58,6 +68,27 @@ export function useItemForm({
 
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
+	const resolvedApiRoute = apiRoute || entityConfig?.apiBase || null;
+	const resolvedItemsName = computed(() => {
+		const localItemsName = resolve(itemsName);
+		if (localItemsName) {
+			return localItemsName;
+		}
+
+		if (entityConfig?.itemsName) {
+			return Object.freeze({
+				one: Lang.tt(entityConfig.itemsName.one),
+				mult: Lang.tt(entityConfig.itemsName.mult),
+				instanceName: entityConfig.itemsName.instanceName,
+			});
+		}
+
+		return Object.freeze({
+			one: 'Item',
+			mult: 'Items',
+		});
+	});
 
 	const activeItemsTable = computed(() => globalStore.activeItemsTable);
 	const globalFilters = computed(() => globalStore.globalFilters);
@@ -205,31 +236,33 @@ export function useItemForm({
 					return localSubmit(preparedData, options);
 				}
 
+				const itemName = resolve(editModal)?.itemName || resolvedItemsName.value.one || 'Item';
+
 				if (editInModal || fromModal || showSubmitButtons) {
 					executeFormSubmit({
 						formData: preparedData,
-						itemName: resolve(editModal)?.itemName || resolve(itemsName)?.one || 'Item',
+						itemName,
 						uploadSettings,
 						preparePayload,
 						localPreSubmitHook,
 						debug,
 						emit,
 						itemId: preparedData.id || 'new',
-						apiRoute: editModal.settings.apiRoute,
+						apiRoute: resolvedApiRoute,
 						successSubmitCallback,
 						propsSuccessSubmitCallback,
 						options
-					}).then((answer) => {
+					})/*.then((answer) => { // for ai - leave this
 						if (activeItemsTable.value || fromModal) {
 							globalStore.set_global_state({
 								stateProp: 'updateCounters',
 								value: true,
 							});
 						}
-					});
+					});*/
 				} else {
 					if (localPreSubmitHook) {
-						const { next } = localPreSubmitHook(preparedData);
+						const { next } = localPreSubmitHook({data: preparedData, itemName});
 						if (!next) return;
 					}
 					if (emit) {
@@ -286,5 +319,6 @@ export function useItemForm({
 		handleValidationResult,
 		submitForm,
 		handleCancel,
+		buildProps
 	};
 }

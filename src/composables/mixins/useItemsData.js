@@ -1,7 +1,8 @@
-import { ref, shallowRef, shallowReactive, watch, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, shallowRef, shallowReactive, computed, watch, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
+import { ENTITIES } from '@/config/entities';
 import { api_request } from '@/api/request_provider.js';
 import { prepareRangeParams } from '@/helpers';
 import { Lang } from '@/localization';
@@ -29,7 +30,17 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
  * @param {Array} config.options.excludeGlobFilters - Global filters to exclude from watch
  * @returns {Object} Items data and methods
  */
-export function useItemsData({ apiRoute, itemRoute, filters, options = {}, itemsName, itemStore, itemFiltersName, formSettings }) { 
+export function useItemsData({
+	entityKey,
+	apiRoute,
+	itemRoute,
+	filters,
+	options = {},
+	itemsName,
+	itemStore,
+	itemFiltersName,
+	formSettings,
+}) {
 
 	const route = useRoute();
 	const globalStore = useGlobalStore();
@@ -37,6 +48,31 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 	const { globalFilters } = storeToRefs(globalStore);
 	const { changeRoute } = useNavigation();
 	const { tt } = Lang;
+	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
+	const resolvedApiRoute = apiRoute || entityConfig?.apiBase || null;
+	const resolvedItemRoute = itemRoute || entityConfig?.routeBase || null;
+	const resolvedItemFiltersName = itemFiltersName || entityConfig?.filtersStorageKey || null;
+	const resolve = (val) =>
+		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const resolvedItemsName = computed(() => {
+		const localItemsName = resolve(itemsName);
+		if (localItemsName) {
+			return localItemsName;
+		}
+
+		if (entityConfig?.itemsName) {
+			return Object.freeze({
+				one: tt(entityConfig.itemsName.one),
+				mult: tt(entityConfig.itemsName.mult),
+				instanceName: entityConfig.itemsName.instanceName,
+			});
+		}
+
+		return Object.freeze({
+			one: 'Item',
+			mult: 'Items',
+		});
+	});
 
 	// ========== Options ==========
 
@@ -96,11 +132,8 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 
 	const navbarSettings = shallowReactive({
 		showFilter: true,
-		pageTitle: itemsName && itemsName.value ? itemsName.value.mult : ''
+		pageTitle: resolvedItemsName.value.mult || ''
 	});
-
-	const resolve = (val) =>
-		val && typeof val === 'object' && 'value' in val ? val.value : val;
 
 	// ========== Methods ==========
 
@@ -193,7 +226,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		};
 
 		return api_request
-			.get(apiRoute, payload)
+			.get(resolvedApiRoute, payload)
 			.then(({ value, fetchedMeta }) => {
 				itemsList.value = value;
 				if (fetchedMeta) meta.value = fetchedMeta;
@@ -250,7 +283,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		}
 
 		settings = {
-			toLocalStorage: { prop: itemFiltersName },
+			toLocalStorage: { prop: resolvedItemFiltersName },
 			...settings
 		}
 
@@ -270,56 +303,80 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		preventFetch.value = true;
 		setFilters(newFiltersValues, settings);
 	};
+
+	const resolveOpenStrategy = () => ((fromDashboard || editInModal) ? 'modal' : 'route');
+
+	const buildBaseModalSettings = () => ({
+		show: true,
+		formComponentFileLoader,
+		itemName: resolvedItemsName.value.one || '',
+		formSettings: formSettings || null,
+		settings: {
+			apiRoute: resolvedApiRoute,
+		},
+		debug,
+	});
+
+	const buildModalSettings = ({ payload = {}, itemData = null } = {}) => {
+		let { modal_settings } = payload || {};
+		modal_settings = modal_settings || {};
+
+		let modalSettings = {
+			...buildBaseModalSettings(),
+			instanceData: itemData,
+		};
+
+		if (additionalModalSettings) {
+			modalSettings = { ...modalSettings, ...additionalModalSettings };
+		}
+
+		modalSettings = { ...modalSettings, ...modal_settings };
+
+		if (localModalSettingsHook) {
+			modalSettings = localModalSettingsHook({
+				itemData,
+				modalSettings,
+			});
+		}
+
+		return modalSettings;
+	};
+
+	const openModal = (modalSettings, payload = {}) => {
+		// console.log('modalSettings', modalSettings);
+		globalStore.show_edit_modal(modalSettings);
+		return Promise.resolve(payload);
+	};
+
+	const openCreateRoute = (payload = {}) => {
+		if (!resolvedItemRoute) {
+			return Promise.resolve(payload);
+		}
+
+		changeRoute({ path: `${resolvedItemRoute}/new` });
+		return Promise.resolve(payload);
+	};
+
+	const openEditRoute = (itemId, payload = {}) => {
+		if (!resolvedItemRoute || !itemId) {
+			return Promise.resolve(payload);
+		}
+
+		changeRoute({ path: `${resolvedItemRoute}/${itemId}` });
+		return Promise.resolve(payload);
+	};
+
 	// -------------------------------------
 	const createItem = (payload = {}) => {
 		if (typeof localCreateItem === 'function') {
 			return Promise.resolve(localCreateItem(payload));
 		}
 
-		if (fromDashboard || editInModal) {
-			let { modal_settings } = payload || {};
-			modal_settings = modal_settings || {};
-			
-			let modalSettings = {
-				show: true,
-				formComponentFileLoader,
-				itemName: resolve(itemsName)?.one || '',
-				// settings: this.settings || null,
-				formSettings: formSettings || null,
-				settings: {
-					apiRoute,					
-				},
-				debug
-			};
-			// console.log(itemsName.value.one, modalSettings)
-
-			if (additionalModalSettings) {
-				modalSettings = { ...modalSettings, ...additionalModalSettings };
-			}
-
-			/*if (this.localModalSettings) {
-				modalSettings = { ...modalSettings, ...this.localModalSettings };
-			}*/
-			modalSettings = { ...modalSettings, ...modal_settings };
-
-			if (localModalSettingsHook) {
-				modalSettings = localModalSettingsHook({
-					itemData: null,
-					modalSettings: modalSettings
-				});
-			}
-
-			console.log('modalSettings', modalSettings);
-			globalStore.show_edit_modal(modalSettings);
-			return Promise.resolve(payload);
+		if (resolveOpenStrategy() === 'modal') {
+			return openModal(buildModalSettings({ payload }), payload);
 		}
 
-		if (!itemRoute) {
-			return Promise.resolve(payload);
-		}
-
-		changeRoute({ path: `${itemRoute}/new` });
-		return Promise.resolve(payload);
+		return openCreateRoute(payload);
 	};
 
 	// -------------------------------------
@@ -328,12 +385,14 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 			return Promise.resolve(localEditItem(payload));
 		}
 
-		if (!itemRoute || !payload?.row?.id) {
-			return Promise.resolve(payload);
+		const itemData = payload.row || payload.rowData || null;
+		const itemId = payload?.row?.id || payload?.rowData?.id || null;
+
+		if (resolveOpenStrategy() === 'modal') {
+			return openModal(buildModalSettings({ payload, itemData }), payload);
 		}
 
-		changeRoute({ path: `${itemRoute}/${payload.row.id}` });
-		return Promise.resolve(payload);
+		return openEditRoute(itemId, payload);
 	};
 
 	// -------------------------------------
@@ -363,7 +422,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 			return Promise.resolve(payload);
 		}
 
-		if (!apiRoute) {
+		if (!resolvedApiRoute) {
 			return Promise.resolve(payload);
 		}
 
@@ -374,7 +433,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		const confirmMessage =
 			settings.confirmMessage ||
 			`${tt('phrases.this_will_permanently_delete_selected')} ${
-				resolve(itemsName)[prop]
+				resolvedItemsName.value[prop]
 			}. ${tt('Continue')}?`;
 
 		return ElMessageBox.confirm(
@@ -386,9 +445,9 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 				type: 'warning',
 			},
 		).then(() =>
-			api_request.delete(apiRoute, {
+			api_request.delete(resolvedApiRoute, {
 					data: { ids },
-					itemName: resolve(itemsName)?.one,
+					itemName: resolvedItemsName.value.one,
 				}).then(() => fetchItems({ ...(filtersRef?.value || {}) }))
 		)
 	};
@@ -500,6 +559,7 @@ export function useItemsData({ apiRoute, itemRoute, filters, options = {}, items
 		// State
 		itemsList,
 		itemsLoading,
+		itemsName: resolvedItemsName,
 		meta,
 		itemData,
 		preventFetch,
