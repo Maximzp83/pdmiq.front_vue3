@@ -33,7 +33,7 @@
 
 		<input
 			ref="inputElement"
-			v-else-if="type == 'text'"
+			v-else-if="type == 'text' || type == 'password' || type == 'email'"
 			:disabled="disabled"
 			autocomplete="off-disabled-closed"
 			autocapitalize="off"

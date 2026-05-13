@@ -77,6 +77,7 @@ const itemsName = computed(() => {
 		Lang.currentLangId === LANGUAGE_TYPES.ENGLISH
 			? plantsVendorsEntity.itemsName.englishPrefix
 			: '';
+
 	return {
 		one: `${prefix}${tt(plantsVendorsEntity.itemsName.one)}`,
 		mult: `${prefix}${tt(plantsVendorsEntity.itemsName.mult)}`,
@@ -85,10 +86,8 @@ const itemsName = computed(() => {
 });
 
 const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: plantsVendorsEntity.apiBase,
-	itemRoute: plantsVendorsEntity.routeBase,
+	entityKey: 'PlantsVendors',
 	itemStore: plantsVendorsStore,
-	itemFiltersName: plantsVendorsEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

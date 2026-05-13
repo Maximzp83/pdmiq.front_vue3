@@ -9,6 +9,7 @@
 						<ItemForm
 							ref="itemFormRef"
 							:itemData="itemData"
+							:itemsName="itemsName"
 							@submit="handleSubmitForm"
 							@onCancel="handleCloseButton"
 						/>
@@ -20,38 +21,26 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-
-import { ENTITIES } from '@/config/entities';
-import { Lang } from '@/localization';
-import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
+import { ref } from 'vue';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
-const { changeRoute } = useNavigation();
+import { useItemPage } from '@/composables/mixins/useItemPage';
 
 const itemFormRef = ref(null);
-const processesEntity = ENTITIES.Processes;
-
-const itemsName = computed(() => ({
-	one: Lang.tt(processesEntity.itemsName.one),
-	mult: Lang.tt(processesEntity.itemsName.mult),
-}));
 
 const {
 	itemData,
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: processesEntity.apiBase,
-	itemRoute: processesEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Processes',
 	itemFormRef,
-	changeRoute,
+	goToListAfterSave: true,
 });
 </script>

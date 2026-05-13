@@ -41,12 +41,6 @@ defineOptions({
 
 const { changeRoute } = useNavigation();
 const itemFormRef = ref(null);
-const machinesEntity = ENTITIES.Machines;
-
-const itemsName = computed(() => ({
-	one: Lang.tt(machinesEntity.itemsName.one),
-	mult: Lang.tt(machinesEntity.itemsName.mult),
-}));
 
 const uploadSettings = {
 	fileProp: 'pictures',
@@ -58,12 +52,11 @@ const {
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: machinesEntity.apiBase,
-	itemRoute: machinesEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Machines',
 	itemFormRef,
 	changeRoute,
 	uploadSettings,

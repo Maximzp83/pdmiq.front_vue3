@@ -17,14 +17,16 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('Email')" prop="email">
-				<el-input v-model="formData.email" type="email" autocomplete="new-password" />
+				<CustomInput v-model="formData.email" type="email" autocomplete="new-password" />
+
+				<!-- <el-input v-model="formData.email" type="email" autocomplete="new-password" /> -->
 			</el-form-item>
 
 			<el-form-item :label="tt('Phone')" prop="phone_number">
 				<CustomInput v-model="formData.phone_number" :placeholder="tt('number')" />
 			</el-form-item>
 
-			<el-form-item :label="`${tt('Enable')} ${tt('one_click')}`" prop="is_one_click">
+			<el-form-item class="switcher" :label="`${tt('Enable')} ${tt('one_click')}`" prop="is_one_click">
 				<el-switch v-model="formData.is_one_click" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
@@ -69,18 +71,16 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
-import { useItemForm } from '@/composables/mixins/useItemForm';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useGlobalStore } from '@/stores/GlobalStore';
 
-import CustomInput from '@/components/form/CustomInput.vue';
-import CustomSelectV2 from '@/components/form/CustomSelect.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 
 const { tt } = Lang;
@@ -89,13 +89,9 @@ defineOptions({
 	name: 'PlantsVendorsItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-});
+const props = defineProps(buildProps());
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const globalStore = useGlobalStore();
 const plantsEntity = ENTITIES.Plants;
@@ -103,11 +99,11 @@ const equipmentTypesEntity = ENTITIES.EquipmentTypes;
 
 const itemFormRef = ref(null);
 const plantsLoading = ref(false);
-const plantsList = ref([]);
+const plantsList = shallowRef([]);
 const equipmentTypesLoading = ref(false);
-const equipmentTypesList = ref([]);
+const equipmentTypesList = shallowRef([]);
 
-const initialFormData = {
+const formData = ref({
 	plant_id: null,
 	name: '',
 	contact_name: '',
@@ -116,9 +112,7 @@ const initialFormData = {
 	is_one_click: 1,
 	equipment_type_for_buy_ids: [],
 	equipment_type_for_service_ids: [],
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	name: required,
@@ -127,32 +121,34 @@ const rules = {
 	phone_number: [required],
 };
 
-const requestsToDoList = computed(() => [
-	{
-		action: 'fetch_plants',
-		localProp: plantsList,
-		localLoadProp: plantsLoading,
-		payload: {
-			params: {
-				max: -1,
-				orderByColumn: 'name',
-				orderByMethod: 'asc',
+const requestsToDoList = computed(() =>
+	Object.freeze([
+		{
+			action: 'fetch_plants',
+			localProp: plantsList,
+			localLoadProp: plantsLoading,
+			payload: {
+				params: {
+					max: -1,
+					orderByColumn: 'name',
+					orderByMethod: 'asc',
+				},
 			},
 		},
-	},
-	{
-		action: 'fetch_equipment_types',
-		localProp: equipmentTypesList,
-		localLoadProp: equipmentTypesLoading,
-		payload: {
-			params: {
-				max: -1,
-				orderByColumn: 'name',
-				orderByMethod: 'asc',
+		{
+			action: 'fetch_equipment_types',
+			localProp: equipmentTypesList,
+			localLoadProp: equipmentTypesLoading,
+			payload: {
+				params: {
+					max: -1,
+					orderByColumn: 'name',
+					orderByMethod: 'asc',
+				},
 			},
 		},
-	},
-]);
+	]),
+);
 
 const methodsMap = {
 	fetch_plants: createGetRequest(plantsEntity.apiBase),
@@ -174,15 +170,18 @@ const localSetupPage = (item) => {
 
 	const globalPlantId = globalStore.globalFilters?.plantId;
 	const navbarPlantId = globalStore.navbarSettings?.showPlantName?.id;
+
 	formData.value.plant_id = globalPlantId || navbarPlantId || null;
 	formData.value.is_one_click = 1;
 };
 
 const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'PlantsVendors',
 	itemData: computed(() => props.itemData),
 	formData,
-	initialFormData,
 	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
 	localSetupPage,
 	emit,
 });

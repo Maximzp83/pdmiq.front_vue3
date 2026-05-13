@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<VueElementLoadingWrapper :isLoading="itemLoading" :isSaving="itemSaving" :itemsName="itemsName.one" />
+		<VueElementLoadingWrapper :isLoading="itemLoading" :isSaving="itemSaving" :itemsName="resolvedItemsName.one" />
 
 		<div class="view-wrapper item-page-wrapper">
 			<div class="mcontainer">
@@ -45,11 +45,11 @@ const {
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName: resolvedItemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: equipmentTypesCategoriesEntity.apiBase,
-	itemRoute: equipmentTypesCategoriesEntity.routeBase,
+	entityKey: 'EquipmentTypesCategories',
 	itemsName: itemsName.value,
 	itemFormRef,
 	changeRoute,

@@ -9,6 +9,7 @@
 						<ItemForm
 							ref="itemFormRef"
 							:itemData="itemData"
+							:itemsName="itemsName"
 							@submit="handleSubmitForm"
 							@onCancel="handleCloseButton"
 						/>
@@ -20,38 +21,26 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-
-import { ENTITIES } from '@/config/entities';
-import { Lang } from '@/localization';
-import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
+import { ref } from 'vue';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
-const { changeRoute } = useNavigation();
+import { useItemPage } from '@/composables/mixins/useItemPage';
 
 const itemFormRef = ref(null);
-const teamsEntity = ENTITIES.Teams;
-
-const itemsName = computed(() => ({
-	one: Lang.tt(teamsEntity.itemsName.one),
-	mult: Lang.tt(teamsEntity.itemsName.mult),
-}));
 
 const {
 	itemData,
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: teamsEntity.apiBase,
-	itemRoute: teamsEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Teams',
 	itemFormRef,
-	changeRoute,
+	goToListAfterSave: true,
 });
 </script>

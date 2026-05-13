@@ -6,7 +6,7 @@
 					<Filterbar
 						:itemsLoading="itemsLoading"
 						:filters="filters"
-						:itemsName="itemsName"
+						:itemsName="resolvedItemsName"
 						:hideCreate="!hasAccessToCreate"
 						:hideDelete="!hasAccessToDelete"
 						@event="handleEvent"
@@ -18,12 +18,12 @@
 						:itemsLoading="itemsLoading"
 						:tableData="itemsList"
 						:tableSettings="tableSettings"
-						:itemsName="itemsName"
+						:itemsName="resolvedItemsName"
 						@event="handleEvent"
 					/>
 
 					<PaginationContainer
-						:itemsName="itemsName"
+						:itemsName="resolvedItemsName"
 						:filters="filters"
 						:meta="meta"
 						@setFilters="setFilters"
@@ -80,11 +80,9 @@ const itemsName = computed(() => ({
 	instanceName: equipmentTypesCategoriesEntity.itemsName.instanceName,
 }));
 
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: equipmentTypesCategoriesEntity.apiBase,
-	itemRoute: equipmentTypesCategoriesEntity.routeBase,
+const { itemsList, itemsLoading, itemsName: resolvedItemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'EquipmentTypesCategories',
 	itemStore: equipmentTypesCategoriesStore,
-	itemFiltersName: equipmentTypesCategoriesEntity.filtersStorageKey,
 	itemsName,
 	options: {
 		tableRef: itemsTableRef,

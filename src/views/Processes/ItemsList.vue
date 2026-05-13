@@ -52,7 +52,6 @@ import { ENTITIES } from '@/config/entities';
 import { DOWNTIME_ORIGIN_TYPES } from '@/constants/global';
 import { getDateRange, getValues } from '@/helpers';
 import { standardTableOperations } from '@/constants/table';
-import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -64,9 +63,6 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import ItemsGridContainer from '@/components/gridTable/ItemsGridContainer.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 import Datepicker from '@/components/common/Datepicker.vue';
-
-const { tt } = Lang;
-
 defineOptions({
 	name: 'ProcessesList',
 });
@@ -91,12 +87,6 @@ const statisticsFilters = ref({
 const instanceName = 'Processes';
 const processesEntity = ENTITIES.Processes;
 
-const itemsName = computed(() => ({
-	one: tt(processesEntity.itemsName.one),
-	mult: tt(processesEntity.itemsName.mult),
-	instanceName: processesEntity.itemsName.instanceName,
-}));
-
 const hasAccessToCreate = computed(() => authStore.hasAccessTo([processesEntity.permissions.create]));
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([processesEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([processesEntity.permissions.delete]));
@@ -106,15 +96,13 @@ const localPrepareFilters = (currentFilters) => ({
 	...statisticsFilters.value,
 });
 
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: processesEntity.apiBase,
-	itemRoute: processesEntity.routeBase,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'Processes',
 	itemStore: processesStore,
-	itemFiltersName: processesEntity.filtersStorageKey,
-	itemsName,
 	options: {
 		localPrepareFilters,
 		tableRef: itemsTableRef,
+		editInModal: true,
 	},
 });
 
@@ -142,7 +130,7 @@ const cardActionsSettings = computed(() => {
 });
 
 const socketChannel = computed(() =>
-	authStore.authUser ? `live.conveyor.processes.${authStore.authUser.uuid}` : null
+	authStore.authUser ? `live.conveyor.processes.${authStore.authUser.uuid}` : null,
 );
 
 const updateProcessData = ({ process_id, actualCapacity, totalDowntime, downtime }) =>
@@ -190,7 +178,7 @@ const setupProcessSocket = (resources) => {
 
 const handleShowDetails = ({ row }) => {
 	if (!row?.id) return;
-	changeRoute({ path: `/processes/${row.id}` });
+	changeRoute({ path: `${processesEntity.routeBase}/${row.id}/details` });
 };
 
 const methodsMap = {
@@ -208,7 +196,7 @@ watch(
 	() => {
 		setFilters({ page: 1 });
 	},
-	{ deep: true }
+	{ deep: true },
 );
 
 watch(
@@ -228,7 +216,7 @@ watch(
 			});
 		}
 	},
-	{ deep: true }
+	{ deep: true },
 );
 
 onBeforeUnmount(() => {

@@ -51,7 +51,7 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
-const { tt, translate } = Lang;
+const { translate } = Lang;
 
 defineOptions({
 	name: 'ApplicationsList',
@@ -71,18 +71,9 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([applicationsEnti
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([applicationsEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([applicationsEntity.permissions.delete]));
 
-const itemsName = computed(() => ({
-	one: tt(applicationsEntity.itemsName.one),
-	mult: tt(applicationsEntity.itemsName.mult),
-	instanceName: applicationsEntity.itemsName.instanceName,
-}));
-
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: applicationsEntity.apiBase,
-	itemRoute: applicationsEntity.routeBase,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'Applications',
 	itemStore: applicationsStore,
-	itemFiltersName: applicationsEntity.filtersStorageKey,
-	itemsName,
 	options: {
 		tableRef: itemsTableRef,
 	},
@@ -97,6 +88,7 @@ const tableSettings = computed(() => {
 	if (hasAccessToDelete.value) {
 		actions.push(standardTableOperations.delete);
 	}
+
 	return {
 		columns: translate([
 			{

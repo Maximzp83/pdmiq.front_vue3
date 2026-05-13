@@ -50,7 +50,7 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
-const { tt, translate } = Lang;
+const { translate } = Lang;
 
 defineOptions({
 	name: 'BrandsList',

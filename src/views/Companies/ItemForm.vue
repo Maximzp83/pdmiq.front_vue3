@@ -195,7 +195,7 @@ import { menuItems } from '@/constants/menuItems';
 import { required } from '@/constants/validation';
 import { findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
-import { useItemForm } from '@/composables/mixins/useItemForm';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 import { useNotify } from '@/composables/useNotify';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -213,16 +213,13 @@ defineOptions({
 	name: 'CompaniesItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
+const props = defineProps(buildProps({
 	activeTab: { type: Object, default: () => ({ prop: 'mainTab' }) },
 	tabsList: { type: Array, default: () => [] },
 	hideMainTab: Boolean,
-});
+}));
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const authStore = useAuthStore();
 
@@ -233,7 +230,7 @@ const loginURL = ref('');
 const identifierURL = ref('');
 const startingElementIdx = ref(0);
 
-const initialFormData = {
+const formData = ref({
 	id: null,
 	name: '',
 	address: '',
@@ -246,9 +243,7 @@ const initialFormData = {
 	saml2_idp_base64_certificate: undefined,
 	menu_items: [],
 	is_archived: 0,
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	name: required,
@@ -447,9 +442,9 @@ watch(
 );
 
 const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'Companies',
 	itemData: computed(() => props.itemData),
 	formData,
-	initialFormData,
 	formRef: itemFormRef,
 	localSetupPage,
 	subItemsSettings: subItemsSettings.value,

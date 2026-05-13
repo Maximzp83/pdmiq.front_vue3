@@ -39,8 +39,6 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
-
 import { ENTITIES } from '@/config/entities';
 import { useItemPage } from '@/composables/mixins/useItemPage';
 import { useNavigation } from '@/composables/mixins/useNavigation';
@@ -57,11 +55,6 @@ defineOptions({
 });
 
 const companiesEntity = ENTITIES.Companies;
-
-const itemsName = computed(() => ({
-	one: tt(companiesEntity.itemsName.one),
-	mult: tt(companiesEntity.itemsName.mult),
-}));
 
 /*const localPageTitle = () => {
 	const itemName = itemsName.one;
@@ -97,7 +90,6 @@ const buildCustomButtons = (itemData) => {
 		};*/
 	}
 
-		console.log('buttons', buttons);
 	return buttons;
 };
 
@@ -108,10 +100,8 @@ const additionalNavbarSettings = Object.freeze({
 		// showFilter: true,
 });
 
-const { itemData, itemLoading } = useItemPage({
-	apiRoute: companiesEntity.apiBase,
-	itemRoute: companiesEntity.routeBase,
-	itemsName: itemsName.value,
+const { itemData, itemLoading, itemsName } = useItemPage({
+	entityKey: 'Companies',
 	customButtons: buildCustomButtons,
 	additionalNavbarSettings,
 	// localPageTitle: localPageTitle

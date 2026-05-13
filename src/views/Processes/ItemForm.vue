@@ -60,10 +60,7 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('Node')" prop="order_action">
-				<el-select
-					v-model="formData.order_action"
-					:placeholder="`${tt('Select')} ${tt('port')}`"
-				>
+				<el-select v-model="formData.order_action" :placeholder="`${tt('Select')} ${tt('port')}`">
 					<el-option
 						v-for="item in portsList"
 						:key="`order_action-${item}`"
@@ -270,21 +267,20 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
+import { sortArrayByKeyNumber } from '@/helpers';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
-import { useItemForm } from '@/composables/mixins/useItemForm';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
-import CustomInput from '@/components/form/CustomInput.vue';
-import CustomSelectV2 from '@/components/form/CustomSelectV2.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
 import BreakTimeItem from './BreakTimeItem.vue';
@@ -297,13 +293,9 @@ defineOptions({
 	name: 'ProcessesItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-});
+const props = defineProps(buildProps());
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 const plantsEntity = ENTITIES.Plants;
 const controllersEntity = ENTITIES.Controllers;
 const machinesEntity = ENTITIES.Machines;
@@ -320,19 +312,19 @@ const faultItemRefs = ref([]);
 const workDateItemRefs = ref([]);
 
 const plantsLoading = ref(false);
-const plantsList = ref([]);
+const plantsList = shallowRef([]);
 const machinesLoading = ref(false);
-const machinesList = ref([]);
+const machinesList = shallowRef([]);
 const controllersLoading = ref(false);
-const controllersList = ref([]);
+const controllersList = shallowRef([]);
 const productionLinesLoading = ref(false);
-const productionLinesList = ref([]);
+const productionLinesList = shallowRef([]);
 
 const faultsItemsList = ref([]);
 const breakTimeItemsList = ref([]);
 const workDatesItemsList = ref([]);
 
-const initialFormData = {
+const formData = ref({
 	name: '',
 	plant_id: null,
 	controller_id: null,
@@ -351,9 +343,7 @@ const initialFormData = {
 	expected_downtime_minutes: 1,
 	extremal_deviation_percent: 20,
 	pictures: [],
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const canEdit = computed(() => authStore.hasAccessTo(['edit_oee']));
 const canDelete = computed(() => authStore.hasAccessTo(['delete_oee']));
@@ -378,7 +368,7 @@ const weekDaysList = computed(() =>
 		{ id: 4, name: 'Thursday' },
 		{ id: 5, name: 'Friday' },
 		{ id: 6, name: 'Saturday' },
-	])
+	]),
 );
 
 const portsList = computed(() => Object.freeze(Array.from({ length: 41 }, (_, index) => index)));
@@ -388,7 +378,7 @@ const timePickerOptions = computed(() =>
 		start: '00:00',
 		step: '00:15',
 		end: '23:45',
-	})
+	}),
 );
 
 const endTimePickerOptions = computed(() => ({
@@ -401,12 +391,12 @@ const workTimeSettings = computed(() => ({
 	finish_work_day: formData.value.finish_work_day,
 }));
 
-const sortPictures = (pictures = []) =>
-	[...pictures].sort((a, b) => Number(a?.display_order || 0) - Number(b?.display_order || 0));
-
-const itemPictures = computed(() =>
-	props.itemData?.pictures?.length ? sortPictures(props.itemData.pictures) : []
-);
+const itemPictures = computed(() => {
+	if (props.itemData?.pictures?.length) {
+		return sortArrayByKeyNumber(props.itemData.pictures, 'display_order');
+	}
+	return [];
+});
 
 const refsMap = computed(() => ({
 	BreakTimeItem: breakTimeItemRefs.value,
@@ -433,11 +423,13 @@ const subItemsSettings = computed(() =>
 		{ ref: 'FaultItem', targetProp: 'faults' },
 		{ ref: 'WorkDateItem', targetProp: 'work_dates' },
 		{ ref: 'FileUploadBlock', targetProp: 'pictures' },
-	])
+	]),
 );
 
 const uploadSettings = computed(() =>
-	Object.freeze([{ fileProp: 'pictures', multiple: true }])
+	Object.freeze([
+		{ fileProp: 'pictures', multiple: true },
+	]),
 );
 
 const requestsToDoList = computed(() => {
@@ -465,7 +457,9 @@ const requestsToDoList = computed(() => {
 			bindTo: [
 				{
 					param: 'plantId',
-					getValue: () => formData.value.plant_id || globalFilters.value.plantId,
+					getValue: () => formData.value.plant_id,
+					alternateGetValue: () => globalFilters.value.plantId,
+					cleanKey: 'controller_id',
 				},
 			],
 		},
@@ -479,11 +473,14 @@ const requestsToDoList = computed(() => {
 			bindTo: [
 				{
 					param: 'plantId',
-					getValue: () => formData.value.plant_id || globalFilters.value.plantId,
+					getValue: () => formData.value.plant_id,
+					alternateGetValue: () => globalFilters.value.plantId,
+					cleanKey: 'machines_ids',
 				},
 				{
 					param: 'productionLineId',
 					getValue: () => formData.value.production_line_id,
+					cleanKey: 'machines_ids',
 				},
 			],
 		});
@@ -508,27 +505,25 @@ const localSetupPage = (itemData) => {
 		faultsItemsList.value = setupFormSubItemsList(itemData.faults || [], 'f_i');
 		breakTimeItemsList.value = setupFormSubItemsList(itemData.work_breaks || [], 'bt_i');
 		workDatesItemsList.value = setupFormSubItemsList(itemData.work_dates || [], 'wd_i');
-	} else {
-		faultsItemsList.value = [];
-		breakTimeItemsList.value = [];
-		workDatesItemsList.value = [];
+		return;
+	}
 
-		if (globalFilters.value.plantId) {
-			formData.value.plant_id = globalFilters.value.plantId;
-		}
+	faultsItemsList.value = [];
+	breakTimeItemsList.value = [];
+	workDatesItemsList.value = [];
+
+	if (globalFilters.value.plantId) {
+		formData.value.plant_id = globalFilters.value.plantId;
 	}
 };
 
-const {
-	isMobile,
-	validateForm,
-	handleCancel,
-	clearValidate,
-} = useItemForm({
+const { isMobile, validateForm, handleCancel, clearValidate } = useItemForm({
+	entityKey: 'Processes',
 	itemData: computed(() => props.itemData),
 	formData,
-	initialFormData,
 	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
 	localSetupPage,
 	subItemsSettings: subItemsSettings.value,
 	validateSubItemsForm,

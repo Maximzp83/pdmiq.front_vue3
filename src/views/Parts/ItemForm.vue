@@ -44,15 +44,15 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
-import CustomInput from '@/components/form/CustomInput.vue';
-import CustomSelectV2 from '@/components/form/CustomSelect.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 
 const { tt } = Lang;
@@ -61,30 +61,23 @@ defineOptions({
 	name: 'PartsItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-});
+const props = defineProps(buildProps());
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 const plantsEntity = ENTITIES.Plants;
 
 const itemFormRef = ref(null);
-const isMobile = ref(false);
-const plantsList = ref([]);
 const plantsLoading = ref(false);
+const plantsList = shallowRef([]);
 
-const initialFormData = {
+const formData = ref({
 	plant_id: null,
 	part_number: '',
 	type: '',
 	description: '',
 	price: 0,
 	stock_quantity: 0,
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	plant_id: required,
@@ -92,69 +85,36 @@ const rules = {
 	price: required,
 };
 
-const setupForm = (item) => {
-	if (item) {
-		formData.value = {
-			plant_id: item.plant_id ?? item.plant?.id ?? null,
-			part_number: item.part_number ?? '',
-			type: item.type ?? '',
-			description: item.description ?? '',
-			price: item.price ?? 0,
-			stock_quantity: item.stock_quantity ?? 0,
-		};
-		return;
-	}
-
-	formData.value = { ...initialFormData };
-};
-
-const fetchPlantsRequest = createGetRequest(plantsEntity.apiBase);
-
-const fetchPlants = async () => {
-	plantsLoading.value = true;
-	try {
-		const { value } = await fetchPlantsRequest({
-			params: {
-				max: -1,
-				orderByColumn: 'name',
-				orderByMethod: 'asc',
+const requestsToDoList = computed(() =>
+	Object.freeze([
+		{
+			action: 'fetch_plants',
+			localProp: plantsList,
+			localLoadProp: plantsLoading,
+			payload: {
+				params: { orderByColumn: 'name', orderByMethod: 'asc' },
 			},
-		});
-		plantsList.value = value || [];
-	} finally {
-		plantsLoading.value = false;
-	}
-};
-
-const submitForm = () => {
-	emit('submit', { ...formData.value });
-};
-
-const validateForm = () => {
-	if (!itemFormRef.value?.validate) return;
-
-	itemFormRef.value.validate((valid) => {
-		if (valid) {
-			submitForm();
-		}
-	});
-};
-
-const handleCancel = () => {
-	emit('onCancel');
-};
-
-watch(
-	() => props.itemData,
-	(item) => {
-		setupForm(item);
-	},
-	{ immediate: true }
+		},
+	]),
 );
 
-onMounted(() => {
-	isMobile.value = window.innerWidth < 768;
-	fetchPlants();
+const methodsMap = {
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
+};
+
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'Parts',
+	itemData: computed(() => props.itemData),
+	formData,
+	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	emit,
+});
+
+useRequestsList({
+	methodsMap,
+	requestsToDoList,
 });
 
 defineExpose({

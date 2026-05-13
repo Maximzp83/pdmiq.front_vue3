@@ -9,6 +9,7 @@
 						<ItemForm
 							ref="itemFormRef"
 							:itemData="itemData"
+							:itemsName="itemsName"
 							@submit="handleSubmitForm"
 							@onCancel="handleCloseButton"
 						/>
@@ -26,12 +27,11 @@ import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
-const { changeRoute } = useNavigation();
+const { tt } = Lang;
 
 const itemFormRef = ref(null);
 const plantsVendorsEntity = ENTITIES.PlantsVendors;
@@ -41,9 +41,10 @@ const itemsName = computed(() => {
 		Lang.currentLangId === LANGUAGE_TYPES.ENGLISH
 			? plantsVendorsEntity.itemsName.englishPrefix
 			: '';
+
 	return {
-		one: `${prefix}${Lang.tt(plantsVendorsEntity.itemsName.one)}`,
-		mult: `${prefix}${Lang.tt(plantsVendorsEntity.itemsName.mult)}`,
+		one: `${prefix}${tt(plantsVendorsEntity.itemsName.one)}`,
+		mult: `${prefix}${tt(plantsVendorsEntity.itemsName.mult)}`,
 		instanceName: plantsVendorsEntity.itemsName.instanceName,
 	};
 });
@@ -56,10 +57,9 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: plantsVendorsEntity.apiBase,
-	itemRoute: plantsVendorsEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'PlantsVendors',
+	itemsName,
 	itemFormRef,
-	changeRoute,
+	goToListAfterSave: true,
 });
 </script>

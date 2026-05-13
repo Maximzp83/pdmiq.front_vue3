@@ -1,5 +1,5 @@
 <template>
-	<div class="edit-form-container" :class="{ 'half-width': !resolvedFromAnotherInstance && !isMobile }">
+	<div class="edit-form-container" :class="{ 'half-width': !fromAnotherInstance && !isMobile }">
 		<el-form
 			ref="itemFormRef"
 			class="item-edit-form"
@@ -16,8 +16,6 @@
 				<CustomSelectV2
 					v-model="formData.plant_id"
 					filterable
-					:disabled="!plantsList.length || resolvedSettings.disablePlant"
-					:class="{ showJustInfo: resolvedSettings.disablePlant }"
 					:optionsLoading="plantsLoading"
 					:optionsList="plantsList"
 					:placeholder="`${tt('Select')} ${tt('plant')}`"
@@ -30,17 +28,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
-import { api_request } from '@/api/request_provider';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
-import { useGlobalStore } from '@/stores/GlobalStore';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
-import CustomInput from '@/components/form/CustomInput.vue';
-import CustomSelectV2 from '@/components/form/CustomSelect.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 
 const { tt } = Lang;
@@ -49,133 +45,58 @@ defineOptions({
 	name: 'ApplicationsItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-	settings: { type: Object, default: () => ({}) },
-	editModal: { type: Object, default: () => ({}) },
-});
+const props = defineProps(buildProps());
 
 const emit = defineEmits(['submit', 'onCancel', 'event']);
-
-const globalStore = useGlobalStore();
 const plantsEntity = ENTITIES.Plants;
 
 const itemFormRef = ref(null);
-const plantsList = ref([]);
 const plantsLoading = ref(false);
-const isMobile = ref(false);
+const plantsList = shallowRef([]);
 
-const initialFormData = {
+
+const formData = ref({
 	name: '',
 	plant_id: null,
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	name: required,
 	plant_id: required,
 };
 
-const resolvedSettings = computed(() => props.settings || {});
-const resolvedFromAnotherInstance = computed(
-	() => props.fromAnotherInstance || !!resolvedSettings.value.fromAnotherInstance
-);
-const isEditMode = computed(() => !!props.itemData?.id);
-
-const setupForm = (item) => {
-	if (item) {
-		formData.value = {
-			name: item.name ?? '',
-			plant_id: item.plant_id ?? item.plant?.id ?? null,
-		};
-	} else {
-		formData.value = {
-			...initialFormData,
-			plant_id: resolvedSettings.value.disablePlant
-				? globalStore.globalFilters?.plantId ?? null
-				: initialFormData.plant_id,
-		};
-	}
-};
-
-const fetchPlantsRequest = createGetRequest(plantsEntity.apiBase);
-
-const fetchPlants = async () => {
-	plantsLoading.value = true;
-	try {
-		const { value } = await fetchPlantsRequest({
+const requestsToDoList = computed(() => [
+	{
+		action: 'fetch_plants',
+		localProp: plantsList,
+		localLoadProp: plantsLoading,
+		payload: {
 			params: {
-				max: -1,
 				orderByColumn: 'name',
 				orderByMethod: 'asc',
 			},
-		});
-		plantsList.value = value || [];
-	} finally {
-		plantsLoading.value = false;
-	}
-};
-
-const submitForm = async () => {
-	const payload = { ...formData.value };
-
-	if (props.fromModal) {
-		emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-		try {
-			const answer = isEditMode.value
-				? await api_request.put(`/applications/${props.itemData.id}`, {
-						data: payload,
-						itemName: tt('Application'),
-					})
-				: await api_request.post('/applications', {
-						data: payload,
-						itemName: tt('Application'),
-					});
-
-			emit('event', { eventName: 'toggleSaving', data: false, onward: true });
-			emit('event', {
-				eventName: 'successModalSubmit',
-				data: answer,
-				onward: true,
-			});
-		} catch (error) {
-			emit('event', { eventName: 'toggleSaving', data: false, onward: true });
-			throw error;
-		}
-		return;
-	}
-
-	emit('submit', payload);
-};
-
-const validateForm = () => {
-	if (!itemFormRef.value?.validate) return;
-
-	itemFormRef.value.validate((valid) => {
-		if (valid) {
-			submitForm();
-		}
-	});
-};
-
-const handleCancel = () => {
-	emit('onCancel');
-};
-
-watch(
-	() => props.itemData,
-	(item) => {
-		setupForm(item);
+		},
 	},
-	{ immediate: true }
-);
+]);
 
-onMounted(() => {
-	isMobile.value = window.innerWidth < 768;
-	fetchPlants();
+const methodsMap = {
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
+};
+
+
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'Applications',
+	itemData: computed(() => props.itemData),
+	formData,
+	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	emit,
+});
+
+useRequestsList({
+	methodsMap,
+	requestsToDoList,
 });
 
 defineExpose({

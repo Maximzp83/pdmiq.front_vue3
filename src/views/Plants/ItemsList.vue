@@ -81,20 +81,11 @@ const canSeeArchivedToggle = computed(() =>
 	authStore.hasAccessTo(['archive_companies', 'archive_plants'], 'some')
 );
 
-const itemsName = computed(() => ({
-	one: tt(plantsEntity.itemsName.one),
-	mult: tt(plantsEntity.itemsName.mult),
-	instanceName: plantsEntity.itemsName.instanceName,
-}));
-
 const { changeRoute } = useNavigation();
 
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: plantsEntity.apiBase,
-	itemRoute: plantsEntity.routeBase,
-	itemFiltersName: plantsEntity.filtersStorageKey,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'Plants',
 	itemStore: plantsStore,
-	itemsName,
 	options: {
 		excludeGetParams: ['plantId'],
 		tableRef: itemsTableRef,

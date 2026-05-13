@@ -45,15 +45,16 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
-import CustomSelectV2 from '@/components/form/CustomSelect.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 
@@ -63,36 +64,30 @@ defineOptions({
 	name: 'TeamsItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
+const props = defineProps(buildProps({
 	hideCompanies: Boolean,
-});
+}));
 
-const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const authStore = useAuthStore();
 const plantsEntity = ENTITIES.Plants;
 const usersEntity = ENTITIES.Users;
 
 const itemFormRef = ref(null);
-const isMobile = ref(false);
 const plantsLoading = ref(false);
-const plantsList = ref([]);
+const plantsList = shallowRef([]);
 const usersLoading = ref(false);
-const usersList = ref([]);
+const usersList = shallowRef([]);
 
-const isIndustrialMatrix = computed(() => authStore.isIndustrialMatrix);
+const isIndustrialMatrix = computed(() => !!authStore.isIndustrialMatrix);
 const authUser = computed(() => authStore.authUser || {});
 
-const initialFormData = {
+const formData = ref({
 	name: '',
 	plant_id: null,
 	users_ids: [],
-};
-
-const formData = ref({ ...initialFormData });
+});
 
 const rules = {
 	name: required,
@@ -107,104 +102,66 @@ const currentPlantId = computed(() => {
 	return authUser.value?.plant_id ?? formData.value.plant_id;
 });
 
-const setupForm = (item) => {
-	if (item) {
-		formData.value = {
-			name: item.name ?? '',
-			plant_id: item.plant_id ?? item.plant?.id ?? authUser.value?.plant_id ?? null,
-			users_ids: item.users_ids ?? item.users?.map((user) => user.id) ?? [],
-		};
-		return;
-	}
-
-	formData.value = {
-		...initialFormData,
-		plant_id: !isIndustrialMatrix.value ? authUser.value?.plant_id ?? null : null,
-	};
-};
-
-const fetchPlantsRequest = createGetRequest(plantsEntity.apiBase);
-const fetchUsersRequest = createGetRequest(usersEntity.apiBase);
-
-const fetchPlants = async () => {
-	plantsLoading.value = true;
-	try {
-		const { value } = await fetchPlantsRequest({
+const requestsToDoList = computed(() => [
+	{
+		action: 'fetch_plants',
+		localProp: plantsList,
+		localLoadProp: plantsLoading,
+		payload: {
 			params: {
 				max: -1,
 				orderByColumn: 'name',
 				orderByMethod: 'asc',
 			},
-		});
-		plantsList.value = value || [];
-	} finally {
-		plantsLoading.value = false;
+		},
+	},
+	{
+		action: 'fetch_users',
+		localProp: usersList,
+		localLoadProp: usersLoading,
+		payload: {
+			params: {
+				max: -1,
+				orderByColumn: 'full_name',
+				orderByMethod: 'asc',
+			},
+		},
+		bindTo: [
+			{
+				param: 'plantId',
+				getValue: () => currentPlantId.value,
+				cleanKey: 'users_ids',
+				fetchAnyWay: !isIndustrialMatrix.value,
+			},
+		],
+	},
+]);
+
+const methodsMap = {
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
+	fetch_users: createGetRequest(usersEntity.apiBase),
+};
+
+const localSetupPage = () => {
+	if (!isIndustrialMatrix.value && authUser.value?.plant_id) {
+		formData.value.plant_id = authUser.value.plant_id;
 	}
 };
 
-const fetchUsers = async (plantId) => {
-	usersLoading.value = true;
-	try {
-		const params = {
-			max: -1,
-			orderByColumn: 'full_name',
-			orderByMethod: 'asc',
-		};
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'Teams',
+	itemData: computed(() => props.itemData),
+	formData,
+	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	localSetupPage,
+	emit,
+});
 
-		if (plantId) {
-			params.plantId = plantId;
-		}
-
-		const { value } = await fetchUsersRequest({
-			params,
-		});
-		usersList.value = value || [];
-	} finally {
-		usersLoading.value = false;
-	}
-};
-
-const submitForm = () => {
-	emit('submit', { ...formData.value });
-};
-
-const validateForm = () => {
-	if (!itemFormRef.value?.validate) return;
-
-	itemFormRef.value.validate((valid) => {
-		if (valid) {
-			submitForm();
-		}
-	});
-};
-
-const handleCancel = () => {
-	emit('onCancel');
-};
-
-watch(
-	() => props.itemData,
-	(item) => {
-		setupForm(item);
-	},
-	{ immediate: true }
-);
-
-watch(
-	currentPlantId,
-	(plantId, previousPlantId) => {
-		if (plantId !== previousPlantId) {
-			formData.value.users_ids = [];
-		}
-
-		fetchUsers(plantId);
-	},
-	{ immediate: true }
-);
-
-onMounted(() => {
-	isMobile.value = window.innerWidth < 768;
-	fetchPlants();
+useRequestsList({
+	methodsMap,
+	requestsToDoList,
 });
 
 defineExpose({

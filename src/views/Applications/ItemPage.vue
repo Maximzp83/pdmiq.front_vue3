@@ -9,6 +9,7 @@
 						<ItemForm
 							ref="itemFormRef"
 							:itemData="itemData"
+							:itemsName="itemsName"
 							@submit="handleSubmitForm"
 							@onCancel="handleCloseButton"
 						/>
@@ -20,38 +21,30 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
-
-import { ENTITIES } from '@/config/entities';
-import { Lang } from '@/localization';
-import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
+import { ref } from 'vue';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
+import { useItemPage } from '@/composables/mixins/useItemPage';
+import { useNavigation } from '@/composables/mixins/useNavigation';
+
 const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
-const applicationsEntity = ENTITIES.Applications;
-
-const itemsName = computed(() => ({
-	one: Lang.tt(applicationsEntity.itemsName.one),
-	mult: Lang.tt(applicationsEntity.itemsName.mult),
-}));
 
 const {
 	itemData,
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: applicationsEntity.apiBase,
-	itemRoute: applicationsEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Applications',
 	itemFormRef,
 	changeRoute,
+	goToListAfterSave: true,
 });
 </script>

@@ -32,39 +32,29 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 
-import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useAuthStore } from '@/stores/AuthStore';
 
 import TabsBar from '@/components/common/TabsBar.vue';
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
-const { changeRoute } = useNavigation();
 const authStore = useAuthStore();
 
 const itemFormRef = ref(null);
-const companiesEntity = ENTITIES.Companies;
 const activeTab = ref({ title: 'Main', prop: 'mainTab' });
-
-const itemsName = computed(() => ({
-	one: Lang.tt(companiesEntity.itemsName.one),
-	mult: Lang.tt(companiesEntity.itemsName.mult),
-}));
 
 const {
 	itemData,
 	itemLoading,
 	loadContent,
 	itemSaving,
+	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
-	apiRoute: companiesEntity.apiBase,
-	itemRoute: companiesEntity.routeBase,
-	itemsName: itemsName.value,
+	entityKey: 'Companies',
 	additionalNavbarSettings: Object.freeze({
 		showStandardNavItem: true,
 	}),
@@ -72,7 +62,8 @@ const {
 		fileProp: 'saml2_idp_base64_certificate',
 	},
 	itemFormRef,
-	changeRoute,
+	goToListAfterSave: true,
+	// debug: true
 });
 
 const tabsList = computed(() => {

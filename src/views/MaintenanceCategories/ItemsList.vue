@@ -78,16 +78,9 @@ const hasAccessToDelete = computed(() =>
 	authStore.hasAccessTo([maintenanceCategoriesEntity.permissions.delete])
 );
 
-const itemsName = computed(() => ({
-	one: tt(maintenanceCategoriesEntity.itemsName.one),
-	mult: tt(maintenanceCategoriesEntity.itemsName.mult),
-	instanceName: maintenanceCategoriesEntity.itemsName.instanceName,
-}));
-
-const { itemsList, itemsLoading, meta, setFilters, fetchItems } = useItemsData({
-	apiRoute: maintenanceCategoriesEntity.apiBase,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, fetchItems } = useItemsData({
+	entityKey: 'MaintenanceCategories',
 	filters,
-	itemsName,
 });
 
 const tableSettings = computed(() => {

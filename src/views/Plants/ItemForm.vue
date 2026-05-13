@@ -202,7 +202,7 @@
 </template>
 
 <script setup>
-import { computed, ref, defineAsyncComponent } from 'vue';
+import { computed, ref, shallowRef, defineAsyncComponent } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
@@ -213,7 +213,7 @@ import { USER_ROLES_TYPES } from '@/constants/global';
 import { metricSystemsList } from '@/modules/charts_factory/controllers/Sensor/enums';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useItemForm } from '@/composables/mixins/useItemForm';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
@@ -231,12 +231,9 @@ defineOptions({
 	name: 'PlantsItemForm',
 });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
+const props = defineProps(buildProps({
 	hideCompanies: Boolean,
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-});
+}));
 
 // const emit = defineEmits(['submit', 'onCancel']);
 const companiesEntity = ENTITIES.Companies;
@@ -249,13 +246,13 @@ const fileUploadBlockRef = ref(null);
 const locationItemRefs = ref([]);
 
 const companiesLoading = ref(false);
-const companiesList = ref([]);
+const companiesList = shallowRef([]);
 const usersLoading = ref(false);
-const usersList = ref([]);
-const thisPlantUsersList = ref([]);
+const usersList = shallowRef([]);
+const thisPlantUsersList = shallowRef([]);
 const plantUsersLoading = ref(false);
 const industrialServicesLoading = ref(false);
-const industrialServicesList = ref([]);
+const industrialServicesList = shallowRef([]);
 const locationsItemsList = ref([]);
 
 const formData = ref({
@@ -450,6 +447,7 @@ const {
 	handleCancel,
 	// formData
 } = useItemForm({
+	entityKey: 'Plants',
 	itemData: computed(() => props.itemData),
 	formData,
 	formRef: itemFormRef,

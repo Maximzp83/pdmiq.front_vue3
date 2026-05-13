@@ -14,7 +14,7 @@
 
 Primary rules source:
 - `docs/session-collaboration-rules.md`
-- Reference example for `src/views` entity migration: `src/views/Plants`
+- Reference examples for `src/views` entity migration: `src/views/Plants`, `src/views/Brands`
 
 ## Migration State Snapshot
 - Latest completed files:

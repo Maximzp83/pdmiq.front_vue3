@@ -235,10 +235,9 @@ defineProps({
 import { useMachinesStore } from '@/stores/MachinesStore';
 const machinesStore = useMachinesStore();
 const { filters } = storeToRefs(machinesStore);
-const machinesEntity = ENTITIES.Machines;
 
 const { itemsList, itemsLoading } = useItemsData({
-	apiRoute: machinesEntity.apiBase,
+	entityKey: 'Machines',
 	filters: filters.value,
 });
 

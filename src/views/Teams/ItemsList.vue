@@ -50,7 +50,7 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
-const { tt, translate } = Lang;
+const { translate } = Lang;
 
 defineOptions({
 	name: 'TeamsList',
@@ -68,18 +68,9 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([teamsEntity.perm
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([teamsEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([teamsEntity.permissions.delete]));
 
-const itemsName = computed(() => ({
-	one: tt(teamsEntity.itemsName.one),
-	mult: tt(teamsEntity.itemsName.mult),
-	instanceName: teamsEntity.itemsName.instanceName,
-}));
-
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	apiRoute: teamsEntity.apiBase,
-	itemRoute: teamsEntity.routeBase,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'Teams',
 	itemStore: teamsStore,
-	itemFiltersName: teamsEntity.filtersStorageKey,
-	itemsName,
 	options: {
 		tableRef: itemsTableRef,
 	},
