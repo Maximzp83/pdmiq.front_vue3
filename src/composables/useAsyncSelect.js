@@ -17,8 +17,8 @@ export function useAsyncSelect({
 	const vm = getCurrentInstance();
 	const timer = ref(null);
 	const query = ref('');
-	const nextPage = ref(1);
-	const loadmoreIsActiveLocal = ref(loadmoreIsActive);
+	const currentPage = ref(0);
+	const lastPage = ref(1);
 	const fetchNextTime = ref(false);
 	const isDropdownOpen = ref(false);
 	const hasLoadedInitialOptions = ref(Array.isArray(optionsList) && optionsList.length > 0);
@@ -56,16 +56,24 @@ export function useAsyncSelect({
 	};
 
 	const runFetchAction = (fetchAction, payload) => {
+		let result;
+
 		if (typeof fetchAction === 'function') {
-			return fetchAction(payload);
+			result = fetchAction(payload);
+		} else {
+			const store = getStore();
+			if (store && typeof store.dispatch === 'function' && typeof fetchAction === 'string') {
+				result = store.dispatch(fetchAction, payload);
+			}
 		}
 
-		const store = getStore();
-		if (store && typeof store.dispatch === 'function' && typeof fetchAction === 'string') {
-			return store.dispatch(fetchAction, payload);
+		if (!result || typeof result.then !== 'function') {
+			return Promise.reject(
+				new Error('[useAsyncSelect] fetchAction did not return a Promise'),
+			);
 		}
 
-		return Promise.reject(new Error('fetchAction is not configured'));
+		return result;
 	};
 
 	const buildListPayload = ({ page = 1, queryValue = '', extraParams = {} } = {}) => {
@@ -80,6 +88,7 @@ export function useAsyncSelect({
 		} = localSettings;
 
 		return {
+			incudeMeta: true,
 			params: {
 				...params,
 				...resolveFetchParams(),
@@ -95,8 +104,8 @@ export function useAsyncSelect({
 	const fetchSuccessHandler = ({ response, append = false, setToStore }) => {
 		const value = response?.value || [];
 		const fetchedMeta = response?.fetchedMeta || {};
-		const currentPage = fetchedMeta.current_page ?? 1;
-		const lastPage = fetchedMeta.last_page ?? currentPage;
+		const responseCurrentPage = fetchedMeta.current_page ?? 1;
+		const responseLastPage = fetchedMeta.last_page ?? responseCurrentPage;
 		const newList = append
 			? mergeArrays(innerOptionsList.value, value, { duplicateCheckProp: idKey })
 			: value;
@@ -110,8 +119,8 @@ export function useAsyncSelect({
 		if (newList.length || !append) {
 			hasLoadedInitialOptions.value = true;
 		}
-		nextPage.value = currentPage < lastPage ? currentPage + 1 : lastPage;
-		loadmoreIsActiveLocal.value = currentPage < lastPage;
+		currentPage.value = responseCurrentPage;
+		lastPage.value = responseLastPage;
 	};
 
 	const fetchItems = async ({ append = false, page = 1, queryValue = query.value, extraParams = {} } = {}) => {
@@ -126,6 +135,12 @@ export function useAsyncSelect({
 			});
 
 			const response = await runFetchAction(fetchAction, payload);
+			if (!response || typeof response !== 'object') {
+				return Promise.reject(
+					new Error('[useAsyncSelect] fetchAction resolved without response payload'),
+				);
+			}
+
 			fetchSuccessHandler({ response, append, setToStore });
 			return response;
 		} catch (error) {
@@ -194,7 +209,8 @@ export function useAsyncSelect({
 		const { minQueryLength = 1, cleanValues, setToStore, maxParam = 'max', max = 30 } =
 			resolveSettings();
 		query.value = value;
-		nextPage.value = 1;
+		currentPage.value = 0;
+		lastPage.value = 1;
 
 		if (value && value.length >= minQueryLength) {
 			if (timer.value) {
@@ -239,26 +255,22 @@ export function useAsyncSelect({
 		if (innerOptionsLoading.value) return;
 		if (!isDropdownOpen.value) return;
 
-		if (settings.isEmptyList) {
-			nextPage.value = 1;
-		}
+		const shouldLoadInitial = !!settings.isEmptyList;
+		const hasMore = currentPage.value < lastPage.value;
+		if (!shouldLoadInitial && (!loadmoreIsActive || !hasMore)) return;
 
-		if (
-			(loadmoreIsActiveLocal.value && loadmoreIsActive) ||
-			(loadmoreIsActive && settings.isEmptyList)
-		) {
-			await fetchItems({
-				append: !settings.isEmptyList,
-				page: nextPage.value,
-			});
-		}
+		await fetchItems({
+			append: !shouldLoadInitial,
+			page: shouldLoadInitial ? 1 : currentPage.value + 1,
+		});
 	};
 
 	const handleValueCleared = () => {
 		if (query.value) {
 			query.value = '';
 			fetchNextTime.value = true;
-			loadmoreIsActiveLocal.value = true;
+			currentPage.value = 0;
+			lastPage.value = 1;
 			updateOptionsList([]);
 		}
 	};

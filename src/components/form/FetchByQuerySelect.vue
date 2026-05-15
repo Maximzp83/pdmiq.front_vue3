@@ -107,6 +107,7 @@ const attachLoadmoreListener = async () => {
 	await nextTick();
 
 	const el = getSelectRootElement();
+	// console.log('el', el);
 	if (!el) return;
 
 	const wrap = getDropdownWrap();
@@ -115,6 +116,7 @@ const attachLoadmoreListener = async () => {
 	detachLoadmoreListener();
 
 	const onScroll = function () {
+		// console.log('onScroll', this.scrollHeight+'-'+ Math.ceil(this.scrollTop)+'-'+2+'<='+ this.clientHeight);
 		if (this.scrollHeight - Math.ceil(this.scrollTop) - 2 <= this.clientHeight) {
 			loadmore();
 		}
@@ -165,8 +167,8 @@ const handleFocus = (event) => {
 
 const handleToggleDropdown = async (open) => {
 	if (open) {
-		await attachLoadmoreListener();
 		await toggleDropdown(open, props.minOptionsToFetch || 2);
+		await attachLoadmoreListener();
 		return;
 	}
 

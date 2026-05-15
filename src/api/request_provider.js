@@ -206,6 +206,7 @@ const handleError = (error, options = {}) => {
  * @returns {Promise} Promise with response data
  */
 const api_request = (url, payload = {}) => {
+	// console.log('api_request', url, payload, isPrevent());
 	if (isPrevent()) return;
 
 	const { loading, toStore, notify, notifyError } = getOptions(payload);
