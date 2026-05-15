@@ -155,13 +155,18 @@ export default {
 							socketNameReadyProp: 'ncd_status_socket_ready',
 							socketChannel: this.socketChannel,
 							localHandleOpen: true,
-							localHandleError: true
+							localHandleError: this.ncdWebsocketErrorHandler,
+							socketCallback: e => this.ncd_socketCallbackHandler(e, {
+								sensor_id,
+								successMessage,
+								failMessage
+							})
 							// socketCallbackName: 'ncd_socketCallback'
 						});
 
 						this.toggleMainPreloader(true, `${this.tt('Working')}...`);
 
-						this['ncd_status_socket'].onopen = () => {
+						/*this['ncd_status_socket'].onopen = () => {
 							// console.log('onopen')
 							this['ncd_status_socket'].onmessage = e => {
 								// console.log('onmessage', e)
@@ -178,19 +183,8 @@ export default {
 										this.toggleMainPreloader(false);
 									});
 							};
-						};
+						};*/
 
-						this['ncd_status_socket'].onerror = err => {
-							console.log(err);
-							this.toggleMainPreloader(false);
-							this.$notify({
-								type: 'warning',
-								title: this.tt('Fail'),
-								message: this.tt('phrases.web_socket_error'),
-								duration: 0
-							});
-							this['ncd_status_socket'].close();
-						};
 					} else {
 						this.sensorSaving = false;
 						this.changeRoute({ parent: true });
@@ -202,7 +196,30 @@ export default {
 				});
 		},
 
-		ncd_socketCallback({ type, data }, settings = {}) {
+		ncdWebsocketErrorHandler(err) {
+			console.log(err);
+			this.toggleMainPreloader(false);
+			this.$notify({
+				type: 'warning',
+				title: this.tt('Fail'),
+				message: this.tt('phrases.web_socket_error'),
+				duration: 0
+			});
+			this['ncd_status_socket'].close();
+		},
+
+		ncd_socketCallbackHandler(e, settings) {		
+			this.ncd_socketCallback(e, settings).then(() => {
+				this.toggleMainPreloader(false);
+				this.changeRoute({ parent: true });
+			})
+			.catch(() => {
+				this.toggleMainPreloader(false);
+			})
+		},
+
+		ncd_socketCallback(response = {}, settings = {}) {
+			const { data, type } = response;
 			return new Promise((resolve, reject) => {
 				const { successMessage, failMessage, sensor_id } = settings;
 				// console.log(type, data)

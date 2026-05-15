@@ -112,7 +112,7 @@ class SensorChartsListFactory extends ChartsListFactoryBase {
 		});
 		// console.log(this.localTimeZone, data.signal_date_at)
 		const { daterange } = this.resources.filters;
-		// console.log('handlePointsLiveUpdate', daterange)
+		console.log('handlePointsLiveUpdate', daterange, isValidPointsData({ data, daterange }))
 		if (isValidPointsData({ data, daterange })) {
 			const chart_id = `chart-${data.parameter_type}`;
 			const ChartInstance = findItemBy(

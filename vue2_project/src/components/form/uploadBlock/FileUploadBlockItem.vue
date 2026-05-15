@@ -202,16 +202,17 @@ export default {
 		},
 
 		imgSrc() {
-			const { itemData, formData } = this;
+			const { itemData, /*formData*/ } = this;
 			let url =
 				itemData.url ||
 				itemData.full_file_name ||
 				itemData.file_path ||
 				itemData.file;
 
-			if (!formData.raw) {
-				url += `?${Date.now()}`;
-			}
+			/*if (!formData.raw) {
+				const hasParams = url.includes('?'); 
+				url += `${hasParams ? '&' : '?'}${Date.now()}`;
+			}*/
 
 			return url;
 		},

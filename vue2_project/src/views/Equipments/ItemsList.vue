@@ -448,7 +448,7 @@ export default {
 			const { authUser } = this;
 
 			if (authUser) {
-				return `live.sensors.${authUser.uuid}`;
+				return `user.${authUser.uuid}`;
 			}
 			return null;
 		},
@@ -764,13 +764,12 @@ export default {
 		},*/
 
 		// -----------------
-		state_socketCallback(answer) {
-			// console.log('state_socketCallback ', answer);
-			const { type } = answer;
+		state_socketCallback(response = {}) {
+			const { data, type } = response;
 
 			if (type == 'counters') {
-				this.itemsList = this.updateSensorsCounters(this.itemsList, answer.data);
-			}
+				this.itemsList = this.updateSensorsCounters(this.itemsList, data);
+			}			
 		},
 
 		getSensorsIds(equipments) {
@@ -853,7 +852,7 @@ export default {
 							socketNameReadyProp: 'state_socket_ready',
 							socketChannel: this.socketChannel,
 							socketCallbackName: 'state_socketCallback',
-							resources: sensorIds
+							// resources: sensorIds
 						});
 					}
 				}
@@ -862,7 +861,7 @@ export default {
 				if (sensorIds.length) {
 					this.webSocketSend({
 						socketName: 'state_socket',
-						resources: sensorIds
+						// resources: sensorIds
 					});
 				}
 			}

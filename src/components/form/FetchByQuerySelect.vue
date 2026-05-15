@@ -1,20 +1,20 @@
 <template>
 	<CustomSelect
-		v-el-select-loadmore="loadmore"
+		ref="selectRootRef"
 		filterable
 		:enabled="!disabled"
 		:multiple="multiple"
-		:className="`${className} ${enableLoadmore && 'enableLoadmore'}`"
+		:className="`${className} ${enableLoadmore ? 'enableLoadmore' : ''}`"
 		:disabled="disabled"
 		:clearable="clearable"
-		:filter-method="(q) => selectQuery(q)"
-		:optionsLoading="optionsLoading"
-		:optionsList="optionsList"
+		:filter-method="selectQuery"
+		:optionsLoading="innerOptionsLoading"
+		:optionsList="innerOptionsList"
 		:placeholder="placeholder"
 		:labelKey="labelKey"
 		:valueKey="valueKey"
 		:idKey="idKey"
-		:value="value"
+		:value="currentValue"
 		:setupLabelSettings="setupLabelSettings"
 		:setupLabelMethod="setupLabelMethod"
 		:prefixIcon="prefixIcon"
@@ -24,230 +24,185 @@
 	/>
 </template>
 
-<script>
-import { cleanValuesByList, mergeArrays } from '@/helpers';
+<script setup>
+import { computed, nextTick, ref, watch } from 'vue';
 
-export default {
-	props: {
-		clearable: Boolean,
-		disabled: Boolean,
-		multiple: Boolean,
-		required: Boolean,
-		optionsLoading: Boolean,
-		enableLoadmore: Boolean,
-		preventResetOptionsWhenQueryIsCleared: Boolean,
-		loadmoreIsActive: { type: Boolean, default: true },
-		placeholder: { type: String, default: 'select item' },
-		labelKey: { type: String, default: 'name' },
-		valueKey: { type: String, default: 'id' },
-		idKey: { type: String, default: 'id' },
-		value: null,
-		className: { type: String, default: '' },
-		label: String,
-		setupLabelSettings: null,
-		setupLabelMethod: { type: Function, default: undefined },
-		prefixIcon: String,
-		minOptionsToFetch: null,
-		optionsList: { type: Array, default: () => [] },
-		settings: { type: Object, default: () => ({}) },
-		fetchParams: { type: Object, default: () => ({}) },
-	},
+import { useAsyncSelect } from '@/composables/useAsyncSelect';
 
-	directives: {
-		elSelectLoadmore: {
-			mounted(el, binding) {
-				const elSelect = el.querySelector('.el-select');
-				if (!elSelect || !elSelect.classList.contains('enableLoadmore')) {
-					return;
-				}
+import CustomSelect from '@/components/form/CustomSelect.vue';
 
-				const wrap = el.querySelector('.el-select-dropdown .el-select-dropdown__wrap');
-				if (!wrap) return;
+defineOptions({
+	name: 'FetchByQuerySelect',
+});
 
-				const onScroll = function () {
-					if (this.scrollHeight - Math.ceil(this.scrollTop) - 2 <= this.clientHeight) {
-						binding.value();
-					}
-				};
+const props = defineProps({
+	modelValue: null,
+	value: null,
+	clearable: Boolean,
+	disabled: Boolean,
+	multiple: Boolean,
+	required: Boolean,
+	optionsLoading: Boolean,
+	enableLoadmore: Boolean,
+	preventResetOptionsWhenQueryIsCleared: Boolean,
+	loadmoreIsActive: { type: Boolean, default: true },
+	placeholder: { type: String, default: 'select item' },
+	labelKey: { type: String, default: 'name' },
+	valueKey: { type: String, default: 'id' },
+	idKey: { type: String, default: 'id' },
+	className: { type: String, default: '' },
+	label: String,
+	setupLabelSettings: null,
+	setupLabelMethod: { type: Function, default: undefined },
+	prefixIcon: String,
+	minOptionsToFetch: null,
+	optionsList: { type: Array, default: () => [] },
+	settings: { type: Object, default: () => ({}) },
+	fetchParams: { type: Object, default: () => ({}) },
+});
 
-				wrap.addEventListener('scroll', onScroll);
-				el.__loadmoreWrap = wrap;
-				el.__loadmoreHandler = onScroll;
-			},
-			unmounted(el) {
-				if (el.__loadmoreWrap && el.__loadmoreHandler) {
-					el.__loadmoreWrap.removeEventListener('scroll', el.__loadmoreHandler);
-				}
-			},
-		},
-	},
+const emit = defineEmits([
+	'update:modelValue',
+	'input',
+	'change',
+	'focus',
+	'update:optionsLoading',
+	'update:optionsList',
+]);
 
-	emits: [
-		'input',
-		'change',
-		'focus',
-		'update:optionsLoading',
-		'update:optionsList',
-	],
+const currentValue = computed(() =>
+	props.modelValue !== null && props.modelValue !== undefined ? props.modelValue : props.value,
+);
+const selectRootRef = ref(null);
 
-	data() {
-		return {
-			timer: null,
-			query: '',
-			nextPage: 1,
-			loadmoreIsActiveLocal: false,
-			skipLoadmore: false,
-			fetchNextTime: false,
-			isDropdownOpen: false,
-		};
-	},
-
-	methods: {
-		fetchItems({ type, params = {} }) {
-			try {
-				let { fetchAction, setToStore, loading } = this.settings;
-				let mergedParams = this.settings.params || {};
-				mergedParams = { ...mergedParams, ...params };
-
-				const payload = {
-					params: {
-						max: 30,
-						q: this.query,
-						page: this.nextPage,
-						...mergedParams,
-					},
-					loading,
-				};
-
-				this.$emit('update:optionsLoading', true);
-
-				const run =
-					typeof fetchAction === 'function'
-						? fetchAction(payload)
-						: this.$store && typeof this.$store.dispatch === 'function'
-							? this.$store.dispatch(fetchAction, payload)
-							: Promise.reject(new Error('fetchAction is not configured'));
-
-				run
-					.then((response) => {
-						this.fetchSuccessHandler({
-							type,
-							response,
-							setToStore,
-						});
-						this.$emit('update:optionsLoading', false);
-					})
-					.catch((error) => {
-						this.$emit('update:optionsLoading', false);
-						console.warn(error);
-					});
-			} catch (error) {
-				console.warn(error);
-			}
-		},
-
-		selectQuery(query) {
-			let { minQueryLength, cleanValues, setToStore } = this.settings;
-			minQueryLength = minQueryLength || 1;
-			this.query = query;
-			this.nextPage = 1;
-
-			if (query && query.length >= minQueryLength) {
-				if (this.timer) {
-					clearTimeout(this.timer);
-				}
-				this.timer = setTimeout(() => {
-					this.timer = null;
-
-					if (cleanValues) cleanValuesByList(cleanValues, this);
-					const params = { max: this.query.length ? -1 : 30 };
-					this.fetchItems({ params });
-				}, 700);
-			} else if (!setToStore && !this.preventResetOptionsWhenQueryIsCleared) {
-				this.$emit('update:optionsList', []);
-			}
-		},
-
-		handleInput(value) {
-			this.$emit('input', value);
-			this.$emit('change', value);
-
-			if (!value && this.query) {
-				this.query = '';
-				this.fetchNextTime = true;
-				this.loadmoreIsActiveLocal = true;
-				this.$emit('update:optionsList', []);
-			}
-		},
-
-		handleFocus(event) {
-			setTimeout(() => {
-				this.$emit('focus', event);
-			}, 10);
-		},
-
-		handleToggleDropdown(open) {
-			this.isDropdownOpen = open;
-			const minOptionsToFetch = this.minOptionsToFetch || 2;
-
-			if (open) {
-				if (this.optionsList.length < minOptionsToFetch || this.fetchNextTime) {
-					this.loadmore({ isEmptyList: true });
-				}
-				this.fetchNextTime = false;
-			} else {
-				this.query = '';
-			}
-		},
-
-		loadmore(settings = {}) {
-			if (this.optionsLoading) return;
-
-			if (!this.fetchNextTime && this.skipLoadmore) {
-				this.skipLoadmore = false;
-				return;
-			}
-
-			if (!this.isDropdownOpen) return;
-
-			if (settings.isEmptyList) {
-				this.nextPage = 1;
-			}
-
-			if (
-				(this.loadmoreIsActiveLocal && this.loadmoreIsActive) ||
-				(this.loadmoreIsActive && settings.isEmptyList)
-			) {
-				this.fetchItems({ type: 'loadmore' });
-			}
-		},
-
-		fetchSuccessHandler({ response, setToStore, type }) {
-			const { value, fetchedMeta } = response;
-			const { current_page: currentPage, last_page: lastPage } = fetchedMeta;
-			let newList = [];
-
-			if (type === 'loadmore') {
-				newList = mergeArrays(this.optionsList, value, {
-					duplicateCheckProp: 'id',
-				});
-			} else {
-				newList = value;
-			}
-
-			if (setToStore && this.$store && typeof this.$store.dispatch === 'function') {
-				this.$store.dispatch(setToStore, newList);
-			} else {
-				this.$emit('update:optionsList', newList);
-			}
-
-			this.nextPage = currentPage < lastPage ? currentPage + 1 : lastPage;
-			this.loadmoreIsActiveLocal = currentPage < lastPage;
-		},
-	},
-
-	created() {
-		this.loadmoreIsActiveLocal = this.loadmoreIsActive;
-	},
+const getSelectRootElement = () => {
+	const root = selectRootRef.value;
+	return root?.$el || root;
 };
+
+const getDropdownWrap = () => {
+	const el = getSelectRootElement();
+	const localWrap = el?.querySelector?.('.el-select-dropdown .el-select-dropdown__wrap');
+	if (localWrap) return localWrap;
+
+	const visibleWraps = Array.from(document.querySelectorAll('.el-select-dropdown__wrap')).filter(
+		(node) => node.offsetParent !== null,
+	);
+
+	return visibleWraps[visibleWraps.length - 1] || null;
+};
+
+const detachLoadmoreListener = () => {
+	const el = getSelectRootElement();
+	if (el?.__loadmoreWrap && el?.__loadmoreHandler) {
+		el.__loadmoreWrap.removeEventListener('scroll', el.__loadmoreHandler);
+		el.__loadmoreWrap = null;
+		el.__loadmoreHandler = null;
+	}
+};
+
+const attachLoadmoreListener = async () => {
+	if (!props.enableLoadmore) return;
+
+	await nextTick();
+
+	const el = getSelectRootElement();
+	if (!el) return;
+
+	const wrap = getDropdownWrap();
+	if (!wrap || wrap === el.__loadmoreWrap) return;
+
+	detachLoadmoreListener();
+
+	const onScroll = function () {
+		if (this.scrollHeight - Math.ceil(this.scrollTop) - 2 <= this.clientHeight) {
+			loadmore();
+		}
+	};
+
+	wrap.addEventListener('scroll', onScroll);
+	el.__loadmoreWrap = wrap;
+	el.__loadmoreHandler = onScroll;
+};
+
+const {
+	innerOptionsList,
+	innerOptionsLoading,
+	fetchSelectedItemsById,
+	selectQuery,
+	handleToggleDropdown: toggleDropdown,
+	loadmore,
+	handleValueCleared,
+	syncExternalOptionsList,
+	syncExternalOptionsLoading,
+} = useAsyncSelect({
+	settings: computed(() => props.settings),
+	fetchParams: computed(() => props.fetchParams),
+	optionsList: props.optionsList,
+	optionsLoading: props.optionsLoading,
+	currentValue,
+	idKey: props.idKey,
+	loadmoreIsActive: props.loadmoreIsActive,
+	onOptionsListChange: (value) => emit('update:optionsList', value),
+	onOptionsLoadingChange: (value) => emit('update:optionsLoading', value),
+});
+
+const handleInput = (value) => {
+	emit('update:modelValue', value);
+	emit('input', value);
+	emit('change', value);
+
+	if (!value && value !== 0) {
+		handleValueCleared();
+	}
+};
+
+const handleFocus = (event) => {
+	setTimeout(() => {
+		emit('focus', event);
+	}, 10);
+};
+
+const handleToggleDropdown = async (open) => {
+	if (open) {
+		await attachLoadmoreListener();
+		await toggleDropdown(open, props.minOptionsToFetch || 2);
+		return;
+	}
+
+	detachLoadmoreListener();
+	await toggleDropdown(open, props.minOptionsToFetch || 2);
+};
+
+watch(
+	currentValue,
+	() => {
+		fetchSelectedItemsById();
+	},
+	{ immediate: true },
+);
+
+watch(
+	() => props.optionsList,
+	(value) => {
+		syncExternalOptionsList(value);
+	},
+	{ deep: true },
+);
+
+watch(
+	() => props.optionsLoading,
+	(value) => {
+		syncExternalOptionsLoading(value);
+	},
+);
+
+watch(
+	() => props.enableLoadmore,
+	(value) => {
+		if (!value) {
+			detachLoadmoreListener();
+		}
+	},
+);
 </script>

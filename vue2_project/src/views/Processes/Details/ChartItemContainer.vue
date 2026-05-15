@@ -275,7 +275,7 @@ export default {
 			const { processData } = this;
 
 			if (processData && processData.uuid) {
-				return `live.conveyor.process.${processData.uuid}`;
+				return `oee.process.${processData.uuid}`;
 			}
 
 			return null;
@@ -333,8 +333,8 @@ export default {
 			});
 		},
 
-		state_socketCallback(answer) {
-			this.ChartInstance.handleCountersLiveUpdate(answer);
+		state_socketCallback(response = {}) {
+			this.ChartInstance.handleCountersLiveUpdate(response);
 		},
 
 		setupSocket() {

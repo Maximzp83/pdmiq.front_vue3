@@ -144,7 +144,7 @@
 
 			<div class="el-form-item">
 				<el-form-item :label="tt('Node')" prop="port_number"
-					v-if="!currentSensorType.isBannerTempVibe2 && !currentSensorType.isBannerV2Generic && !currentSensorType.isBannerV2_1 && !currentSensorType.isBannerM25"
+					v-if="!isLubeMatrixV3 && !currentSensorType.isBannerTempVibe2 && !currentSensorType.isBannerV2Generic && !currentSensorType.isBannerV2_1 && !currentSensorType.isBannerM25"
 				>
 					<el-select
 						v-model="formData.port_number"
@@ -320,7 +320,7 @@
 				<el-form-item
 					:label="`${tt('Device')} ${tt('address')} id`"
 					prop="device_address_id"
-					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
+					v-if="isLubeMatrixV3 || currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
 					required
 				>
 					<CustomInput v-model="formData.device_address_id" />
@@ -329,7 +329,7 @@
 				<el-form-item
 					:label="`${tt('Sensor')} Id`"
 					prop="fft_sensor_id"
-					v-if="currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
+					v-if="isLubeMatrixV3 || currentSensorType.isBannerTempVibe2 || currentSensorType.isBannerV2Generic || currentSensorType.isBannerV2_1 || currentSensorType.isBannerM25"
 					required
 				>
 					<CustomInput v-model="formData.fft_sensor_id" />
@@ -1330,11 +1330,11 @@ export default {
 				}
 			}
 
-			if (!isBannerTempVibe2 && !isBannerV2Generic && !isBannerV2_1 && !isBannerM25) {
+			if (this.isLubeMatrixV3 || isBannerTempVibe2 || isBannerV2Generic || isBannerV2_1 || isBannerM25) {
+				delete data.port_number;				
+			} else {
 				delete data.device_address_id;
 				delete data.fft_sensor_id;
-			} else {
-				delete data.port_number;				
 			}
 
 			if (!isBannerV2Generic) {
@@ -1365,8 +1365,8 @@ export default {
 					...prepareSubmitData(data),
 				}
 			};
-			
 			if (this.isLubeMatrixV3 || this.isLubeMatrixV4) {
+				// console.log('0 localGetFormData banner us formdadta', data.ultrasound_formData.formData )
 				sensorType = 'ultrasound';
 				payload.formData = {
 					...payload.formData,
@@ -1396,7 +1396,7 @@ export default {
 				return
 			}*/
 			// this.$emit('submit', { sensorType, payload });
-
+			// console.log('1 localGetFormData banner', payload )
 			return { sensorType, payload };
 		},
 
@@ -1410,6 +1410,8 @@ export default {
 			//-------- для внедрения lube v3 в banner форму-----
 			if (sensorType == 'ultrasound') {
 				// formData.ultrasound_position = pumpFormData ? +pumpFormData.position : null;
+				// console.log('2 localSubmit banner', payload )
+
 				const ItemFormUltraSound = this.$refs.ItemFormUltraSound;
 				ItemFormUltraSound.localSubmit(payload);
 			} else {

@@ -1,7 +1,10 @@
 import axios from 'axios';
 
 // const DEFAULT_DEV_API_URL = 'https://api.pdmmatrix.assetmatrix.com/api';
-const DEFAULT_DEV_API_URL = 'https://api.testmatrix.assetmatrix.com/api';
+// const DEFAULT_DEV_API_URL = 'https://api.testmatrix.assetmatrix.com/api';
+// const DEFAULT_DEV_API_URL = 'https://api.industrialmatrix-dev.tools/api';
+// const DEFAULT_DEV_API_URL = 'https://api.industrialmatrix-stage.tools/api';
+const DEFAULT_DEV_API_URL = 'https://api.industrialmatrix.tools/api';
 
 const HOST_API_URL_MAP = {
 	'https://testmatrix.assetmatrix.com': 'https://api.testmatrix.assetmatrix.com/api',

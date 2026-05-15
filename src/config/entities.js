@@ -38,6 +38,28 @@ export const ENTITIES = Object.freeze({
 			path: '/brands',
 		}),
 	}),
+	BrandModels: Object.freeze({
+		key: 'brand_models',
+		apiBase: '/equipments/brands/models',
+		routeBase: '/brand-models',
+		filtersStorageKey: 'brand_models_filters',
+		itemsName: Object.freeze({
+			one: 'Part_Number',
+			mult: 'Part_Numbers',
+			instanceName: 'brand_models',
+		}),
+		permissions: Object.freeze({
+			view: 'view_part_numbers',
+			create: 'create_part_numbers',
+			edit: 'edit_part_numbers',
+			delete: 'delete_part_numbers',
+		}),
+		menu: Object.freeze({
+			label: 'part_numbers',
+			icon: 'icon-part-numbers2',
+			path: '/brand-models',
+		}),
+	}),
 	Companies: Object.freeze({
 		key: 'companies',
 		apiBase: '/companies',

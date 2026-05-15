@@ -100,7 +100,7 @@
 			<el-button
 				v-else
 				type="primary"
-				@click="sendRequestFFT"
+				@click="setupRequestFFT"
 				class="capitalize"
 				>{{ tt('Confirm') }}</el-button
 			>
@@ -160,6 +160,8 @@ export default {
 
 			fftRequestDialogOpen: false,
 			initiatedFFTDialog: false,
+
+			fft_request_id: null
 		};
 	},
 
@@ -232,7 +234,7 @@ export default {
 				this.initiatedFFTDialog = true;
 				this.fftRequestDialogOpen = true;
 			} else {
-				this.sendRequestFFT();
+				this.setupRequestFFT();
 			}
 		},
 
@@ -245,7 +247,7 @@ export default {
 			}, 200);
 		},
 
-		sendRequestFFT() {
+		setupRequestFFT() {
 			const { isBannerTempVibe2, isBannerM25, forController } = this;
 
 			const payload = { sensorId: this.sensorData.id, data: {} };
@@ -285,58 +287,74 @@ export default {
 						}
 					});
 				} else {
-					this.$emit('update:isSending', true);
-					// console.log(payload)
-					this.request_ncd_fft(payload)
-						.then(response => {
-							this.handleFFTRequest(response);
 
-							setTimeout(() => {
-								this.$emit('update:isSending', false);
-							}, 100);
-						})
-						.catch(() => {
-							this.$emit('update:isSending', false);
-						});
+					if (this.isBannerTempVibe2 || this.isBannerM25) {
+						this.processingFFTRequest = true;
+					} else {
+						this.toggleMainPreloader(true, `${this.tt('Working')} FFT...`);
+					}
+
+					// const fft_request_id = response.value.id;
+
+					this.setupWebSocket({
+						socketName: 'fft_socket',
+						socketNameReadyProp: 'fft_socket_ready',
+						socketChannel: this.socketChannelFFTRequest,
+						subscriptionSuccededCallback: () => this.handleSubscriptionSucceded(payload),
+						socketCallback: (type, data) => this.fftRequest_socketCallback({ type, data }, {
+							// fft_request_id
+						}),
+						// socketCallbackName: 'fftRequest_socketCallback',
+					});
 				}
 			}			
 		},
 
-		handleFFTRequest(response) {
-			if (this.isBannerTempVibe2 || this.isBannerM25) {
-				this.processingFFTRequest = true;
-			} else {
-				this.toggleMainPreloader(true, `${this.tt('Working')} FFT...`);
-			}
+		/*handleFFTRequest(response) {
+			
+		},*/
 
-			const fft_request_id = response.value.id;
-
-			this.setupWebSocket({
-				socketName: 'fft_socket',
-				socketNameReadyProp: 'fft_socket_ready',
-				socketChannel: this.socketChannelFFTRequest
-				// socketCallbackName: 'fftRequest_socketCallback',
-			});
-
-			this['fft_socket'].onmessage = e => {
-				this['fftRequest_socketCallback'](JSON.parse(e.data), {
-					fft_request_id
-				});
-			};
+		handleSubscriptionSucceded(payload) {
+			// console.log('handleSubscriptionSucceded 123', payload)
+			this.sendRequestFFT(payload);
 		},
 
-		fftRequest_socketCallback({ type, data }, settings = {}) {
-			const { fft_request_id } = settings;
+		sendRequestFFT(payload) {
+			this.fft_request_id = null;
+
+			// this.handleFFTRequest(/*response*/);
+			this.$emit('update:isSending', true);
+			
+			this.request_ncd_fft(payload)
+				.then((response) => {
+					this.fft_request_id = response.value.id;
+
+					this.$emit('update:isSending', false);
+
+					/*setTimeout(() => {
+						this.$emit('update:isSending', false);
+					}, 100);*/
+				})
+				.catch(() => {
+					this.$emit('update:isSending', false);
+				});
+		},
+
+		fftRequest_socketCallback({ type, data } = {}, /*settings = {}*/) {
+			// const { fft_request_id } = settings;
 			const { tt, isBannerTempVibe2, isBannerM25 } = this;
 			const waitingType = (isBannerTempVibe2 || isBannerM25) ? 'dxm.command' : 'ncd.command';
+			const safeData = data.data || {};
 
-			// console.log(fft_request_id, type, data, waitingType)
+			// console.log('fftRequest_socketCallback', safeData.fft_request_id, this.fft_request_id, type, safeData, waitingType)
 			if (
-				type.toLowerCase() == waitingType &&
-				data.fft_request_id === fft_request_id &&
-				(data.type === FFT_SOURCE_TYPES.FFT || data.command_type == 'fft')
+				type && type.toLowerCase() == waitingType &&
+				// data.fft_request_id === fft_request_id &&
+				safeData.fft_request_id === this.fft_request_id &&
+				safeData.sender_id === this.authUser.id &&
+				(safeData.type === FFT_SOURCE_TYPES.FFT || safeData.command_type == 'fft')
 			) {
-				if (data.status == NCD_REQUEST_STATUSES.SUCCESS) {
+				if (safeData.status == NCD_REQUEST_STATUSES.SUCCESS) {
 					/*this.$notify({
 						type: 'success',
 						title: tt('constants.Success'),
@@ -353,7 +371,7 @@ export default {
 					this.processingFFTRequest = false;
 				}
 
-				if (data.status == NCD_REQUEST_STATUSES.FAIL) {
+				if (safeData.status == NCD_REQUEST_STATUSES.FAIL) {
 					/*this.$notify({
 						type: 'warning',
 						title: tt('constants.Fail'),
@@ -375,6 +393,7 @@ export default {
 				}
 				// this.pdfReportURL = reportURL;
 			}
+			
 		},
 
 		handleLastFFT() {

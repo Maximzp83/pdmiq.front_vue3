@@ -237,7 +237,7 @@ export default {
 			const { authUser } = this;
 
 			if (authUser) {
-				return `live.conveyor.processes.${authUser.uuid}`;
+				return `user.${authUser.uuid}`;
 			}
 			return null;
 		}
@@ -305,14 +305,13 @@ export default {
 			});
 		},
 
-		state_socketCallback(answer) {
-			// console.log('state_pusherCallback ', answer);
-			const { type } = answer;
+		state_socketCallback(response = {}) {
+			const { type } = response;
 
 			if (type == 'job' || type == 'downtime') {
-				this.itemsList = this.update_process_data(answer);
-			}
-		}
+				this.itemsList = this.update_process_data(response);
+			}			
+		},
 	},
 
 	watch: {
@@ -335,7 +334,7 @@ export default {
 							socketNameReadyProp: 'state_socket_ready',
 							socketChannel: this.socketChannel,
 							socketCallbackName: 'state_socketCallback',
-							resources: sensorIds
+							// resources: sensorIds
 						});
 					}
 				}

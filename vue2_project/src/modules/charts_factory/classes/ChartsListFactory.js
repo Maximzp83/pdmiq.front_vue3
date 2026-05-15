@@ -162,8 +162,8 @@ export default class ChartsListFactoryBase {
 				...settings,
 				resources: this.resources
 			});
+			// console.log(chartKey, configsKey, charts_configs)
 			let charts_configs_initial = cloneDeep(charts_configs);
-			// console.log(chartKey, cloneDeep(charts_configs_initial))
 
 			if (charts_configs) {
 				// console.log(getParamsByIds, filterParamsBy, joinChartsBy, modifyParamsMethod)

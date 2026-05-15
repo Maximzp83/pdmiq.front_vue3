@@ -185,7 +185,7 @@ export default {
 		sensorId: that => that.sensorData.id,
 		isSensorOnly: that => that.sensorData.functionality_type === ULTRASOUND_SENSOR_TYPES.SENSOR_ONLY,
 
-		socketChannelDXMCommandRequest() {
+		socketChannelDXMCommand() {
 			const { authUser } = this;
 
 			if (authUser) {
@@ -462,7 +462,7 @@ export default {
 				this.setupWebSocket({
 					socketName: 'dxm_command_socket',
 					socketNameReadyProp: 'dxm_command_socket_ready',
-					socketChannel: this.socketChannelDXMCommandRequest,
+					socketChannel: this.socketChannelDXMCommand,
 					socketCallbackName: 'dxmCommand_socketCallback',
 				});
 

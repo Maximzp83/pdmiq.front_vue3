@@ -469,6 +469,7 @@ import { mapState, mapActions } from 'vuex';
 import { required } from '@/constants/validation';
 import { findItemBy, prepareSubmitData } from '@/helpers';
 import { macAddressMask } from '@/helpers/specialHelpers';
+import { /*SENSOR_TYPES,*/ NCD_REQUEST_STATUSES } from '@/constants/global';
 
 import {
 	dataSetsList,
@@ -1032,46 +1033,17 @@ export default {
 							socketName: 'ncd_status_socket',
 							socketNameReadyProp: 'ncd_status_socket_ready',
 							socketChannel: this.socketChannel,
-							localHandleOpen: true,
-							localHandleError: true
+							// localHandleOpen: true,
+							localHandleError: this.ncdWebsocketErrorHandler,
+							socketCallback: e => this.ncd_socketCallbackHandler(e, {
+								sensor_id,
+								successMessage,
+								failMessage
+							})
 							// socketCallbackName: 'ncd_socketCallback'
 						});
 
 						this.toggleMainPreloader(true, `${this.tt('Working')}...`);
-
-						this['ncd_status_socket'].onopen = () => {
-							// console.log('onopen')
-							this['ncd_status_socket'].onmessage = e => {
-								// console.log('onmessage', e)
-
-								this['ncd_socketCallback'](JSON.parse(e.data), {
-									sensor_id,
-									successMessage,
-									failMessage
-								})
-									.then(() => {
-										// console.log('ncd_socketCallback resolve')
-										this.toggleMainPreloader(false, '', true);
-									})
-									.catch(() => {
-										// console.log('ncd_socketCallback reject')
-										this.toggleMainPreloader(false, '', false);
-									});
-							};
-						};
-
-						this['ncd_status_socket'].onerror = err => {
-							this.toggleMainPreloader(false, '', false);
-							this.$notify({
-								type: 'warning',
-								title: this.tt('Fail'),
-								message: this.tt('phrases.Web_Socket_Error'),
-								duration: 0
-							});
-							this['ncd_status_socket'].close();
-							console.warn(err);
-							// reject(err);
-						};
 					} else {
 						this.toggleMainPreloader(false, '', true);
 					}
@@ -1080,6 +1052,64 @@ export default {
 					this.toggleSubmitRequestResult({isLoading:0, success:0});
 				});
 		},
+
+		ncd_socketCallbackHandler(e, settings) {
+			this.ncd_socketCallback(e, settings).then(() => {
+				this.toggleMainPreloader(false, '', true);
+			})
+			.catch(() => {
+				this.toggleMainPreloader(false, '', false);
+			});
+		},
+
+		ncd_socketCallback(response = {}, settings = {}) {
+			const { data, type } = response;
+
+			return new Promise((resolve, reject) => {
+				const { successMessage, failMessage, sensor_id } = settings;
+				// console.log(type, data)
+
+				if (type == 'ncd.command' && sensor_id == data.sensor_id) {
+					if (data.status == NCD_REQUEST_STATUSES.SUCCESS) {
+						this.$notify({
+							type: 'success',
+							title: this.tt('Success'),
+							message:
+								successMessage || this.tt('phrases.sensor_created_successfully')
+						});
+						this.closeWebSocket({ socketName: 'ncd_status_socket' });
+						resolve();
+					}
+
+					if (data.status == NCD_REQUEST_STATUSES.FAIL) {
+						this.$notify({
+							type: 'warning',
+							title: this.tt('Fail'),
+							message:
+								failMessage ||
+								this.tt('phrases.error_check_controller_connectivity'),
+							duration: 0
+						});
+						this.closeWebSocket({ socketName: 'ncd_status_socket' });
+						reject();
+					}
+				}
+			});			
+		},
+
+		ncdWebsocketErrorHandler(err) {
+			console.log(err);
+			this.toggleMainPreloader(false);
+			this.$notify({
+				type: 'warning',
+				title: this.tt('Fail'),
+				message: this.tt('phrases.web_socket_error'),
+				duration: 0
+			});
+			this['ncd_status_socket'].close();
+		},
+
+		// --------------------
 
 		toggleMainPreloader(open, text, success) {
 			if (open) {

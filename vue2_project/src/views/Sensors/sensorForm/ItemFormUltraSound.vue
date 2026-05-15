@@ -896,7 +896,7 @@ import {
 } from '@/constants/ultrasound';
 import { required } from '@/constants/validation';
 
-import { navigation, subItemMixin, actionButtonsMixin } from '@/mixins';
+import { navigation, subItemMixin, actionButtonsMixin, sensorTypeMixin } from '@/mixins';
 
 import 'element-ui/lib/theme-chalk/time-picker.css';
 import { mapState } from 'vuex';
@@ -905,7 +905,7 @@ import { mapState } from 'vuex';
 // import { findItemBy } from '@/helpers';
 
 export default {
-	mixins: [navigation(), subItemMixin(), actionButtonsMixin()],
+	mixins: [navigation(), subItemMixin(), actionButtonsMixin(), sensorTypeMixin()],
 	// name: 'SensorPage',
 
 	components: {
@@ -1079,6 +1079,8 @@ export default {
 		PUMP_TYPES: () => Object.freeze(PUMP_TYPES),
 		DATASET: () => Object.freeze(DATASET),
 		ultrasoundSensorTypesList: () => Object.freeze(ultrasoundSensorTypesList()),
+		currentSensorTypeDataKey: () => 'formData',
+
 		/*lubeVersionsList: () => Object.freeze(
 			lubeVersionsList().filter(lv=>lv.id !== LUBE_VERSIONS.V3)
 		),*/
@@ -1203,6 +1205,7 @@ export default {
 		lubricantCartridgeList: () => Object.freeze(lubricantCartridgeList()),
 
 		numberOfCyclesList() {
+				// console.log(this.pumpFormData.lubricant_container);
 			if (this.pumpFormData.lubricant_container) {
 				const pack = findItemBy(
 					'val',
@@ -1215,6 +1218,7 @@ export default {
 		},
 
 		lubricantAmountsList() {
+			// console.log(this.pumpFormData.lubricant_container);
 			if (this.pumpFormData.lubricant_container) {
 				const pack = findItemBy(
 					'val',
@@ -1560,7 +1564,7 @@ export default {
 					'lube_cycle_percent_danger_points',
 				]);
 			}
-
+			// console.log(' localGetFormDataCallback us data', data);
 			return data;
 		},
 
@@ -1582,7 +1586,7 @@ export default {
 				delete pumpFormData.lube_cycle_max_count;
 			}
 
-			if (data.lube_version === LUBE_VERSIONS.V3) {
+			if (!this.fromBannerSensorForm && data.lube_version === LUBE_VERSIONS.V3) {
 				/*data = removeObjProps(data, [
 					'port_number',
 					'ultrasound_position',
@@ -1615,7 +1619,7 @@ export default {
 			if (this.fromBannerSensorForm) {
 				delete data.location_in_equipment;
 				delete data.controller_id;
-				data.type = SENSOR_TYPES.BANNER;
+				// data.type = SENSOR_TYPES.BANNER;
 				// console.log('us loc submit', payload)
 				if (this.isLubeMatrixV4) {
 					// delete data.data_set;
@@ -1641,6 +1645,7 @@ export default {
 			this.enableLevelZonesForm
 				? (payload.levelZonesFormData = this.levelZoneForm)
 				: null;
+			// console.log(' localGetFormData us payload', payload);
 			
 			return payload;			
 		},
@@ -1668,14 +1673,22 @@ export default {
 
 		sensorSave(payloadData) {
 			const { formData, pumpFormData, levelZonesFormData } = payloadData;
+
 			let successCounter = 0,
 					resposeQuantity = Object.keys(payloadData).length;
 			// console.log('1', successCounter, payload)
 
-			formData.ultrasound_position = pumpFormData ? +pumpFormData.position : null;
-
+			if (formData.lube_version !== LUBE_VERSIONS.V3 ) {
+				formData.ultrasound_position = pumpFormData ? +pumpFormData.position : null;
+			} else {
+				delete formData.ultrasound_position;
+				// delete pumpFormData.position;
+				pumpFormData.position = 0;
+				delete formData.port_number;
+			}
+			
 			/*if (process.env.NODE_ENV === 'development') {
-				console.log('ultrasound', formData, pumpFormData);
+				console.log('sensorSave ultrasound', formData, pumpFormData);
 				return;
 			}*/
 			this.toggleSubmitRequestResult({isLoading:1});

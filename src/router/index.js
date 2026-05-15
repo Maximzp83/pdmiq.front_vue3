@@ -279,24 +279,24 @@ const routes = [
 				component: () => import('@/views/Parts/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_misc_parts'] },
 			},
-			// {
-			// 	path: 'brand-models',
-			// 	name: 'BrandModels',
-			// 	component: () => import('@/views/BrandModels/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_part_numbers'] },
-			// },
-			// {
-			// 	path: 'brand-models/create',
-			// 	name: 'BrandModelCreate',
-			// 	component: () => import('@/views/BrandModels/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['create_part_numbers'] },
-			// },
-			// {
-			// 	path: 'brand-models/:id',
-			// 	name: 'BrandModelEdit',
-			// 	component: () => import('@/views/BrandModels/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_part_numbers'] },
-			// },
+			{
+				path: 'brand-models',
+				name: 'BrandModels',
+				component: () => import('@/views/BrandModels/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_part_numbers'] },
+			},
+			{
+				path: 'brand-models/new',
+				name: 'BrandModelCreate',
+				component: () => import('@/views/BrandModels/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_part_numbers'] },
+			},
+			{
+				path: 'brand-models/:id',
+				name: 'BrandModelEdit',
+				component: () => import('@/views/BrandModels/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_part_numbers'] },
+			},
 			// {
 			// 	path: 'equipment-types',
 			// 	name: 'EquipmentTypes',

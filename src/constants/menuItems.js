@@ -394,14 +394,14 @@ const menuItems1 = [
 		meta: { permissions: ['view_brands'] },
 		enableInCompanyMenuForm: true
 	},
-	// {
-	// 	name: 'part_numbers',
-	// 	belongs_to_label: 'asset_management',
-	// 	id: MENU_TYPES.PART_NUMBERS,
-	// 	icon: 'icon-part-numbers2',
-	// 	path: '/brand-models',
-	// 	meta: { permissions: ['view_part_numbers'] }
-	// },
+	{
+		name: 'part_numbers',
+		belongs_to_label: 'asset_management',
+		id: MENU_TYPES.PART_NUMBERS,
+		icon: 'icon-part-numbers2',
+		path: '/brand-models',
+		meta: { permissions: ['view_part_numbers'] }
+	},
 	// {
 	// 	name: 'item_types',
 	// 	belongs_to_label: 'asset_management',

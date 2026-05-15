@@ -11,7 +11,8 @@ const getBaseURL = () => {
 	if (import.meta.env.VITE_API_BASE_URL) {
 		return import.meta.env.VITE_API_BASE_URL;
 	}
-	return 'https://api.testmatrix.assetmatrix.com/api';
+	// return 'https://api.industrialmatrix-dev.tools/api';
+	return 'https://api.industrialmatrix-stage.tools/api';
 };
 
 /**

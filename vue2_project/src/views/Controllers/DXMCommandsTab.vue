@@ -245,7 +245,8 @@ export default {
 		},
 
 		dxmCommand_socketCallback(response = {}) {
-			const { type, data } = response;
+			const { data, type } = response;
+
 			const { tt } = this;
 
 			if (type.toLowerCase() === 'dxm.command' && data.controller_id === this.controllerData.id) {

@@ -121,12 +121,12 @@ import {
 
 import {
 	fetchItemsHelper,
-	webSocketMixin,
+	// webSocketMixin,
 	chartsCompareExportMixin
 } from '@/mixins';
 
 export default {
-	mixins: [fetchItemsHelper(), webSocketMixin(), chartsCompareExportMixin()],
+	mixins: [fetchItemsHelper(), chartsCompareExportMixin()],
 
 	components: {
 		Datepicker: () => import('@/components/common/Datepicker.vue')

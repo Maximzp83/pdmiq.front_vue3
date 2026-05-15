@@ -76,6 +76,8 @@ import { isTodayRange, getValues } from '@/helpers';
 
 import { mapActions } from 'vuex';
 import { executeChartsListFactory } from '@/modules/charts_factory/index.js';
+// import { WebSocketService } from '@/services/WebSocketService.js';
+
 import { eventHandler, sensorTypeMixin, navigation, webSocketMixin } from '@/mixins';
 
 export default {
@@ -141,7 +143,7 @@ export default {
 			const { sensorData } = this;
 
 			if (sensorData) {
-				return `live.sensor.${sensorData.uuid}`;
+				return `sensor.${sensorData.uuid}`;
 			}
 			return null;
 		},
@@ -410,7 +412,11 @@ export default {
 				isBannerV2_1 ||
 				isBannerM25
 			);
-		}
+		},
+
+		/*accessToken() {
+			return this.$store.state.auth.access_token;
+		}*/
 
 		/*statisticsMockData: () =>
 			Object.freeze({
@@ -563,11 +569,11 @@ export default {
 				this.setupOverlayPlotlines(this.rpmOverlayData.rpm_value);
 			}
 
-			if (window.location.origin === 'http://localhost:8080') {
+			// if (window.location.origin === 'http://localhost:8080') {
 				window[
 					`ChartsListInstance_${this.chartsContainerIdx}`
 				] = this.ChartsListInstance;
-			}
+			// }
 		},
 
 		reloadChart(ids, settings={}) {
@@ -634,7 +640,19 @@ export default {
 					socketCallbackName: 'statistics_socketCallback'
 					// resources: this.getSensorsIds(this.itemsList)
 				});
+
+				// console.log(WebSocketService)
+				/*const wsConfig = {
+				    wsUrl: 'WebSocket URL',
+				    channelAuthConfig: {
+				        headers: {'Authorization': `Bearer ${this.authToken}`}
+				    }
+				};
+				this.statistics_socket = new WebSocketService(wsConfig);
+				this.statistics_socket.*/
+
 			} else if (this.statistics_socket) {
+				// this.statistics_socket.disconnect();
 				this.closeWebSocket({ socketName: 'statistics_socket' });
 			}
 		},
@@ -661,8 +679,9 @@ export default {
 			}
 		},*/
 
-		statistics_socketCallback({ data, type }) {
-			// console.log('statistics_socketCallback', data, type)
+		statistics_socketCallback(response = {}) {
+			const { data, type, /*event*/ } = response;
+			// console.log('statistics_socketCallback', response.data.parameter_type, this.socketChannel)
 			try {
 				if (type === 'job') {
 					this.ChartsListInstance.callMethod('handlePointsLiveUpdate', data);
@@ -691,6 +710,7 @@ export default {
 				}/* else if (type === 'cycle') {
 					this.ChartsListInstance.callMethod('handleLubePointsLiveUpdate', data);
 				}*/
+				
 			} catch (e) {
 				console.error('statistics_socketCallback', e);
 			}
@@ -832,7 +852,7 @@ export default {
 	},
 
 	beforeDestroy() {
-		// console.log('wrapper beforeDestroy')
+			console.log('wrapper beforeDestroy', this.statistics_socket)
 		if (this.statistics_socket) {
 			this.closeWebSocket({ socketName: 'statistics_socket' });
 		}

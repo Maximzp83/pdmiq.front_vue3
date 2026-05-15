@@ -1543,6 +1543,7 @@ const getFileType1 = str => {
 	if (str) {
 		try {
 			const fileExtension = str
+				.split('?')[0]
 				.split('.')
 				.pop()
 				.toLowerCase();

@@ -157,11 +157,7 @@ const fileName = computed(() => {
 
 const imgSrc = computed(() => {
 	const { itemData } = props;
-	const localForm = formData.value;
 	let url = itemData.url || itemData.full_file_name || itemData.file_path || itemData.file;
-	if (!localForm.raw) {
-		url += `?${Date.now()}`;
-	}
 	return url;
 });
 

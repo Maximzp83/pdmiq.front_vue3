@@ -1,26 +1,14 @@
 // import Pusher from 'pusher-js';
 // import axios from '@/services/api/axiosService';
+import { WebSocketService } from '@/services/WebSocketService.js';
 
 const webSocketMixin = {
 	computed: {
-		appKey() {
-			if (process.env.VUE_APP_WEB_SOCKET_APP_KEY) {
-				return `${process.env.VUE_APP_WEB_SOCKET_APP_KEY}`;
-			}
-
-			if (window.location.origin === 'https://app.industrialmatrix.com') {
-				return 'pdmmatrix';
-			} 
-
-			// return 'testmatrix';
-			return 'pdmmatrix';
-		},
-
 		socketEndpoint: () => {
 			if (process.env.VUE_APP_WEB_SOCKET_ENDPOINT) {
 				return `${process.env.VUE_APP_WEB_SOCKET_ENDPOINT}`;
 			}
-			return 'wss://0xnszsa5m8.execute-api.ca-central-1.amazonaws.com/socketprod';
+			return 'wss://ws.industrialmatrix-stage.tools/';
 		},
 		// topic: () => 'live.statistic.9ae4ad0b-ab79-4924-9f2d-89bcde2f66f4',
 		accessToken() {
@@ -32,88 +20,94 @@ const webSocketMixin = {
 		setupWebSocket({
 			socketName,
 			socketCallbackName,
+			socketCallback,
 			socketNameReadyProp,
 			socketChannel,
 			localHandleOpen,
 			localHandleError,
-			resources
+			localHandleConnected,
+			subscriptionSuccededCallback
+			// resources
 		}) {
-			// let appKey = 'testmatrix';
-			// let appKey = 'pdmmatrix';
-
-
-			const url = this.buildUrl(this.socketEndpoint, {
-				topicId: socketChannel,
-				appKey: this.appKey,
-				accessToken: this.accessToken,
-				resources: resources || null
+			// console.log(0)
+			this[socketName] = WebSocketService({
+				// debug: true,
+				wsUrl: this.socketEndpoint,
+				channelAuthConfig: {
+					headers: {'Authorization': `Bearer ${this.accessToken}`}
+				}
 			});
 
-			// console.log('websocket url', url);
-
-			this[socketName] = new WebSocket(url);
 			// console.log(/*url, resources,*/ socketName, this[socketName])
 
 			if (!localHandleOpen) {
-				this[socketName].onopen = () => {
+				this[socketName].on('open', () => {
 					// console.log('websocket on open')
 					this[socketNameReadyProp] = true;
-				};
+				});
 			}
 
-			if (!localHandleError) {
-				this[socketName].onerror = err => {
+			this[socketName].on('connected', () => {
+				if (localHandleConnected) {
+					localHandleConnected();
+				}
+				// console.log('connected in mixin', this[socketName], socketChannel)
+				if (socketCallbackName) {
+					this[socketName].private(socketChannel).listenToAll(this[socketCallbackName]);
+				} else if (socketCallback) {
+					this[socketName].private(socketChannel).listenToAll(socketCallback);
+				}
+
+				if (subscriptionSuccededCallback) {
+					this[socketName].private(socketChannel).onSubscriptionSucceeded(subscriptionSuccededCallback);
+				}
+			});
+
+			/*this[socketName].on('subscribed', () => {
+				console.log('subscribed in mixin', this[socketName], socketChannel)
+				
+				// console.log('subscribed in mixin', this[socketName], socketChannel)
+			});*/
+
+			this[socketName].on('disconnected', () => {
+				// console.log('on disconnected')
+				this[socketNameReadyProp] = false;
+			});
+
+			this[socketName].on('error', err => {
+				if (localHandleError) {
+					this[localHandleError](err);
+				} else {
 					console.error(
 						'Socket encountered error: ',
 						err.message || err,
 						'Closing socket'
 					);
-					this[socketName].close();
-				};
-			}
-
-			if (socketCallbackName) {
-				this[socketName].onmessage = e => {
-					// console.log('onmessage', e)
-					this[socketCallbackName](JSON.parse(e.data));
-				};
-			}
-
-			this[socketName].onclose = () => {
-				this[socketNameReadyProp] = false;
-			};
-		},
-
-		buildUrl(url, parameters) {
-			var qs = '';
-			for (var key in parameters) {
-				var value = parameters[key];
-				qs += encodeURIComponent(key) + '=' + encodeURIComponent(value) + '&';
-			}
-			if (qs.length > 0) {
-				qs = qs.substring(0, qs.length - 1);
-				url = url + '?' + qs;
-			}
-			// console.log(url)
-			return url;
+					this[socketName].disconnect();
+				}
+			});
 		},
 
 		closeWebSocket({ socketName }) {
 			if (this[socketName]) {
-				this[socketName].close();
+				this[socketName].disconnect();
 				// this[socketName] = null;
 			}
 		},
 
 		webSocketSend({ socketName, resources }) {
 			// console.log(this[socketName], resources)
-			this[socketName].send(
+			this[socketName].send('message', {
+				type: 'connect',
+				resources: resources
+			});
+			/*this[socketName].send(
 				JSON.stringify({
 					action: 'message',
 					type: 'connect',
 					resources: resources
 				})
-			);
+			);*/
 		}
 	}
 };

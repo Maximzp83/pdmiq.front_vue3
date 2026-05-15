@@ -271,7 +271,7 @@ export default {
 				}
 			}),
 
-		socketChannelFFTRequest() {
+		socketChannelFFT() {
 			const { authUser } = this;
 
 			if (authUser) {
@@ -457,26 +457,10 @@ export default {
 				this.setupWebSocket({
 					socketName: 'ncd_socket',
 					socketNameReadyProp: 'ncd_socket_ready',
-					socketChannel: this.socketChannelFFTRequest,
-					localHandleError: true
-					// socketCallbackName: 'configRequest_socketCallback',
+					socketChannel: this.socketChannelFFT,
+					localHandleError: this.configRequestWebsocketErrorHandler,
+					socketCallbackName: 'configRequest_socketCallback',
 				});
-
-				this['ncd_socket'].onmessage = e => {
-					this['configRequest_socketCallback'](JSON.parse(e.data));
-				};
-
-				this['ncd_socket'].onerror = err => {
-					console.warn(err);
-					this.toggleMainPreloader(false);
-					this.$notify({
-						type: 'warning',
-						title: this.tt('Fail'),
-						message: this.tt('phrases.web_socket_error'),
-						duration: 0
-					});
-					this['ncd_socket'].close();
-				};
 
 				this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
 			} catch (e) {
@@ -511,6 +495,18 @@ export default {
 				}
 				// this.pdfReportURL = reportURL;
 			}
+		},
+
+		configRequestWebsocketErrorHandler(err) {
+			console.warn(err);
+			this.toggleMainPreloader(false);
+			this.$notify({
+				type: 'warning',
+				title: this.tt('Fail'),
+				message: this.tt('phrases.web_socket_error'),
+				duration: 0
+			});
+			this['ncd_socket'].close();
 		},
 
 		toggleMainPreloader(open, text) {

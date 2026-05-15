@@ -582,6 +582,7 @@ export default {
 		allow: 'Allow',
 		luber: 'Luber',
 		favorites: 'Favorites',
+		stock: 'Stock',
 	},
 
 	sidebar_menu: {

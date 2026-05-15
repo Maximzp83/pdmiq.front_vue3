@@ -575,6 +575,7 @@ export default {
 		components: 'Componentes',
 		allow: 'Permitir',
 		favorites: 'Favoritos',
+		stock: 'Existencia',
 	},
 
 	sidebar_menu: {
