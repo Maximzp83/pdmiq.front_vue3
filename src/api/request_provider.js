@@ -242,6 +242,7 @@ const api_request = (url, payload = {}) => {
 									stateProp,
 									nestedStateProp,
 									action,
+									actionName,
 									resultMessage,
 									concatData,
 									returnResponse,
@@ -274,8 +275,9 @@ const api_request = (url, payload = {}) => {
 								}
 
 								// Dispatch action if provided
-								if (action && store && typeof store[action] === 'function') {
-									store[action]();
+								const resolvedAction = action || (store && store[actionName]);
+								if (resolvedAction && typeof store[actionName] === 'function') {
+									resolvedAction();
 								}
 
 								const payloadResolve = {

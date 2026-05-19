@@ -1,17 +1,18 @@
 <template>
-	<div class="view-wrapper view-list-wrapper brand-models-list">
-		<div class="mcontainer">
-			<div class="view-content-card card content-row">
-				<div class="card-content">
+	<div :class="['view-wrapper view-list-wrapper brand-models-list', { 'pt-0': fromEquipmentsLayout }]">
+		<div :class="[{ mcontainer: !fromEquipmentsLayout }]">
+			<div :class="[{ card: !fromEquipmentsLayout }, 'content-row', { 'view-content-card': !fromDetailsPage }]">
+				<div :class="[{ 'card-content': !fromEquipmentsLayout }]">
 					<Filterbar
+						v-if="!fromEquipmentsLayout"
 						:itemsLoading="itemsLoading"
 						:filters="filters"
 						:itemsName="itemsName"
-						:hideCreate="!hasAccessToCreate"
-						:hideDelete="!hasAccessToDelete"
+						:hideCreate="isStoreRoomItems || !hasAccessToCreate"
+						:hideDelete="isStoreRoomItems || !hasAccessToDelete"
 						@event="handleEvent"
 					>
-						<div class="filter-item mcol-xs-12 mcol-sm-4 relative">
+						<div v-if="!isStoreRoomItems" class="filter-item mcol-xs-12 mcol-sm-2 relative">
 							<FetchByQuerySelect
 								clearable
 								enableLoadmore
@@ -25,11 +26,24 @@
 								@update:optionsList="(value) => (brandsList = value)"
 							/>
 						</div>
+
+						<template v-if="storeroomItem" #middle>
+							<div class="filter-item ml-auto">
+								<CustomSelectV2
+									filterable
+									clearable
+									:optionsList="storeRoomLocationsList"
+									:placeholder="`${tt('all')} ${tt('storeroom')} ${tt('locations')}`"
+									:value="filters?.storeroomLocationId"
+									@change="(id) => setFilters({ storeroomLocationId: id })"
+								/>
+							</div>
+						</template>
 					</Filterbar>
 
 					<CustomDataListTable
 						ref="itemsTableRef"
-						:disableSelection="!hasAccessToDelete"
+						:disableSelection="fromEquipmentsLayout || !hasAccessToDelete"
 						:itemsLoading="itemsLoading"
 						:tableData="itemsList"
 						:tableSettings="tableSettings"
@@ -54,7 +68,7 @@
 import { computed, ref, shallowRef } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { createGetRequest } from '@/api/request_factories';
+import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
@@ -63,11 +77,13 @@ import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useBrandModelsStore } from '@/stores/BrandModelsStore';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
+import CustomSelect from '@/components/form/CustomSelect.vue';
 
 const { tt, translate } = Lang;
 
@@ -75,25 +91,42 @@ defineOptions({
 	name: 'BrandModelsList',
 });
 
+const props = defineProps({
+	fromEquipmentsLayout: Boolean,
+	fromDetailsPage: Boolean,
+	plantId: Number,
+	isStoreRoomItems: Boolean,
+	storeroomItem: { type: Object, default: null },
+});
+
 const itemsTableRef = ref(null);
 const brandsLoading = ref(false);
 const brandsList = shallowRef([]);
+const equipmentTypesLoading = ref(false);
+const equipmentTypesList = shallowRef([]);
 
 const brandModelsStore = useBrandModelsStore();
 const { filters } = storeToRefs(brandModelsStore);
 
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
+const { globalFilters } = storeToRefs(globalStore);
+
 const brandModelsEntity = ENTITIES.BrandModels;
 const brandsEntity = ENTITIES.Brands;
+const equipmentTypesEntity = ENTITIES.EquipmentTypes;
 
 const hasAccessToCreate = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.create]));
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.delete]));
+const storeRoomLocationsList = computed(() => props.storeroomItem?.locations || []);
 
 const brandQueryOptions = computed(() =>
 	Object.freeze({
 		fetchAction: methodsMap.fetch_brands,
+		fetchByIdAction: methodsMap.fetch_brand,
 		params: { orderByColumn: 'name', orderByMethod: 'asc' },
+		bindTo: [{ getValue: () => globalFilters.value?.plantId, param: 'plantId' }],
 	}),
 );
 
@@ -151,6 +184,8 @@ const tableSettings = computed(() => {
 
 const methodsMap = {
 	fetch_brands: createGetRequest(brandsEntity.apiBase),
+	fetch_brand: createGetByIdRequest(brandsEntity.apiBase),
+	fetch_equipment_types: createGetRequest(equipmentTypesEntity.apiBase),
 	setFilters,
 	createItem,
 	editItem,
@@ -161,18 +196,42 @@ useRequestsList({
 	methodsMap,
 	requestsToDoList: computed(() =>
 		Object.freeze([
-			/*{
-				action: 'fetch_brands',
-				localProp: brandsList,
-				localLoadProp: brandsLoading,
-				payload: {
-					params: {
-						max: -1,
-						orderByColumn: 'name',
-						orderByMethod: 'asc',
-					},
-				},
-			},*/
+			{
+				actionName: 'fetch_equipment_types',
+				localProp: equipmentTypesList,
+				localLoadProp: equipmentTypesLoading,
+			},
+			/*...(!props.isStoreRoomItems
+				? [
+						{
+							actionName: 'fetch_brands',
+							localProp: brandsList,
+							localLoadProp: brandsLoading,
+							payload: {
+								params: {
+									plantId: globalFilters.value?.plantId,
+									orderByColumn: 'name',
+									orderByMethod: 'asc',
+								},
+							},
+							initialSetup: filters.value?.brandId
+								? {
+										fetchById: {
+											actionName: 'fetch_brand',
+											itemId: filters.value.brandId,
+										},
+									}
+								: null,
+							bindTo: [
+								{
+									getValue: () => globalFilters.value?.plantId,
+									param: 'plantId',
+									noFetch: true,
+								},
+							],
+						},
+					]
+				: []),*/
 		]),
 	),
 });

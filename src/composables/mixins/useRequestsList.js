@@ -1,4 +1,6 @@
 import { ref, watch, onBeforeMount, onMounted } from 'vue';
+import { executeRequestAction } from '@/composables/executeRequestAction';
+import { mergedBindParams, setupRequestBinding, shouldFetchForBinding } from '@/composables/useRequestBinding';
 
 export function useRequestsList({
 	state,
@@ -46,22 +48,22 @@ export function useRequestsList({
 		}
 	};
 
-	const doFetchAction = (actionName, localProp, localLoadProp, payload, callback) => {
+	const doFetchAction = (action, localProp, localLoadProp, payload, callback) => {
 		if (localLoadProp) setTargetValue(localLoadProp, true);
 		const isInitial = requestsListInitialSetup.value;
 
-		const action = methodsMap[actionName];
+		// const action = methodsMap[actionName];
 		if (typeof action !== 'function') {
-			console.warn(`[useRequestsList] action "${actionName}" not found`);
+			console.warn(`[useRequestsList] action "${action}" not found`);
 			if (localLoadProp) setTargetValue(localLoadProp, false);
 			return;
 		}
 
-		action(payload)
+		executeRequestAction(action, payload, '[useRequestsList]')
 			.then(({ value, request_payload, fetchedMeta }) => {
 				if (callback) {
 					callback({
-						actionName,
+						actionName: action.name || 'anonymousAction',
 						localProp,
 						data: value,
 						fetchedMeta,
@@ -85,10 +87,21 @@ export function useRequestsList({
 			setupBindTo(option);
 			return;
 		}
+		if (requestsListInitialSetup.value && option.initialSetup?.fetchById) {
+			const { localProp, localLoadProp } = option;
+			fetchByIdHandler({
+				...option.initialSetup.fetchById,
+				localProp,
+				localLoadProp,
+			});
+			return;
+		}
 		if (option.blockInitialFetch) return;
 
-		const { action, localProp, localLoadProp, payload, callback, notFetch } = option;
-		if (!methodsMap[action]) return;
+		const { action, actionName, localProp, localLoadProp, payload, callback, notFetch } = option;
+		const resolvedAction = action || methodsMap[actionName];
+
+		if (!resolvedAction) return;
 
 		let newPayload = { params: { max: -1 } };
 		if (payload) {
@@ -99,13 +112,14 @@ export function useRequestsList({
 		}
 
 		if (!notFetch) {
-			doFetchAction(action, localProp, localLoadProp, newPayload, callback);
+			doFetchAction(resolvedAction, localProp, localLoadProp, newPayload, callback);
 		}
 	};
 
 	const setupBindTo = (option) => {
 		const {
 			action,
+			actionName,
 			localProp,
 			localLoadProp,
 			bindTo,
@@ -113,56 +127,26 @@ export function useRequestsList({
 			initialSetup,
 		} = option;
 
-		bindTo.forEach((item, idx) => {
-			const newOption = {
+		const resolvedAction = action || methodsMap[actionName];
+		if (!resolvedAction) return;
+
+		setupRequestBinding({
+			bindTo,
+			isInitialSetupRef: requestsListInitialSetup,
+			blockInitialFetch,
+			initialSetup,
+			decorateOption: (item, mergeWith) => ({
 				...item,
-				action,
+				action: resolvedAction,
 				localProp,
 				localLoadProp,
 				payload: option.payload,
-				mergeWith: bindTo.filter((bti) => bti !== item),
-			};
-
-			const getPrimary = item.getValue;
-			const getAlternate = item.alternateGetValue;
-
-			if (requestsListInitialSetup.value && idx === bindTo.length - 1) {
-				if (!blockInitialFetch && !initialSetup) {
-					const bindingValue = getPrimary ? getPrimary() : undefined;
-					const alternateValue = getAlternate ? getAlternate() : undefined;
-					watchHandler(bindingValue ?? alternateValue, newOption);
-				}
-			}
-
-			if (getPrimary) {
-				watch(
-					() => getPrimary(),
-					(newVal) => {
-						if (!requestsListInitialSetup.value || idx === bindTo.length - 1) {
-							const alternateValue = getAlternate ? getAlternate() : undefined;
-							watchHandler(newVal ?? alternateValue, newOption);
-						}
-					},
-				);
-			}
+				mergeWith,
+			}),
+			onWatchTrigger: watchHandler,
+			onFetchById: (fetchById) =>
+				fetchByIdHandler({ ...fetchById, localLoadProp, localProp }),
 		});
-
-		if (requestsListInitialSetup.value && initialSetup) {
-			const { fetchById } = initialSetup;
-			if (fetchById) {
-				fetchByIdHandler({ ...fetchById, localLoadProp, localProp });
-			}
-		}
-	};
-
-	const mergedParams = (mergeWithItems = []) => {
-		const result = {};
-		mergeWithItems.forEach((obj) => {
-			if (obj.getValue) {
-				result[obj.param] = obj.getValue();
-			}
-		});
-		return result;
 	};
 
 	const watchHandler = (value, option) => {
@@ -172,6 +156,7 @@ export function useRequestsList({
 			localLoadProp,
 			withoutClean,
 			param,
+			// params: mainParams,
 			cleanKey,
 			mergeWith,
 			fetchAnyWay,
@@ -204,27 +189,18 @@ export function useRequestsList({
 			...payload,
 			params: {
 				...payload.params,
-				...mergedParams(mergeWith),
+				...mergedBindParams(mergeWith),
 			},
 		};
-
 		if (param) newPayload.params[param] = value;
 		if (mainParam) newPayload[mainParam] = value;
 
-		let isFetch = false;
-		if (Array.isArray(value)) {
-			isFetch = value.length > 0 && value[0] !== null;
-		} else if (value || fetchAnyWay) {
-			isFetch = true;
-		} else {
-			isFetch = mergeWith?.some((mi) => {
-				if (!mi.noFetch && !mi.disableFetch) {
-					const val = newPayload.params[mi.param];
-					return Array.isArray(val) ? val.length > 0 && val[0] !== null : !!val;
-				}
-				return false;
-			});
-		}
+		const isFetch = shouldFetchForBinding({
+			value,
+			mergeWith,
+			newPayload,
+			fetchAnyWay,
+		});
 
 		if (!noFetch && isFetch) {
 			startFetchAction({
@@ -238,11 +214,11 @@ export function useRequestsList({
 		}
 	};
 
-	const fetchByIdHandler = ({ action, itemId, localProp, localLoadProp, payload }) => {
+	const fetchByIdHandler = ({ action, actionName, itemId, localProp, localLoadProp, payload }) => {
 		if (localLoadProp) setTargetValue(localLoadProp, true);
-		const actionFn = methodsMap[action];
+		const actionFn = action || methodsMap[actionName];
 		if (typeof actionFn !== 'function') {
-			console.warn(`[useRequestsList] action "${action}" not found`);
+			console.warn(`[useRequestsList] action "${actionName}" not found`);
 			if (localLoadProp) setTargetValue(localLoadProp, false);
 			return;
 		}

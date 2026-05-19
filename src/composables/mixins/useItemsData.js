@@ -261,7 +261,8 @@ export function useItemsData({
 	 */
 	const setFilters = (newFiltersValues, settings = {}) => {
 		if (!filtersRef) return;
-
+		
+		console.log('setFilters', newFiltersValues);
 		for (let item in newFiltersValues) {
 			// console.log( item, filters[item], typeof item, filters[item] instanceof Array )
 			if (newFiltersValues[item] instanceof Array) {
@@ -288,8 +289,6 @@ export function useItemsData({
 		}
 
 		itemStore.set_value('filters', newFilters, settings);
-
-
 		// filtersRef.value = newFilters;
 	};
 
@@ -460,6 +459,7 @@ export function useItemsData({
 			if (preventFetch.value) {
 				preventFetch.value = false;
 			} else {
+				console.log('filters', filters);
 				fetchItems({
 					...globalFilters.value,
 					...filters,
@@ -488,6 +488,7 @@ export function useItemsData({
 		setFilters({ page: 1 });
 
 		const filters = filtersRef?.value || {};
+		console.log('newGlobalFilters', newGlobalFilters);
 		fetchItems({
 			...filters,
 			...newGlobalFilters,

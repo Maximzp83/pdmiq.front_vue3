@@ -1,5 +1,7 @@
 import { getCurrentInstance, onBeforeUnmount, ref } from 'vue';
 
+import { executeRequestAction } from '@/composables/executeRequestAction';
+import { mergedBindParams, setupRequestBinding } from '@/composables/useRequestBinding';
 import { cleanValuesByList, findItemBy, mergeArrays } from '@/helpers';
 
 export function useAsyncSelect({
@@ -11,6 +13,7 @@ export function useAsyncSelect({
 	idKey = 'id',
 	loadmoreIsActive = true,
 	proxyTarget,
+	onValueChange,
 	onOptionsListChange,
 	onOptionsLoadingChange,
 } = {}) {
@@ -19,20 +22,27 @@ export function useAsyncSelect({
 	const query = ref('');
 	const currentPage = ref(0);
 	const lastPage = ref(1);
+	const bindingInitialSetup = ref(true);
 	const fetchNextTime = ref(false);
 	const isDropdownOpen = ref(false);
+	const dropdownOpenIntent = ref(false);
 	const hasLoadedInitialOptions = ref(Array.isArray(optionsList) && optionsList.length > 0);
 	const innerOptionsList = ref([...(optionsList || [])]);
 	const innerOptionsLoading = ref(!!optionsLoading);
 	const fetchedByIds = ref([]);
+	const boundParams = ref({});
+	const boundPayload = ref({});
 
-	const getStore = () => vm?.appContext?.config?.globalProperties?.$store;
 	const resolveSettings = () => settings?.value || settings || {};
 	const resolveFetchParams = () => fetchParams?.value || fetchParams || {};
 	const resolveCurrentValue = () =>
 		currentValue && typeof currentValue === 'object' && 'value' in currentValue
 			? currentValue.value
 			: currentValue;
+
+	const updateCurrentValue = (value) => {
+		onValueChange?.(value);
+	};
 
 	const updateOptionsList = (value) => {
 		innerOptionsList.value = Array.isArray(value) ? value : [];
@@ -55,28 +65,10 @@ export function useAsyncSelect({
 		innerOptionsLoading.value = !!value;
 	};
 
-	const runFetchAction = (fetchAction, payload) => {
-		let result;
+	const runFetchAction = (fetchAction, payload) =>
+		executeRequestAction(fetchAction, payload, '[useAsyncSelect]');
 
-		if (typeof fetchAction === 'function') {
-			result = fetchAction(payload);
-		} else {
-			const store = getStore();
-			if (store && typeof store.dispatch === 'function' && typeof fetchAction === 'string') {
-				result = store.dispatch(fetchAction, payload);
-			}
-		}
-
-		if (!result || typeof result.then !== 'function') {
-			return Promise.reject(
-				new Error('[useAsyncSelect] fetchAction did not return a Promise'),
-			);
-		}
-
-		return result;
-	};
-
-	const buildListPayload = ({ page = 1, queryValue = '', extraParams = {} } = {}) => {
+	const buildListPayload = ({ page = 1, queryValue = '', extraParams = {}, extraPayload = {} } = {}) => {
 		const localSettings = resolveSettings();
 		const {
 			params = {},
@@ -85,13 +77,27 @@ export function useAsyncSelect({
 			pageParam = 'page',
 			maxParam = 'max',
 			loading,
+			setToStore,
+			bindTo
 		} = localSettings;
+
+		const paramsFromBindTo = {};
+		if (bindTo) {
+			bindTo.forEach((item) => {
+				paramsFromBindTo[item.param] = item.getValue();
+			});
+		}
 
 		return {
 			incudeMeta: true,
+			...(setToStore ? { setToStore } : {}),
+			...extraPayload,
 			params: {
 				...params,
+				...paramsFromBindTo,
 				...resolveFetchParams(),
+				...boundParams.value,
+				...(extraPayload.params || {}),
 				...extraParams,
 				[maxParam]: extraParams[maxParam] ?? max,
 				[pageParam]: extraParams[pageParam] ?? page,
@@ -101,7 +107,7 @@ export function useAsyncSelect({
 		};
 	};
 
-	const fetchSuccessHandler = ({ response, append = false, setToStore }) => {
+	const fetchSuccessHandler = ({ response, append = false }) => {
 		const value = response?.value || [];
 		const fetchedMeta = response?.fetchedMeta || {};
 		const responseCurrentPage = fetchedMeta.current_page ?? 1;
@@ -110,45 +116,50 @@ export function useAsyncSelect({
 			? mergeArrays(innerOptionsList.value, value, { duplicateCheckProp: idKey })
 			: value;
 
-		const store = getStore();
-		if (setToStore && store && typeof store.dispatch === 'function') {
-			store.dispatch(setToStore, newList);
-		}
-
 		updateOptionsList(newList);
 		if (newList.length || !append) {
 			hasLoadedInitialOptions.value = true;
 		}
+		// console.log('fetchSuccessHandler', responseCurrentPage, responseLastPage);
 		currentPage.value = responseCurrentPage;
 		lastPage.value = responseLastPage;
 	};
 
-	const fetchItems = async ({ append = false, page = 1, queryValue = query.value, extraParams = {} } = {}) => {
-		try {
-			const { fetchAction, setToStore } = resolveSettings();
-			updateOptionsLoading(true);
+	const fetchItems = ({
+		append = false,
+		page = 1,
+		queryValue = query.value,
+		extraParams = {},
+		extraPayload = {},
+	} = {}) => {
+		const { fetchAction } = resolveSettings();
+		updateOptionsLoading(true);
 
-			const payload = buildListPayload({
-				page,
-				queryValue,
-				extraParams,
+		const payload = buildListPayload({
+			page,
+			queryValue,
+			extraParams,
+			extraPayload,
+		});
+		// console.log('fetchItems', )
+		return runFetchAction(fetchAction, payload)
+			.then((response) => {
+				if (!response || typeof response !== 'object') {
+					return Promise.reject(
+						new Error('[useAsyncSelect] fetchAction resolved without response payload'),
+					);
+				}
+
+				fetchSuccessHandler({ response, append });
+				return response;
+			})
+			.catch((error) => {
+				console.warn(error);
+				return Promise.reject(error);
+			})
+			.finally(() => {
+				updateOptionsLoading(false);
 			});
-
-			const response = await runFetchAction(fetchAction, payload);
-			if (!response || typeof response !== 'object') {
-				return Promise.reject(
-					new Error('[useAsyncSelect] fetchAction resolved without response payload'),
-				);
-			}
-
-			fetchSuccessHandler({ response, append, setToStore });
-			return response;
-		} catch (error) {
-			console.warn(error);
-			return Promise.reject(error);
-		} finally {
-			updateOptionsLoading(false);
-		}
 	};
 
 	const getMissingIds = () => {
@@ -163,51 +174,57 @@ export function useAsyncSelect({
 		});
 	};
 
-	const fetchSelectedItemsById = async () => {
+	const fetchSelectedItemsById = () => {
 		const missingIds = getMissingIds();
-		if (!missingIds.length) return;
+		if (!missingIds.length) return Promise.resolve([]);
 
 		const { fetchByIdAction, fetchById, itemIdParam = 'itemId' } = resolveSettings();
 		const fetchConfig = fetchByIdAction || fetchById;
-		if (!fetchConfig) return;
+		if (!fetchConfig) return Promise.resolve([]);
 
 		updateOptionsLoading(true);
 
-		try {
-			const requests = missingIds.map((id) => {
-				if (typeof fetchConfig === 'function') {
-					return fetchConfig({ [itemIdParam]: id });
+		const requests = missingIds.map((id) =>
+			runFetchAction(fetchConfig, { [itemIdParam]: id }),
+		);
+
+		return Promise.all(requests)
+			.then((responses) => {
+				const fetchedItems = responses.map((response) => response?.value).filter(Boolean);
+
+				if (fetchedItems.length) {
+					updateOptionsList(
+						mergeArrays(innerOptionsList.value, fetchedItems, {
+							duplicateCheckProp: idKey,
+						}),
+					);
 				}
 
-				return runFetchAction(fetchConfig, { [itemIdParam]: id });
+				fetchedByIds.value = mergeArrays(
+					fetchedByIds.value.map((id) => ({ id })),
+					missingIds.map((id) => ({ id })),
+					{ duplicateCheckProp: 'id' },
+				).map((item) => item.id);
+
+				return responses;
+			})
+			.catch((error) => {
+				console.warn(error);
+				return Promise.reject(error);
+			})
+			.finally(() => {
+				updateOptionsLoading(false);
 			});
-
-			const responses = await Promise.all(requests);
-			const fetchedItems = responses.map((response) => response?.value).filter(Boolean);
-
-			if (fetchedItems.length) {
-				updateOptionsList(
-					mergeArrays(innerOptionsList.value, fetchedItems, {
-						duplicateCheckProp: idKey,
-					}),
-				);
-			}
-
-			fetchedByIds.value = mergeArrays(
-				fetchedByIds.value.map((id) => ({ id })),
-				missingIds.map((id) => ({ id })),
-				{ duplicateCheckProp: 'id' },
-			).map((item) => item.id);
-		} catch (error) {
-			console.warn(error);
-		} finally {
-			updateOptionsLoading(false);
-		}
 	};
 
 	const selectQuery = (value) => {
 		const { minQueryLength = 1, cleanValues, setToStore, maxParam = 'max', max = 30 } =
 			resolveSettings();
+
+		if (!value && (isDropdownOpen.value || dropdownOpenIntent.value) && !query.value) {
+			return;
+		}
+
 		query.value = value;
 		currentPage.value = 0;
 		lastPage.value = 1;
@@ -228,6 +245,7 @@ export function useAsyncSelect({
 					extraParams: {
 						[maxParam]: value.length ? -1 : max,
 					},
+					extraPayload: boundPayload.value,
 				});
 			}, 700);
 		} else if (!setToStore && resolveSettings().resetOptionsOnEmptyQuery) {
@@ -235,33 +253,78 @@ export function useAsyncSelect({
 		}
 	};
 
-	const handleToggleDropdown = async (open, minOptionsToFetch = 2) => {
+	const handleBoundFetch = (value, option) => {
+		const {
+			withoutClean,
+			param,
+			mergeWith,
+			mainParam,
+			disableFetch,
+			payload = {},
+		} = option;
+		// console.log('handleBoundFetch', value, option);
+		if (!withoutClean) {
+			updateOptionsList([]);
+			updateCurrentValue(null);
+			// currentPage.value = null;
+		}
+		currentPage.value = 0;
+		lastPage.value = 1;
+		hasLoadedInitialOptions.value = false;
+
+		if (disableFetch) return;
+
+		const newPayload = {
+			...payload,
+			params: {
+				...payload.params,
+				...mergedBindParams(mergeWith),
+			},
+		};
+
+		if (param) newPayload.params[param] = value;
+		boundParams.value = { ...(newPayload.params || {}) };
+
+		if (mainParam) {
+			boundPayload.value = { [mainParam]: value };
+		} else {
+			boundPayload.value = {};
+		}
+	};
+
+	const handleToggleDropdown = (open, minOptionsToFetch = 2) => {
 		isDropdownOpen.value = open;
+		dropdownOpenIntent.value = open;
 
 		if (open) {
 			const shouldLoadInitial =
-				!hasLoadedInitialOptions.value && innerOptionsList.value.length < minOptionsToFetch;
-
+				!hasLoadedInitialOptions.value || (innerOptionsList.value.length < minOptionsToFetch);
 			if (shouldLoadInitial || fetchNextTime.value) {
-				await loadmore({ isEmptyList: true });
+				return loadmore({ isEmptyList: true }).finally(() => {
+					fetchNextTime.value = false;
+				});
 			}
 			fetchNextTime.value = false;
 		} else {
 			query.value = '';
 		}
+
+		return Promise.resolve();
 	};
 
-	const loadmore = async (settings = {}) => {
-		if (innerOptionsLoading.value) return;
-		if (!isDropdownOpen.value) return;
+	const loadmore = (settings = {}) => {
+		if (innerOptionsLoading.value) return Promise.resolve();
+		if (!isDropdownOpen.value) return Promise.resolve();
 
 		const shouldLoadInitial = !!settings.isEmptyList;
 		const hasMore = currentPage.value < lastPage.value;
-		if (!shouldLoadInitial && (!loadmoreIsActive || !hasMore)) return;
+		// console.log(currentPage.value +'<'+ lastPage.value)
+		if (!shouldLoadInitial && (!loadmoreIsActive || !hasMore)) return Promise.resolve();
 
-		await fetchItems({
+		return fetchItems({
 			append: !shouldLoadInitial,
 			page: shouldLoadInitial ? 1 : currentPage.value + 1,
+			extraPayload: boundPayload.value,
 		});
 	};
 
@@ -275,11 +338,36 @@ export function useAsyncSelect({
 		}
 	};
 
+	const notifyDropdownOpenIntent = () => {
+		dropdownOpenIntent.value = true;
+	};
+
 	onBeforeUnmount(() => {
 		if (timer.value) {
 			clearTimeout(timer.value);
 		}
 	});
+
+	const bindTo = resolveSettings().bindTo;
+	if (Array.isArray(bindTo) && bindTo.length) {
+		// setup bindTo for FetchByQuerySelect case
+		setupRequestBinding({
+			bindTo,
+			isInitialSetupRef: bindingInitialSetup,
+			initialSetup: resolveSettings().initialSetup,
+			blockInitialFetch: true,
+			decorateOption: (item, mergeWith) => ({
+				...item,
+				payload: resolveSettings().payload,
+				mergeWith,
+			}),
+			onWatchTrigger: handleBoundFetch,
+			onFetchById: () => fetchSelectedItemsById(),
+		});
+		setTimeout(() => {
+			bindingInitialSetup.value = false;
+		}, 0);
+	}
 
 	return {
 		innerOptionsList,
@@ -289,6 +377,7 @@ export function useAsyncSelect({
 		handleToggleDropdown,
 		loadmore,
 		handleValueCleared,
+		notifyDropdownOpenIntent,
 		syncExternalOptionsList,
 		syncExternalOptionsLoading,
 		updateOptionsList,

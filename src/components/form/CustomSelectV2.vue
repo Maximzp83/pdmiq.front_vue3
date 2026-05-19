@@ -28,6 +28,7 @@
 			@update:model-value="handleInput"
 			@focus="handleFocus"
 			@blur="handleBlur"
+			:popperClass="popperClass"
 		>
 			<template v-if="useHtml" #default="slotProps">
 				<div v-if="slotProps.item.html" v-html="slotProps.item.html"></div>
@@ -76,6 +77,7 @@ const props = defineProps({
 		type: Array,
 		default: () => [],
 	},
+	popperClass: { type: String, default: '' },
 });
 
 const emit = defineEmits(['update:modelValue', 'change', 'input', 'focus', 'blur', 'toggleDropdown']);

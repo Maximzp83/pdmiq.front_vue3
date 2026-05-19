@@ -216,19 +216,20 @@
 						class="menu-block role-select filter-block mcol-xs-6 mcol-sm-2 text-right ml-auto relative"
 					>
 						<!-- <SimpleSpinner :active="userRolesLoading" /> -->
-						<el-select-v2
+						<!-- <el-select-v2 -->
+						<CustomSelectV2
 							filterable
 							clearable
-							:loading="userRolesLoading"
+							:optionsLoading="userRolesLoading"
 							v-show="globalFilters.plantId || authUser.temp_role_id"
 							:disabled="!globalPlantsList.length"
 							@change="setTempRole"
 							:value="authUser.temp_role_id"
-							:options="userRolesList"
+							:optionsList="userRolesList"
 							:placeholder="`${tt('select')} ${tt('role')}`"
-							:props="{ value: 'id', label: 'name' }"
 							popper-class="plant-select-dropdown"
 						/>
+							<!-- :props="{ value: 'id', label: 'name' }" -->
 					</div>
 				</Transition>
 
@@ -238,7 +239,8 @@
 						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-3 text-right ml-auto relative"
 						v-if="navbarSettings.showFilter"
 					>
-						<el-select-v2
+						<!-- <el-select-v2 -->
+						<CustomSelectV2
 							filterable
 							clearable
 							:class="
@@ -249,12 +251,12 @@
 							"
 							@change="(id) => setGlobalFilters({ id: id, filterName: 'plantId' })"
 							:modelValue="globalFilters.plantId"
-							:options="globalPlantsList"
-							:loading="globalPlantsLoading"
+							:optionsList="globalPlantsList"
+							:optionsLoading="globalPlantsLoading"
 							:placeholder="`${tt('select')} ${tt('plant')}`"
-							:props="{ value: 'id', label: 'name' }"
 							popper-class="plant-select-dropdown"
 						/>
+							<!-- :props="{ value: 'id', label: 'name' }" -->
 					</div>
 				</Transition>
 
@@ -264,7 +266,8 @@
 						class="menu-block plant-select filter-block mcol-xs-6 mcol-sm-3 text-right ml-auto relative"
 						v-if="enableCompaniesFilter"
 					>
-						<el-select-v2
+						<!-- <el-select-v2 -->
+						<CustomSelectV2
 							filterable
 							clearable
 							:class="
@@ -274,12 +277,12 @@
 							"
 							@change="(id) => setGlobalFilters({ id: id, filterName: 'companyId' })"
 							:modelValue="globalFilters.companyId"
-							:options="companiesList"
-							:loading="companiesLoading"
+							:optionsList="companiesList"
+							:optionsLoading="companiesLoading"
 							:placeholder="`${tt('select')} ${tt('company')}`"
-							:props="{ value: 'id', label: 'name' }"
 							popper-class="plant-select-dropdown"
 						/>
+							<!-- :props="{ value: 'id', label: 'name' }" -->
 					</div>
 				</Transition>
 

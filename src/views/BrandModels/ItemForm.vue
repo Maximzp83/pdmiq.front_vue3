@@ -125,7 +125,7 @@
 <script setup>
 import { computed, ref, shallowRef, watch } from 'vue';
 
-import { createGetRequest } from '@/api/request_factories';
+import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { required } from '@/constants/validation';
 import { findItemBy } from '@/helpers';
@@ -239,7 +239,7 @@ const requestsToDoList = computed(() =>
 
 const methodsMap = {
 	fetch_brands: createGetRequest(brandsEntity.apiBase),
-	fetch_brand: ({ itemId, ...payload } = {}) => createGetRequest(`${brandsEntity.apiBase}/${itemId}`)(payload),
+	fetch_brand: createGetByIdRequest(brandsEntity.apiBase),
 	fetch_equipment_types: createGetRequest(equipmentTypesEntity.apiBase),
 };
 

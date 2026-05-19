@@ -1,5 +1,5 @@
 <template>
-	<CustomSelect
+	<CustomSelectV2
 		ref="selectRootRef"
 		filterable
 		:enabled="!disabled"
@@ -18,6 +18,7 @@
 		:setupLabelSettings="setupLabelSettings"
 		:setupLabelMethod="setupLabelMethod"
 		:prefixIcon="prefixIcon"
+		:popperClass="popperClass"
 		@change="handleInput"
 		@focus="handleFocus"
 		@toggleDropdown="handleToggleDropdown"
@@ -29,7 +30,7 @@ import { computed, nextTick, ref, watch } from 'vue';
 
 import { useAsyncSelect } from '@/composables/useAsyncSelect';
 
-import CustomSelect from '@/components/form/CustomSelect.vue';
+// import CustomSelect from '@/components/form/CustomSelect.vue';
 
 defineOptions({
 	name: 'FetchByQuerySelect',
@@ -74,6 +75,7 @@ const currentValue = computed(() =>
 	props.modelValue !== null && props.modelValue !== undefined ? props.modelValue : props.value,
 );
 const selectRootRef = ref(null);
+const popperClass = `fetch-by-query-select-popper-${Math.random().toString(36).slice(2, 10)}`;
 
 const getSelectRootElement = () => {
 	const root = selectRootRef.value;
@@ -81,15 +83,29 @@ const getSelectRootElement = () => {
 };
 
 const getDropdownWrap = () => {
-	const el = getSelectRootElement();
-	const localWrap = el?.querySelector?.('.el-select-dropdown .el-select-dropdown__wrap');
-	if (localWrap) return localWrap;
+	const byPopperClass = [
+		`.${popperClass} .el-vl__window`,
+		`.${popperClass} .el-scrollbar__wrap`,
+		`.${popperClass} .el-select-dropdown__wrap`,
+	]
+		.map((selector) => document.querySelector(selector))
+		.find(Boolean);
+
+	if (byPopperClass) return byPopperClass;
 
 	const visibleWraps = Array.from(document.querySelectorAll('.el-select-dropdown__wrap')).filter(
 		(node) => node.offsetParent !== null,
 	);
 
-	return visibleWraps[visibleWraps.length - 1] || null;
+	if (visibleWraps.length) {
+		return visibleWraps[visibleWraps.length - 1];
+	}
+
+	const virtualWraps = Array.from(
+		document.querySelectorAll('.el-virtual-scrollbar__wrap, .el-scrollbar__wrap'),
+	).filter((node) => node.offsetParent !== null);
+
+	return virtualWraps[virtualWraps.length - 1] || null;
 };
 
 const detachLoadmoreListener = () => {
@@ -107,10 +123,10 @@ const attachLoadmoreListener = async () => {
 	await nextTick();
 
 	const el = getSelectRootElement();
-	// console.log('el', el);
 	if (!el) return;
 
 	const wrap = getDropdownWrap();
+	// console.log('wrap', wrap, el.__loadmoreWrap);
 	if (!wrap || wrap === el.__loadmoreWrap) return;
 
 	detachLoadmoreListener();
@@ -135,6 +151,7 @@ const {
 	handleToggleDropdown: toggleDropdown,
 	loadmore,
 	handleValueCleared,
+	notifyDropdownOpenIntent,
 	syncExternalOptionsList,
 	syncExternalOptionsLoading,
 } = useAsyncSelect({
@@ -145,6 +162,7 @@ const {
 	currentValue,
 	idKey: props.idKey,
 	loadmoreIsActive: props.loadmoreIsActive,
+	onValueChange: (val) => handleInput(val),
 	onOptionsListChange: (value) => emit('update:optionsList', value),
 	onOptionsLoadingChange: (value) => emit('update:optionsLoading', value),
 });
@@ -160,12 +178,14 @@ const handleInput = (value) => {
 };
 
 const handleFocus = (event) => {
+	notifyDropdownOpenIntent();
 	setTimeout(() => {
 		emit('focus', event);
 	}, 10);
 };
 
 const handleToggleDropdown = async (open) => {
+	// console.log('handleToggleDropdown', open);
 	if (open) {
 		await toggleDropdown(open, props.minOptionsToFetch || 2);
 		await attachLoadmoreListener();
