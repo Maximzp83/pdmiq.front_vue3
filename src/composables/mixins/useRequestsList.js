@@ -42,6 +42,19 @@ export function useRequestsList({
 		return undefined;
 	};
 
+	/*const resolveInitialFetchByIdOption = (option = {}) => {
+		if (option.itemId) {
+			return {
+				// action: option.fetchItemAction,
+				actionName: option.fetchItemActionName,
+				itemId: option.itemId,
+				// payload: option.fetchItemPayload,
+			};
+		}
+
+		return null;
+	};*/
+
 	const operateRequestsList = (list) => {
 		for (const option of list || []) {
 			startFetchAction(option);
@@ -83,19 +96,44 @@ export function useRequestsList({
 	};
 
 	const startFetchAction = (option) => {
+		/*const initialFetchById = requestsListInitialSetup.value
+			? resolveInitialFetchByIdOption(option)
+			: null;*/
+
+		if (option.hasValueCase) {
+			const itemId = option.hasValueCase.getValue && option.hasValueCase.getValue();
+			if (itemId) {
+				option.blockInitialFetch = true;
+			}
+
+			if (itemId) {
+				fetchByIdHandler(itemId, option);
+			}
+		}
+
+
 		if (option.bindTo) {
+			/*if (initialFetchById) {
+				const { localProp, localLoadProp } = option;
+				fetchByIdHandler({
+					...initialFetchById,
+					localProp,
+					localLoadProp,
+				});
+			}*/
 			setupBindTo(option);
 			return;
 		}
-		if (requestsListInitialSetup.value && option.initialSetup?.fetchById) {
+
+		/*if (initialFetchById) {
 			const { localProp, localLoadProp } = option;
 			fetchByIdHandler({
-				...option.initialSetup.fetchById,
+				...initialFetchById,
 				localProp,
 				localLoadProp,
 			});
 			return;
-		}
+		}*/
 		if (option.blockInitialFetch) return;
 
 		const { action, actionName, localProp, localLoadProp, payload, callback, notFetch } = option;
@@ -124,17 +162,16 @@ export function useRequestsList({
 			localLoadProp,
 			bindTo,
 			blockInitialFetch,
-			initialSetup,
 		} = option;
 
 		const resolvedAction = action || methodsMap[actionName];
 		if (!resolvedAction) return;
+		// const initialFetchById = resolveInitialFetchByIdOption(option);
 
 		setupRequestBinding({
 			bindTo,
-			isInitialSetupRef: requestsListInitialSetup,
 			blockInitialFetch,
-			initialSetup,
+			isInitialSetupRef: requestsListInitialSetup,
 			decorateOption: (item, mergeWith) => ({
 				...item,
 				action: resolvedAction,
@@ -144,7 +181,6 @@ export function useRequestsList({
 				mergeWith,
 			}),
 			onWatchTrigger: watchHandler,
-			onFetchById: (fetchById) =>	fetchByIdHandler({ ...fetchById, localLoadProp, localProp }),
 		});
 	};
 
@@ -160,7 +196,7 @@ export function useRequestsList({
 			mergeWith,
 			fetchAnyWay,
 			noFetch,
-			fetchById,
+			// fetchById,
 			mainParam,
 			disableFetch,
 			reset_values,
@@ -220,16 +256,15 @@ export function useRequestsList({
 				localLoadProp,
 				payload: newPayload,
 			});
-		} else if (fetchById?.itemId) {
-			fetchByIdHandler({ ...fetchById, localProp, localLoadProp });
 		}
 	};
 
-	const fetchByIdHandler = ({ action, actionName, itemId, localProp, localLoadProp, payload }) => {
+	const fetchByIdHandler = (itemId, { action, hasValueCase = {}, localProp, localLoadProp }) => {
+		const { fetchItemActionName, payload } = hasValueCase;
 		if (localLoadProp) setTargetValue(localLoadProp, true);
-		const actionFn = action || methodsMap[actionName];
+		const actionFn = action || methodsMap[fetchItemActionName];
 		if (typeof actionFn !== 'function') {
-			console.warn(`[useRequestsList] action "${actionName}" not found`);
+			console.warn(`[useRequestsList] action "${fetchItemActionName}" not found`);
 			if (localLoadProp) setTargetValue(localLoadProp, false);
 			return;
 		}

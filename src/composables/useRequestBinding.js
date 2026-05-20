@@ -32,10 +32,10 @@ export const setupRequestBinding = ({
 	bindTo = [],
 	isInitialSetupRef,
 	blockInitialFetch,
-	initialSetup,
+	// initialSetup,
 	decorateOption,
 	onWatchTrigger,
-	onFetchById,
+	// onFetchById,
 } = {}) => {
 	bindTo.forEach((item, idx) => {
 		const newOption = decorateOption
@@ -46,7 +46,7 @@ export const setupRequestBinding = ({
 		const getAlternate = item.alternateGetValue;
 		if (isInitialSetupRef?.value && idx === bindTo.length - 1) {
 			// console.log('isInitialSetupRef', blockInitialFetch, initialSetup);
-			if (!blockInitialFetch && !initialSetup) {
+			if (!blockInitialFetch) {
 				const bindingValue = getPrimary ? getPrimary() : undefined;
 				const alternateValue = getAlternate ? getAlternate() : undefined;
 				// console.log('bindingValue', () => bindingValue);
@@ -67,7 +67,7 @@ export const setupRequestBinding = ({
 		}
 	});
 
-	if (isInitialSetupRef?.value && initialSetup?.fetchById) {
+	/*if (isInitialSetupRef?.value && initialSetup?.fetchById) {
 		onFetchById?.(initialSetup.fetchById);
-	}
+	}*/
 };

@@ -245,8 +245,6 @@ useRequestsList({
 							actionName: 'fetch_brands',
 							localProp: brandsList,
 							localLoadProp: brandsLoading,
-							itemId: filters.value?.brandId,
-							fetchItemActionName: 'fetch_brand',
 							payload: {
 								params: {
 									plantId: filters.value?.plantId,
@@ -255,14 +253,11 @@ useRequestsList({
 									max: 5
 								},
 							},
-							/*initialSetup: filters.value?.brandId
-								? {
-										fetchById: {
-											actionName: 'fetch_brand',
-											itemId: filters.value.brandId,
-										},
-									}
-								: null,*/
+							hasValueCase: {
+								fetchItemActionName: 'fetch_brand',
+								getValue: () => filters.value?.brandId,
+								// payload: {}
+							},
 							bindTo: [
 								{
 									getValue: () => globalFilters.value?.plantId,
