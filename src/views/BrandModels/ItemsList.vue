@@ -11,9 +11,31 @@
 						:hideCreate="isStoreRoomItems || !hasAccessToCreate"
 						:hideDelete="isStoreRoomItems || !hasAccessToDelete"
 						@event="handleEvent"
-					>
+					>	
+						<!-- <div class="filter-item">{{testValue}}</div> -->
+						<!-- <div class="filter-item ml-auto">
+							<CustomSelectV2
+								filterable
+								clearable
+								:optionsLoading="plantsLoading"
+								:optionsList="plantsList"
+								:placeholder="`${tt('plant')}`"
+								:value="filters?.plantId"
+								@change="(id) => setFilters({ plantId: id })"
+							/>
+						</div> -->
+						
 						<div v-if="!isStoreRoomItems" class="filter-item mcol-xs-12 mcol-sm-2 relative">
-							<FetchByQuerySelect
+							<CustomSelectV2
+								clearable
+								filterable
+								:optionsLoading="brandsLoading"
+								:optionsList="brandsList"
+								:placeholder="`${tt('Select')} ${tt('brand')}`"
+								:value="filters?.brandId"
+								@change="(id) => setFilters({ brandId: id })"
+							/>
+							<!-- <FetchByQuerySelect
 								clearable
 								enableLoadmore
 								:value="filters?.brandId"
@@ -24,7 +46,7 @@
 								@change="(id) => setFilters({ brandId: id })"
 								@update:optionsLoading="(value) => (brandsLoading = value)"
 								@update:optionsList="(value) => (brandsList = value)"
-							/>
+							/> -->
 						</div>
 
 						<template v-if="storeroomItem" #middle>
@@ -105,6 +127,8 @@ const brandsList = shallowRef([]);
 const equipmentTypesLoading = ref(false);
 const equipmentTypesList = shallowRef([]);
 
+// const testValue = ref(123);
+
 const brandModelsStore = useBrandModelsStore();
 const { filters } = storeToRefs(brandModelsStore);
 
@@ -115,6 +139,8 @@ const { globalFilters } = storeToRefs(globalStore);
 const brandModelsEntity = ENTITIES.BrandModels;
 const brandsEntity = ENTITIES.Brands;
 const equipmentTypesEntity = ENTITIES.EquipmentTypes;
+
+const plantsEntity = ENTITIES.Plants;
 
 const hasAccessToCreate = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.create]));
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.edit]));
@@ -130,7 +156,7 @@ const brandQueryOptions = computed(() =>
 	}),
 );
 
-const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems, preventFetch } = useItemsData({
 	entityKey: 'BrandModels',
 	itemStore: brandModelsStore,
 	options: {
@@ -183,6 +209,7 @@ const tableSettings = computed(() => {
 });
 
 const methodsMap = {
+	fetch_plants: createGetRequest(plantsEntity.apiBase),
 	fetch_brands: createGetRequest(brandsEntity.apiBase),
 	fetch_brand: createGetByIdRequest(brandsEntity.apiBase),
 	fetch_equipment_types: createGetRequest(equipmentTypesEntity.apiBase),
@@ -201,37 +228,54 @@ useRequestsList({
 				localProp: equipmentTypesList,
 				localLoadProp: equipmentTypesLoading,
 			},
-			/*...(!props.isStoreRoomItems
+			...(!props.isStoreRoomItems
 				? [
-						{
-							actionName: 'fetch_brands',
-							localProp: brandsList,
-							localLoadProp: brandsLoading,
+						/*{
+							actionName: 'fetch_plants',
+							localProp: plantsList,
+							localLoadProp: plantsLoading,
 							payload: {
 								params: {
-									plantId: globalFilters.value?.plantId,
 									orderByColumn: 'name',
 									orderByMethod: 'asc',
 								},
 							},
-							initialSetup: filters.value?.brandId
+						},*/
+						{
+							actionName: 'fetch_brands',
+							localProp: brandsList,
+							localLoadProp: brandsLoading,
+							itemId: filters.value?.brandId,
+							fetchItemActionName: 'fetch_brand',
+							payload: {
+								params: {
+									plantId: filters.value?.plantId,
+									orderByColumn: 'name',
+									orderByMethod: 'asc',
+									max: 5
+								},
+							},
+							/*initialSetup: filters.value?.brandId
 								? {
 										fetchById: {
 											actionName: 'fetch_brand',
 											itemId: filters.value.brandId,
 										},
 									}
-								: null,
+								: null,*/
 							bindTo: [
 								{
 									getValue: () => globalFilters.value?.plantId,
 									param: 'plantId',
-									noFetch: true,
+									onTrigger: () => setFilters({ brandId: null }),
+									// reset_values: [testValue],
+									// fetchAnyWay: true,
+									// noFetch: true,
 								},
 							],
 						},
 					]
-				: []),*/
+				: []),
 		]),
 	),
 });

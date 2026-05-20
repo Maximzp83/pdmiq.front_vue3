@@ -144,8 +144,7 @@ export function useRequestsList({
 				mergeWith,
 			}),
 			onWatchTrigger: watchHandler,
-			onFetchById: (fetchById) =>
-				fetchByIdHandler({ ...fetchById, localLoadProp, localProp }),
+			onFetchById: (fetchById) =>	fetchByIdHandler({ ...fetchById, localLoadProp, localProp }),
 		});
 	};
 
@@ -164,17 +163,19 @@ export function useRequestsList({
 			fetchById,
 			mainParam,
 			disableFetch,
+			reset_values,
+			onTrigger
 		} = option;
 		const payload = option.payload || {};
 
-		if (cleanKey && !requestsListInitialSetup.value) {
+		/*if (cleanKey && !requestsListInitialSetup.value) {
 			if (state?.skipBindingCleanProp?.[cleanKey]) {
 				state.skipBindingCleanProp[cleanKey] = null;
 			} else {
 				const current = getTargetValue(cleanKey);
 				setTargetValue(cleanKey, Array.isArray(current) ? [] : null);
 			}
-		}
+		}*/
 
 		if (!withoutClean) {
 			if (state?.skipListCleanProp?.[localProp]) {
@@ -183,6 +184,16 @@ export function useRequestsList({
 				setTargetValue(localProp, []);
 			}
 		}
+
+		if (reset_values && !requestsListInitialSetup.value) {
+			// console.log('reset_values', reset_values)
+			reset_values.forEach((value) => {
+				setTargetValue(value, null);
+			})			
+		}
+
+		if (onTrigger && !requestsListInitialSetup.value) onTrigger(value, option);
+
 		if (disableFetch) return;
 
 		const newPayload = {
@@ -201,7 +212,7 @@ export function useRequestsList({
 			newPayload,
 			fetchAnyWay,
 		});
-
+		// console.log(value, option, !noFetch && isFetch)
 		if (!noFetch && isFetch) {
 			startFetchAction({
 				action,

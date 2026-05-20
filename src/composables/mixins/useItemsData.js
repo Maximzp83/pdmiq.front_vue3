@@ -112,6 +112,7 @@ export function useItemsData({
 	const meta = ref({});
 	const itemData = shallowRef(null);
 	const preventFetch = ref(false);
+	const doNotFetchItems = ref(false);
 	const filtersRef = itemStore ? storeToRefs(itemStore).filters : filters;
 
 	// ========== Computed-like ==========
@@ -453,26 +454,38 @@ export function useItemsData({
 
 	// ========== Watchers ==========
 
+	let filtersTimer = null;
+
+	const scheduleFetchItems = () => {
+		if (filtersTimer) clearTimeout(filtersTimer);
+
+		filtersTimer = setTimeout(() => {
+			filtersTimer = null;
+
+			if (doNotFetchItems.value) return;
+
+			fetchItems({
+				...globalFilters.value,
+				...(filtersRef?.value || {}),
+				...getPreventedFilters()
+			});
+		}, 10);
+	};
+
 	// Watch filters
 	if (filtersRef && !watchPropsFiltersOnly) {
-		watch(filtersRef, (filters) => {
-			if (preventFetch.value) {
-				preventFetch.value = false;
-			} else {
-				console.log('filters', filters);
-				fetchItems({
-					...globalFilters.value,
-					...filters,
-					...getPreventedFilters()
-				});
-			}
-		}, { deep: true });
+		watch(filtersRef, () => {
+			scheduleFetchItems();
+		}, {
+			deep: true,
+			flush: 'post'
+		});
 	}
 
 	// Watch globalFilters
 	watch(globalFilters, (newGlobalFilters, oldGlobalFilters) => {
 		let nextStep = true;
-
+		// console.log('globalFilters', newGlobalFilters, oldGlobalFilters);
 		// Check excluded global filters
 		if (excludeGlobFilters.length) {
 			excludeGlobFilters.forEach(gf => {
@@ -484,27 +497,22 @@ export function useItemsData({
 
 		if (!nextStep) return;
 
-		preventFetch.value = true;
 		setFilters({ page: 1 });
 
-		const filters = filtersRef?.value || {};
-		console.log('newGlobalFilters', newGlobalFilters);
-		fetchItems({
-			...filters,
-			...newGlobalFilters,
-			...getPreventedFilters()
-		});
-	}, { deep: true });
+		scheduleFetchItems();
+	}, {
+		deep: true,
+		flush: 'post'
+	});
 
 	// Watch propsFilters if provided
 	if (propsFilters) {
 		watch(propsFilters, () => {
-			if (preventFetch.value) {
-				preventFetch.value = false;
-			} else {
-				refetchItemsList();
-			}
-		}, { deep: true });
+			scheduleFetchItems();
+		}, {
+			deep: true,
+			flush: 'post'
+		});
 	}
 
 	// ========== Lifecycle ==========

@@ -44,19 +44,20 @@ export const setupRequestBinding = ({
 
 		const getPrimary = item.getValue;
 		const getAlternate = item.alternateGetValue;
-
 		if (isInitialSetupRef?.value && idx === bindTo.length - 1) {
+			// console.log('isInitialSetupRef', blockInitialFetch, initialSetup);
 			if (!blockInitialFetch && !initialSetup) {
 				const bindingValue = getPrimary ? getPrimary() : undefined;
 				const alternateValue = getAlternate ? getAlternate() : undefined;
+				// console.log('bindingValue', () => bindingValue);
 				onWatchTrigger?.(bindingValue ?? alternateValue, newOption);
 			}
 		}
-
 		if (getPrimary) {
 			watch(
 				() => getPrimary(),
 				(newVal) => {
+					// console.log('newVal', newVal);
 					if (!isInitialSetupRef?.value || idx === bindTo.length - 1) {
 						const alternateValue = getAlternate ? getAlternate() : undefined;
 						onWatchTrigger?.(newVal ?? alternateValue, newOption);
