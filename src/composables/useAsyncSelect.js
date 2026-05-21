@@ -354,15 +354,13 @@ export function useAsyncSelect({
 		setupRequestBinding({
 			bindTo,
 			isInitialSetupRef: bindingInitialSetup,
-			initialSetup: resolveSettings().initialSetup,
 			blockInitialFetch: true,
-			decorateOption: (item, mergeWith) => ({
+			buildWatchOption: (item, mergeWith) => ({
 				...item,
 				payload: resolveSettings().payload,
 				mergeWith,
 			}),
 			onWatchTrigger: handleBoundFetch,
-			onFetchById: () => fetchSelectedItemsById(),
 		});
 		setTimeout(() => {
 			bindingInitialSetup.value = false;

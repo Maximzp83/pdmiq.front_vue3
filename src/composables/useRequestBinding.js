@@ -32,24 +32,20 @@ export const setupRequestBinding = ({
 	bindTo = [],
 	isInitialSetupRef,
 	blockInitialFetch,
-	// initialSetup,
-	decorateOption,
+	buildWatchOption,
 	onWatchTrigger,
-	// onFetchById,
 } = {}) => {
 	bindTo.forEach((item, idx) => {
-		const newOption = decorateOption
-			? decorateOption(item, bindTo.filter((bti) => bti !== item))
+		const newOption = buildWatchOption
+			? buildWatchOption(item, bindTo.filter((bti) => bti !== item))
 			: { ...item, mergeWith: bindTo.filter((bti) => bti !== item) };
 
 		const getPrimary = item.getValue;
 		const getAlternate = item.alternateGetValue;
 		if (isInitialSetupRef?.value && idx === bindTo.length - 1) {
-			// console.log('isInitialSetupRef', blockInitialFetch, initialSetup);
 			if (!blockInitialFetch) {
 				const bindingValue = getPrimary ? getPrimary() : undefined;
 				const alternateValue = getAlternate ? getAlternate() : undefined;
-				// console.log('bindingValue', () => bindingValue);
 				onWatchTrigger?.(bindingValue ?? alternateValue, newOption);
 			}
 		}
@@ -66,8 +62,4 @@ export const setupRequestBinding = ({
 			);
 		}
 	});
-
-	/*if (isInitialSetupRef?.value && initialSetup?.fetchById) {
-		onFetchById?.(initialSetup.fetchById);
-	}*/
 };

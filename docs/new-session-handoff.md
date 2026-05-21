@@ -15,6 +15,7 @@
 Primary rules source:
 - `docs/session-collaboration-rules.md`
 - Reference examples for `src/views` entity migration: `src/views/Plants`, `src/views/Brands`
+- Reference example for `FetchByQuerySelect` / `requestsToDoList` patterns with `hasValueCase`, `bindTo`, and dropdown-triggered full-list reload: `src/views/BrandModels/ItemsList.vue`
 
 ## Migration State Snapshot
 - Latest completed files:

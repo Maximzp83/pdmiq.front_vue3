@@ -26,7 +26,7 @@
 						</div> -->
 						
 						<div v-if="!isStoreRoomItems" class="filter-item mcol-xs-12 mcol-sm-2 relative">
-							<CustomSelectV2
+							<!-- <CustomSelectV2
 								clearable
 								filterable
 								:optionsLoading="brandsLoading"
@@ -35,8 +35,8 @@
 								:value="filters?.brandId"
 								@change="(id) => setFilters({ brandId: id })"
 								@toggleDropdown="o=>handleToggleDropdown(o, 'brands')"
-							/>
-							<!-- <FetchByQuerySelect
+							/> -->
+							<FetchByQuerySelect
 								clearable
 								enableLoadmore
 								:value="filters?.brandId"
@@ -47,7 +47,7 @@
 								@change="(id) => setFilters({ brandId: id })"
 								@update:optionsLoading="(value) => (brandsLoading = value)"
 								@update:optionsList="(value) => (brandsList = value)"
-							/> -->
+							/>
 						</div>
 
 						<template v-if="storeroomItem" #middle>
@@ -219,8 +219,8 @@ const methodsMap = {
 	handleDeleteItems,
 };
 
-const { handleToggleDropdown } = useRequestsList({
-	methodsMap,
+/*const { handleToggleDropdown } = */ useRequestsList({
+	// methodsMap,
 	requestsToDoList: computed(() =>
 		Object.freeze([
 			{
@@ -228,9 +228,9 @@ const { handleToggleDropdown } = useRequestsList({
 				localProp: equipmentTypesList,
 				localLoadProp: equipmentTypesLoading,
 			},
-			...(!props.isStoreRoomItems
+			/*...(!props.isStoreRoomItems
 				? [
-						/*{
+						{
 							actionName: 'fetch_plants',
 							localProp: plantsList,
 							localLoadProp: plantsLoading,
@@ -240,22 +240,23 @@ const { handleToggleDropdown } = useRequestsList({
 									orderByMethod: 'asc',
 								},
 							},
-						},*/
+						},
 						{
 							key: 'brands',
-							actionName: 'fetch_brands',
+							action: methodsMap.fetch_brands,
 							localProp: brandsList,
 							localLoadProp: brandsLoading,
 							payload: {
 								params: {
-									plantId: filters.value?.plantId,
+									// plantId: () => globalFilters.value?.plantId,
+									plantId: globalFilters.value?.plantId,
 									orderByColumn: 'name',
 									orderByMethod: 'asc',
 									max: 5
 								},
 							},
 							hasValueCase: {
-								fetchItemActionName: 'fetch_brand',
+								action: methodsMap.fetch_brand,
 								getValue: () => filters.value?.brandId,
 								// payload: {}
 							},
@@ -271,7 +272,7 @@ const { handleToggleDropdown } = useRequestsList({
 							],
 						},
 					]
-				: []),
+				: []),*/
 		]),
 	),
 });

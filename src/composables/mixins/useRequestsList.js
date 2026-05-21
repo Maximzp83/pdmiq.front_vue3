@@ -1,6 +1,7 @@
 import { ref, watch, onBeforeMount, onMounted } from 'vue';
 import { executeRequestAction } from '@/composables/executeRequestAction';
 import { mergedBindParams, setupRequestBinding, shouldFetchForBinding } from '@/composables/useRequestBinding';
+import { mergeObjects } from '@/helpers';
 
 export function useRequestsList({
 	state,
@@ -123,13 +124,20 @@ export function useRequestsList({
 		if (!resolvedAction) return;
 
 		let newPayload = { params: { max: -1 } };
+		
 		if (payload) {
-			newPayload = {
-				...payload,
-				params: { max: -1, ...payload.params },
-			};
-		}
+			newPayload = mergeObjects(newPayload, payload);
 
+			if (payload.params) {
+				Object.keys(payload.params).forEach(key => {
+					newPayload.params[key] = typeof payload.params[key] === 'function' ?
+						payload.params[key]() :
+						payload.params[key];
+				});
+			}
+		}
+		
+		// console.log('startFetchAction', option, newPayload);
 		if (!notFetch) {
 			doFetchAction(resolvedAction, localProp, localLoadProp, newPayload, callback);
 		}
@@ -199,7 +207,7 @@ export function useRequestsList({
 			bindTo,
 			blockInitialFetch,
 			isInitialSetupRef: requestsListInitialSetup,
-			decorateOption: (item, mergeWith) => ({
+			buildWatchOption: (item, mergeWith) => ({
 				...item,
 				action: resolvedAction,
 				localProp,
@@ -286,8 +294,8 @@ export function useRequestsList({
 		}
 	};
 
-	const fetchByIdHandler = (itemId, { action, hasValueCase = {}, localProp, localLoadProp }) => {
-		const { fetchItemActionName, payload } = hasValueCase;
+	const fetchByIdHandler = (itemId, { hasValueCase = {}, localProp, localLoadProp }) => {
+		const { action, fetchItemActionName, payload } = hasValueCase;
 		if (localLoadProp) setTargetValue(localLoadProp, true);
 		const actionFn = action || methodsMap[fetchItemActionName];
 		if (typeof actionFn !== 'function') {
