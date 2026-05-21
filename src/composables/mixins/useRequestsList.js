@@ -1,6 +1,6 @@
 import { ref, watch, onBeforeMount, onMounted } from 'vue';
-import { executeRequestAction } from '@/composables/executeRequestAction';
-import { mergedBindParams, setupRequestBinding, shouldFetchForBinding } from '@/composables/useRequestBinding';
+import { executeRequestAction } from '@/composables/requests/executeRequestAction';
+import { mergedBindParams, setupRequestBinding, shouldFetchForBinding } from '@/composables/requests/useRequestBinding';
 import { mergeObjects } from '@/helpers';
 
 export function useRequestsList({

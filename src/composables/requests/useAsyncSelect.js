@@ -1,7 +1,7 @@
 import { getCurrentInstance, onBeforeUnmount, ref } from 'vue';
 
-import { executeRequestAction } from '@/composables/executeRequestAction';
-import { mergedBindParams, setupRequestBinding } from '@/composables/useRequestBinding';
+import { executeRequestAction } from '@/composables/requests/executeRequestAction';
+import { mergedBindParams, setupRequestBinding } from '@/composables/requests/useRequestBinding';
 import { cleanValuesByList, findItemBy, mergeArrays } from '@/helpers';
 
 export function useAsyncSelect({

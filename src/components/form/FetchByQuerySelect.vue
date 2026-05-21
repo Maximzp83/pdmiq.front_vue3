@@ -28,7 +28,7 @@
 <script setup>
 import { computed, nextTick, ref, watch } from 'vue';
 
-import { useAsyncSelect } from '@/composables/useAsyncSelect';
+import { useAsyncSelect } from '@/composables/requests/useAsyncSelect';
 
 // import CustomSelect from '@/components/form/CustomSelect.vue';
 
