@@ -34,6 +34,7 @@
 								:placeholder="`${tt('Select')} ${tt('brand')}`"
 								:value="filters?.brandId"
 								@change="(id) => setFilters({ brandId: id })"
+								@toggleDropdown="o=>handleToggleDropdown(o, 'brands')"
 							/>
 							<!-- <FetchByQuerySelect
 								clearable
@@ -105,7 +106,6 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
-import CustomSelect from '@/components/form/CustomSelect.vue';
 
 const { tt, translate } = Lang;
 
@@ -156,7 +156,7 @@ const brandQueryOptions = computed(() =>
 	}),
 );
 
-const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems, preventFetch } = useItemsData({
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	entityKey: 'BrandModels',
 	itemStore: brandModelsStore,
 	options: {
@@ -219,7 +219,7 @@ const methodsMap = {
 	handleDeleteItems,
 };
 
-useRequestsList({
+const { handleToggleDropdown } = useRequestsList({
 	methodsMap,
 	requestsToDoList: computed(() =>
 		Object.freeze([
@@ -242,6 +242,7 @@ useRequestsList({
 							},
 						},*/
 						{
+							key: 'brands',
 							actionName: 'fetch_brands',
 							localProp: brandsList,
 							localLoadProp: brandsLoading,

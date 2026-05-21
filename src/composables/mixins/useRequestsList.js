@@ -42,23 +42,25 @@ export function useRequestsList({
 		return undefined;
 	};
 
-	/*const resolveInitialFetchByIdOption = (option = {}) => {
-		if (option.itemId) {
-			return {
-				// action: option.fetchItemAction,
-				actionName: option.fetchItemActionName,
-				itemId: option.itemId,
-				// payload: option.fetchItemPayload,
-			};
-		}
-
-		return null;
-	};*/
-
 	const operateRequestsList = (list) => {
 		for (const option of list || []) {
 			startFetchAction(option);
 		}
+	};
+
+	const resolveRequestOptionList = () => resolve(requestsToDoList) || [];
+
+	const findRequestOption = (keyOrPredicate) => {
+		const list = resolveRequestOptionList();
+		if (typeof keyOrPredicate === 'function') {
+			return list.find(keyOrPredicate);
+		}
+		return list.find(
+			(option) =>
+				option.key === keyOrPredicate ||
+				option.actionName === keyOrPredicate ||
+				option.localProp === keyOrPredicate,
+		);
 	};
 
 	const doFetchAction = (action, localProp, localLoadProp, payload, callback) => {
@@ -95,45 +97,24 @@ export function useRequestsList({
 			});
 	};
 
-	const startFetchAction = (option) => {
-		/*const initialFetchById = requestsListInitialSetup.value
-			? resolveInitialFetchByIdOption(option)
-			: null;*/
+	const startFetchAction = (option, settings = {}) => {
+		const { forceFullList = false, skipBindToSetup = false } = settings;
 
-		if (option.hasValueCase) {
+		if (option.hasValueCase && !forceFullList) {
 			const itemId = option.hasValueCase.getValue && option.hasValueCase.getValue();
+
 			if (itemId) {
 				option.blockInitialFetch = true;
-			}
-
-			if (itemId) {
 				fetchByIdHandler(itemId, option);
 			}
 		}
 
-
-		if (option.bindTo) {
-			/*if (initialFetchById) {
-				const { localProp, localLoadProp } = option;
-				fetchByIdHandler({
-					...initialFetchById,
-					localProp,
-					localLoadProp,
-				});
-			}*/
+		if (option.bindTo && !skipBindToSetup) {
+			// console.log('setupBindTo')
 			setupBindTo(option);
 			return;
 		}
 
-		/*if (initialFetchById) {
-			const { localProp, localLoadProp } = option;
-			fetchByIdHandler({
-				...initialFetchById,
-				localProp,
-				localLoadProp,
-			});
-			return;
-		}*/
 		if (option.blockInitialFetch) return;
 
 		const { action, actionName, localProp, localLoadProp, payload, callback, notFetch } = option;
@@ -151,6 +132,52 @@ export function useRequestsList({
 
 		if (!notFetch) {
 			doFetchAction(resolvedAction, localProp, localLoadProp, newPayload, callback);
+		}
+	};
+
+	const reloadRequestOption = (option, settings = {}) => {
+		/*const option =
+			typeof keyOrOption === 'object' && keyOrOption !== null
+				? keyOrOption
+				: findRequestOption(keyOrOption);
+
+		if (!option) {
+			console.warn(`[useRequestsList] request option "${keyOrOption}" not found`);
+			return;
+		}*/
+
+		const nextOption = { ...option };
+		delete nextOption.blockInitialFetch;
+
+		return startFetchAction(nextOption, {
+			forceFullList: true,
+			skipBindToSetup: true,
+			...settings,
+		});
+	};
+
+	const handleToggleDropdown = (isOpen, keyOrOption, settings = {}) => {
+		// console.log('handleToggleDropdown', isOpen, keyOrOption, settings)
+		if (isOpen) {
+			const { shouldReload } = settings;
+
+			const option =
+				typeof keyOrOption === 'object' && keyOrOption !== null
+					? keyOrOption
+					: findRequestOption(keyOrOption);
+
+			if (!option) {
+				console.warn(`[useRequestsList] request option "${keyOrOption}" not found`);
+				return;
+			}
+
+			const currentList = getTargetValue(option.localProp);
+			const defaultShouldReload =
+				!!option.hasValueCase && Array.isArray(currentList) && currentList.length === 1;
+
+			if (typeof shouldReload === 'function' ? shouldReload(option, currentList) : defaultShouldReload) {
+				reloadRequestOption(option);
+			}
 		}
 	};
 
@@ -319,6 +346,9 @@ export function useRequestsList({
 		initialSuccessResponsesQuantity,
 		initiateRequestsToDoList,
 		operateRequestsList,
+		findRequestOption,
+		reloadRequestOption,
+		handleToggleDropdown,
 		startFetchAction,
 		setupBindTo,
 		watchHandler,
