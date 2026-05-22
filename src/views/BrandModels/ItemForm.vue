@@ -51,7 +51,7 @@
 			<el-form-item
 				:label="tt('phrases.crossover_exluded')"
 				prop="is_crossover_excluded"
-				class="half-width"
+				class="half-width switcher"
 			>
 				<el-switch v-model="formData.is_crossover_excluded" />
 			</el-form-item>
@@ -60,8 +60,9 @@
 				<TabsBar
 					:activeTab="activeTab"
 					:tabsList="tabsList"
-					buttonsType="primary inverted"
+					buttonsType="primary"
 					@switchTab="switchTab"
+					buttonClass="inverted"
 				/>
 			</div>
 
@@ -199,40 +200,18 @@ const equipmentType = computed(() => {
 const brandQueryOptions = computed(() =>
 	Object.freeze({
 		fetchAction: methodsMap.fetch_brands,
-		params: {
-			orderByColumn: 'name',
-			orderByMethod: 'asc',
-		},
+		fetchByIdAction: methodsMap.fetch_brand,
+		params: { orderByColumn: 'name', orderByMethod: 'asc' },
+		bindTo: [{ getValue: () => formData.value.type_id, param: 'equipmentTypeId' }],
 	}),
 );
 
 const requestsToDoList = computed(() =>
 	Object.freeze([
 		{
-			action: 'fetch_equipment_types',
+			action: methodsMap.fetch_equipment_types,
 			localProp: equipmentTypesList,
 			localLoadProp: equipmentTypesLoading,
-		},
-		{
-			action: 'fetch_brands',
-			localProp: brandsList,
-			localLoadProp: brandsLoading,
-			payload: {
-				params: {
-					max: 30,
-					orderByColumn: 'name',
-					orderByMethod: 'asc',
-				},
-			},
-			initialSetup:
-				itemData.value?.brand_id
-					? {
-							fetchById: {
-								action: 'fetch_brand',
-								itemId: itemData.value.brand_id,
-							},
-						}
-					: null,
 		},
 	]),
 );
@@ -259,6 +238,8 @@ const subItemsSettings = computed(() =>
 		{
 			ref: 'TypeMediaValueItem',
 			targetProp: 'type_media_values',
+			removeFilePropIfNull: true,
+			fileProp: 'file',
 			conditionSettings: {
 				checkMethod: 'some',
 				conditions: [

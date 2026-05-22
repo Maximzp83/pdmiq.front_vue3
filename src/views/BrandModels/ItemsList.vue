@@ -224,7 +224,7 @@ const methodsMap = {
 	requestsToDoList: computed(() =>
 		Object.freeze([
 			{
-				actionName: 'fetch_equipment_types',
+				action: methodsMap.fetch_equipment_types,
 				localProp: equipmentTypesList,
 				localLoadProp: equipmentTypesLoading,
 			},

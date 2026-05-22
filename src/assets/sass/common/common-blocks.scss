@@ -1503,11 +1503,16 @@
 	.el-form-item__content {line-height: 20px;}
 
 	&:not(.locations-container):not(.acknowledge-options) {
-		.el-select .el-input,
+		.el-select,
 		.el-input {
 			height: 34px;
 			min-height: 34px;
 			line-height: 34px;
+
+			.el-select__wrapper {
+				height: inherit !important;
+				min-height: inherit;
+			}
 
 			input {
 				// min-height: inherit;
@@ -1543,14 +1548,22 @@
 			&.type-media-value-item {
 				align-items: center;
 
-				.upload-container .el-upload {padding-top: 0; margin-top: 0;}
+				.upload-container .el-upload {}
 
 				.upload-container {
 					align-items: center;
 
 					.el-upload  {
-						margin-left: 15px;
+						margin: 0 0 0 15px;
 					}
+					.el-upload-list {
+						margin-top: 0;
+
+						.el-upload-list__item {
+							max-width: 100%;
+						}
+					}
+					.el-upload-list__item {margin-bottom: 0;}
 					.view-file-button {
 						order: 1;
 						margin-left: 15px;
@@ -1886,6 +1899,10 @@
 	.upload-button {
 		border: 1px dashed #878787;
 		padding: 7px 15px;
+
+		&.el-button--small {
+			height: 30px;
+		}
 
 		& > span {
 			display: flex;

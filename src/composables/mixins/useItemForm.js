@@ -68,6 +68,7 @@ export function useItemForm({
 
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const resolveSubItemsSettings = () => resolve(subItemsSettings);
 	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
 	const resolvedApiRoute = apiRoute || entityConfig?.apiBase || null;
 	const resolvedItemsName = computed(() => {
@@ -168,13 +169,14 @@ export function useItemForm({
 				handleValidationResultCallback();
 			}
 
-			if (subItemsSettings && collectDataFromSubItems && formData) {
+			const currentSubItemsSettings = resolveSubItemsSettings();
+			if (currentSubItemsSettings && collectDataFromSubItems && formData) {
 				if (resetFormDataBySubItems) {
-					resetFormDataBySubItems(subItemsSettings);
+					resetFormDataBySubItems(currentSubItemsSettings);
 				}
 				formData.value = {
 					...formData.value,
-					...collectDataFromSubItems(subItemsSettings, options),
+					...collectDataFromSubItems(currentSubItemsSettings, options),
 				};
 			}
 
@@ -204,8 +206,9 @@ export function useItemForm({
 		form.validate((mainFormIsValid) => {
 			const validationResults = [mainFormIsValid];
 
-			if (subItemsSettings && validateSubItemsForm) {
-				validationResults.push(validateSubItemsForm(subItemsSettings));
+			const currentSubItemsSettings = resolveSubItemsSettings();
+			if (currentSubItemsSettings && validateSubItemsForm) {
+				validationResults.push(validateSubItemsForm(currentSubItemsSettings));
 			}
 
 			handleValidationResult(validationResults, options);

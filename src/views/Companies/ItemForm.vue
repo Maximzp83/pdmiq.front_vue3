@@ -447,7 +447,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	formData,
 	formRef: itemFormRef,
 	localSetupPage,
-	subItemsSettings: subItemsSettings.value,
+	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	resetFormDataBySubItems,

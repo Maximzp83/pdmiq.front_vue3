@@ -11,6 +11,7 @@ const createLocalId = (prefix = 'id') => {
 export function useSubItemsList({ formData, refsMap, state } = {}) {
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const resolveSubItemsSettings = (subItemsSettings) => resolve(subItemsSettings) || [];
 
 	const resolveListTarget = (list) => {
 		if (list && typeof list === 'object' && 'value' in list && Array.isArray(list.value)) {
@@ -115,6 +116,30 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		context.collectedValue = destructure(context.collectedValue);
 	};
 
+	const applyRemoveNullFileProp = (context) => {
+		const { removeFilePropIfNull, fileProp = 'file' } = context.settings;
+		if (!removeFilePropIfNull) return;
+
+		const sanitizeItem = (item) => {
+			if (!item || typeof item !== 'object' || Array.isArray(item)) return item;
+
+			if (item[fileProp] == null) {
+				const nextItem = { ...item };
+				delete nextItem[fileProp];
+				return nextItem;
+			}
+
+			return item;
+		};
+
+		if (Array.isArray(context.collectedValue)) {
+			context.collectedValue = context.collectedValue.map(sanitizeItem);
+			return;
+		}
+
+		context.collectedValue = sanitizeItem(context.collectedValue);
+	};
+
 	const applyDataUpdate = (context) => {
 		if (context.settings.onCollectDataCallback) {
 			context = context.settings.onCollectDataCallback(context);
@@ -187,7 +212,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 	};
 
 	const updateDataByRef = ({ Instance, settingsItem, collectedData }) => {
-		const { conditionSettings, callback, destructure, setIfEmpty, cleanIfEmpty } =
+		const { conditionSettings, callback, destructure, setIfEmpty, cleanIfEmpty, removeFilePropIfNull } =
 			settingsItem;
 		const context = {
 			collectedValue: Instance.getFormData(),
@@ -200,6 +225,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		if (conditionSettings) steps.push(applyCondition);
 		if (callback) steps.push(applyCallback);
 		if (destructure) steps.push(applyDestructure);
+		if (removeFilePropIfNull) steps.push(applyRemoveNullFileProp);
 		steps.push(applyDataUpdate);
 		if (setIfEmpty || cleanIfEmpty) steps.push(applyFlags);
 
@@ -217,7 +243,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 
 	const validateSubItemsForm = (subItemsSettings) => {
 		const validationResults = [];
-		subItemsSettings.forEach((settingsItem) => {
+		resolveSubItemsSettings(subItemsSettings).forEach((settingsItem) => {
 			operateRefs({
 				settingsItem,
 				operation: (Instance) => {
@@ -231,7 +257,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 	};
 
 	const resetFormDataBySubItems = (subItemsSettings) => {
-		subItemsSettings.forEach((settingsItem) => {
+		resolveSubItemsSettings(subItemsSettings).forEach((settingsItem) => {
 			if (settingsItem.targetProp && !settingsItem.keepOriginalData) {
 				const fd = resolve(formData);
 				if (!fd) return;
@@ -247,7 +273,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 	const collectDataFromSubItems = (subItemsSettings, options = {}) => {
 		let collectedData = {};
 
-		subItemsSettings.forEach((settingsItem) => {
+		resolveSubItemsSettings(subItemsSettings).forEach((settingsItem) => {
 			operateRefs({
 				settingsItem,
 				operation: (Instance) => {

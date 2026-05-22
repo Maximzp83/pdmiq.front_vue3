@@ -16,6 +16,7 @@ Primary rules source:
 - `docs/session-collaboration-rules.md`
 - Reference examples for `src/views` entity migration: `src/views/Plants`, `src/views/Brands`
 - Reference example for `FetchByQuerySelect` / `requestsToDoList` patterns with `hasValueCase`, `bindTo`, and dropdown-triggered full-list reload: `src/views/BrandModels/ItemsList.vue`
+- Migration note: when a legacy file loads data for `<FetchByQuerySelect>` through `requestsToDoList` / `requestsListMixin`, do not carry that duplication into Vue3. Move that logic into the component settings (`fetchAction`, `fetchByIdAction`, `bindTo`, etc.) because `src/components/form/FetchByQuerySelect.vue` already handles async option loading.
 
 ## Migration State Snapshot
 - Latest completed files:

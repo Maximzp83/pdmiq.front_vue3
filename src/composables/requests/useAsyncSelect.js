@@ -32,6 +32,7 @@ export function useAsyncSelect({
 	const fetchedByIds = ref([]);
 	const boundParams = ref({});
 	const boundPayload = ref({});
+	const previousBindValues = ref({});
 
 	const resolveSettings = () => settings?.value || settings || {};
 	const resolveFetchParams = () => fetchParams?.value || fetchParams || {};
@@ -262,8 +263,14 @@ export function useAsyncSelect({
 			disableFetch,
 			payload = {},
 		} = option;
+		const bindKey = param || option.mainParam || option.key || '__default__';
+		const hasPreviousValue = Object.prototype.hasOwnProperty.call(previousBindValues.value, bindKey);
+		const previousValue = previousBindValues.value[bindKey];
+		const shouldResetCurrentValue = hasPreviousValue && previousValue !== value;
+
+		previousBindValues.value[bindKey] = value;
 		// console.log('handleBoundFetch', value, option);
-		if (!withoutClean) {
+		if (!withoutClean && shouldResetCurrentValue) {
 			updateOptionsList([]);
 			updateCurrentValue(null);
 			// currentPage.value = null;

@@ -16,10 +16,10 @@
 			<FileUploadBlock
 				ref="fileUploadBlockRef"
 				:pictures="uploadPictures"
-				:multiple="false"
-				:showDeleteButton="true"
-				:showLinkToFileButton="true"
-				:enableLinkToFile="true"
+				showNameOnly
+				multiple
+				hideDeleteButton
+				enableLinkToFile
 				:buttonText="tt('phrases.click_to_upload')"
 				filePropName="file"
 				hidePreview

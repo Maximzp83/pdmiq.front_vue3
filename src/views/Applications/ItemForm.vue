@@ -67,7 +67,7 @@ const rules = {
 
 const requestsToDoList = computed(() => [
 	{
-		action: 'fetch_plants',
+		action: methodsMap.fetch_plants,
 		localProp: plantsList,
 		localLoadProp: plantsLoading,
 		payload: {

@@ -124,7 +124,7 @@ const rules = {
 const requestsToDoList = computed(() =>
 	Object.freeze([
 		{
-			action: 'fetch_plants',
+			action: methodsMap.fetch_plants,
 			localProp: plantsList,
 			localLoadProp: plantsLoading,
 			payload: {
@@ -136,7 +136,7 @@ const requestsToDoList = computed(() =>
 			},
 		},
 		{
-			action: 'fetch_equipment_types',
+			action: methodsMap.fetch_equipment_types,
 			localProp: equipmentTypesList,
 			localLoadProp: equipmentTypesLoading,
 			payload: {

@@ -435,12 +435,12 @@ const uploadSettings = computed(() =>
 const requestsToDoList = computed(() => {
 	const list = [
 		{
-			action: 'fetch_plants',
+			action: methodsMap.fetch_plants,
 			localProp: plantsList,
 			localLoadProp: plantsLoading,
 		},
 		{
-			action: 'fetch_production_lines',
+			action: methodsMap.fetch_production_lines,
 			localProp: productionLinesList,
 			localLoadProp: productionLinesLoading,
 			bindTo: [
@@ -451,7 +451,7 @@ const requestsToDoList = computed(() => {
 			],
 		},
 		{
-			action: 'fetch_controllers',
+			action: methodsMap.fetch_controllers,
 			localProp: controllersList,
 			localLoadProp: controllersLoading,
 			bindTo: [
@@ -467,7 +467,7 @@ const requestsToDoList = computed(() => {
 
 	if (isIndustrialMatrix.value || canEdit.value) {
 		list.push({
-			action: 'fetch_machines',
+			action: methodsMap.fetch_machines,
 			localProp: machinesList,
 			localLoadProp: machinesLoading,
 			bindTo: [
@@ -525,7 +525,7 @@ const { isMobile, validateForm, handleCancel, clearValidate } = useItemForm({
 	fromModal: props.fromModal,
 	editModal: props.editModal,
 	localSetupPage,
-	subItemsSettings: subItemsSettings.value,
+	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	resetFormDataBySubItems,

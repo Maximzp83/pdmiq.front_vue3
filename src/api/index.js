@@ -59,8 +59,13 @@ const setupMultipartFormData = (obj, form, namespace) => {
 			) {
 				setupMultipartFormData(obj[property], fd, formKey);
 			} else {
-				// If it's a primitive value or File object
-				fd.append(formKey, obj[property]);
+				// Normalize booleans for multipart requests so backend validation
+				// receives the same 1/0 semantics as legacy form submits.
+				const value =
+					typeof obj[property] === 'boolean'
+						? (obj[property] ? 1 : 0)
+						: obj[property];
+				fd.append(formKey, value);
 			}
 		}
 

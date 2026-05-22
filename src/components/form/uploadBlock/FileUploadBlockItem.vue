@@ -7,13 +7,13 @@
 				{ 'without-footer': !multiple }
 			]"
 		>
-			<div v-if="!hidePreview && fileType == 'video'">
+			<div v-if="!showNameOnly && !hidePreview && fileType == 'video'">
 				<video autoplay playsinline muted loop class="el-upload-list__item-thumbnail">
 					<source :src="file.url" type="video/mp4" />
 				</video>
 			</div>
 
-			<div v-else-if="!hidePreview && fileType == 'image'">
+			<div v-else-if="!showNameOnly && !hidePreview && fileType == 'image'">
 				<div class="relative imgWrapper">
 					<div class="reorder-button can-dragging" v-if="enableReorderFiles">
 						<img class="can-dragging" :src="icon_drag" alt="" />
@@ -41,7 +41,7 @@
 				<i class="icomoon icon-rotate" v-if="rotate" @click="rotateImg"></i>
 			</div>
 
-			<div class="file-name ellipsis" v-if="!fileType && !hidePreview">
+			<div class="file-name ellipsis" v-if="showNameOnly || (!fileType && !hidePreview)">
 				<span v-if="fileName">
 					<a
 						v-if="enableLinkToFile && !formData.raw"
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 
-		<div v-if="multiple || showDeleteButton || showLinkToFileButton" class="footer-block">
+		<div v-if="!hideDeleteButton && (multiple || showDeleteButton || showLinkToFileButton)" class="footer-block">
 			<div class="remove-button-container flex">
 				<a
 					v-if="showLinkToFileButton"
@@ -112,6 +112,7 @@ const props = defineProps({
 	filePropName: { type: String, default: 'file' },
 	mergeArrayValues: Boolean,
 	hidePreview: Boolean,
+	showNameOnly: Boolean,
 	multiple: Boolean,
 	showImageClickOverlay: Boolean,
 	rotate: Boolean,
@@ -120,6 +121,7 @@ const props = defineProps({
 	keepFilePath: Boolean,
 	enableLinkToFile: Boolean,
 	showLinkToFileButton: Boolean,
+	hideDeleteButton: Boolean,
 	additionalFormData: Object,
 	enableReorderFiles: { type: Object, default: () => null },
 	itemIndex: Number,

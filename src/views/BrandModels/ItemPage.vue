@@ -43,6 +43,7 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
+	// debug: true,
 	entityKey: 'BrandModels',
 	itemFormRef,
 	goToListAfterSave: true,

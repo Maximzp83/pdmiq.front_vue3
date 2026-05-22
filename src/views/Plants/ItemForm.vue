@@ -329,20 +329,20 @@ const subItemsSettings = computed(() =>
 const requestsToDoList = computed(() => {
 		return Object.freeze([
 			{
-				action: 'fetch_companies',
+				action: methodsMap.fetch_companies,
 				localProp: companiesList,
 				localLoadProp: companiesLoading,
 				payload: { params: { max: -1, orderByColumn: 'name', orderByMethod: 'asc' } },
 				notFetch: props.hideCompanies || !isIndustrialMatrix.value,
 			},
 			{
-				action: 'fetch_users',
+				action: methodsMap.fetch_users,
 				localProp: usersList,
 				localLoadProp: usersLoading,
 				payload: { params: { max: -1, type: USER_ROLES_TYPES.INDUSTRIAL_MATRIX } },
 			},
 			{
-				action: 'fetch_users',
+				action: methodsMap.fetch_users,
 				localProp: thisPlantUsersList,
 				localLoadProp: plantUsersLoading,
 				payload: { params: { max: -1 } },
@@ -356,7 +356,7 @@ const requestsToDoList = computed(() => {
 				blockInitialFetch: true,
 			},
 			{
-				action: 'fetch_industrial_services',
+				action: methodsMap.fetch_industrial_services,
 				localProp: industrialServicesList,
 				localLoadProp: industrialServicesLoading,
 				payload: { params: { max: -1 } },
@@ -452,7 +452,7 @@ const {
 	formData,
 	formRef: itemFormRef,
 	localSetupPage,
-	subItemsSettings: subItemsSettings.value,
+	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	resetFormDataBySubItems,

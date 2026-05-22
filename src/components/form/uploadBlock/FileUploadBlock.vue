@@ -43,8 +43,10 @@
 							:additionalFormData="additionalFormData"
 							:keepFilePath="keepFilePath"
 							:enableLinkToFile="enableLinkToFile"
+							:hideDeleteButton="hideDeleteButton"
 							:showLinkToFileButton="showLinkToFileButton"
 							:showImageClickOverlay="showImageClickOverlay"
+							:showNameOnly="showNameOnly"
 							:filePropName="filePropName"
 							:deleteButtonType="deleteButtonType"
 							:enableReorderFiles="enableReorderFiles"
@@ -94,11 +96,13 @@ const props = defineProps({
 	multiple: Boolean,
 	deleteFileId: Boolean,
 	hidePreview: Boolean,
+	showNameOnly: Boolean,
 	showImageClickOverlay: Boolean,
 	showDeleteButton: Boolean,
 	keepFilePath: Boolean,
 	disabled: Boolean,
 	showLinkToFileButton: Boolean,
+	hideDeleteButton: Boolean,
 	imgItemClass: String,
 	buttonIcon: String,
 	deleteButtonType: String,

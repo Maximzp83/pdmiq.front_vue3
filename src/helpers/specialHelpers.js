@@ -133,11 +133,14 @@ const checkUploadSettingsUtil = (formData, { fileProp, multiple }) => {
 
 	if (multiple) {
 		if (formData[fileProp] && formData[fileProp].length) {
-			result.hasFile = formData[fileProp].some(fi => typeof fi.file == 'object');
+			result.hasFile = formData[fileProp].some(fi => {
+				// console.log('fi', fi.file, typeof fi.file, fi.file && typeof fi.file == 'object' );
+				return fi.file && typeof fi.file == 'object';
+			});
 		}
 	} else {
 		if (formData[fileProp]) {
-			result.hasFile = typeof formData[fileProp] == 'object';
+			result.hasFile = formData[fileProp] && typeof formData[fileProp] == 'object';
 			if (typeof formData[fileProp] != 'object') {
 				// delete payload.formData[fileProp];
 				result.deleteProp = true;
@@ -157,6 +160,7 @@ const checkUploadSettings1 = (payload, settings, additionalSettings = {}) => {
 	settingsList.forEach(si => {
 		const { hasFile, deleteProp } = checkUploadSettingsUtil(payload[dataKey], si);
 		results.push(hasFile);
+		// console.log('si', dataKey, si, payload[dataKey],hasFile);
 
 		if (deleteProp) {
 			delete payload[dataKey][si.fileProp];

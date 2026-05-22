@@ -104,7 +104,7 @@ const currentPlantId = computed(() => {
 
 const requestsToDoList = computed(() => [
 	{
-		action: 'fetch_plants',
+		action: methodsMap.fetch_plants,
 		localProp: plantsList,
 		localLoadProp: plantsLoading,
 		payload: {
@@ -116,7 +116,7 @@ const requestsToDoList = computed(() => [
 		},
 	},
 	{
-		action: 'fetch_users',
+		action: methodsMap.fetch_users,
 		localProp: usersList,
 		localLoadProp: usersLoading,
 		payload: {
