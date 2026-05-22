@@ -21,93 +21,82 @@
 		/>
 
 		<div
-			class="card-header chart-card-header capitalize flex mrow wrap"
+			:class="['card-header chart-card-header capitalize flex mrow', {'wrap': !additionalProps.isCompare}]"
 			v-if="!hideChartHeader"
 			v-show="hasStatistics"
 		>
 			<!-- <button @click="zoomYAxis">+</button> -->
-			<div
-				:class="[
-					'mcol-xs-10 mcol-sm-9 flex mrow wrap align-center left-part',
-					{ 'mcol-lg-7': !additionalProps.isCompare },
-					{ 'mcol-lg-auto fluid': additionalProps.isCompare }
-				]"
-			>
-				<div
-					:class="[
-						'title-block ellipsis',
-						{ 'mcol-xs-12': additionalProps.isCompare }
-					]"
-					v-text="chartTitle"
-				></div>
-				<div
-					class="zoom-block-container mcol-xs-9 mcol-sm-auto"
-					v-if="enableZoomBlock && ChartAPI"
-				>
-					<div class="chart-actions-block">
-						<div class="flex wrap mrow">
-							<ChartZoom
-								ref="ChartZoom"
-								class="mcol-xs-12 mcol-sm-auto"
-								@event="handleEventNew"
-								:ChartInstance="ChartInstance"
-								:chartOptionsUpdate="chartOptionsUpdate"
-								:chartIsInit="chartRendering"
-								:showHistory="additionalProps.showHistory"
-							/>
-								<!-- :ChartAPI="ChartAPI" -->
+			<div :class="['mcol-xs-10 mcol-sm-9 left-part',
+				{'mcol-lg-7': !additionalProps.isCompare},
+				{'fluid': additionalProps.isCompare}
+			]">
+				<div class="flex mrow wrap align-center">
+					<div :class="['title-block ellipsis', {'mcol-xs-12': additionalProps.isCompare}]" v-text="chartTitle"></div>
+					<div
+						class="zoom-block-container mcol-xs-9 mcol-sm-auto"
+						v-if="enableZoomBlock && ChartAPI"
+					>
+						<div class="chart-actions-block">
+							<div class="flex wrap mrow">
+								<ChartZoom
+									ref="ChartZoom"
+									class="mcol-xs-12 mcol-sm-auto"
+									@event="handleEventNew"
+									:ChartInstance="ChartInstance"
+									:chartOptionsUpdate="chartOptionsUpdate"
+									:chartIsInit="chartRendering"
+									:showHistory="additionalProps.showHistory"
+								/>
+									<!-- :ChartAPI="ChartAPI" -->
 
-							<ChartThresholdsOperations
-								v-if="
-									enableThresholdsOperations && additionalProps.accessToThresholds
-								"
-								class="mcol-xs-12 mcol-sm-auto"
-								@event="handleEventNew"
-								:ChartInstance="ChartInstance"
-								:editPlotlines="editPlotlines"
-								:disabledThresholdsEdit="disabledThresholdsEdit"
-								:showCalculateThresholdsButton="showCalculateThresholdsButton"
-								:isRebaseline="isRebaseline"
-								:calculateThresholdsIsActive="calculateThresholdsIsActive"
-							/>
+								<ChartThresholdsOperations
+									v-if="
+										enableThresholdsOperations && additionalProps.accessToThresholds
+									"
+									class="mcol-xs-12 mcol-sm-auto"
+									@event="handleEventNew"
+									:ChartInstance="ChartInstance"
+									:editPlotlines="editPlotlines"
+									:disabledThresholdsEdit="disabledThresholdsEdit"
+									:showCalculateThresholdsButton="showCalculateThresholdsButton"
+									:isRebaseline="isRebaseline"
+									:calculateThresholdsIsActive="calculateThresholdsIsActive"
+								/>
+							</div>
 						</div>
 					</div>
-				</div>
 
-				<div
-					class="zoom-block-container lube-blocked-container mcol-xs-9 mcol-sm-auto"
-					v-if="(enableLubeUnlockBlock || enableFFTUnlockBlock) && ChartAPI"
-				>
-					<div class="chart-actions-block">
-						<div class="flex wrap mrow">
-							<UnlockBlock
-								v-if="enableLubeUnlockBlock"
-								ref="LubeBlock"
-								class="mcol-xs-12 mcol-sm-auto unlock-block"
-								@onUnlock="handleUnlockLube"
-								:popoverTitle="tt('phrases.Reset_lube')"
-								:instanceLabel="tt('Luber')"
-								:sensorData="sensorData"
-								:chartOptionsUpdate="chartOptionsUpdate"
-								:passedTimeValue="
-									sensorData.lube_cycle_updated_at || sensorData.lube_shot_updated_at
-								"
-							/>
+					<div
+						class="zoom-block-container lube-blocked-container mcol-xs-9 mcol-sm-auto"
+						v-if="(enableLubeUnlockBlock || enableFFTUnlockBlock) && ChartAPI"
+					>
+						<div class="chart-actions-block">
+							<div class="flex wrap mrow">
+								<UnlockBlock
+									v-if="enableLubeUnlockBlock"
+									ref="LubeBlock"
+									class="mcol-xs-12 mcol-sm-auto unlock-block"
+									@onUnlock="handleUnlockLube"
+									:popoverTitle="tt('phrases.Reset_lube')"
+									:instanceLabel="tt('Luber')"
+									:sensorData="sensorData"
+									:chartOptionsUpdate="chartOptionsUpdate"
+									:passedTimeValue="sensorData.lube_cycle_updated_at || sensorData.lube_shot_updated_at"
+								/>
 
-							<UnlockBlock
-								v-if="enableFFTUnlockBlock"
-								ref="FFTBlock"
-								class="mcol-xs-12 mcol-sm-auto unlock-block"
-								@onUnlock="handleUnlockFFT"
-								:popoverTitle="tt('phrases.unlock_fft')"
-								instanceLabel="FFT"
-								:sensorData="sensorData"
-								:chartOptionsUpdate="chartOptionsUpdate"
-								:passedTimeValue="
-									sensorData.last_fft_lock && sensorData.last_fft_lock.created_at
-								"
-							/>
-							<!-- :chartIsInit="chartRendering" -->
+								<UnlockBlock
+									v-if="enableFFTUnlockBlock"
+									ref="FFTBlock"
+									class="mcol-xs-12 mcol-sm-auto unlock-block"
+									@onUnlock="handleUnlockFFT"
+									:popoverTitle="tt('phrases.unlock_fft')"
+									instanceLabel="FFT"
+									:sensorData="sensorData"
+									:chartOptionsUpdate="chartOptionsUpdate"
+									:passedTimeValue="sensorData.last_fft_lock && sensorData.last_fft_lock.created_at"
+								/>
+									<!-- :chartIsInit="chartRendering" -->
+							</div>
 						</div>
 					</div>
 				</div>

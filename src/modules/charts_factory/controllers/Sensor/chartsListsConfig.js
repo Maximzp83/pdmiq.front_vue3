@@ -430,37 +430,53 @@ const getConfigSet = (setName, param) => {
 		template: 'sensor.base',
 	}
 
+	const standartColumnSeries = [
+		{
+			id: 'transparent-serie',
+			data_path: 'transparent',
+			responseDataKey: `parameter_${param}`,
+			template: 'edgeTransparent',
+			inject: { customSettings: { event_key: null } }
+		},
+		{
+			id: `base-serie_for-param-${param}`,
+			data_path: 'base',
+			responseDataKey: `parameter_${param}`,
+			template: 'sensor.base',
+			event_key: 'pointClickEvent'
+		},
+		{
+			id: `warning-serie_for-param-${param}`,
+			data_path: 'warning',
+			template: 'sensor.warning',
+			responseDataKey: `parameter_${param}`,
+			event_key: 'pointClickEvent'
+		},
+		{
+			id: `alarm-serie_for-param-${param}`,
+			data_path: 'alarm',
+			template: 'sensor.alarm',
+			responseDataKey: `parameter_${param}`,
+			event_key: 'pointClickEvent'
+		},
+	];
+
 	const setsList = {
-		'standardColumn': [
+		'standardColumn': standartColumnSeries,
+		'standardColumnLube': standartColumnSeries.concat([
 			{
-				id: 'transparent-serie',
-				data_path: 'transparent',
-				responseDataKey: `parameter_${param}`,
-				template: 'edgeTransparent',
-				inject: { customSettings: { event_key: null } }
+				id: `off_alarm-serie_for-param-${param}`,
+				data_path: 'off_alarm',
+				template: 'sensor.off_alarm',
+				event_key: 'pointClickEvent',
 			},
 			{
-				id: `base-serie_for-param-${param}`,
-				data_path: 'base',								
-				responseDataKey: `parameter_${param}`,
-				template: 'sensor.base',
-				event_key: 'pointClickEvent'				
+				id: `lube-serie_for-param-${param}`,
+				data_path: 'lube',
+				template: 'sensor.lube',
+				event_key: 'pointClickEvent',
 			},
-			{
-				id: `warning-serie_for-param-${param}`,
-				data_path: 'warning',
-				template: 'sensor.warning',
-				responseDataKey: `parameter_${param}`,
-				event_key: 'pointClickEvent'
-			},
-			{
-				id: `alarm-serie_for-param-${param}`,
-				data_path: 'alarm',
-				template: 'sensor.alarm',
-				responseDataKey: `parameter_${param}`,
-				event_key: 'pointClickEvent'
-			},
-		],
+		]),
 		'invisibleLine': [{
 			id: `invisible-serie_for-param-${param}`,
 			responseDataKey: `parameter_${param}`,
@@ -1405,12 +1421,12 @@ const chartsListsConfig1 = {
 					setupFlagsData: { enable_fft: 1, enable_runtime_tracker: 1 }
 				}
 			},
-			zonesKeysList: ['alarm', 'warning'],
+			zonesKeysList: ['alarm', 'warning', 'lube'],
 			seriesConfigIncludes: ['fft_flag', 'runtime_flag', 'statistic_lines'],
 			seriesConfig: buildCustomSeriesConfig({
 				pointsData: {
 					seriesConfigsList: [
-						{ setName: 'standardColumn', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS },
+						{ setName: 'standardColumnLube', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS },
 						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_IMPACT_INDEX },
 						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK },
 						{ setName: 'invisibleLine', param: BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_CREST_FACTOR },

@@ -1,5 +1,5 @@
 <template>
-	<div class="buttons-container flex">
+	<div class="buttons-container flex" v-if="isRebaseline || is_high_speed || (problems.length && !hideProblems) || !hideExportButton || showToggleNavigator">
 		<div class="header-item rebase-line-wrapper" v-if="isRebaseline">
 			<span class="rebase-wheel animate">
 				<img :class="[`suffix-icon`]" :src="rebase_wheel" />

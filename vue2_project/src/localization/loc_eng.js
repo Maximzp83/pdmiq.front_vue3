@@ -1179,6 +1179,7 @@ export default {
 	  	api_secret_warn: 'Is the only time You will be able to see the secret',
 	  	frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
 	  	measurement_warn: 'Change measurement type to default',
+	  	dt_cost_req_togr: 'Downtime Hour and Hours Saved must be filled together',
 	},
 
 	constants: {

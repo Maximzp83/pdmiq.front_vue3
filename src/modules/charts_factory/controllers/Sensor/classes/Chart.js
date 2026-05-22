@@ -73,7 +73,7 @@ class SensorChartBase extends ChartBase {
 		// console.log('constructor', resources)
 		// resources.payload_3 = {
 		let options = {
-			chart: { type: 'column' /*zoomType: 'xy'*/ /*animation: false*/ },
+			chart: { type: 'column', zoomType: 'xy' /*animation: false*/ },
 			/*xAxis: {
 				type: 'datetime',
 				ordinal: false,

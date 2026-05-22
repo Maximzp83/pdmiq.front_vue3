@@ -1,8 +1,8 @@
 # New Session Handoff
 
 ## Current Objective
-- Continue Vue2 -> Vue3 migration with focus on components from `vue2_project/src/components`.
-- Migrate and/or sync exactly one file per step.
+- Continue Vue2 -> Vue3 migration with focus on the remaining `BrandModels` details stack from `vue2_project/src/views/BrandModels/Details`.
+- Migrate and/or sync exactly one file per step unless the files are structurally coupled.
 
 ## Mandatory Workflow For Next Session
 - Apply changes only after explicit user confirmation.
@@ -19,67 +19,52 @@ Primary rules source:
 
 ## Migration State Snapshot
 - Latest completed files:
-  - `src/components/gridTable/GridItemCardHeader.vue`
-  - `src/components/table/CustomDataListTable.vue`
-  - `src/components/gridTable/ItemsGridContainer.vue`
-  - `src/components/itemDetails/CounterItem.vue`
-  - `src/components/form/uploadBlock/FileUploadBlockItem.vue`
-  - `src/components/form/uploadBlock/FileUploadBlock.vue`
-- `src/views/Plants/Details/DetailsPage.vue` restored from previous commit.
-- `src/views/Plants/ItemPage.vue` remains temporary stub.
+  - `src/views/BrandModels/ItemsList.vue`
+  - `src/views/BrandModels/ItemForm.vue`
+  - `src/views/BrandModels/ItemPage.vue`
+  - `src/views/BrandModels/TypeOptionValueItem.vue`
+  - `src/views/BrandModels/TypeMediaValueItem.vue`
+  - `src/views/BrandModels/ItemCard.vue`
+  - `src/views/BrandModels/StoreroomWrapper.vue`
+- Supporting request/item-card infrastructure was refactored to support the `BrandModels` migration.
+- `StoreroomWrapper.vue` was migrated as a file, but its route/menu wiring was not handled in the same step.
+- `setFiltersViaList` was refactored to explicit store config; remaining old `action: 'module/set_*_filters'` payloads in active Vue3 code should be migrated when touched.
 
 ## Recommended Next File Order
-Use one-by-one sequence (high impact first for current imports):
-1. `src/components/itemDetails/ItemInfoBlock.vue`
-2. `src/components/itemDetails/ItemImagesBlock.vue`
-3. `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
-4. `src/components/itemDetails/ItemWOStatisticBlock.vue`
-5. `src/components/itemDetails/MaintenanceListWrapper.vue`
-6. `src/components/table/TableHeader.vue`
-7. `src/components/table/Row.vue`
-8. `src/components/table/TableCell.vue`
-9. `src/components/table/TableHeaderCell.vue`
+Use one-by-one sequence unless a coupled exception is required:
+1. `src/views/BrandModels/Details/MoveForm.vue`
+2. `src/views/BrandModels/Details/LocationList.vue`
+3. `src/views/BrandModels/Details/DetailsPage.vue`
 
-Then continue remaining missing components from `vue2_project/src/components`.
+Rationale:
+- These files are the remaining unmigrated `BrandModels` details stack.
+- `LocationList.vue` and `DetailsPage.vue` are coupled to `MoveForm.vue`, so a narrow multi-file step is acceptable if the migration demands it.
 
-## Missing Components (Still Not In `src/components`)
-- `Import/DragDropCellItem.vue`
-- `Import/ImportContainer.vue`
-- `Import/ImportForm.vue`
-- `WarningsTableBlock.vue`
-- `charts/ChartWrapper.vue`
-- `charts/ChartsListContainer.vue`
-- `charts/ChartsPreloader.vue`
-- `charts/CommonChartItemContainer.vue`
-- `charts/CommonChartItemWrapper.vue`
-- `common/ButtonWithPopover.vue`
-- `common/ButtonsNavbar.vue`
-- `common/CustomPopover.vue`
-- `common/CustomProgressbar.vue`
-- `common/CustomTransition.vue`
-- `common/DynamicComponentWrapper.vue`
-- `common/ItemDetailsPreview.vue`
-- `common/NavigationButtons.vue`
-- `common/addToFavoriteButton.vue`
-- `form/FetchByQuerySelect.vue`
-- `form/FormOperationsButtons.vue`
-- `form/InputItemBlock.vue`
-- `form/IsolatedSelect.vue`
-- `form/PhoneInput.vue`
-- `form/SelectorBlock.vue`
-- `gridTable/CardDroppedSection.vue`
-- `itemDetails/CreateWOButton.vue`
-- `itemDetails/ItemImagesBlock.vue`
-- `itemDetails/ItemInfoBlock.vue`
-- `itemDetails/ItemPDMsStatisticBlock.vue`
-- `itemDetails/ItemWOStatisticBlock.vue`
-- `itemDetails/MaintenanceListWrapper.vue`
-- `pages/NotFoundPage.vue`
-- `pages/RemoteLogin.vue`
-- `table/Row.vue`
-- `table/TableCell.vue`
-- `table/TableHeader.vue`
-- `table/TableHeaderCell.vue`
+## Remaining BrandModels Files
+- `vue2_project/src/views/BrandModels/Details/MoveForm.vue`
+- `vue2_project/src/views/BrandModels/Details/LocationList.vue`
+- `vue2_project/src/views/BrandModels/Details/DetailsPage.vue`
+
+## Files Already Modified In This Migration Batch
+- `src/views/BrandModels/ItemsList.vue`
+- `src/views/BrandModels/ItemForm.vue`
+- `src/views/BrandModels/ItemPage.vue`
+- `src/views/BrandModels/TypeOptionValueItem.vue`
+- `src/views/BrandModels/TypeMediaValueItem.vue`
+- `src/views/BrandModels/ItemCard.vue`
+- `src/views/BrandModels/StoreroomWrapper.vue`
+- `src/config/entities.js`
+- `src/components/form/FetchByQuerySelect.vue`
+- `src/composables/requests/useAsyncSelect.js`
+- `src/composables/requests/useRequestBinding.js`
+- `src/composables/requests/executeRequestAction.js`
+- `src/composables/mixins/useRequestsList.js`
+- `src/composables/mixins/useItemsData.js`
+- `src/composables/useDeferredRequestScheduler.js`
+- `src/composables/mixins/useItemCard.js`
+- `src/composables/mixins/useHelpers.js`
+- `src/helpers/specialHelpers.js`
+- `src/stores/mixins/commonStoreMixin.js`
 
 ## Docs To Keep Updating
 - `docs/migration-progress.md`

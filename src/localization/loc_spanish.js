@@ -1145,6 +1145,7 @@ export default {
 		anomaly1: 'Anomalia de datos de metrica',
 		api_secret_warn: 'Es la única vez que podrás ver el secreto',
 		frequency_reset: 'La configuración de frecuencia se ha restablecido correctamente antes de guardar debido a que el método de lubricación ha cambiado. Configure los nuevos ajustes de frecuencia y guarde.',
+		dt_cost_req_togr: 'Hora de inactividad/Hora y Horas Ahorradas deben completarse juntos',
 	},
 
 	constants: {

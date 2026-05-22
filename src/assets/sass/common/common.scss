@@ -242,8 +242,13 @@ button,
 select,
 a {
 	// cursor: pointer;
+	font-family: inherit;
 	font-size: inherit;
 	transition: all linear $formTransitions;
+}
+
+text {
+	font-family: $mainFont;
 }
 
 input, select {

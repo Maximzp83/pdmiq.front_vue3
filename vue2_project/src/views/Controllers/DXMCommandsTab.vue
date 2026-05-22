@@ -192,7 +192,6 @@ export default {
 
 		handleSendDXMCommand(message_body) {
 			if (message_body) {
-				this.sendingDXMCommandRequest = true;
 				const payload = {
 					controllerId: this.controllerData.id,
 					data: { message_body }
@@ -203,23 +202,22 @@ export default {
 					return;
 				}*/
 
-				this.request_dxm_command(payload)
-					.then(response => {
-						if (!response.value || response.value.status !== 2) {
-							this.handleDXMCommandResponse(response);
-						}
-
-						this.sendingDXMCommandRequest = false;
-						/*setTimeout(() => {
-						this.sendingDXMCommandRequest = false;
-					}, 100);*/
-					})
-					.catch(() => {
-						this.sendingDXMCommandRequest = false;
-						/*if (!error.response || error.response.status !== 400) {
-						this.sendingDXMCommandRequest = false;
-					}*/
+				try {
+					this.processingDXMCommandRequest = true;
+					this.setupWebSocket({
+						socketName: 'dxm_command_socket',
+						socketNameReadyProp: 'dxm_command_socket_ready',
+						socketChannel: this.socketChannelDXMCommandRequest,
+						subscriptionSuccededCallback: () => this.handleSubscriptionSucceded(payload),
+						socketCallback: (type, data) => this.dxmCommand_socketCallback({ type, data })
 					});
+
+					// this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
+				} catch (e) {
+					console.log(e);
+				}
+
+				
 			} else {
 				this.$notify({
 					type: 'warning',
@@ -228,29 +226,57 @@ export default {
 			}
 		},
 
-		handleDXMCommandResponse() {
+		handleSubscriptionSucceded(payload) {
+			// console.log('handleSubscriptionSucceded 123', payload)
+			this.sendRequestDXMCommand(payload);
+		},
+
+		sendRequestDXMCommand(payload) {
+			this.sendingDXMCommandRequest = true;
+
+			this.request_dxm_command(payload)
+				.then((/*response*/) => {
+					/*if (!response.value || response.value.status !== 2) {
+						this.handleDXMCommandResponse(response);
+					}*/
+
+					this.sendingDXMCommandRequest = false;
+				})
+				.catch(() => {
+					this.sendingDXMCommandRequest = false;
+				});
+		},
+
+		/*handleDXMCommandResponse() {
 			try {
 				this.processingDXMCommandRequest = true;
 				this.setupWebSocket({
 					socketName: 'dxm_command_socket',
 					socketNameReadyProp: 'dxm_command_socket_ready',
 					socketChannel: this.socketChannelDXMCommandRequest,
-					socketCallbackName: 'dxmCommand_socketCallback'
+					subscriptionSuccededCallback: () => this.handleSubscriptionSucceded(payload),
+
+					// socketCallbackName: 'dxmCommand_socketCallback'
 				});
 
 				// this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
 			} catch (e) {
 				console.log(e);
 			}
-		},
+		},*/
 
 		dxmCommand_socketCallback(response = {}) {
 			const { data, type } = response;
+			const safeData = data.data || {};
 
 			const { tt } = this;
 
-			if (type.toLowerCase() === 'dxm.command' && data.controller_id === this.controllerData.id) {
-				if (data.status == DXM_COMMANDS_REQUEST_STATUSES.SUCCESS) {
+			if (
+				type.toLowerCase() === 'dxm.command'
+					&& safeData.controller_id === this.controllerData.id
+					&& safeData.sender_id === this.authUser.id
+			) {
+				if (safeData.status == DXM_COMMANDS_REQUEST_STATUSES.SUCCESS) {
 					this.$notify({
 						type: 'success',
 						title: tt('constants.Success'),
@@ -258,7 +284,7 @@ export default {
 					});
 				}
 
-				if (data.status == DXM_COMMANDS_REQUEST_STATUSES.FAIL) {
+				if (safeData.status == DXM_COMMANDS_REQUEST_STATUSES.FAIL) {
 					this.$notify({
 						type: 'warning',
 						title: tt('constants.Fail'),
@@ -269,18 +295,18 @@ export default {
 					});
 				}
 
-				if (data.status !== DXM_COMMANDS_REQUEST_STATUSES.PENDING) {
+				if (safeData.status !== DXM_COMMANDS_REQUEST_STATUSES.PENDING) {
 					const commandItem = findItemBy(
 						'message_body',
-						data.message_body,
+						safeData.message_body,
 						this.commandsList
 					);
 
 					if (commandItem) {
-						commandItem.dxm_response = data.message_response;
+						commandItem.dxm_response = safeData.message_response;
 					}
 
-					this.commandsHistoryList.unshift(data);
+					this.commandsHistoryList.unshift(safeData);
 					this.closeWebSocket({ socketName: 'dxm_command_socket' });
 					this.processingDXMCommandRequest = false;
 				}
