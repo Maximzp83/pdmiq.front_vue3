@@ -70,7 +70,10 @@ article, .section-row, [class^="sectionBlockColumn_"] {
   &.space-around {justify-content: space-around;}
   &.justify-center {justify-content: center;}
   &.justify-end {justify-content: flex-end;}
-  &.align-center {align-items: center;}
+  &.align-center {
+    align-items: center;
+    &.child-align-center > * {align-items: center;}
+  }
   &.top {align-items: flex-start;}
   &.bottom {align-items: flex-end;}
   

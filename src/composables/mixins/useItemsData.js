@@ -263,7 +263,7 @@ export function useItemsData({
 	const setFilters = (newFiltersValues, settings = {}) => {
 		if (!filtersRef) return;
 		
-		console.log('setFilters', newFiltersValues);
+		// console.log('setFilters', newFiltersValues);
 		for (let item in newFiltersValues) {
 			// console.log( item, filters[item], typeof item, filters[item] instanceof Array )
 			if (newFiltersValues[item] instanceof Array) {

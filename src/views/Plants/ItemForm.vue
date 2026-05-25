@@ -73,7 +73,7 @@
 			<div class="el-form-item">
 				<div class="flex mrow height-60">
 					<el-form-item
-						class="mcol-xs-6 flex align-center label-margin-0"
+						class="mcol-xs-6 flex align-center child-align-center label-margin-0 "
 						:label="`${tt('amplitude')} ${tt('alarms')}`"
 						prop="is_amplitude_alarm_tracking"
 					>
@@ -452,7 +452,7 @@ const {
 	formData,
 	formRef: itemFormRef,
 	localSetupPage,
-	subItemsSettings,
+	subItemsSettings: subItemsSettings.value,
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	resetFormDataBySubItems,
