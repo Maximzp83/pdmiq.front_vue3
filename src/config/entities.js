@@ -16,6 +16,17 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_applications',
 		}),
 	}),
+	Assets: Object.freeze({
+		key: 'assets',
+		apiBase: '/assets',
+		routeBase: '/assets',
+		filtersStorageKey: 'assets_filters',
+		itemsName: Object.freeze({
+			one: 'Asset',
+			mult: 'Assets',
+			instanceName: 'assets',
+		}),
+	}),
 	Brands: Object.freeze({
 		key: 'brands',
 		apiBase: '/equipments/brands',
@@ -127,6 +138,17 @@ export const ENTITIES = Object.freeze({
 			create: 'create_equipment_types',
 			edit: 'edit_equipment_types',
 			delete: 'delete_equipment_types',
+		}),
+	}),
+	Equipments: Object.freeze({
+		key: 'equipments',
+		apiBase: '/equipments',
+		routeBase: '/equipments',
+		filtersStorageKey: 'equipments_filters',
+		itemsName: Object.freeze({
+			one: 'Item',
+			mult: 'Items',
+			instanceName: 'equipments',
 		}),
 	}),
 	Machines: Object.freeze({
@@ -280,6 +302,61 @@ export const ENTITIES = Object.freeze({
 			create: 'create_users',
 			edit: 'edit_users',
 			delete: 'delete_users',
+		}),
+	}),
+	UserRoles: Object.freeze({
+		key: 'user_roles',
+		apiBase: '/roles',
+		routeBase: '/user-roles',
+		filtersStorageKey: 'user-roles_filters',
+		itemsName: Object.freeze({
+			one: 'sidebar_menu.user_roles',
+			mult: 'sidebar_menu.user_roles',
+			instanceName: 'user_roles',
+		}),
+		permissions: Object.freeze({
+			view: 'view_user_roles',
+			create: 'create_user_roles',
+			edit: 'edit_user_roles',
+			delete: 'delete_user_roles',
+		}),
+	}),
+	Sensors: Object.freeze({
+		key: 'sensors',
+		apiBase: '/sensors',
+		routeBase: '/sensors',
+		filtersStorageKey: 'sensors_filters',
+		itemsName: Object.freeze({
+			one: 'sidebar_menu.sensors',
+			mult: 'sidebar_menu.sensors',
+			instanceName: 'sensors',
+		}),
+		permissions: Object.freeze({
+			view: 'view_sensors',
+			create: 'create_sensors',
+			edit: 'edit_sensors',
+			delete: 'delete_sensors',
+		}),
+	}),
+	StoreRooms: Object.freeze({
+		key: 'store_rooms',
+		apiBase: '/store-rooms',
+		routeBase: '/store-rooms',
+		filtersStorageKey: 'store_rooms_filters',
+		itemsName: Object.freeze({
+			one: 'StoreRoom',
+			mult: 'StoreRooms',
+			instanceName: 'store_rooms',
+		}),
+		permissions: Object.freeze({
+			view: 'view_storerooms',
+			create: 'create_storerooms',
+			edit: 'edit_storerooms',
+			delete: 'delete_storerooms',
+		}),
+		menu: Object.freeze({
+			label: 'storerooms',
+			path: '/store-rooms',
 		}),
 	}),
 });

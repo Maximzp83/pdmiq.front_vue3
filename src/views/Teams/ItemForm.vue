@@ -94,14 +94,6 @@ const rules = {
 	users_ids: required,
 };
 
-const currentPlantId = computed(() => {
-	if (isIndustrialMatrix.value) {
-		return formData.value.plant_id;
-	}
-
-	return authUser.value?.plant_id ?? formData.value.plant_id;
-});
-
 const requestsToDoList = computed(() => [
 	{
 		action: methodsMap.fetch_plants,
@@ -129,8 +121,8 @@ const requestsToDoList = computed(() => [
 		bindTo: [
 			{
 				param: 'plantId',
-				getValue: () => currentPlantId.value,
-				cleanKey: 'users_ids',
+				getValue: () => formData.value?.plant_id,
+				onTrigger: () => formData.value.users_ids = [],
 				fetchAnyWay: !isIndustrialMatrix.value,
 			},
 		],

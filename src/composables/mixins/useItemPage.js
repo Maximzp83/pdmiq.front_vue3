@@ -12,7 +12,6 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
 import { Lang } from '@/localization';
 
 
-
 export function useItemPage({
 	entityKey,
 	apiRoute,

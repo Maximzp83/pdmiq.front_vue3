@@ -75,7 +75,7 @@
 <script setup>
 import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import { ElButton } from 'element-plus';
-import { storeToRefs } from 'pinia';
+// import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { Lang } from '@/localization';
 import CoverOverlay from '@/components/common/CoverOverlay.vue';
@@ -162,6 +162,7 @@ const handleCloseEditModal = () => {
 
 const saveModalItem = () => {
 	if (ItemFormComponent.value && ItemFormComponent.value.validateForm) {
+		// console.log('validating form');
 		ItemFormComponent.value.validateForm({editModal: editModal.value});
 	}
 };

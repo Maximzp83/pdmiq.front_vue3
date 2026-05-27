@@ -63,7 +63,7 @@
 						    	:is="Component"
 						    	ref="viewContent"
 									:key="viewContentComponentKey"
-									@event="handleEventNew"
+									@event="handleEvent"
 						    />
 						  </transition>
 						</router-view>
@@ -75,7 +75,7 @@
 			<DynamicFormContainer editModalProp="editModalSecond" />
 			<DynamicFormContainer
 				editModalProp="editModalClassic"
-				@event="handleEventNew"
+				@event="handleEvent"
 			/>
 			<DynamicFormContainer editModalProp="editModalClassicSecond" />
 		</div>
@@ -104,6 +104,7 @@ import {
 } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
 
 const VueElementLoading = defineAsyncComponent(
 	() => import('@/components/common/VueElementLoading.vue'),
@@ -236,13 +237,13 @@ const overlayClick = () => {
 	});
 };
 
-const handleEventNew = (event) => {
-	console.log('handleEventNew:', event);
-};
-
-const handleEvent = (event) => {
+/*const handleEvent = (event) => {
 	console.log('handleEvent:', event);
-};
+};*/
+
+/*const handleEvent = (event) => {
+	console.log('handleEvent:', event);
+};*/
 
 const printHTML = ({ querySelector }) => {
 	globalStore.set_global_state({
@@ -279,6 +280,17 @@ const autoLogout = () => {
 	});
 };
 
+const methodsMap = {
+	autoLogout,
+	printHTML,
+	closePreviewModal,
+	togglePreviewModal
+};
+
+const emit = defineEmits(['event']);
+const { handleEvent } = useEventHandler(methodsMap, emit);
+
+
 // ========== Provide ==========
 provide('DashboardLayout.methods', {
 	testEvent,
@@ -291,7 +303,7 @@ provide('DashboardLayout.methods', {
 	togglePreviewModal,
 	printHTML,
 	setGlobalFilters,
-	handleEvent,
+	// handleEvent,
 	signIn,
 });
 

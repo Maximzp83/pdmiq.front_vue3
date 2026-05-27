@@ -81,6 +81,7 @@ defineOptions({
 const props = defineProps({
 	settings: { type: Object, required: true },
 	optionsList: { type: Array, required: true },
+	modelValue: null,
 	value: null,
 	alwaysSwitch: Boolean,
 });
@@ -90,22 +91,25 @@ const emit = defineEmits(['update:modelValue', 'input', 'onChange']);
 const activeKey = computed(() => (props.settings.isCheckbox ? 'is-checked' : 'active'));
 const valueAsObject = computed(() => props.settings.valueAsObject);
 const valueAsArray = computed(() => props.settings.valueAsArray);
+const currentValue = computed(() =>
+	props.modelValue !== null && props.modelValue !== undefined ? props.modelValue : props.value,
+);
 
 const isActive = (item) => {
 	if (valueAsObject.value) {
 		if (valueAsObject.value.isActiveKey) {
-			return props.value[valueAsObject.value.isActiveKey] == item[valueAsObject.value.isActiveKey];
+			return currentValue.value?.[valueAsObject.value.isActiveKey] == item[valueAsObject.value.isActiveKey];
 		}
 
 		let value = {};
 		valueAsObject.value.props.forEach((prop) => {
 			value[prop] = item[prop];
 		});
-		return JSON.stringify(value) == JSON.stringify(props.value);
+		return JSON.stringify(value) == JSON.stringify(currentValue.value);
 	} else if (valueAsArray.value) {
-		return props.value.some((val) => val === item.id);
+		return (currentValue.value || []).some((val) => val === item.id);
 	}
-	return props.value === item.id;
+	return currentValue.value === item.id;
 };
 
 const emitValue = (val) => {
@@ -115,7 +119,7 @@ const emitValue = (val) => {
 };
 
 const updateObjectInput = (key, val) => {
-	const base = props.value && typeof props.value === 'object' ? props.value : {};
+	const base = currentValue.value && typeof currentValue.value === 'object' ? currentValue.value : {};
 	emitValue({ ...base, [key]: val });
 };
 
@@ -129,7 +133,7 @@ const switchItem = (item) => {
 			selectedValue[prop] = item[prop];
 		});
 	} else if (valueAsArray.value) {
-		selectedValue = [...props.value];
+		selectedValue = [...(currentValue.value || [])];
 		if (selectedValue.includes(item.id)) {
 			selectedValue = selectedValue.filter((val) => val !== item.id);
 		} else {
@@ -143,17 +147,17 @@ const switchItem = (item) => {
 
 	if (props.settings.clearable) {
 		if (valueAsObject.value) {
-			if (JSON.stringify(selectedValue) != JSON.stringify(props.value)) {
+			if (JSON.stringify(selectedValue) != JSON.stringify(currentValue.value)) {
 				selectedId = selectedValue;
 			}
-		} else if (selectedValue !== props.value) {
+		} else if (selectedValue !== currentValue.value) {
 			selectedId = selectedValue;
 		}
 	} else {
 		selectedId = selectedValue;
 	}
 
-	if (selectedId != props.value || props.settings.alwaysSwitch) {
+	if (selectedId != currentValue.value || props.settings.alwaysSwitch) {
 		emitValue(selectedId);
 	}
 };

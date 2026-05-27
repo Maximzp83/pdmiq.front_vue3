@@ -1,528 +1,228 @@
 <template>
 	<div class="plant-details details-page main-instance-item">
-		<div class="view-content-card" v-if="plantItem">
+		<VueElementLoadingWrapper :isLoading="itemLoading" :itemsName="itemsName.one" />
 
-			<div class="section-row">
-				<div class="mrow flex wrap big-padding">
-					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-						<!-- <el-button @click="toggleSearchbar">toggleSearchbar</el-button> -->
+		<div v-if="loadContent && itemData" class="view-wrapper item-page-wrapper">
+			<div class="mcontainer">
+				<div class="nested-view-content-wrapper">
+					<div class="view-content-card">
+						<div class="section-row">
+							<div class="mrow flex wrap big-padding">
+								<div class="mcol-xs-12 mcol-lg-6">
+									<ItemInfoBlock
+										:blockTitle="`${tt('Plant')} ${tt('details')}`"
+										dotsInText
+										:itemData="itemData"
+										:settingsList="mainInfoSettingsList"
+									/>
+								</div>
 
-						<!-- <el-button label="Confirm" @click="confirm = true">confirm</el-button> -->
-						<!-- <ItemPDMsStatisticBlock
-							:title="tt('phrases.overall_asset_health')"
-							@event="handleEventNew"
-							:itemData="plantItem"
-							:filters="filters"
-							:predefinedFilters="predefinedFilters"
-							:chartLegendEvents="chartLegendEvents"
-						/> -->
-					</div>
+								<div class="mcol-xs-12 mcol-lg-6">
+									<ItemImagesBlock
+										title="Logo"
+										:itemData="itemData"
+										showMockSrc="/static/img/plant_logo_mock.jpg"
+										@event="handleEvent"
+									/>
+								</div>
 
-					<!-- <div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-						<el-form @submit="onSubmit">
-							<el-input v-model="name" />
-							<el-input-number v-model="age" :min="1" :max="10" />
+								<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
+									<ItemPDMsStatisticBlock
+										:title="tt('phrases.overall_asset_health')"
+										:filters="filters"
+										:predefinedFilters="predefinedFilters"
+										:chartLegendEvents="chartLegendEvents"
+										@event="handleEvent"
+									/>
+								</div>
 
-							<el-tooltip
-								class="box-item"
-								effect="dark"
-								content="Top Left prompts info"
-								placement="top-start"
-							>
-								<el-button>top-start</el-button>
-							</el-tooltip>
+								<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
+									<Counters
+										disableViewAll
+										standardIconBlock
+										:plantId="itemData.id"
+										@event="handleEvent"
+									/>
+								</div>
 
-							<el-upload
-								class="upload-demo"
-								action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
-								multiple
-							>
-								<el-button type="primary">Click to upload</el-button>
-								<template #tip>
-									<div class="el-upload__tip">
-										jpg/png files with a size less than 500KB.
-									</div>
-								</template>
-							</el-upload>
-
-							<el-select-v2
-								v-model="select2"
-								:options="options2"
-								placeholder="Please select"
-							/>
-
-							<el-date-picker
-								v-model="date"
-								type="datetime"
-								placeholder="Select date and time"
-							/>
-
-							<el-time-select
-								start="08:30"
-								step="00:15"
-								end="18:30"
-								placeholder="Select time"
-							/>
-
-							<el-checkbox label="Option A">Option A</el-checkbox>
-
-							<el-switch v-model="accept">I accept the license and terms</el-switch>
-
-							<el-pagination layout="prev, pager, next" :total="50" />
-
-							<el-popover
-								class="box-item"
-								title="Title"
-								content="Top Left prompts info"
-								placement="top-start"
-							>
-								<template #reference>
-									<el-button>top-start</el-button>
-								</template>
-							</el-popover>
-
-							<div>
-								<el-button type="primary" @click="onSubmit">Submit</el-button>
-								<el-button @click="onReset">Reset</el-button>
+								<div
+									v-if="canViewMaintenance"
+									class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6"
+								>
+									<ItemWOStatisticBlock
+										:createWOButtonFormSetup="createWOButtonFormSetup"
+										:itemData="itemData"
+										:filters="filters"
+										:predefinedFilters="predefinedFilters"
+										@event="handleEvent"
+									/>
+								</div>
 							</div>
-						</el-form>
-					</div> -->
-
-					<div class="mcol-xs-12">
-						<!-- <EquipmentsLayout
-							ref="EquipmentsLayout"
-							@event="handleEventNew"
-							hideDropdownFilterbar
-							hideDatepicker
-							fromDashboard
-							fromDetailsPage
-							showCardHeader
-							showToggleListButton
-							preventSetNavbar
-							:additionalModalSettings="additionalModalSettings"
-							:propsFilters="equipmentsListFilters"
-							:plantId="predefinedFilters.plantId"
-						/> -->
+						</div>
 					</div>
-
-					<div class="mcol-xs-12">
-						<!-- <AssetsList
-							@event="handleEventNew"
-							fromDashboard
-							fromDetailsPage
-							showCardHeader
-							showToggleListButton
-							preventSetNavbar
-							:additionalModalSettings="additionalModalSettings"
-							:propsFilters="itemsListsFilters"
-							:plantId="predefinedFilters.plantId"
-						/> -->
-					</div>
-
-					<div class="mcol-xs-12">
-						<!-- <MachinesList
-							@event="handleEventNew"
-							fromDashboard
-							fromDetailsPage
-							showCardHeader
-							showToggleListButton
-							preventSetNavbar
-							:additionalModalSettings="additionalModalSettings"
-							:propsFilters="itemsListsFilters"
-							:plantId="predefinedFilters.plantId"
-						/> -->
-					</div>
-
-					<div class="mcol-xs-12">
-						<!-- <ProductionLinesList
-							@event="handleEventNew"
-							:productionLineType="PRODUCTION_LINES_TYPES.PRODUCTION_LINE"
-							fromDashboard
-							fromDetailsPage
-							showCardHeader
-							showToggleListButton
-							preventSetNavbar
-							:additionalModalSettings="additionalModalSettings"
-							:propsFilters="itemsListsFilters"
-							:plantId="predefinedFilters.plantId"
-						/> -->
-					</div>
-
-					<div class="mcol-xs-12">
-						<!-- <ProductionLinesList
-							@event="handleEventNew"
-							:productionLineType="PRODUCTION_LINES_TYPES.UTILITY"
-							fromDashboard
-							fromDetailsPage
-							showCardHeader
-							showToggleListButton
-							preventSetNavbar
-							:additionalModalSettings="additionalModalSettings"
-							:propsFilters="itemsListsFilters"
-							:plantId="predefinedFilters.plantId"
-						/> -->
-					</div>
-
-					<!-- <MaintenanceListWrapper
-						v-if="$hasAccessTo(['view_maintenance'])"
-						ref="MaintenanceListWrapper"
-						:woFilters="woFilters"
-						:logFilters="logFilters"
-						hideDatepicker
-						fromPlantDashboard
-					/> -->
 				</div>
 			</div>
 		</div>
-
-		<!-- <el-dialog v-model="confirm">
-			<div class="card">
-				<div class="card-content">
-					<div class="row items-center">
-						<span class="q-ml-sm"
-							>You are currently not connected to any network.</span
-						>
-					</div>
-
-					<div align="right">
-						<el-button @click="confirm = false" type="primary">Cancel</el-button>
-						<el-button @click="confirm = false">Turn on Wifi</el-button>
-					</div>
-				</div>
-			</div>
-		</el-dialog> -->
 	</div>
 </template>
 
 <script setup>
-import { ref, onMounted, shallowReactive } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRoute } from 'vue-router';
 
+import { api_request } from '@/api/request_provider';
+import { scrollToElement, waitForElement } from '@/helpers/specialHelpers';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useMainInstanceDetailsPage } from '@/composables/mixins/useMainInstanceDetailsPage';
 import { Lang } from '@/localization';
+import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
+import { usePlantsStore } from '@/stores/PlantsStore';
+
+import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
+import ItemImagesBlock from '@/components/itemDetails/ItemImagesBlock.vue';
+import ItemInfoBlock from '@/components/itemDetails/ItemInfoBlock.vue';
+import ItemPDMsStatisticBlock from '@/components/itemDetails/ItemPDMsStatisticBlock.vue';
+import ItemWOStatisticBlock from '@/components/itemDetails/ItemWOStatisticBlock.vue';
+import Counters from './Counters.vue';
+
 const { tt, translate } = Lang;
 
-// -----Store-----
-import { useAuthStore } from '@/stores/AuthStore';
-const authStore = useAuthStore();
-const authUser = authStore.authUser;
-
-import { useGlobalStore } from '@/stores/GlobalStore';
-const { set_value: set_global_store } = useGlobalStore();
-
-// =========================
-
 defineOptions({
-	name: 'PlantDetails',
+	name: 'PlantDetailsPage',
 });
-/*import Vue from 'vue';
-import HighchartsVue from 'highcharts-vue';
-Vue.use(HighchartsVue);
-import { mapActions, mapState } from 'vuex';*/
 
-// import { scrollToElement, waitForElement } from '@/helpers/specialHelpers';
+const emit = defineEmits(['event']);
 
-// import { PRODUCTION_LINES_TYPES, MAINTENANCE_TYPES } from '@/constants/global';
+const authStore = useAuthStore();
+const route = useRoute();
+const globalStore = useGlobalStore();
+const plantsStore = usePlantsStore();
+const { statistics_filters: filters } = storeToRefs(plantsStore);
+const { globalFilters } = storeToRefs(globalStore);
 
-/*import {
-	// initPageDataMixin,
-	tabsMixin,
-	eventHandler,
-	mainInstanceDetailsPage,
-	fetchItemsHelper
-} from '@/mixins';*/
+const itemData = ref(null);
+const itemLoading = ref(false);
+const loadContent = ref(false);
 
-import { ElNotification } from 'element-plus';
+const itemsName = Object.freeze({
+	one: tt('Plant'),
+	mult: tt('Plants'),
+});
 
-const options = [];
-for (let i = 0; i <= 10; i++) {
-	options.push('Opt ' + i);
-}
-const options2 = [];
-for (let i = 0; i <= 100000; i++) {
-	options2.push({ label: 'Opt ' + i, value: i });
-}
+const mainInfoSettingsList = computed(() =>
+	Object.freeze(
+		translate([
+			{ label: 'Company', prop: 'company.name' },
+			{ label: 'Region', prop: 'region' },
+			{ label: 'Address', prop: 'address' },
+			{ label: 'Billing_Plan_Cost', prop: 'billing_plan_cost' },
+		]),
+	),
+);
 
-const plantItem = true;
-const name = ref(null);
-const age = ref(null);
-const accept = ref(false);
-const select = ref(null);
-const select2 = ref(null);
-const date = ref('');
-const confirm = ref(false);
-const text = ref('');
+const additionalNavbarSettings = computed(() =>
+	Object.freeze({
+		showFilter: true,
+		showCompareButton: true,
+		datepickerSettings: {
+			label: `${tt('phrases.statistics_for_period')}:`,
+			storeSettings: {
+				storeName: 'PlantsStore',
+				stateKey: 'statistics_filters',
+			},
+		},
+	}),
+);
 
-const onSubmit = () => {
-	if (accept.value !== true) {
-		ElNotification({
-			title: 'Title',
-			type: 'warning',
-			message: 'You need to accept the license and terms first',
+const effectivePlantId = computed(() => route.params?.id || globalFilters.value?.plantId || null);
+
+const predefinedFilters = computed(() =>
+	Object.freeze({
+		plantId: itemData.value?.id,
+		daterange: filters.value?.daterange,
+	}),
+);
+
+const canViewMaintenance = computed(() => authStore.hasAccessTo(['view_maintenance']));
+const createWOButtonFormSetup = computed(() =>
+	Object.freeze([{ formKey: 'plant_id', valKey: 'id' }]),
+);
+
+const setupNavbar = () => {
+	globalStore.setup_navbar({
+		pageTitle:
+			itemData.value?.name ||
+			(route.name === 'PlantDetails' ? tt('phrases.Plant_Dashboard') : tt('Plant')),
+		...additionalNavbarSettings.value,
+		showPlantName: itemData.value?.name
+			? { id: itemData.value.id, name: itemData.value.name }
+			: undefined,
+	});
+};
+
+const fetchPlant = async (plantId) => {
+	if (!plantId) {
+		itemData.value = null;
+		loadContent.value = false;
+		setupNavbar();
+		return;
+	}
+
+	itemLoading.value = true;
+	try {
+		const { value } = await api_request.get(`/plants/${plantId}`, {
+			notNotify: true,
+			itemId: plantId,
 		});
-	} else {
-		ElNotification({
-			title: 'Title',
-			type: 'success',
-			message: 'Submitted',
+		itemData.value = value;
+		loadContent.value = true;
+		setupNavbar();
+	} catch (error) {
+		console.warn(error);
+		itemData.value = null;
+		loadContent.value = false;
+	} finally {
+		itemLoading.value = false;
+	}
+};
+
+const initialPageSetup = () => fetchPlant(effectivePlantId.value);
+
+const { chartLegendEvents, showItemsWithSensors, handleCreateWorkOrderButton } =
+	useMainInstanceDetailsPage({
+	itemData,
+	instanceViewName: 'Plants',
+	itemsName,
+	predefinedFilters,
+	filters,
+	initialPageSetup,
+});
+
+const handleScrollTo = () => {
+	const query = window.location.search ? new URLSearchParams(window.location.search) : null;
+	const scrollTo = query?.get('scrollTo');
+	if (scrollTo) {
+		waitForElement(scrollTo, () => {
+			scrollToElement(scrollTo);
 		});
 	}
 };
 
-const onReset = () => {
-	console.log(name);
-	name.value = null;
-	age.value = null;
-	accept.value = false;
-	select.value = null;
+const methodsMap = {
+	showItemsWithSensors,
+	handleCreateWorkOrderButton,
 };
 
-const navbarSettings = shallowReactive({
-	showFilter: true,
-	showCompareButton: true,
-	// showSearchbar: true,
-	datepickerSettings: {
-		label: `${tt('phrases.statistics_for_period')}:`,
-		storeSettings: {
-			storeName: 'PlantsStore',
-			stateKey: 'statistics_filters',
-		},
-	},
+const { handleEvent } = useEventHandler(methodsMap, emit);
 
-	// showSearchbar: true
-});
+watch(effectivePlantId, () => {
+	initialPageSetup();
+}, { immediate: true });
 
-const toggleSearchbar = () => {
-	navbarSettings.showSearchbar = !navbarSettings.showSearchbar;
-	set_global_store('navbarSettings', navbarSettings);
-};
-
-// ========== Hooks ==============
 onMounted(() => {
-	set_global_store('navbarSettings', navbarSettings);
+	setupNavbar();
+	handleScrollTo();
 });
-
-// export default {
-/*name: 'PlantDetails',
-	setup() {
-
-	},*/
-/*mixins: [
-		// initPageDataMixin,
-		tabsMixin(),
-		eventHandler(),
-		mainInstanceDetailsPage(),
-		fetchItemsHelper()
-	],*/
-
-/*components: {
-		ItemPDMsStatisticBlock: () =>
-			import('@/components/itemDetails/ItemPDMsStatisticBlock.vue'),
-
-		ProductionLinesList: () => import('@/views/ProductionLines/ItemsList.vue'),
-		MachinesList: () => import('@/views/Machines/ItemsList.vue'),
-		AssetsList: () => import('@/views/Assets/ItemsList.vue'),
-		EquipmentsLayout: () => import('@/views/Equipments/EquipmentsLayout.vue'),
-		MaintenanceListWrapper: () =>
-			import('@/components/itemDetails/MaintenanceListWrapper.vue'),
-		Counters: () => import('./Counters.vue')
-	},*/
-
-/*props: {
-		plantItem: { type: Object, required: true },
-		additionalModalSettings: Object
-	},*/
-
-/*data() {
-		return {
-			meetingTrackerLoading: false,
-			meetingTrackersList: [],
-
-			recommendedActionsTitle: '',
-			recommnendedActionsVisible: false,
-			recommnendedActionsItemsList: []
-		};
-	},*/
-
-/*computed: {
-		...mapState({
-			filters: state => state.plants.statistics_filters,
-			production_linesFilters: state => state.production_lines.filters,
-			utilitiesFilters: state => state.production_lines.utility_filters,
-			machinesFilters: state => state.machines.filters,
-			assetsFilters: state => state.assets.filters,
-			// equipmentsFilters: state => state.equipments.filters,
-
-			authUser: state => state.auth.authUser
-		}),
-
-		itemsName() {
-			return {
-				one: this.$t('Plant'),
-				mult: this.$t('Plants')
-			};
-		},
-
-		instanceDataKey: () => 'plantItem',
-		instanceViewName: () => 'Plants',
-
-		PRODUCTION_LINES_TYPES: () => PRODUCTION_LINES_TYPES,
-
-		woFilters: that =>
-			Object.freeze({
-				...that.predefinedFilters,
-				type: MAINTENANCE_TYPES.WORK_ORDER,
-				daterange: that.filters.daterange
-			}),
-		logFilters: that =>
-			Object.freeze({
-				...that.predefinedFilters,
-				type: MAINTENANCE_TYPES.LOG,
-				daterange: that.filters.daterange
-			}),
-
-		predefinedFilters: that =>
-			Object.freeze({
-				// productionLineId: that.plantItem.id,
-				plantId: that.plantItem.id,
-				daterange: that.filters.daterange
-			}),
-
-		itemsListsFilters: that =>
-			Object.freeze({
-				plantId: that.plantItem.id
-			}),
-
-		equipmentsListFilters: that =>
-			Object.freeze({
-				plantId: that.plantItem.id,
-				daterange: that.filters.daterange
-			}),
-
-
-
-		tabsList: that =>
-			Object.freeze(
-				that.$translate([
-					{ title: 'WORK_ORDERS', prop: 'woTab' },
-					{ title: 'MAINTENANCE_LOGS', prop: 'logsTab' }
-				])
-			),
-
-		mainInfoSettingsList: that =>
-			Object.freeze(
-				that.$translate([
-					{
-						label: 'Company',
-						prop: 'company.name'
-					},
-					{
-						label: 'Region',
-						prop: 'region'
-					},
-					{
-						label: 'Address',
-						prop: 'address'
-					},
-					{
-						label: 'Billing_Plan_Cost',
-						prop: 'billing_plan_cost'
-					}
-				])
-			),
-
-		countersSettings: that =>
-			Object.freeze({
-				filter: { key: 'productionLineId', valueProp: 'id' },
-				items: that.$translate([
-					{
-						title: 'Machines',
-						count: 'machines_count',
-						iconName: 'machines',
-						sectionClass: '.machines-list'
-					},
-					{
-						title: 'Assets',
-						count: 'assets_count',
-						iconName: 'assets',
-						sectionClass: '.assets-list'
-					},
-					{
-						title: 'Items',
-						count: 'equipments_count',
-						iconName: 'equipments',
-						sectionClass: '.equipments-list'
-					}
-				])
-			}),
-
-		createWOButtonFormSetup: () => Object.freeze([{ formKey: 'plant_id', valKey: 'id' }])
-	},*/
-
-/*methods: {
-		...mapActions({
-			// fetch_item: 'plants/fetch_plant',
-			show_edit_modal: 'show_edit_modal',
-			set_filters: 'plants/set_statistics_filters',
-			set_production_lines_filters: 'production_lines/set_production_lines_filters',
-			set_utilities_filters: 'production_lines/set_utilities_filters',
-			set_machines_filters: 'machines/set_machines_filters',
-			set_assets_filters: 'assets/set_assets_filters',
-			// set_equipments_filters: 'equipments/set_equipments_filters',
-			// fetch_meeting_tracker_last: 'meeting_trackers/fetch_meeting_tracker_last',
-			fetch_meeting_trackers: 'meeting_trackers/fetch_meeting_trackers',
-			fetch_locations: 'plants/fetch_locations'
-		}),
-
-		setup_navbar(settings) {
-			const { meta } = this.$route;
-			if ((!meta || !meta.preventSetNavbar) && !this.preventSetNavbar) {
-				this.$store.dispatch('setup_navbar', settings);
-			}
-		},
-
-		viewTable({ iconName }) {
-			const filters = this[`${iconName}Filters`];
-			this[`set_${iconName}_filters`]({
-				...filters,
-				isShowList: true
-			});
-
-			// console.log(iconName, document.querySelector('.equipments-list'))
-
-			if (iconName == 'equipments') {
-				let postfix = '';
-				if (!document.querySelector('.equipments-layout')) {
-					iconName = 'brand-models';
-					postfix = 'list';
-				} else {
-					postfix = 'layout';
-				}
-				// console.log(iconName, postfix)
-				setTimeout(() => {
-					scrollToElement(`.${iconName}-${postfix}`);
-				}, 270);
-			} else {
-				setTimeout(() => {
-					scrollToElement(`.${iconName}-list`);
-				}, 270);
-			}
-		}
-	},*/
-
-/*beforeMount() {
-		this.setup_navbar(this.navbarSettings);
-	},
-
-	mounted() {
-		// console.log(document.querySelector('.equipments-layout'))
-		const { query } = this.$route;
-
-		if (query) {
-			if (query.scrollTo) {
-				waitForElement(query.scrollTo, () => {
-				  scrollToElement(query.scrollTo);
-				});
-			}
-		}
-	},*/
-// };
 </script>

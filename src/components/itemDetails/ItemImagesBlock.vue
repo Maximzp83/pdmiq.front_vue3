@@ -40,6 +40,9 @@
 import { computed } from 'vue';
 
 import { cloneDeep, mergeArrays } from '@/helpers';
+import { Lang } from '@/localization';
+
+const { tt } = Lang;
 
 defineOptions({
 	name: 'ItemImagesBlock',

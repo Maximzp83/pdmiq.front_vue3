@@ -13,6 +13,8 @@ export const buildProps = (extra = {}) => ({
 	fromModal: Boolean,
 	editModal: { type: Object, default: null },
 	fromAnotherInstance: Boolean,
+	settings: { type: Object, default: () => ({}) },
+	additionalSettings: { type: Object, default: () => ({}) },
 	...extra,
 });
 
@@ -52,7 +54,6 @@ export function useItemForm({
 	localPreSubmitHook,
 	successSubmitCallback,
 	propsSuccessSubmitCallback,
-	instanceName,
 	emit,
 	debug
 } = {}) {
@@ -181,7 +182,13 @@ export function useItemForm({
 			}
 
 			if (localValidationHook) {
-				localValidationHook(options);
+				const localValidationResult = localValidationHook(options);
+				if (localValidationResult === false) {
+					return false;
+				}
+				if (localValidationResult === true) {
+					submitForm(options);
+				}
 			} else if (handleValidateRefsItems) {
 				handleValidateRefsItems(options);
 			} else {

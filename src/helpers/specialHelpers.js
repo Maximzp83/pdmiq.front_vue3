@@ -30,6 +30,7 @@ import {
 	SENSOR_TYPES,
 	bannerPowerTypesList
 } from '@/constants/global';
+import { ElMessage } from 'element-plus';
 
 // import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
 // import { storeGetter, dispatchGetter } from '@/store';
@@ -536,6 +537,38 @@ const isPasswordStrong1 = password => {
   return { isStrong, isLength, hasLowercase, hasUppercase,	hasDigit,	hasSpecialChar };
 };
 
+const setupTrueFalseCellIcon1 = (cellValue) => {
+	const trueVal = 'success-color icomoon icon-check';
+	const falseVal = 'alarm-color icomoon icon-cross';
+	const icon = cellValue ? trueVal : falseVal;
+	return `<span class="${icon}"></span>`;
+};
+
+const copyToClipboard1 = (string, settings = {}) => {
+	if (!string) return;
+
+	const input = document.createElement('textarea');
+	input.id = 'toBuffer';
+	input.value = string;
+	input.setAttribute('readonly', '');
+	input.style.position = 'absolute';
+	input.style.left = '-9999px';
+	input.style.opacity = '0';
+	input.style.zIndex = -1000;
+	document.body.appendChild(input);
+	input.focus();
+	input.select();
+	document.execCommand('copy');
+	document.body.removeChild(input);
+
+	const { messageText, messageType } = settings;
+
+	ElMessage({
+		type: messageType || 'info',
+		message: messageText || 'copied to clipboard',
+	});
+};
+
 const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem}) => {
 	const {rpmSources} = sensorData;
 	let list = [];
@@ -609,4 +642,6 @@ export const getSensorTitle = (payload, options) =>
 	getSensorTitle1(payload, options);
 
 export const isPasswordStrong = str => isPasswordStrong1(str);
+export const setupTrueFalseCellIcon = val => setupTrueFalseCellIcon1(val);
+export const copyToClipboard = (str, settings) => copyToClipboard1(str, settings);
 export const setupItemSpeedOptionsList = payload => setupItemSpeedOptionsList1(payload);

@@ -1,7 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
-- Continue Vue2 -> Vue3 migration with focus on the remaining `BrandModels` details stack from `vue2_project/src/views/BrandModels/Details`.
+- Continue Vue2 -> Vue3 migration after completing the `BrandModels` details stack.
 - Migrate and/or sync exactly one file per step unless the files are structurally coupled.
 
 ## Mandatory Workflow For Next Session
@@ -19,32 +19,32 @@ Primary rules source:
 - Migration note: when a legacy file loads data for `<FetchByQuerySelect>` through `requestsToDoList` / `requestsListMixin`, do not carry that duplication into Vue3. Move that logic into the component settings (`fetchAction`, `fetchByIdAction`, `bindTo`, etc.) because `src/components/form/FetchByQuerySelect.vue` already handles async option loading.
 
 ## Migration State Snapshot
-- Latest completed files:
-  - `src/views/BrandModels/ItemsList.vue`
-  - `src/views/BrandModels/ItemForm.vue`
-  - `src/views/BrandModels/ItemPage.vue`
-  - `src/views/BrandModels/TypeOptionValueItem.vue`
-  - `src/views/BrandModels/TypeMediaValueItem.vue`
-  - `src/views/BrandModels/ItemCard.vue`
-  - `src/views/BrandModels/StoreroomWrapper.vue`
-- Supporting request/item-card infrastructure was refactored to support the `BrandModels` migration.
-- `StoreroomWrapper.vue` was migrated as a file, but its route/menu wiring was not handled in the same step.
-- `setFiltersViaList` was refactored to explicit store config; remaining old `action: 'module/set_*_filters'` payloads in active Vue3 code should be migrated when touched.
+- `BrandModels` details stack is now migrated in Vue3:
+  - `src/views/BrandModels/Details/MoveForm.vue`
+  - `src/views/BrandModels/Details/LocationList.vue`
+  - `src/views/BrandModels/Details/DetailsPage.vue`
+- Route for `BrandModelDetailsPage` is enabled in `src/router/index.js`.
+- `src/config/entities.js` now includes `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow and remove local endpoint hardcodes.
+- Runtime fix applied: `src/components/itemDetails/ItemImagesBlock.vue` now imports `Lang.tt`, which resolved the `_ctx.tt is not a function` crash on `BrandModelDetailsPage`.
+- Supporting request/item-card infrastructure from the earlier `BrandModels` migration remains active and was reused by the details stack.
+
+## Latest Completed Files
+- `src/views/BrandModels/Details/MoveForm.vue`
+- `src/config/entities.js`
+- `src/views/BrandModels/Details/LocationList.vue`
+- `src/views/BrandModels/Details/DetailsPage.vue`
+- `src/router/index.js`
+- `src/components/itemDetails/ItemImagesBlock.vue`
 
 ## Recommended Next File Order
-Use one-by-one sequence unless a coupled exception is required:
-1. `src/views/BrandModels/Details/MoveForm.vue`
-2. `src/views/BrandModels/Details/LocationList.vue`
-3. `src/views/BrandModels/Details/DetailsPage.vue`
+Use one-by-one sequence:
+1. `docs/migration-progress.md`
+2. `docs/migration-todos.md`
+3. Re-audit remaining active `BrandModels` runtime behavior only if a new issue is reported
 
 Rationale:
-- These files are the remaining unmigrated `BrandModels` details stack.
-- `LocationList.vue` and `DetailsPage.vue` are coupled to `MoveForm.vue`, so a narrow multi-file step is acceptable if the migration demands it.
-
-## Remaining BrandModels Files
-- `vue2_project/src/views/BrandModels/Details/MoveForm.vue`
-- `vue2_project/src/views/BrandModels/Details/LocationList.vue`
-- `vue2_project/src/views/BrandModels/Details/DetailsPage.vue`
+- The code migration for the targeted `BrandModels` stack is complete.
+- The docs still describe that stack as pending, so the handoff/progress trail should be brought back in sync before switching focus.
 
 ## Files Already Modified In This Migration Batch
 - `src/views/BrandModels/ItemsList.vue`
@@ -54,8 +54,12 @@ Rationale:
 - `src/views/BrandModels/TypeMediaValueItem.vue`
 - `src/views/BrandModels/ItemCard.vue`
 - `src/views/BrandModels/StoreroomWrapper.vue`
+- `src/views/BrandModels/Details/MoveForm.vue`
+- `src/views/BrandModels/Details/LocationList.vue`
+- `src/views/BrandModels/Details/DetailsPage.vue`
 - `src/config/entities.js`
 - `src/components/form/FetchByQuerySelect.vue`
+- `src/components/itemDetails/ItemImagesBlock.vue`
 - `src/composables/requests/useAsyncSelect.js`
 - `src/composables/requests/useRequestBinding.js`
 - `src/composables/requests/executeRequestAction.js`
@@ -66,6 +70,7 @@ Rationale:
 - `src/composables/mixins/useHelpers.js`
 - `src/helpers/specialHelpers.js`
 - `src/stores/mixins/commonStoreMixin.js`
+- `src/router/index.js`
 
 ## Docs To Keep Updating
 - `docs/migration-progress.md`

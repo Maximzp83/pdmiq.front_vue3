@@ -72,7 +72,8 @@
 - DONE (single-file): added `src/views/Companies/ItemForm.vue` in Vue3 style with main/menu/SSO tabs and direct SSO host generation request.
 - DONE (single-file): added `src/views/Companies/ItemPage.vue` in Vue3 style with tabbed page wrapper and multipart save flow for SSO certificate uploads.
 - DONE (single-file): added `src/views/Companies/InfoPage.vue` in Vue3 style; route enablement and Companies list `Info` action wiring remain separate next steps.
-- Next priority (components-first rule): migrate missing components required by current imports:
+- DONE (details stack): completed `BrandModels` details flow with `MoveForm`, `LocationList`, `DetailsPage`, route wiring in `src/router/index.js`, and supporting registry/runtime fixes.
+- Next priority: continue docs/process sync only when the migration state changes again; otherwise move to the next real code migration target instead of reopening completed `BrandModels` details work.
 
 - Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.
   - Note: `src/views/Plants/Details/DetailsPage.vue` was restored from previous commit (not stub anymore).

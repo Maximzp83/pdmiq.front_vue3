@@ -198,46 +198,4 @@ onMounted(() => {
 
 		}
 	}
-
-	.password-creation-tooltip {
-		font-size: 14px;
-
-		.title {
-			margin-left: 33px;
-		}
-
-		.conditions-list {
-			margin-top: 10px;
-			padding: 8px;
-
-			li {
-				display: flex;
-				align-items: center;
-
-				& + li { margin-top: 10px; }
-
-				.indicator {
-					width: 13px;
-					height: 13px;
-					border-radius: 50%;
-					border: 1px solid #B6BDC4;
-
-					&.error { 
-						border-color: $danger-color;
-						& + .text {	color: $danger-color; font-weight:600;	}
-					}
-					&.success {
-						background-color: $success-color;
-						border-color: $success-color;
-					}
-
-
-				}
-
-				.text {
-					margin-left: 10px;
-				}
-			}
-		}
-	}
 </style>

@@ -202,6 +202,13 @@ await fetchUsers({ page: 1 });
   - Added `src/views/PlantsVendors/ItemsList.vue`
   - Added `PlantsVendors` routes in `src/router/index.js` with `/plants-vendors`, `/plants-vendors/new`, `/plants-vendors/:id`
   - Enabled `Vendors` sidebar entry in `src/constants/menuItems.js`
+- [x] `BrandModels` details stack completed for current Vue3 scope
+  - Added `src/views/BrandModels/Details/MoveForm.vue`
+  - Added `src/views/BrandModels/Details/LocationList.vue`
+  - Added `src/views/BrandModels/Details/DetailsPage.vue`
+  - Enabled `BrandModelDetailsPage` route in `src/router/index.js` with `/brand-models/:id/details`
+  - Extended `src/config/entities.js` with `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow
+  - Fixed `src/components/itemDetails/ItemImagesBlock.vue` runtime translation import after enabling the new details page
 - [x] `src/views/Brands/ItemsList.vue` added in Vue3 style
   - Migrated from legacy `vue2_project/src/views/Brands/ItemsList.vue`
   - Switched list page flow to `useItemsData` + `useEventHandler`

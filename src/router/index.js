@@ -87,24 +87,30 @@ const routes = [
 				component: () => import('@/views/Companies/InfoPage.vue'),
 				meta: { auth: true, permissions: ['view_companies'] },
 			},
-			// {
-			// 	path: 'users',
-			// 	name: 'Users',
-			// 	component: () => import('@/views/Users/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_users'] },
-			// },
-			// {
-			// 	path: 'users/create',
-			// 	name: 'UserCreate',
-			// 	component: () => import('@/views/Users/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['create_users'] },
-			// },
-			// {
-			// 	path: 'users/:id',
-			// 	name: 'UserEdit',
-			// 	component: () => import('@/views/Users/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_users'] },
-			// },
+			{
+				path: 'users',
+				name: 'Users',
+				component: () => import('@/views/Users/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_users'] },
+			},
+			{
+				path: 'users/new',
+				name: 'UserCreate',
+				component: () => import('@/views/Users/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_users'] },
+			},
+			{
+				path: 'users/:id',
+				name: 'UserEdit',
+				component: () => import('@/views/Users/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_users'] },
+			},
+			{
+				path: 'profile',
+				name: 'Profile',
+				component: () => import('@/views/Users/ItemPage.vue'),
+				meta: { auth: true },
+			},
 			// {
 			// 	path: 'user-roles',
 			// 	name: 'UserRoles',
@@ -296,6 +302,12 @@ const routes = [
 				name: 'BrandModelEdit',
 				component: () => import('@/views/BrandModels/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_part_numbers'] },
+			},
+			{
+				path: 'brand-models/:id/details',
+				name: 'BrandModelDetailsPage',
+				component: () => import('@/views/BrandModels/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_part_numbers'] },
 			},
 			// {
 			// 	path: 'equipment-types',

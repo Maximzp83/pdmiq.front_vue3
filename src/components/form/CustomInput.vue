@@ -47,6 +47,7 @@
 			@blur="({ target }) => handleInput(target)"
 			@keyup.enter="({ target }) => handleInput(target)"
 			:value="inputValue"
+			:type="type"
 		/>
 		<!-- onkeydown="keyDown" -->
 		<textarea

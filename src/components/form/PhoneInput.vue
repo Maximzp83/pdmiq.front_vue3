@@ -149,4 +149,8 @@ const handleFocus = () => {
 	hasError.value = false;
 	errorText.value = '';
 };
+
+defineExpose({
+	hasError,
+});
 </script>

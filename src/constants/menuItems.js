@@ -115,26 +115,26 @@ const menuItems1 = [
 		meta: { permissions: ['view_plants'] },
 		enableInCompanyMenuForm: true
 	},
-	// {
-	// 	name: 'Users',
-	// 	belongs_to_label: 'system',
-	// 	icon: 'icon-users',
-	// 	children: [
-	// 		{
-	// 			id: MENU_TYPES.USERS,
-	// 			name: 'Users',
-	// 			path: '/users',
-	// 			meta: { permissions: ['view_users'] },
-	// 			enableInCompanyMenuForm: true
-	// 		},
-	// 		{
-	// 			id: MENU_TYPES.USERS_TEAMS,
-	// 			name: 'Teams',
-	// 			path: '/teams',
-	// 			meta: { permissions: ['view_users_teams'] }
-	// 		}
-	// 	]
-	// },
+	{
+		name: 'Users',
+		belongs_to_label: 'system',
+		icon: 'icon-users',
+		children: [
+			{
+				id: MENU_TYPES.USERS,
+				name: 'Users',
+				path: '/users',
+				meta: { permissions: ['view_users'] },
+				enableInCompanyMenuForm: true
+			},
+			{
+				id: MENU_TYPES.USERS_TEAMS,
+				name: 'Teams',
+				path: '/teams',
+				meta: { permissions: ['view_users_teams'] }
+			}
+		]
+	},
 	// {
 	// 	name: 'sidebar_menu.user_roles',
 	// 	belongs_to_label: 'system',

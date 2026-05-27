@@ -5,9 +5,19 @@ const localStorageFilters = JSON.parse(localStorage.getItem('users_filters'));
 const localStorageReportsFilters = JSON.parse(
 	localStorage.getItem('users_reports_filters'),
 );
+const localStorageClientApiCredentialsFilters = JSON.parse(
+	localStorage.getItem('users_client_api_credentials'),
+);
 
 const report_filters_init = {
 	max: 10,
+	page: 1,
+	orderByColumn: '',
+	orderByMethod: '',
+};
+
+const clientApiCredentialsFiltersInit = {
+	max: -1,
 	page: 1,
 	orderByColumn: '',
 	orderByMethod: '',
@@ -30,6 +40,9 @@ export const useUsersStore = defineStore('usersStore', {
 			reports_filters: localStorageReportsFilters
 				? { ...localStorageReportsFilters }
 				: { ...report_filters_init },
+			client_api_credentials_filters: localStorageClientApiCredentialsFilters
+				? { ...localStorageClientApiCredentialsFilters }
+				: { ...clientApiCredentialsFiltersInit },
 
 			// Loading states
 			isLoading: false,

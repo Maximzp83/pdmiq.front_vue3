@@ -120,6 +120,14 @@ export const getResponseMessage = (response, errorMessageSettings) => {
 		return errorMessageSettings.customMessage;
 	}
 
+	if (response.data?.messages) {
+		let message = '';
+		response.data.messages.forEach((mi) => {;
+			message += mi + '\n';
+		})
+		return message;
+	}
+
 	if (response.data?.message) {
 		return response.data.message;
 	}
@@ -154,12 +162,14 @@ const handleError = (error, options = {}) => {
 		}
 		return;
 	}
-	
-	const message =
+
+	const message = getResponseMessage(error.response, errorMessageSettings);
+
+	/*const message =
 		error.response?.data?.message ||
 		errorMessageSettings?.customMessage ||
 		error.message ||
-		Lang.tt('phrases.request_error');
+		Lang.tt('phrases.request_error');*/
 
 	if (notify) {
 		// Use Element Plus notification if available

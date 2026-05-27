@@ -94,9 +94,6 @@ export function useItemsData({
 		localEditItem,
 		localDeleteItem,
 		localDeleteItems,
-		preventSetNavbar,
-		preventSetupNavbar,
-		preventDestroyNavbar,
 		fromDashboard,
 		editInModal,
 		additionalModalSettings,
@@ -104,6 +101,7 @@ export function useItemsData({
 		formComponentFileLoader,
 		debug,
 		enableDeepUpdateForList,
+		filtersStateProp = 'filters',
 	} = options;
 
 	// ========== State ==========
@@ -113,7 +111,7 @@ export function useItemsData({
 	const itemData = shallowRef(null);
 	const preventFetch = ref(false);
 	const doNotFetchItems = ref(false);
-	const filtersRef = itemStore ? storeToRefs(itemStore).filters : filters;
+	const filtersRef = itemStore ? storeToRefs(itemStore)[filtersStateProp] : filters;
 
 	// ========== Computed-like ==========
 	const getRouteMeta = () => route.meta;
@@ -289,8 +287,11 @@ export function useItemsData({
 			...settings
 		}
 
-		itemStore.set_value('filters', newFilters, settings);
-		// filtersRef.value = newFilters;
+		if (itemStore?.set_value) {
+			itemStore.set_value(filtersStateProp, newFilters, settings);
+		} else if (filtersRef) {
+			filtersRef.value = newFilters;
+		}
 	};
 
 	/**

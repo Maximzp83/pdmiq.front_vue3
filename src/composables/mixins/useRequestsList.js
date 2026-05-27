@@ -29,6 +29,7 @@ export function useRequestsList({
 
 	const setTargetValue = (target, value) => {
 		const resolved = resolveTarget(target);
+		// console.log('setTargetValue', target, resolved, value);
 		if (resolved.type === 'ref') {
 			resolved.ref.value = value;
 		} else if (resolved.type === 'state') {

@@ -76,7 +76,10 @@
 		margin-bottom: 0;
 
 		&.error-block-not-absolute {
-			.el-form-item__error {position: relative;}
+			.el-form-item__error {
+				position: relative;
+				top: 0;
+			}
 		}
 	
 		.el-icon-info {
@@ -97,8 +100,8 @@
 		&.label_pt-5 {
 			.el-form-item__label {padding-top: 5px;}
 		}
-		.label-margin-0 {
-			.el-form-item__content {margin-left: 0 !important;}
+		&.label-align-center {
+			.el-form-item__label {align-items: center;}
 		}
 
 		&.card {
