@@ -205,10 +205,6 @@ const tableSettings = computed(() => {
 		operations: {
 			actions,
 		},
-		activeSortingFilters: {
-			orderByColumn: filters.value?.orderByColumn,
-			orderByMethod: filters.value?.orderByMethod,
-		},
 	});
 });
 

@@ -147,10 +147,6 @@ const tableSettings = computed(() => {
 		operations: {
 			actions: translate(actions, { key: 'tooltip_text' }),
 		},
-		activeSortingFilters: {
-			orderByColumn: filters.value?.orderByColumn,
-			orderByMethod: filters.value?.orderByMethod,
-		},
 	};
 });
 

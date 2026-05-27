@@ -19,11 +19,11 @@
 
 			<el-button
 				type="primary"
-				icon="icomoon icon-cross"
 				circle
 				class="md-hide mobile-close-sidebar"
 				@click="toggleSidebar"
 			>
+				<i class="icomoon icon-cross"></i>
 			</el-button>
 		</div>
 		<div class="sidebar-wrapper" ref="sidebarScrollArea">
@@ -41,7 +41,7 @@
 					v-for="menuCategory in navMenuItems"
 					:key="'sidebar_nav_cat-' + menuCategory.name"
 				>
-					<template slot="title">
+					<template #title>
 						<i :class="['icomoon', menuCategory.icon]" />
 						<span>{{ menuCategory.name }}</span>
 					</template>
@@ -171,7 +171,7 @@ export default {
 			}*/
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		/*if (this.$sidebar.showSidebar) {
 			this.$sidebar.showSidebar = false;
 		}*/

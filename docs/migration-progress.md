@@ -1,5 +1,18 @@
 # Migration Progress
 
+## Current Session Mode
+
+- Apply changes only after explicit user confirmation.
+- Work one step at a time.
+- Do not print code or diff in responses unless a risk or ambiguity must be discussed.
+- After each completed step, report the result and the file path in plain text, then stop.
+
+## Current Focus
+
+- `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
+- The next real migration focus remains unfinished `Plants` details coverage or another user-selected Vue3 target.
+- Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
+
 ## Phase 1 — API Migration ✅ COMPLETE
 
 - [x] Identify legacy API files
@@ -202,6 +215,12 @@ await fetchUsers({ page: 1 });
   - Added `src/views/PlantsVendors/ItemsList.vue`
   - Added `PlantsVendors` routes in `src/router/index.js` with `/plants-vendors`, `/plants-vendors/new`, `/plants-vendors/:id`
   - Enabled `Vendors` sidebar entry in `src/constants/menuItems.js`
+- [x] `UserRoles` entity migration completed for current Vue3 scope
+  - Added `src/views/UserRoles/ItemForm.vue`
+  - Added `src/views/UserRoles/ItemPage.vue`
+  - Added `src/views/UserRoles/ItemsList.vue`
+  - Enabled `UserRoles` routes in `src/router/index.js` with `/user-roles`, `/user-roles/new`, `/user-roles/:id`
+  - Enabled `UserRoles` sidebar entry in `src/constants/menuItems.js`
 - [x] `BrandModels` details stack completed for current Vue3 scope
   - Added `src/views/BrandModels/Details/MoveForm.vue`
   - Added `src/views/BrandModels/Details/LocationList.vue`

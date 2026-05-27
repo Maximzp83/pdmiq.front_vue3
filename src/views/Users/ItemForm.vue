@@ -495,7 +495,7 @@ const subItemsSettings = computed(() =>
 	]),
 );
 
-const { validateSubItemsForm, collectDataFromSubItems, resetFormDataBySubItems } = useSubItemsList({
+const { validateSubItemsForm, collectDataFromSubItems, resetFormDataBySubItems, setSubItemRef } = useSubItemsList({
 	formData,
 	refsMap,
 });
@@ -670,19 +670,6 @@ const fetchSensors = (ids) =>
 	}).then(({ value }) => {
 		sensorsList.value = value || [];
 	});
-
-const setSubItemRef = (refName, el, idx) => {
-	if (refName !== 'ProdlinesSelectItem') return;
-
-	if (el) {
-		prodlinesSelectItemRefs.value[idx] = el;
-		return;
-	}
-
-	if (prodlinesSelectItemRefs.value.length > idx) {
-		prodlinesSelectItemRefs.value.splice(idx, 1);
-	}
-};
 
 const handlePhoneVerified = () => {
 	confirmedPhoneNumber.value = formData.value.phone_number;

@@ -74,8 +74,9 @@
 				type="primary"
 				native-type="button"
 				class="prev-button"
-				icon="icomoon icon-path_2"
-			/>
+			>
+				<i class="icomoon icon-path_2"></i>
+			</el-button>
 
 			<el-button
 				v-show="showNextButton"
@@ -83,8 +84,9 @@
 				type="primary"
 				native-type="button"
 				class="next-button"
-				icon="icomoon icon-path_2"
-			/>
+			>
+				<i class="icomoon icon-path_2"></i>
+			</el-button>
 		</div>
 	</div>
 </template>

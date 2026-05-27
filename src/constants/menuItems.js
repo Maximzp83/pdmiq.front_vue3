@@ -135,14 +135,14 @@ const menuItems1 = [
 			}
 		]
 	},
-	// {
-	// 	name: 'sidebar_menu.user_roles',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.USER_ROLES,
-	// 	icon: 'icon-distributors',
-	// 	path: '/user-roles',
-	// 	meta: { permissions: ['view_user_roles'] } //todo
-	// },
+	{
+		name: 'sidebar_menu.user_roles',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.USER_ROLES,
+		icon: 'icon-distributors',
+		path: '/user-roles',
+		meta: { permissions: ['view_user_roles'] }
+	},
 	// {
 	// 	name: 'Distributors',
 	// 	belongs_to_label: 'system',
@@ -402,27 +402,26 @@ const menuItems1 = [
 		path: '/brand-models',
 		meta: { permissions: ['view_part_numbers'] }
 	},
-	// {
-	// 	name: 'item_types',
-	// 	belongs_to_label: 'asset_management',
-	// 	// id: MENU_TYPES.EQUIPMENT_TYPES,
-	// 	icon: 'icon-item-types2',
+	{
+		name: 'item_types',
+		belongs_to_label: 'asset_management',
+		icon: 'icon-item-types2',
 
-	// 	children: [
-	// 		{
-	// 			id: MENU_TYPES.EQUIPMENT_TYPES,
-	// 			name: 'item_types',
-	// 			path: '/equipment-types',
-	// 			meta: { permissions: ['view_equipment_types'] }
-	// 		},
-	// 		{
-	// 			id: MENU_TYPES.EQUIPMENT_TYPES_CATEGORIES,
-	// 			name: 'sidebar_menu.Categories',
-	// 			path: '/equipment-types-categories',
-	// 			meta: { permissions: ['view_equipment_types_categories'] }
-	// 		}
-	// 	]
-	// },
+		children: [
+			{
+				id: MENU_TYPES.EQUIPMENT_TYPES,
+				name: 'item_types',
+				path: '/equipment-types',
+				meta: { permissions: ['view_equipment_types'] }
+			},
+			{
+				id: MENU_TYPES.EQUIPMENT_TYPES_CATEGORIES,
+				name: 'sidebar_menu.Categories',
+				path: '/equipment-types-categories',
+				meta: { permissions: ['view_equipment_types_categories'] }
+			}
+		]
+	},
 	{
 		name: 'Applications',
 		belongs_to_label: 'asset_management',

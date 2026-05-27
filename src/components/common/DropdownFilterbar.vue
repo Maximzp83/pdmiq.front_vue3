@@ -62,9 +62,10 @@
 											type="primary"
 											native-type="button"
 											:class="['inverted', { active: showAdditionalFilters }]"
-											icon="icomoon icon-settings"
 											@click="toggleAdditionalFilters"
-										/>
+										>
+											<i class="icomoon icon-settings"></i>
+										</el-button>
 									</div>
 								</div>
 							</div>

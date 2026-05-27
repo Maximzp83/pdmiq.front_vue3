@@ -89,6 +89,24 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		}
 	};
 
+	const setSubItemRef = (refName, el, idx) => {
+		const refs = resolve(refsMap);
+		if (!refs) return;
+
+		if (!refs[refName]) {
+			refs[refName] = [];
+		}
+
+		if (el) {
+			refs[refName][idx] = el;
+			return;
+		}
+
+		if (refs[refName]?.length > idx) {
+			refs[refName].splice(idx, 1);
+		}
+	};
+
 	const runPipeline = (steps, context) => {
 		for (const step of steps) {
 			const result = step(context);
@@ -308,6 +326,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		setupFormSubItemsList,
 		addFormItem,
 		removeFormItem,
+		setSubItemRef,
 		updateDataByRef,
 		validateSubItemsForm,
 		resetFormDataBySubItems,

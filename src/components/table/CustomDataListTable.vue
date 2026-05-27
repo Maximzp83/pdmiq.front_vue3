@@ -12,7 +12,6 @@
 					:itemsName="itemsName"
 					:operationsWidth="operationsWidth"
 					:disableSelection="disableSelection"
-					:activeSortingFilters="activeSortingFilters"
 					@event="handleEvent"
 				/>
 
@@ -86,14 +85,6 @@ const selectedIds = ref([]);
 const actionsLength = ref(0);
 
 const showOperations = computed(() => true);
-
-const activeSortingFilters = computed(() => {
-	const filtersSource = props.tableSettings?.activeSortingFilters || props.tableSettings?.filters || {};
-	return Object.freeze({
-		orderByColumn: filtersSource.orderByColumn,
-		orderByMethod: filtersSource.orderByMethod,
-	});
-});
 
 const operationsWidth = computed(() => {
 	if (props.tableSettings.operations && props.tableSettings.operations.width) {

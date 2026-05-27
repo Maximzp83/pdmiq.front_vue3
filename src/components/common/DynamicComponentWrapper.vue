@@ -27,9 +27,11 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const additionalBlock = ref(null);
+const componentModules = import.meta.glob('/src/components/**/*.vue');
 
 const componentFile = computed(() => {
-	return () => import(`@/${props.componentPath}.vue`);
+	const modulePath = `/src/${props.componentPath}.vue`;
+	return componentModules[modulePath];
 });
 
 const handleEvent = (event) => {

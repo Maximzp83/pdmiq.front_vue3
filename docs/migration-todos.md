@@ -4,7 +4,8 @@
   - One file per step.
   - Apply only after explicit user confirmation.
   - Ask first on any risk/ambiguity.
-  - After each file: lint that file, update docs, STOP.
+  - Do not print code or diff in responses unless a risk or ambiguity must be discussed.
+  - After each completed step: report result and file path in plain text, then STOP.
 
 - DONE (chunk C-001): migrated `src/views/Plants/LocationItem.vue`, `src/views/Plants/WorkStationItem.vue`, `src/views/Plants/ProcessItem.vue` to `useSubItem`.
 - DONE (chunk C-002): added `src/views/Plants/ItemsList.vue` (Vue3 + `useItemsData`).
@@ -73,11 +74,8 @@
 - DONE (single-file): added `src/views/Companies/ItemPage.vue` in Vue3 style with tabbed page wrapper and multipart save flow for SSO certificate uploads.
 - DONE (single-file): added `src/views/Companies/InfoPage.vue` in Vue3 style; route enablement and Companies list `Info` action wiring remain separate next steps.
 - DONE (details stack): completed `BrandModels` details flow with `MoveForm`, `LocationList`, `DetailsPage`, route wiring in `src/router/index.js`, and supporting registry/runtime fixes.
-- Next priority: continue docs/process sync only when the migration state changes again; otherwise move to the next real code migration target instead of reopening completed `BrandModels` details work.
-
-- Next after components: replace temporary Plants stubs with full migrated implementations from `vue2_project/src/views/Plants`.
-  - Note: `src/views/Plants/Details/DetailsPage.vue` was restored from previous commit (not stub anymore).
-  - `src/views/Plants/ItemPage.vue` is still a temporary stub and must be fully migrated.
+- Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.
+- Current next focus: continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage or move to another real Vue3 migration target selected by the user.
 
 - useCreateFormItem: when migrating components, pass list as ref/array (string prop is not supported).
 - useDashboardListsReorder: pass tt, emit, itemsList, reorderAction, filters, itemsLoading, globalFilters, fromDetailsPage, showEditModal.

@@ -6,11 +6,12 @@
 
 ## Mandatory Workflow For Next Session
 - Apply changes only after explicit user confirmation.
+- Exception: files under `docs/` and `SESSION_CONTEXT.md` may be updated automatically without separate confirmation.
 - If there are risks or ambiguous points, ask first and do not apply until confirmed.
 - Work one file at a time.
 - Diff preview is not required by default.
-- After each migrated file: run local lint for that file, update docs, then STOP and wait.
-- Preferred open-in-IDE reference after each file: provide clickable absolute path in reply.
+- Do not print code or diff in responses unless a risk or ambiguity must be discussed.
+- After each completed step: report the result and the file path in plain text, then STOP.
 
 Primary rules source:
 - `docs/session-collaboration-rules.md`
@@ -36,15 +37,10 @@ Primary rules source:
 - `src/router/index.js`
 - `src/components/itemDetails/ItemImagesBlock.vue`
 
-## Recommended Next File Order
-Use one-by-one sequence:
-1. `docs/migration-progress.md`
-2. `docs/migration-todos.md`
-3. Re-audit remaining active `BrandModels` runtime behavior only if a new issue is reported
-
-Rationale:
-- The code migration for the targeted `BrandModels` stack is complete.
-- The docs still describe that stack as pending, so the handoff/progress trail should be brought back in sync before switching focus.
+## Recommended Next Focus
+- Do not reopen completed `BrandModels` details work unless a new issue is reported.
+- Continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage when its missing Vue3 dependencies are available.
+- Otherwise move to the next real Vue3 migration target selected by the user.
 
 ## Files Already Modified In This Migration Batch
 - `src/views/BrandModels/ItemsList.vue`
@@ -76,3 +72,4 @@ Rationale:
 - `docs/migration-progress.md`
 - `docs/migration-todos.md`
 - `docs/session-collaboration-rules.md` (if process changes again)
+- `SESSION_CONTEXT.md`

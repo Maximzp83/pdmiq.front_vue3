@@ -255,6 +255,7 @@ const {
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	resetFormDataBySubItems,
+	setSubItemRef,
 } = useSubItemsList({
 	formData,
 	refsMap,
@@ -262,21 +263,6 @@ const {
 
 const switchTab = (tab) => {
 	activeTab.value = tab;
-};
-
-const setSubItemRef = (refName, el, idx) => {
-	if (!refsMap.value[refName]) {
-		refsMap.value[refName] = [];
-	}
-
-	if (el) {
-		refsMap.value[refName][idx] = el;
-		return;
-	}
-
-	if (refsMap.value[refName]?.length > idx) {
-		refsMap.value[refName].splice(idx, 1);
-	}
 };
 
 const {

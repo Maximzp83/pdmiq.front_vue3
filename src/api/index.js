@@ -13,6 +13,7 @@ const getBaseURL = () => {
 	}
 	// return 'https://api.industrialmatrix-dev.tools/api';
 	return 'https://api.industrialmatrix-stage.tools/api';
+	// return 'https://api.industrialmatrix.tools/api';
 };
 
 /**

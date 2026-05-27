@@ -6,7 +6,7 @@
 					<Filterbar
 						:itemsLoading="itemsLoading"
 						:filters="filters"
-						:itemsName="resolvedItemsName"
+						:itemsName="itemsName"
 						:hideCreate="!hasAccessToCreate"
 						:hideDelete="!hasAccessToDelete"
 						@event="handleEvent"
@@ -18,12 +18,12 @@
 						:itemsLoading="itemsLoading"
 						:tableData="itemsList"
 						:tableSettings="tableSettings"
-						:itemsName="resolvedItemsName"
+						:itemsName="itemsName"
 						@event="handleEvent"
 					/>
 
 					<PaginationContainer
-						:itemsName="resolvedItemsName"
+						:itemsName="itemsName"
 						:filters="filters"
 						:meta="meta"
 						@setFilters="setFilters"
@@ -39,51 +39,39 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { ENTITIES } from '@/config/entities';
+import { userRolesTypesList } from '@/constants/global';
 import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
-import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
-import { useEquipmentTypesCategoriesStore } from '@/stores/EquipmentTypesCategoriesStore';
+import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useUserRolesStore } from '@/stores/UserRolesStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
-const { tt, translate } = Lang;
+const { translate } = Lang;
 
 defineOptions({
-	name: 'EquipmentTypesCategoriesList',
+	name: 'UserRolesList',
 });
 
 const itemsTableRef = ref(null);
 
-const equipmentTypesCategoriesStore = useEquipmentTypesCategoriesStore();
-const { filters } = storeToRefs(equipmentTypesCategoriesStore);
+const userRolesStore = useUserRolesStore();
+const { filters } = storeToRefs(userRolesStore);
 
 const authStore = useAuthStore();
-const equipmentTypesCategoriesEntity = ENTITIES.EquipmentTypesCategories;
+const userRolesEntity = ENTITIES.UserRoles;
 
-const hasAccessToCreate = computed(() =>
-	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.create])
-);
-const hasAccessToEdit = computed(() =>
-	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.edit])
-);
-const hasAccessToDelete = computed(() =>
-	authStore.hasAccessTo([equipmentTypesCategoriesEntity.permissions.delete])
-);
+const hasAccessToCreate = computed(() => authStore.hasAccessTo([userRolesEntity.permissions.create]));
+const hasAccessToEdit = computed(() => authStore.hasAccessTo([userRolesEntity.permissions.edit]));
+const hasAccessToDelete = computed(() => authStore.hasAccessTo([userRolesEntity.permissions.delete]));
 
-const itemsName = computed(() => ({
-	one: `${tt(equipmentTypesCategoriesEntity.itemsName.group)} ${tt(equipmentTypesCategoriesEntity.itemsName.one)}`,
-	mult: `${tt(equipmentTypesCategoriesEntity.itemsName.group)} ${tt(equipmentTypesCategoriesEntity.itemsName.mult)}`,
-	instanceName: equipmentTypesCategoriesEntity.itemsName.instanceName,
-}));
-
-const { itemsList, itemsLoading, itemsName: resolvedItemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
-	entityKey: 'EquipmentTypesCategories',
-	itemStore: equipmentTypesCategoriesStore,
-	itemsName,
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+	entityKey: 'UserRoles',
+	itemStore: userRolesStore,
 	options: {
 		tableRef: itemsTableRef,
 	},
@@ -102,9 +90,17 @@ const tableSettings = computed(() => {
 	return {
 		columns: translate([
 			{
-				prop: 'name',
 				label: 'Name',
+				prop: 'name',
 				sortable: true,
+			},
+			{
+				label: 'type',
+				prop: 'type',
+				sortable: true,
+				meta: {
+					getItemValue: { prop: 'name', list: userRolesTypesList() },
+				},
 			},
 		]),
 		operations: {
