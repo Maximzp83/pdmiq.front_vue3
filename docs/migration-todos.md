@@ -86,8 +86,21 @@
 - DONE (single-file): added `src/views/TaskProcedures/ItemPage.vue` in Vue3 style.
 - DONE (coupled step): enabled TaskProcedures routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
 - DONE (entity): completed `MaintenanceCategories` alignment and migration with shared `useItemsData` list actions, added `ItemForm`, `ItemPage`, and enabled routes/menu.
+- DONE (single-file): added `src/views/Controllers/ItemsList.vue` in Vue3 style with shared list flow and controller-specific actions.
+- DONE (single-file): added `src/views/Controllers/ItemPage.vue` in Vue3 style with `useItemPage`, tabs, controller-type form selection, and multipart payload detection.
+- DONE (single-file): added `src/views/Controllers/ItemForm.vue` in Vue3 style for PDM/Banner controllers; formulas/commands tabs remain lazy dependencies for next steps.
+- DONE (single-file): added `src/views/Controllers/FormulasRow.vue` in Vue3 style for PDM/Banner formulas rows.
+- DONE (single-file): added `src/views/Controllers/DXMCommandsTab.vue` in Vue3 style for PDM/Banner commands tab.
+- DONE (single-file): added `src/views/Controllers/CommandItem.vue` in Vue3 style for DXM command cards.
+- DONE (single-file): added `src/views/Controllers/CommandsHistoryItem.vue` in Vue3 style for DXM command history rows.
+- DONE (single-file): added `src/views/Controllers/ItemFormUltraSound.vue` in Vue3 style for LubeMatrix controllers.
+- DONE (single-file): added `src/views/Controllers/ItemFormCounter.vue` in Vue3 style for OEE controllers.
+- DONE (single-file): added `src/views/Controllers/ItemFormNCD.vue` in Vue3 style for NCD controllers.
+- DONE (single-file): added `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue` in Vue3 style for the legacy White River controller form.
+- DONE (coupled step): enabled Controllers routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
+- DONE (bugfix): fixed Controllers create blank state by adding a default PDM/Banner type fallback in `src/views/Controllers/ItemPage.vue` and gating formulas tab rendering in `src/views/Controllers/ItemForm.vue`.
 - Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.
-- Current next focus: continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage or move to another real Vue3 migration target selected by the user.
+- Current next focus: smoke-test Controllers list/create/edit flows in the app.
 
 - useCreateFormItem: when migrating components, pass list as ref/array (string prop is not supported).
 - useDashboardListsReorder: pass tt, emit, itemsList, reorderAction, filters, itemsLoading, globalFilters, fromDetailsPage, showEditModal.

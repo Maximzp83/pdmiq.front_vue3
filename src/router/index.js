@@ -267,6 +267,24 @@ const routes = [
 				component: () => import('@/views/Applications/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_applications'] },
 			},
+			{
+				path: 'controllers',
+				name: 'Controllers',
+				component: () => import('@/views/Controllers/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_controllers'] },
+			},
+			{
+				path: 'controllers/new',
+				name: 'ControllerCreate',
+				component: () => import('@/views/Controllers/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_controllers'] },
+			},
+			{
+				path: 'controllers/:id',
+				name: 'ControllerEdit',
+				component: () => import('@/views/Controllers/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_controllers'] },
+			},
 			// {
 			// 	path: 'store-rooms',
 			// 	name: 'StoreRooms',

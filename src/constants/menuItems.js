@@ -73,15 +73,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_customer_success'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'Controllers',
-	// 	belongs_to_label: 'predictive_maintenance',
-	// 	id: MENU_TYPES.CONTROLLERS,
-	// 	icon: 'icon-controllers',
-	// 	path: '/controllers',
-	// 	meta: { permissions: ['view_controllers'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Controllers',
+		belongs_to_label: 'predictive_maintenance',
+		id: MENU_TYPES.CONTROLLERS,
+		icon: 'icon-controllers',
+		path: '/controllers',
+		meta: { permissions: ['view_controllers'] },
+		enableInCompanyMenuForm: true
+	},
 
 	// {
 	// 	name: 'sidebar_menu.OEE',

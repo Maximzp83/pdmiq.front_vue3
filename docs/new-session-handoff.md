@@ -1,7 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
-- Continue Vue2 -> Vue3 migration after completing the `BrandModels` details stack.
+- Continue Vue2 -> Vue3 migration for `vue2_project/src/views/Controllers`.
 - Migrate and/or sync exactly one file per step unless the files are structurally coupled.
 
 ## Mandatory Workflow For Next Session
@@ -20,6 +20,26 @@ Primary rules source:
 - Migration note: when a legacy file loads data for `<FetchByQuerySelect>` through `requestsToDoList` / `requestsListMixin`, do not carry that duplication into Vue3. Move that logic into the component settings (`fetchAction`, `fetchByIdAction`, `bindTo`, etc.) because `src/components/form/FetchByQuerySelect.vue` already handles async option loading.
 
 ## Migration State Snapshot
+- `Controllers` migration has started:
+  - `src/views/Controllers/ItemsList.vue` was added in Vue3 style.
+  - It uses `useItemsData`, `useEventHandler`, Pinia `ControllersStore`, and `ENTITIES.Controllers`.
+  - Controller-specific list actions were preserved with direct `api_request` calls where no dedicated composable exists yet.
+  - `src/views/Controllers/ItemPage.vue` was added in Vue3 style.
+  - It uses `useItemPage`, lazy form components, controller type selection from item data or route query, tabs, and multipart payload detection.
+  - `src/views/Controllers/ItemForm.vue` was added in Vue3 style for PDM/Banner controllers.
+  - It uses `useItemForm`, `useRequestsList`, `useSubItemsList`, and global form controls.
+  - `src/views/Controllers/FormulasRow.vue` was added in Vue3 style for PDM/Banner formulas rows.
+  - `src/views/Controllers/DXMCommandsTab.vue` was added in Vue3 style for PDM/Banner commands tab.
+  - `src/views/Controllers/CommandItem.vue` was added in Vue3 style for DXM command cards.
+  - `src/views/Controllers/CommandsHistoryItem.vue` was added in Vue3 style for DXM command history rows.
+  - `src/views/Controllers/ItemFormUltraSound.vue` was added in Vue3 style for LubeMatrix controllers.
+  - `src/views/Controllers/ItemFormCounter.vue` was added in Vue3 style for OEE controllers.
+  - `src/views/Controllers/ItemFormNCD.vue` was added in Vue3 style for NCD controllers.
+  - `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue` was added in Vue3 style for the legacy White River controller form.
+  - Controllers routes were enabled in `src/router/index.js`.
+  - Controllers sidebar menu entry was enabled in `src/constants/menuItems.js`.
+  - Controllers create blank state was fixed: `ItemPage.vue` defaults `/controllers/new` without query type to PDM/Banner and `ItemForm.vue` gates formulas content by tab presence.
+  - Legacy devices tab is intentionally deferred because `Sensors/BannerSensorsList.vue` is not present in Vue3 yet.
 - `BrandModels` details stack is now migrated in Vue3:
   - `src/views/BrandModels/Details/MoveForm.vue`
   - `src/views/BrandModels/Details/LocationList.vue`
@@ -30,6 +50,19 @@ Primary rules source:
 - Supporting request/item-card infrastructure from the earlier `BrandModels` migration remains active and was reused by the details stack.
 
 ## Latest Completed Files
+- `src/router/index.js`
+- `src/constants/menuItems.js`
+- `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue`
+- `src/views/Controllers/ItemFormNCD.vue`
+- `src/views/Controllers/ItemFormCounter.vue`
+- `src/views/Controllers/ItemFormUltraSound.vue`
+- `src/views/Controllers/CommandsHistoryItem.vue`
+- `src/views/Controllers/CommandItem.vue`
+- `src/views/Controllers/DXMCommandsTab.vue`
+- `src/views/Controllers/FormulasRow.vue`
+- `src/views/Controllers/ItemForm.vue`
+- `src/views/Controllers/ItemPage.vue`
+- `src/views/Controllers/ItemsList.vue`
 - `src/views/BrandModels/Details/MoveForm.vue`
 - `src/config/entities.js`
 - `src/views/BrandModels/Details/LocationList.vue`
@@ -38,11 +71,23 @@ Primary rules source:
 - `src/components/itemDetails/ItemImagesBlock.vue`
 
 ## Recommended Next Focus
+- Smoke-test Controllers list/create/edit flows in the app, including PDM/LubeMatrix/OEE/NCD create type links.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.
-- Continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage when its missing Vue3 dependencies are available.
-- Otherwise move to the next real Vue3 migration target selected by the user.
 
 ## Files Already Modified In This Migration Batch
+- `src/router/index.js`
+- `src/constants/menuItems.js`
+- `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue`
+- `src/views/Controllers/ItemFormNCD.vue`
+- `src/views/Controllers/ItemFormCounter.vue`
+- `src/views/Controllers/ItemFormUltraSound.vue`
+- `src/views/Controllers/CommandsHistoryItem.vue`
+- `src/views/Controllers/CommandItem.vue`
+- `src/views/Controllers/DXMCommandsTab.vue`
+- `src/views/Controllers/FormulasRow.vue`
+- `src/views/Controllers/ItemForm.vue`
+- `src/views/Controllers/ItemPage.vue`
+- `src/views/Controllers/ItemsList.vue`
 - `src/views/BrandModels/ItemsList.vue`
 - `src/views/BrandModels/ItemForm.vue`
 - `src/views/BrandModels/ItemPage.vue`

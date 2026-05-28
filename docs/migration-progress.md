@@ -10,7 +10,8 @@
 ## Current Focus
 
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
-- The next real migration focus remains unfinished `Plants` details coverage or another user-selected Vue3 target.
+- Current selected migration target is `vue2_project/src/views/Controllers`.
+- `Controllers` views have been added in Vue3 style and routes/menu are enabled; next step is runtime smoke testing.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE
