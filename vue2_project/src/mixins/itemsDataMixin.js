@@ -359,10 +359,6 @@ const itemsDataMixin = {
 				ids = this.$refs[refName].selectedIds;
 			}
 
-			/*if (this.preDeleteItemsHook) {
-				ids = this.preDeleteItemsHook({ data, ids });
-			}*/
-
 			const confirmButtonText = settings.confirmButtonText || this.tt('Delete');
 			const methodName = settings.methodName || 'deleteItem';
 			const payload = settings.payload || {};

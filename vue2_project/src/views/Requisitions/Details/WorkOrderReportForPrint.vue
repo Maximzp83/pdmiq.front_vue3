@@ -211,24 +211,6 @@ export default {
 					label: 'Additional Work Order Details',
 					prop: 'fab_shop_manager_notes',
 					icon: 'icomoon icon-doc_2'
-				},
-				// requisition-update
-				{
-					label: 'DownTime/Hour',
-					prop: 'downtime_cost_per_hour',
-					valuePrefix: '$',
-					icon: 'icomoon icon-money'
-				},
-				{
-					label: 'Hours Saved / Lead Time',
-					prop: 'hours_saved',
-					icon: 'icomoon icon-clock_2'
-				},
-				{
-					label: 'Contractor Quote',
-					prop: 'contractor_quote',
-					valuePrefix: '$',
-					icon: 'icomoon icon-money'
 				}
 			]);
 		}

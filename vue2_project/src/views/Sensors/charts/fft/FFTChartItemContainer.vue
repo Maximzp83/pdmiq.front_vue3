@@ -83,7 +83,6 @@
 						:sensorId="chartMainData.sensorItem.id"
 						:selectedAnalysisRules="selectedAnalysisRules"
 						@event="handleEventNew"
-						:rootFilters="rootFilters"
 					/>
 				</div>
 

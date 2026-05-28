@@ -143,15 +143,15 @@ const menuItems1 = [
 		path: '/user-roles',
 		meta: { permissions: ['view_user_roles'] }
 	},
-	// {
-	// 	name: 'Distributors',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.DISTRIBUTORS,
-	// 	icon: 'icon-distributors',
-	// 	path: '/distributors',
-	// 	meta: { permissions: ['view_distributors'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Distributors',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.DISTRIBUTORS,
+		icon: 'icon-distributors',
+		path: '/distributors',
+		meta: { permissions: ['view_distributors'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'Vendors',
 		belongs_to_label: 'system',
@@ -287,15 +287,15 @@ const menuItems1 = [
 	// 	meta: { permissions: ['view_work_order_requests'] },
 	// 	enableInCompanyMenuForm: true
 	// },
-	// {
-	// 	name: 'task_Procedures',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.TASK_PROCEDURES,
-	// 	icon: 'icon-task_procedures',
-	// 	path: '/task-procedures',
-	// 	meta: { permissions: ['view_task_procedures'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'task_Procedures',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.TASK_PROCEDURES,
+		icon: 'icon-task_procedures',
+		path: '/task-procedures',
+		meta: { permissions: ['view_task_procedures'] },
+		enableInCompanyMenuForm: true
+	},
 	// {
 	// 	name: 'work_order_type',
 	// 	belongs_to_label: 'cmms',

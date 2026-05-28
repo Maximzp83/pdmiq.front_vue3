@@ -1657,24 +1657,6 @@ const routes = [
 							)
 					},
 					{
-						path: '/settings/measurement-units',
-						name: 'MeasurementUnitsTab',
-						meta: { auth: true },
-						component: () =>
-							import(
-								/* webpackChunkName: "MeasurementUnitsTab" */ '@/views/Settings/MeasurementUnits/ItemsList.vue'
-							)
-					},
-					{
-						path: '/settings/event-logs',
-						name: 'EventLogsTab',
-						meta: { auth: true },
-						component: () =>
-							import(
-								/* webpackChunkName: "EventLogsTab" */ '@/views/Settings/EventLogs/ItemsList.vue'
-							)
-					},
-					{
 						path: '/settings/statistics',
 						name: 'StatisticsTab',
 						meta: { auth: true },

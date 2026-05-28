@@ -1,11 +1,5 @@
-import { mapActions } from 'vuex';
-
 const RebaselineRequestMixin = {
 	methods: {
-		...mapActions({
-			sensor_rebase_line: 'sensors/sensor_rebase_line',
-		}),
-
 		click_re_baseline() {
 			const { tt } = this;
 			const isRebaseline = this.sensorData.is_re_baseline_process;
@@ -42,7 +36,7 @@ const RebaselineRequestMixin = {
 			this.rebaselineLoading = true;
 			// console.log(payload)
 			this.sensor_rebase_line(payload).then(() => {
-				this.$emit('event', {	eventName: 'initSensors' });
+				this.event('initSensors');
 				setTimeout(() => {
 					this.rebaselineLoading = true;
 				}, 1000);

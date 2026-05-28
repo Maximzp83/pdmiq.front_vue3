@@ -333,14 +333,14 @@
 						/>
 					</div>
 
-					<div class="el-form-item notifications-block">
+					<!-- <div class="el-form-item notifications-block">
 						<NotificationsBlock
 							:title="tt('phrases.Requisitions_Notifications')"
 							class="notifications-block"
 							ref="NotificationsBlockRequisitions"
 							:rows="userRequisitionNotificationItemsList"
 						/>
-					</div>
+					</div> -->
 				</div>
 
 				<div
@@ -466,7 +466,6 @@ export default {
 
 			userNotificationItemsList: [],
 			userRealTimeNotificationItemsList: [],
-			userRequisitionNotificationItemsList: [],
 
 			formData: {
 				role_id: null,
@@ -875,10 +874,10 @@ export default {
 				list: this.userRealTimeNotificationTypesList,
 				itemData
 			});
-			this.userRequisitionNotificationItemsList = this.setupNotificationsBlockList({
+			/*this.userRequisitionNotificationItemsList = this.setupNotificationsBlockList({
 				list: this.userRequisitionNotificationTypesList,
 				itemData
-			});
+			});*/
 		},
 
 		handleUserRoleChange() {

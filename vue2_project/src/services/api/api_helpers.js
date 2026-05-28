@@ -364,7 +364,8 @@ const prepareEquipmentsList = (data, settings = {}) => {
 		{ key: 'is_company_favorite', val_key: 'is_company_favorite' },
 		{ key: 'child_components', val_key: 'child_components' },		
 		{ key: 'vibration_analysis_rules', val_key: 'vibration_analysis_rules' },		
-		{ key: 'option_values', val_key: 'option_values' },
+		{ key: 'option_values', val_key: 'option_values' },		
+		
 	];
 
 	if (settings.addSettingItems) {

@@ -32,7 +32,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('sidebar_menu.User_Role')" prop="role_id">
+					<el-form-item class="content-row" :label="tt('sidebar_menu.User_Role')" prop="role_id">
 						<CustomSelectV2
 							v-model="formData.role_id"
 							:optionsList="filteredUserRolesList"
@@ -42,7 +42,7 @@
 						/>
 					</el-form-item>
 
-					<div v-if="isCustomer" class="el-form-item">
+					<div v-if="isCustomer" class="content-row">
 						<el-form-item
 							v-if="!isHideCompany"
 							:label="tt('Company')"
@@ -77,7 +77,7 @@
 						</el-form-item>
 					</div>
 
-					<el-form-item :label="tt('Language')" prop="language">
+					<el-form-item class="content-row" :label="tt('Language')" prop="language">
 						<CustomSelectV2
 							v-model="formData.language"
 							:optionsList="languagesListOptions"
@@ -404,7 +404,6 @@ const itemFormRef = ref(null);
 const phoneInputRef = ref(null);
 const notificationsBlockRef = ref(null);
 const notificationsBlockRTRef = ref(null);
-const notificationsBlockRequisitionsRef = ref(null);
 const startingElementIdx = ref(0);
 const showPassTooltip = ref(false);
 const confirmedPhoneNumber = ref('');
@@ -480,7 +479,6 @@ const routeQuery = computed(() => (typeof window !== 'undefined'
 const refsMap = computed(() => ({
 	NotificationsBlock: notificationsBlockRef.value,
 	NotificationsBlockRT: notificationsBlockRTRef.value,
-	NotificationsBlockRequisitions: notificationsBlockRequisitionsRef.value,
 	ProdlinesSelectItem: prodlinesSelectItemRefs.value,
 }));
 
@@ -490,7 +488,6 @@ const subItemsSettings = computed(() =>
 	Object.freeze([
 		{ ref: 'NotificationsBlock', targetProp: 'notification_rules' },
 		{ ref: 'NotificationsBlockRT', targetProp: 'notification_rules' },
-		{ ref: 'NotificationsBlockRequisitions', targetProp: 'notification_rules' },
 		{ ref: 'ProdlinesSelectItem', targetProp: 'notifiable_production_lines' },
 	]),
 );

@@ -105,6 +105,28 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_controllers',
 		}),
 	}),
+	Distributors: Object.freeze({
+		key: 'distributors',
+		apiBase: '/distributors',
+		routeBase: '/distributors',
+		filtersStorageKey: 'distributors_filters',
+		itemsName: Object.freeze({
+			one: 'Distributor',
+			mult: 'Distributors',
+			instanceName: 'distributors',
+		}),
+		permissions: Object.freeze({
+			view: 'view_distributors',
+			create: 'create_distributors',
+			edit: 'edit_distributors',
+			delete: 'delete_distributors',
+		}),
+		menu: Object.freeze({
+			label: 'Distributors',
+			icon: 'icon-distributors',
+			path: '/distributors',
+		}),
+	}),
 	EquipmentTypesCategories: Object.freeze({
 		key: 'equipment_types_categories',
 		apiBase: '/equipments/types/options/categories',
@@ -357,6 +379,28 @@ export const ENTITIES = Object.freeze({
 		menu: Object.freeze({
 			label: 'storerooms',
 			path: '/store-rooms',
+		}),
+	}),
+	TaskProcedures: Object.freeze({
+		key: 'task_procedures',
+		apiBase: '/plnts/task-procedures',
+		routeBase: '/task-procedures',
+		filtersStorageKey: 'task-procedures_filters',
+		itemsName: Object.freeze({
+			one: 'Task_procedure',
+			mult: 'Task_procedures',
+			instanceName: 'task_procedures',
+		}),
+		permissions: Object.freeze({
+			view: 'view_task_procedures',
+			create: 'create_task_procedures',
+			edit: 'edit_task_procedures',
+			delete: 'delete_task_procedures',
+		}),
+		menu: Object.freeze({
+			label: 'task_Procedures',
+			icon: 'icon-task_procedures',
+			path: '/task-procedures',
 		}),
 	}),
 });

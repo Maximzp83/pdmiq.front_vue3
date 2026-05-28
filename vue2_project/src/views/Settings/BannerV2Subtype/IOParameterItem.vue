@@ -16,46 +16,12 @@
 		</el-form-item>
 
 		<el-form-item
-			label="Metric Unit"
-			prop="metric_unit_id"
-			:class="{ 'mcol-xs-6': !fromModal }"
-		>
-			<CustomSelect
-				clearable
-				filterable
-				:optionsLoading="measurementUnitsLoading"
-				:optionsList="metricMeasurementUnitsOptions"
-				placeholder="Select Metric Unit"
-				v-model="formData.metric_unit_id"
-				@change="handleMetricUnitChange"
-			/>
-		</el-form-item>
-
-		<el-form-item
-			label="Imperial Unit"
-			prop="imperial_unit_id"
-			:class="{ 'mcol-xs-6': !fromModal }"
-		>
-			<CustomSelect
-				clearable
-				filterable
-				:optionsLoading="measurementUnitsLoading"
-				:optionsList="imperialMeasurementUnitsOptions"
-				placeholder="Select Imperial Unit"
-				v-model="formData.imperial_unit_id"
-				@change="handleImperialUnitChange"
-			/>
-		</el-form-item>
-
-		<!--
-		<el-form-item
 			:label="tt('units')"
 			prop="units"
 			:class="{ 'mcol-xs-6': !fromModal }"
 		>
 			<CustomInput v-model="formData.units" :placeholder="tt('units')" />
 		</el-form-item>
-		-->
 
 		<el-form-item
 			:label="tt('formula')"
@@ -111,17 +77,6 @@
 			/>
 		</el-form-item>
 
-		<el-form-item
-			:label="tt('phrases.Visible_by_default')"
-			prop="is_visible_by_default"
-		>
-			<el-switch
-				v-model="formData.is_visible_by_default"
-				:active-value="1"
-				:inactive-value="0"
-			/>
-		</el-form-item>
-
 		<el-form-item label=" ">
 			<el-button
 				class="ml-auto action-button remove-button"
@@ -135,24 +90,16 @@
 </template>
 
 <script>
+// import { updateFormData } from '@/helpers';
 import { ncdAlarmTypesList, chartTypesList } from '@/constants/global';
 import { required } from '@/constants/validation';
 import { subItemMixin } from '@/mixins';
-import {
-	getMeasurementUnitsOptionsBySystem
-} from '@/helpers/measurementUnits';
-import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		// isMobile: Boolean,
-		fromModal: Boolean,
-		measurementUnitsList: {
-			type: Array,
-			default: () => []
-		},
-		measurementUnitsLoading: Boolean
+		isMobile: Boolean,
+		fromModal: Boolean
 	},
 
 	data() {
@@ -161,14 +108,11 @@ export default {
 				id: null,
 				name: '',
 				units: '',
-				metric_unit_id: null,
-				imperial_unit_id: null,
 				formula: '',
 				alarm_type: null,
 				graph_type: null,
 				is_customizable: 0,
-				is_signed: 0,
-				is_visible_by_default: 0
+				is_signed: 0
 			}
 		};
 	},
@@ -176,22 +120,6 @@ export default {
 	computed: {
 		ncdAlarmTypesList: () => Object.freeze(ncdAlarmTypesList()),
 		chartTypesList: () => Object.freeze(chartTypesList()),
-		metricMeasurementUnitsOptions() {
-			return Object.freeze(
-				getMeasurementUnitsOptionsBySystem(
-					this.measurementUnitsList,
-					METRIC_SYSTEM_TYPES.METRIC
-				)
-			);
-		},
-		imperialMeasurementUnitsOptions() {
-			return Object.freeze(
-				getMeasurementUnitsOptionsBySystem(
-					this.measurementUnitsList,
-					METRIC_SYSTEM_TYPES.IMPERIAL
-				)
-			);
-		},
 
 		rules: () => ({
 			name: required,
@@ -200,26 +128,6 @@ export default {
 		}),
 
 		deleteNewId: () => true,
-	},
-
-	methods: {
-		handleMetricUnitChange(value) {
-			if (value != null) {
-				this.formData.imperial_unit_id = null;
-			}
-		},
-
-		handleImperialUnitChange(value) {
-			if (value != null) {
-				this.formData.metric_unit_id = null;
-			}
-		},
-
-		localGetFormDataCallback(formData) {
-			const newFormData = { ...formData };
-			delete newFormData.units;
-			return newFormData;
-		}
 	}
 };
 </script>

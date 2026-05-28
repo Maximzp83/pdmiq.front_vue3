@@ -95,7 +95,7 @@ const getLabel = (item) => {
 	if (props.setupLabelMethod) {
 		return props.setupLabelMethod(item);
 	}
-	return props.label || item[props.labelKey];
+	return props.label || item[props.labelKey] || item['label'];
 };
 
 const normalizedOptions = computed(() => {

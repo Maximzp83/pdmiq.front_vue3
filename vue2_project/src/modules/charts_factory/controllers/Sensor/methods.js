@@ -39,20 +39,10 @@ import {
 import {
 	unitTypesList,
 	metricKeysTable,
-	METRIC_SYSTEM_TYPES,
+	// METRIC_SYSTEM_TYPES,
 	ncdAxisList,
 	thresholdUpdateSourceTypesList,
 } from './enums';
-import { storeGetter } from '@/store';
-import {
-	buildMeasurementUnitFormula,
-	getMeasurementUnitDefaultMeasurement,
-	getMeasurementUnitFormulaForMeasurement,
-	getMeasurementUnitIdByMeasurement,
-	resolveMeasurementUnitName,
-	resolveMeasurementUnitObject,
-	shouldConvertMeasurementUnit
-} from '@/helpers/measurementUnits';
 
 const getThresholdUpdateSource = source => {
 	const sourceItem = findItemBy('id', +source, thresholdUpdateSourceTypesList());
@@ -1291,15 +1281,14 @@ const setupFFTPeaksList1 = ({ statistics }) => {
 	return value > max_value
 };*/
 const getStatisticsItemParams = item => {
-	const { register_value, unit, t, signal_date_at, raw_value } = item;
+	const { register_value, unit, t, signal_date_at } = item;
 	let xKey, yKey;
 
 	if (signal_date_at) xKey = 'signal_date_at';
 	else if (t) xKey = 't';
-	if (unit != null) yKey = 'unit';
-	else if (register_value != null) yKey = 'register_value';
-	else if (raw_value != null) yKey = 'raw_value';
-	// console.log('xKey', xKey, 'yKey', yKey);
+	if (unit !== undefined) yKey = 'unit';
+	else if (register_value !== undefined) yKey = 'register_value';
+
 	return {
 		xKey,
 		yKey,
@@ -1364,9 +1353,6 @@ const standard_datetime1 = payload => {
 
 		if (parameter_item) {
 			toFixedNum = parameter_item.toFixedNum;
-			if (parameter_item.y_formula) {
-				formula_y = parameter_item.y_formula;
-			}
 
 			/*if (parameter_item.calc_imperial_cpm && measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 				formula_y = y => y * 60;
@@ -1639,7 +1625,6 @@ const line_charts_datetime1 = payload => {
 			const x = getPointX_ms(
 				statistics[i][xKey] || getStatisticsItemParams(statistics[i]).x
 			);
-			// console.log(yKey, initialParams, statistics[i])
 			const y = getPointY(
 				statistics[i][yKey] || getStatisticsItemParams(statistics[i]).y,
 				{ formula: y_formula }
@@ -1720,51 +1705,12 @@ const get_sensor_parameter_item1 = ({sensor, parameter_id, graph_item}) => {
 			if (sensorType.isBannerV2Generic) {
 				const {metric_type} = graph_item;
 				const { units, name } = graph_item.banner_v2_subtype_parameter;
-				const measurementUnitsList = storeGetter('measurement_units.itemsList') || [];
-				const defaultMeasurement = getMeasurementUnitDefaultMeasurement(
-					graph_item.banner_v2_subtype_parameter
-				);
-				const measurement_unit_id = getMeasurementUnitIdByMeasurement({
-					parameterItem: graph_item.banner_v2_subtype_parameter,
-					measurement: defaultMeasurement
-				});
-				const unit = resolveMeasurementUnitObject({
-					unit:
-						graph_item.banner_v2_subtype_parameter.metric_unit ||
-						graph_item.banner_v2_subtype_parameter.imperial_unit,
-					measurementUnitId: measurement_unit_id,
-					items: measurementUnitsList
-				});
-				const measurement =
-					(storeGetter('sensors.statistics_filters') || {}).measurement ||
-					METRIC_SYSTEM_TYPES.METRIC;
-				const resolvedUnits = unit
-					? resolveMeasurementUnitName({ unit, measurement })
-					: units;
-				const y_formula = shouldConvertMeasurementUnit({
-					unit,
-					measurement,
-					defaultMeasurement
-				})
-					? buildMeasurementUnitFormula(
-						getMeasurementUnitFormulaForMeasurement({
-							unit,
-							measurement
-						})
-					)
-					: null;
 				
 				return {
 					id: metric_type,
 					icon: 'icon-acceleration',
 					name,
-					units: resolvedUnits,
-					defaultMeasurement,
-					measurement_unit_id,
-					metric_unit_id: graph_item.banner_v2_subtype_parameter.metric_unit_id,
-					imperial_unit_id: graph_item.banner_v2_subtype_parameter.imperial_unit_id,
-					measurementUnit: unit,
-					y_formula
+					units
 				}
 			} else {
 				const configsList = chartsListsConfig(sensorType.chartSettingsKey, {

@@ -504,7 +504,7 @@ const dataSetsList1 = [
 		label: 'constants.sdt_sensor_full_spectrum',
 		// alt_label: 'constants.NCD_Custom_4_20',
 		isLubeV3: true,
-	},
+	},	
 ];
 
 export const NCD_ALARM_TYPES = {
@@ -1722,6 +1722,7 @@ const fftLockStatusesList1 = [
 	{ id: FFT_LOCK_STATUSES.NODE_OFFLINE, name: 'constants.node_offline', color: '#c21405', },
 	{ id: FFT_LOCK_STATUSES.UNCONFIRMED_FFT_REQUEST, name: 'constants.unconfirmed_fft_request', color: '#ffde32', },
 ];
+	
 export const SUBJECT_TYPES = {
 	USER: 1,
 	COMPANY: 2,

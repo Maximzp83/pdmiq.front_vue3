@@ -35,6 +35,30 @@
   - `activeSortingFilters` moved into `src/components/table/TableHeader.vue`
   - `setSubItemRef` moved into `src/composables/mixins/useSubItemsList.js`
   - Shared `el-button icon="icomoon ..."` issues fixed in `TabsBar.vue`, `DropdownFilterbar.vue`, `SidebarWithSubs.vue`
+- Latest sync applied:
+  - `src/components/table/CustomDataListTable.vue` aligned with latest legacy selection behavior; row selectability filtering was removed.
+  - Confirmed legacy sync batch applied to table row/header selection behavior, date shortcut helpers, EquipmentTypes vibration-analysis unit handling, and Machines form silence-mode removal.
+  - `src/constants/global.js` was skipped because its legacy diff was whitespace-only; `src/composables/mixins/useItemsData.js` was already aligned for the changed legacy comment removal.
+  - Remaining sync applied without touching `.scss` or `src/localization`: removed unused `src/helpers/eventLogs.js`, cleaned Users requisition notification remnants, and aligned Sensor chart factory unit/y-value/velocity-name changes.
+- Current Distributors migration:
+  - `src/views/Distributors/ItemsList.vue` added.
+  - `src/views/Distributors/ItemForm.vue` added.
+  - `src/views/Distributors/LocationItem.vue` added.
+  - `src/views/Distributors/ItemPage.vue` added.
+  - `src/config/entities.js` now includes `Distributors`.
+  - Routes enabled in `src/router/index.js` with `/distributors`, `/distributors/new`, and `/distributors/:id`.
+  - Sidebar menu entry enabled in `src/constants/menuItems.js`.
+  - `Distributors` migration is complete for current Vue3 scope.
+- Current TaskProcedures migration:
+  - `src/views/TaskProcedures/ItemsList.vue` added.
+  - `src/views/TaskProcedures/ItemForm.vue` added.
+  - `src/views/TaskProcedures/PartItem.vue` added.
+  - `src/views/TaskProcedures/ProcessItem.vue` added.
+  - `src/views/TaskProcedures/ItemPage.vue` added.
+  - `src/config/entities.js` now includes `TaskProcedures`.
+  - Routes enabled in `src/router/index.js` with `/task-procedures`, `/task-procedures/new`, and `/task-procedures/:id`.
+  - Sidebar menu entry enabled in `src/constants/menuItems.js`.
+  - `TaskProcedures` migration is complete for current Vue3 scope.
 
 ## Files Already Modified
 - `src/views/UserRoles/ItemsList.vue`

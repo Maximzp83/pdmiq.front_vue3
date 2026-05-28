@@ -130,6 +130,24 @@ const routes = [
 				meta: { auth: true, permissions: ['edit_user_roles'] },
 			},
 			{
+				path: 'distributors',
+				name: 'Distributors',
+				component: () => import('@/views/Distributors/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_distributors'] },
+			},
+			{
+				path: 'distributors/new',
+				name: 'DistributorCreate',
+				component: () => import('@/views/Distributors/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_distributors'] },
+			},
+			{
+				path: 'distributors/:id',
+				name: 'DistributorEdit',
+				component: () => import('@/views/Distributors/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_distributors'] },
+			},
+			{
 				path: 'teams',
 				name: 'Teams',
 				component: () => import('@/views/Teams/ItemsList.vue'),
@@ -284,6 +302,24 @@ const routes = [
 				name: 'PartEdit',
 				component: () => import('@/views/Parts/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_misc_parts'] },
+			},
+			{
+				path: 'task-procedures',
+				name: 'TaskProcedures',
+				component: () => import('@/views/TaskProcedures/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_task_procedures'] },
+			},
+			{
+				path: 'task-procedures/new',
+				name: 'TaskProcedureCreate',
+				component: () => import('@/views/TaskProcedures/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_task_procedures'] },
+			},
+			{
+				path: 'task-procedures/:id',
+				name: 'TaskProcedureEdit',
+				component: () => import('@/views/TaskProcedures/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_task_procedures'] },
 			},
 			{
 				path: 'brand-models',

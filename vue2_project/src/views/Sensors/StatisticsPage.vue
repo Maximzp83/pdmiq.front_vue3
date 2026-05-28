@@ -44,8 +44,7 @@
 						</div>
 
 						<!-- v-if="currentSensorType.isBanner" -->
-						<div
-							class="mcol-xs-auto legend-container"
+						<div class="mcol-xs-auto legend-container"
 							v-if="!currentSensorType.isBannerV2Generic"
 						>
 							<div class="legend-list">
@@ -98,7 +97,7 @@
 							@event="handleEvent"
 							filterbarDropdownId="statisticsPageDropdownFilterbar"
 						>
-							<!-- :key="dropdownFilterbarUpdated" -->
+								<!-- :key="dropdownFilterbarUpdated" -->
 							<BannerFilterBlock
 								ref="BannerFilterBlock"
 								v-if="enableFilterBlock.banner"
@@ -125,7 +124,7 @@
 								ref="UltrasoundFilterBlock"
 								v-if="enableFilterBlock.ultrasound"
 								:enableLubeTriggerButtonOnly="enableLubeTriggerButton"
-								:class="[{ 'ml-5': enableLubeTriggerButton }]"
+								:class="[{'ml-5': enableLubeTriggerButton }]"
 								@event="handleEvent"
 								:sensorData="sensorData"
 								:isCompare="isCompare"
@@ -152,6 +151,7 @@
 								"
 								:enableStatsBlock="currentSensorType.isBannerV2Generic"
 								:statsThresholdsActive="statsThresholdsActive"
+
 							/>
 						</DropdownFilterbar>
 					</div>
@@ -180,13 +180,10 @@
 				<div class="tab-container reportBlock-tab" :class="'show_tab'">
 					<div
 						key="charts_tab"
-						:class="[
-							'tab-container',
-							{
-								'showHistory': showHistory,
-								'show-RPM': equipmentData && equipmentData.is_rpm_visible
-							}
-						]"
+						:class="['tab-container', { 
+							showHistory: showHistory,
+							'show-RPM': equipmentData && equipmentData.is_rpm_visible
+						}]"
 					>
 						<PossibleProblemsBlock
 							v-if="enableProblemsBlock"
@@ -213,8 +210,7 @@
 						</div>
 
 						<div
-							:class="[
-								'section-row',
+							:class="['section-row', 
 								{ 'compare-section flex mrow': isCompare },
 								{ 'show-statistics-lines': statsThresholdsActive }
 							]"
@@ -256,11 +252,11 @@
 		>
 			<ChartMessageForm
 				@closeDialog="showNewMessage = false"
-				@success="reloadChart(null, { reloadAll: 1 })"
+				@success="reloadChart(null, {reloadAll:1})"
 				:itemData="showNewMessage ? pointData : null"
 				:sensorId="sensorData.id"
 			/>
-			<!-- :visible="showNewMessage" -->
+				<!-- :visible="showNewMessage" -->
 		</el-dialog>
 
 		<el-dialog
@@ -324,10 +320,8 @@ import {
 } from '@/helpers';
 
 import {
-	NCD_NODE_TYPES,
-	NCD_ALARM_TYPES,
-	ITEM_SPEED_OPTIONS,
-	RPM_SOURCES_TYPES,
+	NCD_NODE_TYPES, NCD_ALARM_TYPES,
+	ITEM_SPEED_OPTIONS, RPM_SOURCES_TYPES,
 	DATASET
 } from '@/constants/global';
 
@@ -464,16 +458,14 @@ export default {
 				boostNew,
 				stockInit,
 				boost
-			}
+			}	
+
 		}),
 
 		isLubeMatrixV3() {
 			const { sensorData } = this;
 			if (sensorData) {
-				return (
-					sensorData.data_set === DATASET.LUBEMATRIX_V3 ||
-					sensorData.lube_version === LUBE_VERSIONS.V3
-				);
+				return sensorData.data_set === DATASET.LUBEMATRIX_V3 || sensorData.lube_version === LUBE_VERSIONS.V3;
 			}
 			return false;
 		},
@@ -516,22 +508,14 @@ export default {
 
 		enableFFT() {
 			if (this.isCompare) return false;
-
-			const { enableAxisSelector, $hasAccessTo } = this;
-			const {
-				isBannerV2_1,
-				isBannerM25,
-				isBannerV2Generic
-			} = this.currentSensorType;
+			
+			const {enableAxisSelector, $hasAccessTo} = this;
+			const { isBannerV2_1, isBannerM25, isBannerV2Generic } = this.currentSensorType;
 			const { bannerV2Subtype } = this.sensorData;
-
+			
 			if ($hasAccessTo(['view_dashboard'])) {
-				return (
-					enableAxisSelector ||
-					isBannerV2_1 ||
-					isBannerM25 ||
-					(isBannerV2Generic && bannerV2Subtype && bannerV2Subtype.is_fft_allowed)
-				);
+				return enableAxisSelector || isBannerV2_1 || isBannerM25 ||
+						(isBannerV2Generic && (bannerV2Subtype && bannerV2Subtype.is_fft_allowed));
 			}
 			return false;
 		},
@@ -573,7 +557,7 @@ export default {
 					isNCDTempVibe,
 					isNCDWiredTempVibe,
 					isNCDTempVibeCurr,
-					isBannerTempVibe2
+					isBannerTempVibe2,
 				} = currentSensorType;
 
 				return (
@@ -620,18 +604,15 @@ export default {
 		},
 
 		overlaySensorId() {
-			const { isCompare, rpmOverlayData, current_sensor_ids } = this;
-			return !isCompare &&
-				rpmOverlayData &&
-				rpmOverlayData.rpm_request &&
-				rpmOverlayData.rpm_request.sensor_id !== current_sensor_ids[0]
-				? rpmOverlayData.rpm_request.sensor_id
-				: null;
+			const {isCompare, rpmOverlayData, current_sensor_ids} = this;
+			return !isCompare && rpmOverlayData && rpmOverlayData.rpm_request &&
+							rpmOverlayData.rpm_request.sensor_id !== current_sensor_ids[0] ?
+							rpmOverlayData.rpm_request.sensor_id : null;
 		},
 
 		allSensorsReady() {
-			return this.sensorsReadyCount === this.current_sensor_ids.length;
-			// &&	(this.overlaySensorId ? this.isOverlaySensorReady : true);
+			return (this.sensorsReadyCount === this.current_sensor_ids.length)
+				 // &&	(this.overlaySensorId ? this.isOverlaySensorReady : true);
 		},
 
 		sensorData() {
@@ -643,15 +624,12 @@ export default {
 
 		rpmOverlayData() {
 			if (this.equipmentData && this.equipmentData.rpm_source_item) {
-				// console.log('computed rpmOverlayData', this.equipmentData.rpm_source_item)
-				let {
-					rpm_source_item,
-					rpmSources,
+			// console.log('computed rpmOverlayData', this.equipmentData.rpm_source_item)
+				let { 
+					rpm_source_item, rpmSources,
 					// rpm_external_source_type, rpm_external_value,
-					rpm_external_node_parameter,
-					rpm_external_node_id,
-					rpm_formula,
-					is_rpm_visible
+					rpm_external_node_parameter, rpm_external_node_id,
+					rpm_formula, is_rpm_visible
 				} = this.equipmentData;
 				let data = { is_rpm_visible };
 
@@ -659,67 +637,62 @@ export default {
 
 				// rpm_source_item = 4
 
-				switch (rpm_source_item) {
-					case ITEM_SPEED_OPTIONS.LINESPEED_RPM:
-						{
-							let {
-								prodline_rpm_source_type /*prodline_rpm_value,*/,
-								prodline_rpm_node_parameter,
-								prodline_rpm_node_id
-							} = this.equipmentData;
-							// const {	line_speed_rpm_evaluated } = rpmSources;
-							// prodline_rpm_source_type = 2
-
-							if (prodline_rpm_source_type === RPM_SOURCES_TYPES.MANUAL) {
-								data.rpm_value = rpmSources && rpmSources.line_speed_rpm_evaluated;
-							} else if (
-								prodline_rpm_source_type === RPM_SOURCES_TYPES.EXTERNAL_INPUT
-							) {
-								data.rpm_request = {
-									parameter: prodline_rpm_node_parameter, //|| 5,
-									sensor_id: prodline_rpm_node_id //|| 1087
-								};
-							}
+				switch(rpm_source_item) {
+					case ITEM_SPEED_OPTIONS.LINESPEED_RPM: {
+						let { 
+							prodline_rpm_source_type, /*prodline_rpm_value,*/
+							prodline_rpm_node_parameter, prodline_rpm_node_id
+						} = this.equipmentData; 
+						// const {	line_speed_rpm_evaluated } = rpmSources;
+						// prodline_rpm_source_type = 2
+						
+						if (prodline_rpm_source_type === RPM_SOURCES_TYPES.MANUAL) {
+							data.rpm_value = rpmSources && rpmSources.line_speed_rpm_evaluated;
+						} else if (prodline_rpm_source_type === RPM_SOURCES_TYPES.EXTERNAL_INPUT) {
+							data.rpm_request = {
+								parameter: prodline_rpm_node_parameter, //|| 5,
+								sensor_id: prodline_rpm_node_id //|| 1087
+							};
 						}
-						break;
+					}
+					break;
 
-					case ITEM_SPEED_OPTIONS.SPECIFICATION_RPM:
-						data.rpm_value = rpmSources && rpmSources.specification_rpm_evaluated;
-						break;
+				case ITEM_SPEED_OPTIONS.SPECIFICATION_RPM:
+					data.rpm_value = rpmSources && rpmSources.specification_rpm_evaluated;
+					break;
 
-					case ITEM_SPEED_OPTIONS.MANUAL_RPM:
-						data.rpm_value = rpmSources && rpmSources.manual_rpm_evaluated;
-						break;
+				case ITEM_SPEED_OPTIONS.MANUAL_RPM:
+					data.rpm_value = rpmSources && rpmSources.manual_rpm_evaluated;
+					break;
 
-					case ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY:
-						data.rpm_request = {
-							// parameter: SENSOR_EXTRA_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQ,
-							parameter:
-								BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS
-							// sensor_id: rpm_external_node_id
-						};
-						data.isMaxPeakFrequency = true;
-						break;
+				case ITEM_SPEED_OPTIONS.MAX_PEAK_FREQUENCY:
+					data.rpm_request = { 
+						// parameter: SENSOR_EXTRA_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQ,
+						parameter: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAX_PEAK_FREQUENCY_FROM_3_AXIS,
+						// sensor_id: rpm_external_node_id
+					};
+					data.isMaxPeakFrequency = true;
+					break;
 
-					case ITEM_SPEED_OPTIONS.EXTERNAL:
-						// if (rpm_external_source_type === RPM_SOURCES_TYPES.MANUAL) {
-						// 	data.rpm_value = rpm_external_value;
-						// } else if (rpm_external_source_type === RPM_SOURCES_TYPES.EXTERNAL_INPUT) {
-						data.rpm_request = {
+				case ITEM_SPEED_OPTIONS.EXTERNAL:
+					// if (rpm_external_source_type === RPM_SOURCES_TYPES.MANUAL) {
+					// 	data.rpm_value = rpm_external_value;
+					// } else if (rpm_external_source_type === RPM_SOURCES_TYPES.EXTERNAL_INPUT) {
+						data.rpm_request = { 
 							parameter: rpm_external_node_parameter,
 							sensor_id: rpm_external_node_id
 						};
-						// }
-						break;
+					// }
+					break;
 				}
 
 				if (rpm_formula && data.rpm_request) {
 					data.rpm_request.get_params = {
 						unitExpression: rpm_formula
-					};
+					}
 				}
 				// console.log(rpm_formula, data.rpm_request)
-				return data;
+				return data;				
 			}
 
 			return null;
@@ -729,9 +702,9 @@ export default {
 			const { equipmentData, rpmOverlayData } = this;
 			// console.log('linespeedOverlaySensorData')
 			if (rpmOverlayData && rpmOverlayData.rpm_request) {
-				return rpmOverlayData.isMaxPeakFrequency
-					? cloneDeep(this.sensorData)
-					: cloneDeep(this.rpmOverlaySensorData);
+					return rpmOverlayData.isMaxPeakFrequency
+										? cloneDeep(this.sensorData)
+										: cloneDeep(this.rpmOverlaySensorData);
 			}
 
 			return equipmentData ? equipmentData.linespeedSensor : null;
@@ -932,11 +905,10 @@ export default {
 			set_sensor_state: 'sensors/set_sensor_state',
 			fetch_sensor: 'sensors/fetch_sensor',
 			set_sensor: 'sensors/set_sensor',
-			fetch_measurement_units: 'measurement_units/fetch_measurement_units',
 
 			set_filters: 'sensors/set_statistics_filters',
 			forceRerender: 'forceRerender',
-			toggle_ultrasound_command: 'sensors/toggle_ultrasound_command'
+			toggle_ultrasound_command: 'sensors/toggle_ultrasound_command',
 			// update_sensor_level_zone: 'sensors/update_sensor_level_zone'
 			// thresholds_re_baseline: 'sensors/thresholds_re_baseline',
 
@@ -957,15 +929,15 @@ export default {
 		},*/
 
 		toggleV2_1View() {
-			this.V2_1ViewActive = !this.V2_1ViewActive;
+		 	this.V2_1ViewActive = !this.V2_1ViewActive;
 
-			if (this.V2_1ViewActive) {
-				this.sensors[0].data_set = DATASET.BANNER_TEMP_VIBE_V2_1;
-			} else {
-				this.sensors[0].data_set = this.initialSensorDataSet;
-			}
-
-			this.dropdownFilterbarUpdated++;
+		 	if (this.V2_1ViewActive) {
+		 		this.sensors[0].data_set = DATASET.BANNER_TEMP_VIBE_V2_1;
+		 	} else {
+		 		this.sensors[0].data_set = this.initialSensorDataSet;
+		 	}
+		 	
+		 	this.dropdownFilterbarUpdated++;
 		},
 
 		toggleStatsThresholds() {
@@ -979,7 +951,7 @@ export default {
 				daterange: range,
 				daterange_setted_at: Date.now(),
 				isLiveEnabled: this.isTodayRangeClicked
-			});
+			})
 
 			const { dateStart, dateFinish, parameter, source } = this.$route.query;
 
@@ -987,7 +959,7 @@ export default {
 				let newPath = this.$route.path + '?';
 				if (parameter) newPath += `parameter=${parameter}`;
 				if (source) newPath += `${parameter ? '&' : ''}source=${source}`;
-				this.$router.replace(newPath);
+				this.$router.replace(newPath);				
 			}
 		},
 
@@ -1001,36 +973,13 @@ export default {
 		},
 
 		update_sensor({ id, sensor }) {
-			const { item, index } = findItemBy('id', id, this.sensors, { returnIndex: 1 });
+			const { item, index } = findItemBy('id', id, this.sensors, {returnIndex:1});
 			if (item) {
 				this.sensors[index] = sensor;
 				// console.log('update_sensor', this.sensors, sensor)
 				this.lube_cycle_high_speed = sensor.lube_cycle_high_speed;
 				this.dropdownFilterbarUpdated++;
 			}
-		},
-
-		loadMeasurementUnitsIfNeeded(sensor) {
-			const hasMeasurementUnit =
-				sensor &&
-				sensor.bannerV2Subtype &&
-				sensor.bannerV2Subtype.parameters &&
-				sensor.bannerV2Subtype.parameters.some(
-					item => item.metric_unit_id != null || item.imperial_unit_id != null
-				);
-
-			if (
-				!hasMeasurementUnit ||
-				this.$store.state.measurement_units.itemsList.length
-			) {
-				return Promise.resolve();
-			}
-
-			return this.fetch_measurement_units({
-				params: { max: -1 },
-				notNotify: true,
-				setToStore: 1
-			});
 		},
 
 		initSensors(sensors) {
@@ -1052,14 +1001,15 @@ export default {
 
 		fetchSensorsAction(ids, sensorIdx) {
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
-				.then(async ({ value }) => {
-					await this.loadMeasurementUnitsIfNeeded(value);
+				.then(({ value }) => {
 					const dashboardSensors = this.equipmentData
 						? this.equipmentData.dashboardSensors
 						: [];
-					let sensorFromEquipment = cloneDeep(
-						findItemBy('id', ids[sensorIdx], dashboardSensors)
-					);
+					let sensorFromEquipment = cloneDeep(findItemBy(
+						'id',
+						ids[sensorIdx],
+						dashboardSensors
+					));
 					sensorFromEquipment = sensorFromEquipment || {};
 
 					this.sensors.push({ ...sensorFromEquipment, ...value });
@@ -1113,7 +1063,7 @@ export default {
 			this.showHistory = !this.showHistory;
 		},
 
-		reloadChart(chartId, settings = {}) {
+		reloadChart(chartId, settings={}) {
 			const chartIds = chartId ? [chartId] : null;
 			const ChartsListWrapper = this.$refs['ChartsListWrapper'];
 			if (ChartsListWrapper.length) {
@@ -1259,22 +1209,20 @@ export default {
 					return {
 						...point,
 						graph_timestamp: localToUtcYmdHis(point.graph_timestamp),
-						chartId: chart_id
+						chartId: chart_id,						
 					};
-				} else if (point[2]) {
-					//new note
+				} else if (point[2]) { //new note
 					return {
 						graph_timestamp: localToUtcYmdHis(point[2]),
 						chartId: chart_id,
 						metric_type: series.userOptions.customSettings.metric_type
-					};
-				} else if (point.pointId) {
-					//crash
+					}
+				} else if (point.pointId) { //crash
 					return {
 						metric_issue_alert_id: point.pointId,
 						chartId: chart_id,
 						metric_type: series.chart.options.chart_parameter_id
-					};
+					}
 				}
 				/*const graph_timestamp = localToUtcYmdHis(point[id_prop]);
 				full_file_name = point.full_file_name;
@@ -1336,7 +1284,6 @@ export default {
 						chart_id: statistics_result.chart_id,
 						parameterItem: paramItem,
 						levelZoneData: statistics_result.levelZoneData,
-						primaryLevelZoneData: statistics_result.primaryLevelZoneData,
 						levelZones: statistics_result.levelZones
 					};
 				});
@@ -1362,7 +1309,7 @@ export default {
 			this.levelZoneSetupSettings = {};
 		},
 
-		handleUnlockLube({ sensorId }) {
+		handleUnlockLube({sensorId}) {
 			// console.log(row)
 			this.confirmHelper({
 				insertToMessage: `<b>${this.$t('phrases.reset_cycle')}</b>`
@@ -1380,14 +1327,12 @@ export default {
 
 					this.sensorLoading = true;
 
-					this.toggle_ultrasound_command(payload)
-						.then(() => {
-							this.initSensors();
-							// this.reloadChart(chartId);
-						})
-						.catch(() => {
-							this.sensorLoading = false;
-						});
+					this.toggle_ultrasound_command(payload).then(() => {
+						this.initSensors();
+						// this.reloadChart(chartId);
+					}).catch(() => {
+						this.sensorLoading = false;
+					});
 				})
 				.catch(() => {});
 		},
@@ -1396,7 +1341,7 @@ export default {
 			const BannerFilterBlock = this.$refs.BannerFilterBlock;
 
 			if (BannerFilterBlock && BannerFilterBlock.handleUnlockFFT) {
-				BannerFilterBlock.handleUnlockFFT(payload);
+				BannerFilterBlock.handleUnlockFFT(payload);				
 			}
 		},
 
@@ -1404,8 +1349,7 @@ export default {
 		openFFTCharts({ payload, sensorType }) {
 			const { id, sensor_id } = payload;
 			const { isBannerTempVibe2, isBannerV2_1, isBannerM25 } = sensorType;
-			const type =
-				isBannerTempVibe2 || isBannerV2_1 || isBannerM25 ? 'banner' : 'ncd';
+			const type = (isBannerTempVibe2 || isBannerV2_1 || isBannerM25) ? 'banner' : 'ncd';
 			// const { baseURL } = axios.defaults;
 			let url = `${window.location.origin}/${type}/${sensor_id}/fft/${id}`;
 			// url = setupGetParamsStr(url, params);
@@ -1417,7 +1361,7 @@ export default {
 			link.click();
 		},
 
-		handleUnlockFFTSuccess({ fft_lock_item, sensorId }) {
+		handleUnlockFFTSuccess({fft_lock_item, sensorId}) {
 			let { index } = findItemBy('id', sensorId, this.sensors);
 			index = index == null ? 0 : index;
 			this.sensors[index].last_fft_lock = fft_lock_item;
@@ -1427,7 +1371,7 @@ export default {
 			// 	fromInstance: true,
 			// 	payload: y_filters
 			// });
-		}
+		},
 
 		/*updateChartsByYfilters(y_filters) {
 			this.callMethodInCharts({
@@ -1451,8 +1395,8 @@ export default {
 				this.setup_navbar(this.navbarSettings);
 
 				var newMetric = data.controller.plant
-					? data.controller.plant.metric_system_type
-					: data.controller.metric_system_type;
+						? data.controller.plant.metric_system_type
+						: data.controller.metric_system_type
 
 				// console.log('watch sensorData', this.filters.metric, )
 				if (this.filters.measurement != newMetric) {

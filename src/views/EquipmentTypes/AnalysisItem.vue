@@ -10,16 +10,9 @@
 				<CustomInput v-model="formData.name" :placeholder="tt('name')" />
 			</el-form-item>
 
-			<el-form-item prop="measurement_unit_id" class="mcol-xs-2">
-				<label>Measurement Unit</label>
-				<CustomSelectV2
-					v-model="formData.measurement_unit_id"
-					clearable
-					filterable
-					:optionsLoading="measurementUnitsLoading"
-					:optionsList="measurementUnitsOptions"
-					placeholder="Select Measurement Unit"
-				/>
+			<el-form-item prop="unit" class="mcol-xs-2">
+				<label>{{ tt('Unit') }}</label>
+				<CustomInput v-model="formData.unit" :placeholder="tt('unit')" />
 			</el-form-item>
 
 			<el-form-item prop="crossover_tags" class="mcol-xs-3" required>
@@ -86,8 +79,6 @@ defineOptions({
 const props = defineProps({
 	itemData: { type: Object, default: () => ({}) },
 	itemIndex: { type: Number, default: 0 },
-	measurementUnitsList: { type: Array, default: () => [] },
-	measurementUnitsLoading: Boolean,
 });
 
 const emit = defineEmits(['onRemove']);
@@ -97,7 +88,6 @@ const formData = ref({
 	id: null,
 	name: '',
 	unit: '',
-	measurement_unit_id: null,
 	crossover_tags: '',
 	is_visible: 0,
 	is_editable: 0,
@@ -105,25 +95,10 @@ const formData = ref({
 	harmonics: 5,
 });
 
-const measurementUnitsOptions = computed(() =>
-	(props.measurementUnitsList || []).map((item) => ({
-		...item,
-		label: item.name || item.label,
-		value: item.id,
-	}))
-);
-
-const localGetFormDataCallback = (data) => {
-	const nextData = { ...data };
-	delete nextData.unit;
-	return nextData;
-};
-
 const { validateItemForm, getFormData, removeItem } = useSubItem({
 	itemData: computed(() => props.itemData),
 	formData,
 	itemFormRef,
-	localGetFormDataCallback,
 	deleteNewId: true,
 	emit,
 });

@@ -73,17 +73,15 @@
 				<div class="title article-title">{{ tt('IO_Parameters') }}:</div>
 				<div class="form-subitems-wrapper">
 					<div v-if="ioParametersItemsList.length" class="form-subitems-list content-row">
-							<IOParameterItem
-								ref="IOParameterItem"
-								v-for="(item, idx) in ioParametersItemsList"
-								:key="`io_item-${item.id}`"
-								:item-data="item"
-								:item-index="idx"
-								:measurementUnitsList="measurementUnitsList"
-								:measurementUnitsLoading="measurementUnitsLoading"
-								fromModal
-								@onRemove="id => removeFormItem(id, 'ioParametersItemsList')"
-							/>
+						<IOParameterItem
+							ref="IOParameterItem"
+							v-for="(item, idx) in ioParametersItemsList"
+							:key="`io_item-${item.id}`"
+							:item-data="item"
+							:item-index="idx"
+							fromModal
+							@onRemove="id => removeFormItem(id, 'ioParametersItemsList')"
+						/>
 					</div>
 
 					<div class="margin-top-row">
@@ -93,7 +91,7 @@
 							type="success"
 							@click="addFormItem('ioParametersItemsList', 'p_i-')"
 						>
-							<span class="capitalize" v-text="`${tt('Add')} ${tt('parameter')}`"></span>
+							<span class="capitalize" v-text="`${tt('Add')} ${tt('constants.Metric')}`"></span>
 							<i class="icomoon icon-plus"></i>
 						</el-button>
 					</div>
@@ -110,24 +108,22 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { /*mapState,*/ mapActions } from 'vuex';
 import { sensorClassesList } from '@/constants/global';
 
 // import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { required } from '@/constants/validation';
-import { itemFormMixin, subItemsListMixin, requestsListMixin } from '@/mixins';
+import { itemFormMixin, subItemsListMixin } from '@/mixins';
 
 export default {
-	mixins: [itemFormMixin(), subItemsListMixin(), requestsListMixin()],
+	mixins: [itemFormMixin(), subItemsListMixin()],
 	components: {
 		IOParameterItem: () => import('./IOParameterItem.vue'),
 	},
 	data() {
 		return {
 			ioParametersItemsList: [],
-			measurementUnitsList: [],
-			measurementUnitsLoading: false,
 
 			formData: {
 				name: '',
@@ -154,14 +150,6 @@ export default {
 		subItemsSettings: () => Object.freeze([
 			{ ref: 'IOParameterItem', targetProp: 'parameters' }
 		]),
-		requestsToDoList: () => Object.freeze([
-			{
-				action: 'fetch_measurement_units',
-				localProp: 'measurementUnitsList',
-				localLoadProp: 'measurementUnitsLoading',
-				// payload: { params: { max: -1 }, notNotify: true }
-			}
-		]),
 		sensorClassesList: () => Object.freeze(sensorClassesList()),
 
 		/*refsList: () => ['IOParameterItem'],
@@ -180,7 +168,6 @@ export default {
 	methods: {
 		...mapActions({
 			save_item: 'banner_v2_subtypes/save_subtype',
-			fetch_measurement_units: 'measurement_units/fetch_measurement_units',
 		}),
 
 		localSetupPage(itemData) {
@@ -192,6 +179,6 @@ export default {
 				);
 			}
 		}
-	},
+	}
 };
 </script>

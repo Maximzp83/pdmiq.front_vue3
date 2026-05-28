@@ -25,9 +25,6 @@ import {
 
 import { sensorThresholdsTypesList } from '@/constants/global';
 import { Lang } from '@/localization';
-import {
-	resolveMeasurementUnitName
-} from '@/helpers/measurementUnits';
 
 import {
 	prepareFilters,
@@ -44,8 +41,8 @@ import {
 	setupAnnotationSelectionData,
 	collect_specific_points
 } from '../methods';
+import { METRIC_SYSTEM_TYPES } from '../enums';
 import { colorsList } from '../../../enums';
-import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums.js';
 
 import { setupYAxisPlotlines } from '../../../helpers/series_generator';
 // import { setupStatisticsTransformator } from '../StatisticsTransformatorDispatcher';
@@ -57,37 +54,6 @@ import {
 import { createDraggablePlotline } from './DraggablePlotline';
 
 class SensorChartBase extends ChartBase {
-	resolveUnitTypeName(parameterItem) {
-		if (!parameterItem) return '';
-
-		if (
-			this.currentSensorType &&
-			this.currentSensorType.isBannerV2Generic &&
-			(
-				parameterItem.measurementUnit ||
-				parameterItem.measurement_unit_id != null ||
-				parameterItem.metric_unit_id != null ||
-				parameterItem.imperial_unit_id != null
-			)
-		) {
-			return resolveMeasurementUnitName({
-				unit: parameterItem.measurementUnit,
-				measurement: this.measurement
-			}) || parameterItem.units || '';
-		}
-
-		if (parameterItem.units) return parameterItem.units;
-
-		return this.setupUnitTypeName({
-			parameterItem,
-			measurement: this.measurement
-		});
-	}
-
-	getMeasurementTypeMismatchWarning() {
-		return null;
-	}
-
 	constructor() {
 		super();
 		this.generateSeriesByStatistics = false;
@@ -402,24 +368,21 @@ class SensorChartBase extends ChartBase {
 			const yAxisOptions = resources.chart_config.yAxisOptions || {};
 			const { customYAxisTickPositioner } = resources.chart_config;
 			// console.log('localSetupYAxis', requestsList[0])
-			const unit_type_name = this.resolveUnitTypeName(requestsList[0]);
+			const units = requestsList[0] && requestsList[0].units;
+			let unit_type_name = units || this.setupUnitTypeName({
+				parameterItem: requestsList[0],
+				measurement: this.measurement
+			});
 
 			this.options.yAxis = [];
 			YAxisList.forEach((axisSettings = {}) => {
-				const axisParameterItem = axisSettings.parameterItem || axisSettings;
-				const axisUnitTypeName = this.resolveUnitTypeName(axisParameterItem) || unit_type_name;
-
 				let axis = {
 					max: -9999999,
 					min: 0,
 					softMax: 1,
 					title: {
 						// useHTML: true,
-						text: axisUnitTypeName || ''
-					},
-					customSettings: {
-						parameterItem: axisParameterItem,
-						unit_type_name: axisUnitTypeName || ''
+						text: unit_type_name || ''
 					},
 					startOnTick: true,
 					opposite: false,
@@ -550,12 +513,16 @@ class SensorChartBase extends ChartBase {
 	// seriesConfig - step 3
 	modifySeriesConfig({ requestsList, resources, seriesConfig }) {
 		const { filters, chart_config } = resources;
+		const units = requestsList[0] && requestsList[0].units;
 
 		this.measurement = filters.measurement;
 		const { ncd_active_axial_axis } = this.sensorItem;
 			// console.log('requestsList', requestsList)
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = this.resolveUnitTypeName(parameterItem);
+			const unit_type_name = units || this.setupUnitTypeName({
+				parameterItem,
+				measurement: this.measurement
+			});
 			seriesConfig.pointsData.seriesConfigsList[
 				idx
 			] = seriesConfig.pointsData.seriesConfigsList[idx].map(item => {
@@ -1664,11 +1631,6 @@ class SensorChart extends SensorChartBase {
 							zonesData: levelZoneData,
 							value: new_val
 						};
-						const parameterItem = requestsList[0];
-						const value = getZoneValue(
-							plotLine.customSettings.data_path,
-							getZoneSettings
-						);
 
 						const requestPayload = {
 							sensorId: sensorItem.id,
@@ -1676,9 +1638,12 @@ class SensorChart extends SensorChartBase {
 							method: 'PUT',
 							data: {
 								metric_system_type: this.measurement,
-								parameter_type: parameterItem.id,
+								parameter_type: requestsList[0].id,
 								level: plotLine.zone_id,
-								value
+								value: getZoneValue(
+									plotLine.customSettings.data_path,
+									getZoneSettings
+								)
 							}
 						};
 
@@ -2471,17 +2436,6 @@ class SensorOverlayChart extends SensorChartBase {
 
 // --------------------
 class MultiViewChart extends ChartBase {
-	resolveUnitTypeName(parameterItem) {
-		if (!parameterItem) return '';
-
-		if (parameterItem.units) return parameterItem.units;
-
-		return this.setupUnitTypeName({
-			parameterItem,
-			measurement: this.measurement
-		});
-	}
-
 	constructor(resources) {
 		super();
 		// console.log('resources', resources)
@@ -2620,8 +2574,11 @@ class MultiViewChart extends ChartBase {
 			this.options.yAxis = [];
 
 			YAxisList.forEach((axisSettings = {}, idx) => {
-				const axisParameterItem = axisSettings.parameterItem || axisSettings;
-				const unit_type_name = this.resolveUnitTypeName(axisParameterItem);
+				const units = axisSettings && axisSettings.units;
+				let unit_type_name = units || this.setupUnitTypeName({
+					parameterItem: axisSettings,
+					measurement: this.measurement
+				});
 
 				let axis = {
 					max: -9999999,
@@ -2633,10 +2590,7 @@ class MultiViewChart extends ChartBase {
 					},
 					startOnTick: true,
 					opposite: !!idx,	
-					customSettings: {
-						parameterItem: axisParameterItem,
-						unit_type_name: unit_type_name || ''
-					},
+					customSettings: { parameterItem: axisSettings },
 					...yAxisOptions,
 				};
 				// console.log('axisSettings', axisSettings)
@@ -2718,7 +2672,10 @@ class MultiViewChart extends ChartBase {
 		// const { ncd_active_axial_axis } = this.sensorItem;
 		// console.log('modifySeriesConfig', this.measurement, this.options.yAxis)
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = this.resolveUnitTypeName(parameterItem);
+			const unit_type_name = this.setupUnitTypeName({
+				parameterItem,
+				measurement: this.measurement
+			});
 			const { sensor_id } = parameterItem;
 			let actualAxisIdx = 0;
 

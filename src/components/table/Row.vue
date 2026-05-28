@@ -63,6 +63,7 @@
 
 <script setup>
 import { computed, defineAsyncComponent, onMounted, watch } from 'vue';
+import { validateBySettings } from '@/helpers';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 
 import TableAction from './TableAction.vue';
@@ -84,7 +85,6 @@ const props = defineProps({
 	expandedRowSettings: { type: Object, default: null },
 	disableSelection: Boolean,
 	selectedIds: { type: Array, default: () => [] },
-	canSelect: { type: Boolean, default: true },
 	itemsSaving: Boolean,
 	canDeleteSettings: Boolean,
 	operationsWidth: { type: String, default: '0' },
@@ -104,6 +104,37 @@ const actionsListSecondRow = computed(() => {
 		return Object.freeze(props.operations.actions_second_row);
 	}
 	return [];
+});
+
+const canSelect = computed(() => {
+	if (actionsList.value.length) {
+		const deleteActions = actionsList.value.filter(
+			(action) =>
+				(action.name === 'handleDeleteItems' ||
+					action.name === 'handleDeleteWorkOrders') &&
+				action.conditionSettings
+		);
+
+		if (deleteActions.length) {
+			let allowedActionsCount = 0;
+
+			deleteActions.forEach((action) => {
+				if (
+					action.conditionSettings &&
+					validateBySettings({
+						...action.conditionSettings,
+						dataObj: props.rowData,
+					})
+				) {
+					allowedActionsCount++;
+				}
+			});
+
+			return allowedActionsCount > 0;
+		}
+	}
+
+	return true;
 });
 
 const handleChecked = () => {

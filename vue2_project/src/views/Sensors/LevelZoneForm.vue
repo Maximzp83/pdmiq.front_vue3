@@ -165,8 +165,7 @@
 				prop="periods"
 				v-if="
 					(parameterItem.id === SENSOR_PARAMETERS_TYPES.TEMPERATURE ||
-						isHumiditySensor ||
-						isBannerV2Generic) &&
+						isHumiditySensor) &&
 						!isOffAlarm
 					// !isHumiditySensor
 				"
@@ -182,6 +181,7 @@
 					:item-index="idx"
 					@onRemove="id => removeFormItem(id, 'thresholdPeriodsItemsList')"
 					@selectMonth="handleSelectMonth"
+					:isMobile="isMobile"
 					:isOffAlarm="isOffAlarm"
 					:selectedMonths="selectedMonths"
 					:isHumiditySensor="isHumiditySensor"
@@ -270,8 +270,9 @@ export default {
 	},
 
 	computed: {
-		subItemsSettings: () =>
-			Object.freeze([{ ref: 'ThresholdPeriodItem', targetProp: 'periods' }]),
+		subItemsSettings: () => Object.freeze([
+			{ ref: 'ThresholdPeriodItem', targetProp: 'periods' },
+		]),
 
 		SENSOR_PARAMETERS_TYPES: () => SENSOR_PARAMETERS_TYPES,
 		parameter_type: that => that.parameterData.parameterItem.id,
@@ -281,18 +282,14 @@ export default {
 		isSDTsensor: that =>
 			that.currentSensorType.isSDTsensor || that.currentSensorType.isNCDSDT,
 		isUltrasound: that => that.currentSensorType.isUltrasound,
-		isLubeModeOnForBanner: that =>
-			!that.currentSensorType.isUltrasound && that.sensor.is_lube_mode,
+		isLubeModeOnForBanner: that => !that.currentSensorType.isUltrasound && that.sensor.is_lube_mode,
 
-		enableLubeMatrixInputForBanner: that =>
-			that.isLubeModeOnForBanner &&
-			that.sensor.lube_trigger_metric_type === that.parameter_type,
+		enableLubeMatrixInputForBanner: that => that.isLubeModeOnForBanner && that.sensor.lube_trigger_metric_type === that.parameter_type,
 
 		isNCDPressure: that => that.currentSensorType.isNCDPressure,
 		isBannerPressure: that => that.currentSensorType.isBannerPressure,
 		isHumiditySensor: that =>
 			that.currentSensorType.isHumiditySensor || that.currentSensorType.isNCDEnv,
-		isBannerV2Generic: that => that.currentSensorType.isBannerV2Generic,
 
 		isLowHighZones() {
 			const {
@@ -306,11 +303,7 @@ export default {
 			const { bannerV2Subtype } = this.sensor;
 
 			if (isBannerV2Generic && bannerV2Subtype) {
-				const currentSubTypeParam = findItemBy(
-					'node_parameter',
-					this.parameterData.parameterItem.id,
-					bannerV2Subtype.parameters
-				);
+				const currentSubTypeParam = findItemBy('node_parameter', this.parameterData.parameterItem.id,bannerV2Subtype.parameters);
 				if (currentSubTypeParam) {
 					return currentSubTypeParam.alarm_type === NCD_ALARM_TYPES.LOW_HIGH_ALARM;
 				}
@@ -321,8 +314,7 @@ export default {
 				isNCDEnv ||
 				isNCDPressure ||
 				isBannerPressure ||
-				(isNCDCustom_4_20 &&
-					this.sensor.alarm_type === NCD_ALARM_TYPES.LOW_HIGH_ALARM)
+				(isNCDCustom_4_20 && this.sensor.alarm_type === NCD_ALARM_TYPES.LOW_HIGH_ALARM)
 			);
 		},
 
@@ -354,8 +346,8 @@ export default {
 
 		warningZoneMin() {
 			if (
-				this.parameterData.parameterItem.type == 'temperature' ||
-				this.parameterData.parameterItem.type === undefined // для всех generic parameters
+				this.parameterData.parameterItem.type == 'temperature' 
+				|| this.parameterData.parameterItem.type === undefined // для всех generic parameters
 			) {
 				return -273;
 			}
@@ -407,11 +399,10 @@ export default {
 				this.formData.parameter_type = SENSOR_SPECIFIC_PARAMETERS_TYPES.DB;
 			}
 
-			const { levelZones, levelZoneData, primaryLevelZoneData } = parameterData;
-			const formLevelZoneData = primaryLevelZoneData || levelZoneData;
+			const { levelZones, levelZoneData } = parameterData;
 
-			if (formLevelZoneData || (levelZones && levelZones.length)) {
-				let actualLevelZoneData = formLevelZoneData;
+			if (levelZoneData || (levelZones && levelZones.length)) {
+				let actualLevelZoneData = levelZoneData;
 
 				if (!actualLevelZoneData) {
 					actualLevelZoneData = findItemBy(
@@ -448,7 +439,7 @@ export default {
 					} else*/
 				}
 			}
-
+			
 			if (isUltrasound || enableLubeMatrixInputForBanner) {
 				this.formData.is_lube_zone_included = true;
 			}

@@ -74,6 +74,17 @@
 - DONE (single-file): added `src/views/Companies/ItemPage.vue` in Vue3 style with tabbed page wrapper and multipart save flow for SSO certificate uploads.
 - DONE (single-file): added `src/views/Companies/InfoPage.vue` in Vue3 style; route enablement and Companies list `Info` action wiring remain separate next steps.
 - DONE (details stack): completed `BrandModels` details flow with `MoveForm`, `LocationList`, `DetailsPage`, route wiring in `src/router/index.js`, and supporting registry/runtime fixes.
+- DONE (sync): applied latest `vue2_project/src/components/table/CustomDataListTable.vue` selection behavior update to `src/components/table/CustomDataListTable.vue`.
+- DONE (sync): applied latest confirmed legacy changes to migrated files: `src/components/table/Row.vue`, `src/components/table/TableHeader.vue`, `src/constants/date_time.js`, `src/helpers/index.js`, `src/views/EquipmentTypes/AnalysisItem.vue`, `src/views/EquipmentTypes/VibrationAnalysisItemsBlock.vue`, and `src/views/Machines/ItemForm.vue`; skipped `src/constants/global.js` as whitespace-only and `src/composables/mixins/useItemsData.js` as already aligned.
+- DONE (sync): applied remaining non-SCSS/non-localization legacy updates to migrated files: removed unused `src/helpers/eventLogs.js`, cleaned disabled requisition notification refs from `src/views/Users/ItemForm.vue`, and aligned Sensor chart factory `Chart.js`, `methods.js`, and `enums.js`.
+- DONE (single-file): added `src/views/Distributors/ItemsList.vue` in Vue3 style and registered `Distributors` in `src/config/entities.js`.
+- DONE (coupled step): added `src/views/Distributors/ItemForm.vue` and `src/views/Distributors/LocationItem.vue` in Vue3 style.
+- DONE (single-file): added `src/views/Distributors/ItemPage.vue` in Vue3 style.
+- DONE (coupled step): enabled Distributors routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
+- DONE (single-file): added `src/views/TaskProcedures/ItemsList.vue` in Vue3 style and registered `TaskProcedures` in `src/config/entities.js`.
+- DONE (coupled step): added `src/views/TaskProcedures/ItemForm.vue`, `PartItem.vue`, and `ProcessItem.vue` in Vue3 style.
+- DONE (single-file): added `src/views/TaskProcedures/ItemPage.vue` in Vue3 style.
+- DONE (coupled step): enabled TaskProcedures routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
 - Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.
 - Current next focus: continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage or move to another real Vue3 migration target selected by the user.
 

@@ -47,37 +47,6 @@
 				:sensorParametersList="sensorParametersListVFDPressureRPMAmps"
 			/>
 		</div>
-
-		<div
-			class="button-item"
-			v-if="
-					!isCompare &&
-					isBannerV2Generic &&
-					$hasAccessTo(['edit_dashboard'])"
-		>
-			<RebaselineBlock
-				:sensorData="sensorData"
-			/>
-		</div>
-
-		<div class="button-item chart-switcher text-right">
-			<div class="relative flex">
-				<el-button-group>
-					<!-- :disabled="itemsLoading" -->
-					<!-- :loading="itemsLoading" -->
-					<el-button
-						v-for="item in metricSystemsList"
-						:key="`metricSystem-${item.id}`"
-						@click="switchMetricSystem(item)"
-						type="primary"
-						native-type="button"
-						v-text="item.name"
-						:class="{ active: filters.measurement === item.id }"
-						class="inverted"
-					/>
-				</el-button-group>
-			</div>
-		</div>
 	</div>
 </template>
 
@@ -97,8 +66,7 @@ export default {
 	// mixins: [chartsCompareExportMixin()],
 	components: {
 		ChartsFilterBar: () => import('../charts/ChartsFilterBar.vue'),
-		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue'),
-		RebaselineBlock: () => import('./RebaselineBlock.vue')
+		PDFandFFTrequestsBlock: () => import('./PDFandFFTrequestsBlock.vue')
 		// AcknowledgeForm: () => import('../Dashboard/AcknowledgeForm.vue')
 	},
 	props: {
@@ -141,7 +109,7 @@ export default {
 			authUser: state => state.auth.authUser
 			// levelZonesSaving: state => state.sensors.levelZonesSaving
 		}),
-		isBannerV2Generic: that => that.currentSensorType.isBannerV2Generic,
+
 		metricSystemsList: () => Object.freeze(metricSystemsList()),
 		sensorParametersListVFDPressureRPMAmps: () =>
 			Object.freeze(sensorParametersListVFDPressureRPMAmps())

@@ -73,6 +73,7 @@
 					:optionsList="equipmentTypesList"
 					:placeholder="`${tt('Select')} ${tt('type')}`"
 					v-model="formData.equipment_type_id"
+					@change="handleEquipmentTypeChange"
 				/>
 			</el-form-item>
 
@@ -1309,6 +1310,13 @@ export default {
 			} else if (id === this.STATUSES_TYPES.ASSET) {
 				this.rules.asset_id = required;
 			}
+		},
+
+		handleEquipmentTypeChange() {
+			this.formData.equipment_subtype_id = null;
+			// -----------------
+			// this.equipmentTypeHasChanged = true;
+			// this.fetchVibrationAnalysis(id);
 		},
 
 		// ----------------------

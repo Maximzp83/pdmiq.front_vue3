@@ -1281,14 +1281,13 @@ const setupFFTPeaksList1 = ({ statistics }) => {
 	return value > max_value
 };*/
 const getStatisticsItemParams = item => {
-	const { register_value, unit, t, signal_date_at, raw_value } = item;
+	const { register_value, unit, t, signal_date_at } = item;
 	let xKey, yKey;
 
 	if (signal_date_at) xKey = 'signal_date_at';
 	else if (t) xKey = 't';
-	if (unit != null) yKey = 'unit';
-	else if (register_value != null) yKey = 'register_value';
-	else if (raw_value != null) yKey = 'raw_value';
+	if (unit !== undefined) yKey = 'unit';
+	else if (register_value !== undefined) yKey = 'register_value';
 
 	return {
 		xKey,
@@ -1354,9 +1353,6 @@ const standard_datetime1 = payload => {
 
 		if (parameter_item) {
 			toFixedNum = parameter_item.toFixedNum;
-			if (parameter_item.y_formula) {
-				formula_y = parameter_item.y_formula;
-			}
 
 			/*if (parameter_item.calc_imperial_cpm && measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 				formula_y = y => y * 60;

@@ -6,7 +6,6 @@
 					@change="handleCheckAllChange"
 					:value="checkAll"
 					:indeterminate="isIndeterminate"
-					:disabled="disableCheckAll"
 				></el-checkbox>
 			</div>
 
@@ -44,7 +43,6 @@ export default {
 		itemsName: { type: Object, required: true },
 		className: String,
 		disableSelection: Boolean,
-		disableCheckAll: Boolean,
 		checkAll: Boolean,
 		isIndeterminate: Boolean,
 		operationsWidth: String

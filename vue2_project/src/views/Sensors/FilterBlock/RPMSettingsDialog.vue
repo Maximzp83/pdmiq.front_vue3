@@ -3,39 +3,24 @@
 		<div class="section-row">
 			<div class="rpm-settings-grid">
 				<div class="rpm-settings-grid__header">
-					<div
-						class="rpm-settings-grid__cell rpm-settings-grid__cell--option"
-					></div>
-					<div
-						class="bold rpm-settings-grid__cell rpm-settings-grid__cell--value"
-					>
-						RPM
-					</div>
-					<div
-						class="bold rpm-settings-grid__cell rpm-settings-grid__cell--value"
-					>
-						Hz
-					</div>
+					<div class="rpm-settings-grid__cell rpm-settings-grid__cell--option"></div>
+					<div class="bold rpm-settings-grid__cell rpm-settings-grid__cell--value">RPM</div>
+					<div class="bold rpm-settings-grid__cell rpm-settings-grid__cell--value">Hz</div>
 				</div>
 
 				<div
-					v-for="item in displayItemSpeedOptionsList"
+					v-for="item in preparedItemSpeedOptionsList"
 					:key="`rpm-source-${item.id}`"
 					:class="['rpm-settings-grid__row', { 'is-active': isActive(item) }]"
 					@click="handleSelect(item)"
 				>
-					<div
-						class="rpm-settings-grid__cell rpm-settings-grid__cell--option el-checkbox"
-					>
+					<div class="rpm-settings-grid__cell rpm-settings-grid__cell--option el-checkbox">
 						<span
 							:class="['el-checkbox__input', { 'is-checked': isActive(item) }]"
 						>
 							<span class="el-checkbox__inner"></span>
 						</span>
-						<span
-							class="rpm-settings-grid__label capitalize"
-							v-html="item.name"
-						/>
+						<span class="rpm-settings-grid__label capitalize" v-html="item.name" />
 					</div>
 
 					<div class="rpm-settings-grid__cell rpm-settings-grid__cell--value">
@@ -61,20 +46,26 @@
 				type="primary"
 				@click="handleSave"
 				class="uppercase semi-bold"
-				>{{ tt("Save") }}</el-button
+				>{{ tt('Save') }}</el-button
 			>
 
-			<el-button class="uppercase semi-bold" @click="handleCancel">{{
-				tt("Cancel")
-			}}</el-button>
+			<el-button
+				class="uppercase semi-bold"
+				@click="handleCancel"
+				>{{ tt('Cancel') }}</el-button
+			>
 		</div>
+		
 	</div>
 </template>
 
 <script>
-import { setupItemSpeedOptionsList } from "@/helpers/specialHelpers";
+import { setupItemSpeedOptionsList } from '@/helpers/specialHelpers';
 
-import { itemSpeedOptionsList, ITEM_SPEED_OPTIONS } from "@/constants/global";
+import {
+	itemSpeedOptionsList,
+	ITEM_SPEED_OPTIONS,
+} from '@/constants/global';
 
 export default {
 	props: {
@@ -90,10 +81,10 @@ export default {
 			type: Object,
 			default: () => null
 		},
-		currentRpmSource: null
+		currentRpmSource: null,
 	},
 	components: {
-		CustomInput: () => import("@/components/form/CustomInput.vue")
+		CustomInput: () => import('@/components/form/CustomInput.vue'),
 	},
 	data() {
 		return {
@@ -109,128 +100,9 @@ export default {
 				itemSpeedOptionsList: that.itemSpeedOptionsList,
 				fftItem: that.fftItem,
 				rootFilters: that.rootFilters
-			});
-		},
-		snapshotItemSpeedOptionsList() {
-			const optionDefinitions = [
-				/*{
-					id: "fft-snapshot-line-speed-rpm",
-					name: this.getSnapshotOptionName(this.tt("constants.linespeed_rpm"), [
-						"Saved",
-						"Raw"
-					]),
-					value: this.fftItem && this.fftItem.line_speed_rpm
-				},*/
-				{
-					id: "fft-snapshot-line-speed-rpm-evaluated",
-					name: this.getSnapshotOptionName(this.tt("constants.linespeed_rpm"), [
-						"Saved",
-						"Evaluated"
-					]),
-					value: this.fftItem && this.fftItem.line_speed_rpm_evaluated
-				},
-				/*{
-					id: "fft-snapshot-specification-rpm",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.specification_rpm"),
-						["Saved", "Raw"]
-						),
-					value: this.fftItem && this.fftItem.specification_rpm
-				},*/
-				{
-					id: "fft-snapshot-specification-rpm-evaluated",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.specification_rpm"),
-						["Saved", "Evaluated"]
-						),
-					value: this.fftItem && this.fftItem.specification_rpm_evaluated
-				},
-				/*{
-					id: "fft-snapshot-manual-rpm",
-					name: this.getSnapshotOptionName(this.tt("constants.manual_rpm"), [
-						"Saved",
-						"Raw"
-					]),
-					value: this.fftItem && this.fftItem.manual_rpm
-				},*/
-				{
-					id: "fft-snapshot-manual-rpm-evaluated",
-					name: this.getSnapshotOptionName(this.tt("constants.manual_rpm"), [
-						"Saved",
-						"Evaluated"
-					]),
-					value: this.fftItem && this.fftItem.manual_rpm_evaluated
-				},
-				/*{
-					id: "fft-snapshot-external-rpm",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.external_input"),
-						["Saved", "Raw"]
-						),
-					value: this.fftItem && this.fftItem.external_rpm
-				},*/
-				{
-					id: "fft-snapshot-external-rpm-evaluated",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.external_input"),
-						["Saved", "Evaluated"]
-						),
-					value: this.fftItem && this.fftItem.external_rpm_evaluated
-				},
-				/*{
-					id: "fft-snapshot-max-peak-frequency-metric",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.max_peak_frequency"),
-						["Saved", "Metric", "Raw"]
-						),
-					value: this.fftItem && this.fftItem.max_peak_frequency_at_metric
-				},*/
-				{
-					id: "fft-snapshot-max-peak-frequency-metric-evaluated",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.max_peak_frequency"),
-						["Saved", "Metric", "Evaluated"]
-						),
-					value:
-					this.fftItem && this.fftItem.max_peak_frequency_at_metric_evaluated
-				},
-				/*{
-					id: "fft-snapshot-max-peak-frequency-imperial",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.max_peak_frequency"),
-						["Saved", "Imperial", "Raw"]
-						),
-					value: this.fftItem && this.fftItem.max_peak_frequency_at_imperial
-				},*/
-				{
-					id: "fft-snapshot-max-peak-frequency-imperial-evaluated",
-					name: this.getSnapshotOptionName(
-						this.tt("constants.max_peak_frequency"),
-						["Saved", "Imperial", "Evaluated"]
-						),
-					value:
-					this.fftItem &&
-					this.fftItem.max_peak_frequency_at_imperial_evaluated
-				}
-			];
+			})
 
-			return Object.freeze(
-				optionDefinitions
-				.filter(item => item.value != null)
-				.map(item => ({
-					...item,
-					rpmValue: +item.value,
-					value: +item.value,
-					isFftSnapshot: true
-				}))
-			);
 		},
-		displayItemSpeedOptionsList() {
-			return Object.freeze([
-				...this.preparedItemSpeedOptionsList,
-				...this.snapshotItemSpeedOptionsList
-			]);
-		}
 	},
 
 	methods: {
@@ -241,8 +113,7 @@ export default {
 		handleSelect(item) {
 			this.rpm_source_item = {
 				id: item.id,
-				value: this.getRpmValue(item),
-				isFftSnapshot: !!item.isFftSnapshot
+				value: this.getRpmValue(item)
 			};
 		},
 
@@ -255,44 +126,33 @@ export default {
 
 		getHzValue(item) {
 			const rpmValue = this.getRpmValue(item);
-			return rpmValue != null && rpmValue !== "" && !isNaN(+rpmValue)
-				? +rpmValue / 60
-				: null;
+			return rpmValue != null && rpmValue !== '' && !isNaN(+rpmValue) ? +rpmValue / 60 : null;
 		},
 
 		formatValue(value, fixed = 0) {
-			if (value == null || value === "" || isNaN(+value)) {
-				return "-";
+			if (value == null || value === '' || isNaN(+value)) {
+				return '-';
 			}
 			return (+value).toFixed(fixed);
 		},
 
-		getSnapshotOptionName(baseName, tags = []) {
-			const labels = tags.filter(Boolean).join(" / ");
-			return labels
-				? `${baseName} <span class="rpm-settings-grid__label-note">(${labels})</span>`
-				: baseName;
-		},
-
 		handleSave() {
 			let data = {
-				rpm_source_item: this.rpm_source_item.id
-			};
+				rpm_source_item: this.rpm_source_item.id,
+			}
 			if (this.rpm_source_item.id === ITEM_SPEED_OPTIONS.MANUAL_RPM) {
 				data.rpm_value = +this.rpm_source_item.value;
-			} else if (
-				this.rpm_source_item.id === "fft-rpm" ||
-				this.rpm_source_item.isFftSnapshot
-			) {
+			} else if (this.rpm_source_item.id === 'fft-rpm') {
+				// console.log('rpm_source_item', this.rpm_source_item)
 				data.rpm_value = +this.rpm_source_item.value;
 				data.isFFTRPM = true;
 			}
-
-			this.$emit("save", data);
+			
+			this.$emit('save', data);
 		},
 
 		handleCancel() {
-			this.$emit("close");
+			this.$emit('close');	
 		}
 	},
 
@@ -314,10 +174,7 @@ export default {
 .rpm-settings-grid__header,
 .rpm-settings-grid__row {
 	display: grid;
-	grid-template-columns: minmax(0, 1.5fr) minmax(90px, 120px) minmax(
-			90px,
-			120px
-		);
+	grid-template-columns: minmax(0, 1.5fr) minmax(90px, 120px) minmax(90px, 120px);
 	gap: 12px;
 	align-items: center;
 }
@@ -333,6 +190,7 @@ export default {
 	/*border: 1px solid #dcdfe6;*/
 	/*border-radius: 6px;*/
 	cursor: pointer;
+
 }
 
 /*.rpm-settings-grid__row.is-active {
@@ -369,10 +227,5 @@ export default {
 
 .rpm-settings-grid__label {
 	line-height: 1.3;
-}
-
-.rpm-settings-grid__label-note {
-	font-size: 11px;
-	color: #909399;
 }
 </style>

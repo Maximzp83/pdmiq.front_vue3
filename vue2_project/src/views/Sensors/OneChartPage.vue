@@ -425,24 +425,8 @@ export default {
 		...mapActions({
 			set_sensor_state: 'sensors/set_sensor_state',
 			fetch_sensor: 'sensors/fetch_sensor',
-			fetch_equipment: 'equipments/fetch_equipment',
-			fetch_measurement_units: 'measurement_units/fetch_measurement_units'
+			fetch_equipment: 'equipments/fetch_equipment'
 		}),
-
-		loadMeasurementUnitsIfNeeded(sensor) {
-			const hasMeasurementUnit = sensor &&
-				sensor.bannerV2Subtype &&
-				sensor.bannerV2Subtype.parameters &&
-				sensor.bannerV2Subtype.parameters.some(
-					item => item.metric_unit_id != null || item.imperial_unit_id != null
-				);
-
-			if (!hasMeasurementUnit || this.$store.state.measurement_units.itemsList.length) {
-				return Promise.resolve();
-			}
-
-			return this.fetch_measurement_units({ params: { max: -1 }, notNotify: true, setToStore: true });
-		},
 
 		/*calcFirstStatisticsItemForAll(statistics) {
 			let first;
@@ -505,8 +489,7 @@ export default {
 
 		fetchSensorsAction(ids, sensorIdx) {
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
-				.then(async ({ value }) => {
-					await this.loadMeasurementUnitsIfNeeded(value);
+				.then(({ value }) => {
 					const dashboardSensors = this.equipmentData
 						? this.equipmentData.dashboardSensors
 						: [];

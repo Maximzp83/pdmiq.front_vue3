@@ -20,7 +20,6 @@
 				</div>
 			</div>
 			<!-- :validate="" -->
-			<!-- requisition-update -->
 			<el-form
 				:class="[
 					'item-edit-form relative section-row mcol-xs-12',
@@ -29,7 +28,6 @@
 				label-width="150px"
 				ref="itemForm"
 				:model="formData"
-				:rules="rules"
 				:label-position="isMobile || fromModal ? 'top' : 'left'"
 			>
 				<!-- :label-position="(isMobile || !fromModal) ? 'top' : 'left'" -->
@@ -147,64 +145,6 @@
 								/>
 							</div>
 							<div v-else class="semi-bold">{{ formData.actual_time }}</div>
-						</el-form-item>
-
-						<!-- requisition-update -->
-						<el-form-item :label="tt('phrases.DT_per_Hour')" prop="downtime_cost_per_hour">
-							<el-input-number
-								v-if="!showJustInfo"
-								v-model.number="formData.downtime_cost_per_hour"
-								:controls="false"
-								:min="0"
-								class="mcol-xs-12"
-							/>
-							<div v-else class="semi-bold">
-								{{
-									itemData.downtime_cost_per_hour || itemData.downtime_cost_per_hour === 0 ? itemData.downtime_cost_per_hour : '-'
-								}}
-							</div>
-						</el-form-item>
-
-						<!-- requisition-update -->
-						<el-form-item
-							:label="tt('phrases.Hours_Saved_or_Lead_Time')"
-							prop="hours_saved"
-						>
-							<el-input-number
-								v-if="!showJustInfo"
-								v-model.number="formData.hours_saved"
-								:controls="false"
-								:min="0"
-								class="mcol-xs-12"
-							/>
-							<div v-else class="semi-bold">
-								{{
-									itemData.hours_saved || itemData.hours_saved === 0
-										? itemData.hours_saved
-										: '-'
-								}}
-							</div>
-						</el-form-item>
-
-						<!-- requisition-update -->
-						<el-form-item
-							:label="tt('phrases.Contractor_Quote')"
-							prop="contractor_quote"
-						>
-							<el-input-number
-								v-if="!showJustInfo"
-								v-model.number="formData.contractor_quote"
-								:controls="false"
-								:min="0"
-								class="mcol-xs-12"
-							/>
-							<div v-else class="semi-bold">
-								{{
-									itemData.contractor_quote || itemData.contractor_quote === 0
-										? itemData.contractor_quote
-										: '-'
-								}}
-							</div>
 						</el-form-item>
 
 						<el-form-item
@@ -481,12 +421,18 @@ import {
 
 import { USER_ROLES_TYPES } from '@/constants/global';
 
-// requisition-update
-import { itemFormMixin, requestsListMixin, subItemsListMixin } from '@/mixins';
+import {
+	itemFormMixin,
+	requestsListMixin,
+	subItemsListMixin
+} from '@/mixins';
 
 export default {
-	// requisition-update
-	mixins: [itemFormMixin(), requestsListMixin(), subItemsListMixin()],
+	mixins: [
+		itemFormMixin(),
+		requestsListMixin(),
+		subItemsListMixin()
+	],
 	components: {
 		/*FormOperationsButtons: () =>
 			import('@/components/form/FormOperationsButtons.vue'),*/
@@ -525,7 +471,7 @@ export default {
 			formData: {
 				work_station_id: null,
 				technicians_ids: [],
-				actual_time: '',				
+				actual_time: '',
 				fab_shop_manager_notes: '',
 				actual_cost: 0,
 				actual_materials: [],
@@ -535,55 +481,17 @@ export default {
 				estimated_started_at: '',
 				estimated_finished_at: '',
 
-				po_number: '',
-
-				// requisition-update
-				downtime_cost_per_hour: 0,
-				hours_saved: 0,
-				contractor_quote: 0,
+				po_number: ''
 				// proposed_cost: 0,
-			},
-			// requisition-update
-			rules: {
-				downtime_cost_per_hour: [
-					{
-						validator: (rule, value, callback) => {
-							const hasDtHour = this.hasNumericValue(value);
-							const hasHoursSaved = this.hasNumericValue(this.formData.hours_saved);
-							if (hasDtHour !== hasHoursSaved) {
-								callback(new Error(this.tt('aliases.dt_cost_req_togr')));
-								return;
-							}
-							callback();
-						},
-						trigger: ['blur', 'change']
-					}
-				],
-				hours_saved: [
-					{
-						validator: (rule, value, callback) => {
-							const hasDtHour = this.hasNumericValue(this.formData.downtime_cost_per_hour);
-							const hasHoursSaved = this.hasNumericValue(value);
-							if (hasDtHour !== hasHoursSaved) {
-								callback(new Error(this.tt('aliases.dt_cost_req_togr')));
-								return;
-							}
-							callback();
-						},
-						trigger: ['blur', 'change']
-					}
-				]
 			}
 		};
 	},
 
 	computed: {
-		// requisition-update
-		subItemsSettings: () =>
-			Object.freeze([
-				{ ref: 'MaterialItem', targetProp: 'proposed_materials' },
-				{ ref: 'ActualMaterialItem', targetProp: 'actual_materials' }
-			]),
+		subItemsSettings: () => Object.freeze([
+			{ ref: 'MaterialItem', targetProp: 'proposed_materials' },
+			{ ref: 'ActualMaterialItem', targetProp: 'actual_materials' },
+		]),
 
 		requestsToDoList() {
 			if (!this.showJustInfo) {
@@ -711,10 +619,6 @@ export default {
 
 		event(name, data) {
 			this.$emit('event', name, data);
-		},
-		// requisition-update
-		hasNumericValue(value) {
-			return value !== null && value !== '' && typeof value !== 'undefined';
 		},
 
 		handleTimeInput(time, prop) {

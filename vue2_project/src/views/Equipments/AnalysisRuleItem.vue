@@ -12,7 +12,7 @@
 			]">
 				<SimpleSpinner :active="ruleOptionsLoading" />
 				<div class="value" v-if="showRuleItemTextValue">{{selectedRuleItemTextValue}}</div>
-				<div class="unit">{{originalRuleUnit}}</div>
+				<div class="unit">{{original_rule.unit}}</div>
 				<el-button
 					@click.stop="handleShowAnalysisRuleFormDialog"
 					native-type="button"
@@ -82,7 +82,7 @@
 							labelKey="value"
 						/>
 					
-						<span class="span-block mcol-xs-1"> {{originalRuleUnit}}</span>
+						<span class="span-block mcol-xs-1"> {{original_rule.unit}}</span>
 					</div>
 				</el-form-item>
 			</el-form>
@@ -141,7 +141,7 @@
 					labelKey="value"
 				/>
 					<!-- labelKey="vibration_analysis_value" -->
-				<span class="mcol-xs-2 text-center"> {{originalRuleUnit}}</span>
+				<span class="mcol-xs-2 text-center"> {{original_rule.unit}}</span>
 				
 				<div v-if="original_rule.is_editable"
 					class="pointer mcol-xs-2 ml-auto"
@@ -157,7 +157,6 @@
 
 <script>
 import { mapActions } from 'vuex';
-import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { subItemMixin, fetchItemsHelper } from '@/mixins';
 
@@ -172,8 +171,7 @@ export default {
 		savingInProgress: Boolean,
 		rpm_source_value: null,
 		crossoverRulesList: null,
-		showRuleItemTextValue: Boolean,
-		rootFilters: { type: Object, default: () => ({}) },
+		showRuleItemTextValue: Boolean
 	},
 
 	data() {
@@ -201,28 +199,6 @@ export default {
 	computed: {
 		deleteNewId: () => true,
 		original_rule: that => that.itemData.original_rule,
-		originalRuleUnit() {
-			const { original_rule } = this;
-			if (!original_rule) return '';
-
-			if (original_rule.unit) {
-				return original_rule.unit;
-			}
-
-			if (original_rule.measurement_unit) {
-				const { measurement } = this.rootFilters;
-				let key;
-
-				if (measurement === METRIC_SYSTEM_TYPES.METRIC) {
-					key = 'metric_name';
-				} else if (measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
-					key = 'imperial_name';					
-				}
-				return original_rule.measurement_unit[key] || '';
-			}
-
-			return '';
-		},
 		showFFTAnalysisHarmonicsSettings: that => that.fromFFTPage && that.insideChartAnalysisRulesBar,
 		formRules() {
 			return {

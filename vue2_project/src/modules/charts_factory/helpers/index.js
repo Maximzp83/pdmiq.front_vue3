@@ -263,7 +263,6 @@ export const getPointY = (value, settings = {}) => {
 	}
 
 	const isInt = Number(value) === value && value % 1 === 0;
-	// console.log(value, isInt)
 	return isInt ? value : +value.toFixed(toFixedNum || 4);
 };
 

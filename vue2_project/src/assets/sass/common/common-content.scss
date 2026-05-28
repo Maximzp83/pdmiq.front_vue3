@@ -2105,43 +2105,6 @@
 
 			.checkbox-part .el-form-item__content {margin-left: 220px !important;}
 		}
-
-		.reports-tab {
-			max-width: 850px;
-			min-width: 572px;
-			margin-left: 10px;
-		}
-
-		.reports-list-container {
-		
-			& > .el-form-item__content {
-				margin-left: 0 !important;
-			}
-
-			.card {
-				background-color: #f6fafd;
-			}
-
-			.report-item-form {
-				.radio-item {
-					padding: 4px;
-				}
-			}
-
-			.create-button-container .el-button {
-				width: 100%;
-				border: 1px #c6c6c6 dotted !important;
-
-				span  {vertical-align: middle;}
-				
-				.icon-plus {
-					font-size: 17px;
-					font-weight: 600;
-					margin-left: 10px;
-					color: #adb5bc;
-				}
-			}
-		}
 	}
 
 	&.multiview-form-container {
@@ -3053,8 +3016,6 @@
 			.runtime-tracking-section {
 				background-color: #fff;
 				margin-top: 10px;
-				padding: 10px;
-				
 				.label {
 					color: $text-muted;
 				}
@@ -3069,12 +3030,12 @@
 			.runtime-tracking-section,
 			.alarms-block {
 				background-color: #fff;
+				padding: 10px;				
 			}
 
 			.alarms-block {
 				// width: 100%;
 				.counters-part {
-					padding: 10px;
 					column-count: 1;
 					column-gap: 0;
 
@@ -3089,7 +3050,7 @@
 
 				.faults-part {
 					border-top: 1px solid #9797974d;
-					padding: 10px;
+					padding-top: 10px;
 					margin-top: 10px;
 				}
 			}
@@ -5354,39 +5315,6 @@
 	}
 }
 
-.controller-form {
-	.dxm-controllers-commands-form  {
-		.el-form-item__label {
-			font-weight: 600;
-			width: 100px !important;
-		}
-		.el-form-item__content {
-			margin-left: 100px !important;
-		}
-		.card-content {
-			background-color: #fcfcfc;
-		}
-		.commands-history-item + .commands-history-item {
-			border-top: 1px solid #DEE2E6;
-			margin-top: 15px;
-			padding-top: 15px;
-		}
-
-		.showJustInfo {
-			.el-form-item__label {
-				padding-top: 2px;
-			}
-			.el-input  {
-				height: auto;
-			}
-			.el-form-item__content,
-			.el-form-item__label {
-				line-height: 18px;
-			}
-		}
-	}
-}
-
 .periodic-cursors-bar {
 	.mrow > div {
 		display: flex;
@@ -5555,6 +5483,39 @@
 			left: 15px;
 			top: 5px;
 		}*/
+	}
+}
+
+.controller-form {
+	.dxm-controllers-commands-form  {
+		.el-form-item__label {
+			font-weight: 600;
+			width: 100px !important;
+		}
+		.el-form-item__content {
+			margin-left: 100px !important;
+		}
+		.card-content {
+			background-color: #fcfcfc;
+		}
+		.commands-history-item + .commands-history-item {
+			border-top: 1px solid #DEE2E6;
+			margin-top: 15px;
+			padding-top: 15px;
+		}
+
+		.showJustInfo {
+			.el-form-item__label {
+				padding-top: 2px;
+			}
+			.el-input  {
+				height: auto;
+			}
+			.el-form-item__content,
+			.el-form-item__label {
+				line-height: 18px;
+			}
+		}
 	}
 }
 

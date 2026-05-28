@@ -17,56 +17,22 @@
 			:label="tt('name')"
 			prop="name"
 			class="mcol-xs-9 label_pt-5 mini"
-		>
+		>	
 			<CustomInput v-model="formData.name" :placeholder="tt('name')" />
 		</el-form-item>
 
 		<el-form-item
-			label="Metric Unit"
-			prop="metric_unit_id"
-			class="mcol-xs-9 label_pt-5 mini"
-		>
-			<CustomSelect
-				class="mini"
-				clearable
-				filterable
-				:optionsList="metricMeasurementUnitsOptions"
-				placeholder="Select Metric Unit"
-				v-model="formData.metric_unit_id"
-				@change="handleMetricUnitChange"
-			/>
-		</el-form-item>
-
-		<el-form-item
-			label="Imperial Unit"
-			prop="imperial_unit_id"
-			class="mcol-xs-9 label_pt-5 mini"
-		>
-			<CustomSelect
-				class="mini"
-				clearable
-				filterable
-				:optionsList="imperialMeasurementUnitsOptions"
-				placeholder="Select Imperial Unit"
-				v-model="formData.imperial_unit_id"
-				@change="handleImperialUnitChange"
-			/>
-		</el-form-item>
-
-		<!--
-		<el-form-item
 			:label="tt('units')"
 			prop="units"
 			class="mcol-xs-9 label_pt-5 mini"
-		>
+		>	
 			<CustomInput v-model="formData.units" :placeholder="tt('units')" />
 		</el-form-item>
-		-->
 
 		<el-form-item
 			prop="formula"
 			class="mcol-xs-9 label_pt-5 mini"
-		>
+		>	
 			<template v-slot:label>
 				<span class="span-block">{{ tt('formula') }}</span>
 				<span class="span-block">
@@ -108,21 +74,16 @@
 </template>
 
 <script>
+// import { updateFormData } from '@/helpers';
 import { chartTypesList } from '@/constants/global';
+
 import { subItemMixin } from '@/mixins';
-import {
-	getMeasurementUnitsOptionsBySystem
-} from '@/helpers/measurementUnits';
-import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [subItemMixin()],
 	props: {
-		fromModal: Boolean,
-		measurementUnitsList: {
-			type: Array,
-			default: () => []
-		}
+		// isMobile: Boolean,
+		fromModal: Boolean
 	},
 
 	data() {
@@ -131,8 +92,6 @@ export default {
 				id: null,
 				name: '',
 				units: '',
-				metric_unit_id: null,
-				imperial_unit_id: null,
 				formula: '',
 				graph_type: null,
 				is_line_speed: false
@@ -142,45 +101,26 @@ export default {
 
 	computed: {
 		chartTypesList: () => Object.freeze(chartTypesList()),
-		metricMeasurementUnitsOptions() {
-			return Object.freeze(
-				getMeasurementUnitsOptionsBySystem(
-					this.measurementUnitsList,
-					METRIC_SYSTEM_TYPES.METRIC
-				)
-			);
-		},
-		imperialMeasurementUnitsOptions() {
-			return Object.freeze(
-				getMeasurementUnitsOptionsBySystem(
-					this.measurementUnitsList,
-					METRIC_SYSTEM_TYPES.IMPERIAL
-				)
-			);
-		},
 		tooltipContent() {
+			/*`Use {value} as the input from the IO. <br/>
+			Example: {value} * 60 + 500 <br/>
+			NB: The original formula will be applied before this formula`*/
 			return this.$t('aliases.subtype_formula_tooltip');
 		}
 	},
 
 	methods: {
-		handleMetricUnitChange(value) {
-			if (value != null) {
-				this.formData.imperial_unit_id = null;
+		/*localGetFormDataCallback(formData) {
+			// if (!formData.name) delete formData.name;
+			if (this.itemData.isDefaultValues) {
+				const { itemData } = this;
+				if (formData.name === itemData.name) formData.name = '';
+				if (formData.units === itemData.units) formData.units = '';
+				if (formData.formula === itemData.formula) formData.formula = '';
 			}
-		},
 
-		handleImperialUnitChange(value) {
-			if (value != null) {
-				this.formData.metric_unit_id = null;
-			}
-		},
-
-		localGetFormDataCallback(formData) {
-			const newFormData = { ...formData };
-			delete newFormData.units;
-			return newFormData;
-		}
+			return formData;
+		}*/
 	}
 };
 </script>

@@ -88,6 +88,7 @@ export default {
 	mixins: [subItemMixin()],
 	props: {
 		isOffAlarm: Boolean,
+		isMobile: Boolean,
 		selectedMonths: Array,
 		isHumiditySensor: Boolean
 	},

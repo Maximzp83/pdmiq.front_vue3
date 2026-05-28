@@ -127,30 +127,6 @@ const datePickerYearQuartersShortcuts1 = [
 	}
 ];
 
-const datePickerAdditionalShortcuts_2 = [
-	{
-		text: 'constants.last_1_month',
-		rangeName: 'last_month',
-		onClick(picker) {
-			picker.$emit('pick', getDateRange(this.rangeName));
-		}
-	},
-	{
-		text: 'constants.last_6_months',
-		rangeName: 'last_6_months',
-		onClick(picker) {
-			picker.$emit('pick', getDateRange(this.rangeName));
-		}
-	},
-	{
-		text: 'constants.last_12_months',
-		rangeName: 'last_12_months',
-		onClick(picker) {
-			picker.$emit('pick', getDateRange(this.rangeName));
-		}
-	},
-];
-
 /*export const utcZonesList = [
 	{ id:1, label:'UTC-12:00', value: -12 },
 	{ id:2, label:'UTC-11:00', value: -11 },
@@ -492,8 +468,6 @@ export const datePickerShortcuts = () =>
 	Lang.translate(datePickerShortcuts1, { key: 'text' });
 export const datePickerAdditionalShortcuts = () =>
 	Lang.translate(datePickerAdditionalShortcuts1, { key: 'text' });
-export const datePickerAdditionalShortcuts2 = () =>
-	Lang.translate(datePickerAdditionalShortcuts_2, { key: 'text' });
 export const datePickerYearQuartersShortcuts = () =>
 	Lang.translate(datePickerYearQuartersShortcuts1, { key: 'text' });
 export const timeZonesList = () => timeZonesList1;

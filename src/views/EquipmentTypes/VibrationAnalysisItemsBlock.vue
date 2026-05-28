@@ -22,8 +22,6 @@
 							:ref="(el) => setSubItemRef('AnalysisItem', el, idx)"
 							:item-data="item"
 							:item-index="idx"
-							:measurementUnitsList="measurementUnitsList"
-							:measurementUnitsLoading="measurementUnitsLoading"
 							@onRemove="(id) => removeFormItem(id, vibrationAnalysisItems)"
 						/>
 					</div>
@@ -69,8 +67,6 @@ const props = defineProps({
 const vibrationAnalysisFormRef = ref(null);
 const isLoading = ref(false);
 const vibrationAnalysisItems = ref([]);
-const measurementUnitsList = ref([]);
-const measurementUnitsLoading = ref(false);
 const refsMap = ref({
 	AnalysisItem: [],
 });
@@ -109,19 +105,6 @@ const fetchVibrationAnalysis = async () => {
 	}
 };
 
-const fetchMeasurementUnits = async () => {
-	measurementUnitsLoading.value = true;
-	try {
-		const answer = await api_request.get('/measurement-units', {
-			notNotify: true,
-			params: { max: -1 },
-		});
-		measurementUnitsList.value = answer?.value || [];
-	} finally {
-		measurementUnitsLoading.value = false;
-	}
-};
-
 const validateItemForm = () => validateSubItemsForm(subItemsSettings.value);
 
 const submitItemForm = async () => {
@@ -147,7 +130,6 @@ const submitItemForm = async () => {
 
 onMounted(() => {
 	fetchVibrationAnalysis();
-	fetchMeasurementUnits();
 });
 
 defineExpose({

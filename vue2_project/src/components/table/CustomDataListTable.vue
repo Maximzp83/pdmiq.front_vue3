@@ -13,7 +13,6 @@
 				:columns="tableSettings.columns"
 				:isIndeterminate="isIndeterminate"
 				:checkAll="checkAll"
-				:disableCheckAll="isAllRowsSelectionDisabled"
 				:itemsName="itemsName"
 				:operationsWidth="operationsWidth"
 				:disableSelection="disableSelection"
@@ -35,7 +34,6 @@
 				:operations="showOperations ? tableSettings.operations : null"
 				:expandedRowSettings="tableSettings.expandedRowSettings"
 				:selectedIds="selectedIds"
-				:canSelect="selectableRowIds.some(id => id === row.id)"
 				:itemsSaving="itemsSaving"
 				:operationsWidth="operationsWidth"
 				:disableSelection="disableSelection"
@@ -61,7 +59,6 @@
 </template>
 
 <script>
-import { validateBySettings } from '@/helpers';
 import { /*navigation,*/ eventHandler } from '@/mixins';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 
@@ -133,16 +130,6 @@ export default {
 				return width < 69 ? '69px' : `${width}px`;
 			}
 			return '0';
-		},
-
-		selectableRowIds() {
-			return this.tableData
-				.filter(row => this.canSelectRow(row))
-				.map(row => row.id);
-		},
-
-		isAllRowsSelectionDisabled() {
-			return !this.selectableRowIds.length;
 		}
 	},
 	methods: {
@@ -151,7 +138,7 @@ export default {
 		},*/
 
 		handleChecked(id) {
-			const { selectableRowIds } = this;
+			const { tableData } = this;
 			if (id) {
 				this.selectedIds.some(sid => sid === id)
 					? (this.selectedIds = this.selectedIds.filter(sid => sid !== id))
@@ -159,79 +146,20 @@ export default {
 			} else {
 				this.selectedIds =
 					this.isIndeterminate || !this.selectedIds.length
-						? selectableRowIds
+						? tableData.map(row => row.id)
 						: [];
 			}
 
-			this.syncSelectionState();
+			let checkedCount = this.selectedIds.length;
+			this.checkAll = checkedCount === tableData.length;
+			this.isIndeterminate = checkedCount > 0 && checkedCount < tableData.length;
 			// console.log(id, this.isIndeterminate)
-		},
-
-		canSelectRow(rowData) {
-			const actions =
-				this.showOperations &&
-				this.tableSettings.operations &&
-				this.tableSettings.operations.actions
-					? this.tableSettings.operations.actions
-					: [];
-
-			if (actions.length) {
-				const deleteActions = actions.filter(
-					action =>
-						(action.name == 'handleDeleteItems' ||
-							action.name == 'handleDeleteWorkOrders') &&
-						action.conditionSettings
-				);
-
-				if (deleteActions.length) {
-					let allowedActionsCount = 0;
-
-					deleteActions.forEach(action => {
-						if (
-							action.conditionSettings &&
-							validateBySettings({
-								...action.conditionSettings,
-								dataObj: rowData
-							})
-						) {
-							allowedActionsCount++;
-						}
-					});
-
-					return allowedActionsCount > 0;
-				}
-			}
-
-			return true;
-		},
-
-		syncSelectionState() {
-			const { selectableRowIds } = this;
-
-			this.selectedIds = this.selectedIds.filter(id =>
-				selectableRowIds.some(selectableId => selectableId === id)
-			);
-
-			const checkedCount = this.selectedIds.length;
-			this.checkAll =
-				!!selectableRowIds.length && checkedCount === selectableRowIds.length;
-			this.isIndeterminate =
-				checkedCount > 0 && checkedCount < selectableRowIds.length;
 		},
 
 		calcOperationsWidth(num) {
 			if (num > this.actionsLength) {
 				this.actionsLength = num;
 			}
-		}
-	},
-
-	watch: {
-		tableData: {
-			handler() {
-				this.syncSelectionState();
-			},
-			deep: true
 		}
 	}
 };
