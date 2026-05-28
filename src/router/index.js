@@ -322,6 +322,24 @@ const routes = [
 				meta: { auth: true, permissions: ['edit_task_procedures'] },
 			},
 			{
+				path: 'maintenance-categories',
+				name: 'MaintenanceCategories',
+				component: () => import('@/views/MaintenanceCategories/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_work_order_type'] },
+			},
+			{
+				path: 'maintenance-categories/new',
+				name: 'MaintenanceCategoryCreate',
+				component: () => import('@/views/MaintenanceCategories/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_work_order_type'] },
+			},
+			{
+				path: 'maintenance-categories/:id',
+				name: 'MaintenanceCategoryEdit',
+				component: () => import('@/views/MaintenanceCategories/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_work_order_type'] },
+			},
+			{
 				path: 'brand-models',
 				name: 'BrandModels',
 				component: () => import('@/views/BrandModels/ItemsList.vue'),

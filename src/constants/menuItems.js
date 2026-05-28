@@ -296,15 +296,15 @@ const menuItems1 = [
 		meta: { permissions: ['view_task_procedures'] },
 		enableInCompanyMenuForm: true
 	},
-	// {
-	// 	name: 'work_order_type',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.WORK_ORDER_TYPE,
-	// 	icon: 'icon-grid2',
-	// 	path: '/maintenance-categories',
-	// 	meta: { permissions: ['view_work_order_type'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'work_order_type',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.WORK_ORDER_TYPE,
+		icon: 'icon-grid2',
+		path: '/maintenance-categories',
+		meta: { permissions: ['view_work_order_type'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'sidebar_menu.Misc_Parts',
 		belongs_to_label: 'cmms',

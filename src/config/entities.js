@@ -383,7 +383,7 @@ export const ENTITIES = Object.freeze({
 	}),
 	TaskProcedures: Object.freeze({
 		key: 'task_procedures',
-		apiBase: '/plnts/task-procedures',
+		apiBase: '/plants/task-procedures',
 		routeBase: '/task-procedures',
 		filtersStorageKey: 'task-procedures_filters',
 		itemsName: Object.freeze({

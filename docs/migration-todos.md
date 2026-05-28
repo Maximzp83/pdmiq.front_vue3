@@ -85,6 +85,7 @@
 - DONE (coupled step): added `src/views/TaskProcedures/ItemForm.vue`, `PartItem.vue`, and `ProcessItem.vue` in Vue3 style.
 - DONE (single-file): added `src/views/TaskProcedures/ItemPage.vue` in Vue3 style.
 - DONE (coupled step): enabled TaskProcedures routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
+- DONE (entity): completed `MaintenanceCategories` alignment and migration with shared `useItemsData` list actions, added `ItemForm`, `ItemPage`, and enabled routes/menu.
 - Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.
 - Current next focus: continue unfinished `src/views/Plants/Details/DetailsPage.vue` coverage or move to another real Vue3 migration target selected by the user.
 
