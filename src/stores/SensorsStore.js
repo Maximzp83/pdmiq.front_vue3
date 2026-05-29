@@ -84,6 +84,51 @@ export const useSensorsStore = defineStore('sensorsStore', {
 	actions: {
 		...commonStoreMixin.actions,
 
+		set_sensors(items = []) {
+			this.set_value('itemsList', items);
+		},
+
+		set_sensor(item = null) {
+			this.set_value('itemData', item);
+		},
+
+		set_sensors_filters(filters) {
+			this.set_value('filters', filters || { ...commonStoreMixin.state.filters }, {
+				toLocalStorage: { prop: 'sensors_filters' },
+			});
+		},
+
+		set_statistics_filters(filters) {
+			this.set_value(
+				'statistics_filters',
+				filters ? { ...filters } : { ...statistics_filters_init },
+				{ toLocalStorage: { prop: 'statistics_filters' } },
+			);
+		},
+
+		set_fft_statistics_filters(filters) {
+			this.set_value(
+				'fft_statistics_filters',
+				filters ? { ...filters } : { ...statistics_filters_init },
+				{ toLocalStorage: { prop: 'fft_statistics_filters' } },
+			);
+		},
+
+		set_charts_filters(filters) {
+			this.set_value('charts_filters', filters || { ...charts_filters_init }, {
+				toLocalStorage: { prop: 'charts_filters' },
+			});
+		},
+
+		set_sensor_state({ stateProp, value }) {
+			this.set_value(stateProp, value);
+		},
+
+		set_report_filters(filters) {
+			this.set_value('report_filters', filters || { ...report_filters_init }, {
+				toLocalStorage: { prop: 'equipments_report_filters' },
+			});
+		},
 	},
 
 	getters: {

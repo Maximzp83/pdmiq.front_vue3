@@ -90,6 +90,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			'@': fileURLToPath(new URL('./src', import.meta.url)),
+			'element-plus/es/components/submenu/style/css': 'element-plus/es/components/sub-menu/style/css',
 		},
 	},
 });

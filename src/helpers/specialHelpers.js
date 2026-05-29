@@ -28,7 +28,8 @@ import {
 	alertTypesList,
 	DATASET,
 	SENSOR_TYPES,
-	bannerPowerTypesList
+	bannerPowerTypesList,
+	itemSpeedOptionsList
 } from '@/constants/global';
 import { ElMessage } from 'element-plus';
 
@@ -607,6 +608,16 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem})
 	return Object.freeze(list);
 };
 
+const getCurrentRpmSource1 = ({ sensorData = {}, fftItem = null, rpm_source_item = null }) => {
+	const preparedList = setupItemSpeedOptionsList1({
+		sensorData,
+		itemSpeedOptionsList: itemSpeedOptionsList(),
+		fftItem,
+	});
+	const sourceId = fftItem?.rpm_source_item || rpm_source_item || sensorData.rpm_source_item;
+	return findItemBy('id', sourceId, preparedList) || preparedList[0] || null;
+};
+
 export const equipmentCardTitle = (titles, equipmentData) =>
 	equipmentCardTitle1(titles, equipmentData);
 export const getBrandModelImgByType = payload => getBrandModelImgByType1(payload);
@@ -645,3 +656,4 @@ export const isPasswordStrong = str => isPasswordStrong1(str);
 export const setupTrueFalseCellIcon = val => setupTrueFalseCellIcon1(val);
 export const copyToClipboard = (str, settings) => copyToClipboard1(str, settings);
 export const setupItemSpeedOptionsList = payload => setupItemSpeedOptionsList1(payload);
+export const getCurrentRpmSource = payload => getCurrentRpmSource1(payload);

@@ -37,6 +37,7 @@ export const MENU_TYPES = {
 	STOREROOMS: 30,
 	USER_ROLES: 31,
 	CLIENT_API: 32,
+	SENSORS: 33,
 };
 
 const menuItems1 = [
@@ -80,6 +81,15 @@ const menuItems1 = [
 		icon: 'icon-controllers',
 		path: '/controllers',
 		meta: { permissions: ['view_controllers'] },
+		enableInCompanyMenuForm: true
+	},
+	{
+		name: 'sidebar_menu.sensors',
+		belongs_to_label: 'predictive_maintenance',
+		id: MENU_TYPES.SENSORS,
+		icon: 'icon-sensors',
+		path: '/sensors',
+		meta: { permissions: ['view_sensors'] },
 		enableInCompanyMenuForm: true
 	},
 

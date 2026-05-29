@@ -10,8 +10,11 @@
 ## Current Focus
 
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
-- Current selected migration target is `vue2_project/src/views/Controllers`.
-- `Controllers` views have been added in Vue3 style and routes/menu are enabled; next step is runtime smoke testing.
+- Current selected migration target is `vue2_project/src/views/Sensors`.
+- User instruction for Sensors: migrate continuously without per-file confirmation; defer `statistics` and `charts` to the final Sensors stage.
+- `Controllers` views have been added in Vue3 style and routes/menu are enabled.
+- Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
+- Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE
@@ -229,6 +232,19 @@ await fetchUsers({ page: 1 });
   - Enabled `BrandModelDetailsPage` route in `src/router/index.js` with `/brand-models/:id/details`
   - Extended `src/config/entities.js` with `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow
   - Fixed `src/components/itemDetails/ItemImagesBlock.vue` runtime translation import after enabling the new details page
+- [x] `Sensors` migration completed for current Vue3 scope
+  - Added `src/composables/useSensors.js`
+  - Added Pinia filter/state actions in `src/stores/SensorsStore.js`
+  - Added shared `set_filters` support in `src/stores/mixins/commonStoreMixin.js`
+  - Added `src/views/Sensors/ItemsList.vue`
+  - Added `src/views/Sensors/NCDSensorsList.vue`
+  - Added `src/views/Sensors/BannerSensorsList.vue`
+  - Added `src/views/Sensors/ItemPage.vue`
+  - Added base `src/views/Sensors/sensorForm` files for Banner, UltraSound, and NCD forms
+  - Added threshold/level-zone support files and empty `ReportBlock.vue`
+  - Enabled Sensors list/create/edit/NCD routes and sidebar menu entry
+  - Added `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, `OneChartPage.vue`, `AnalysisFFT/**`, chart wrappers, FFT chart wrappers, chart support dialogs, and remaining filter blocks
+  - Enabled Sensors statistics/chart routes
 - [x] `src/views/Brands/ItemsList.vue` added in Vue3 style
   - Migrated from legacy `vue2_project/src/views/Brands/ItemsList.vue`
   - Switched list page flow to `useItemsData` + `useEventHandler`

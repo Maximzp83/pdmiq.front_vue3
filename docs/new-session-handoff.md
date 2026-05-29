@@ -1,8 +1,9 @@
 # New Session Handoff
 
 ## Current Objective
-- Continue Vue2 -> Vue3 migration for `vue2_project/src/views/Controllers`.
-- Migrate and/or sync exactly one file per step unless the files are structurally coupled.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
+- Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
+- Ask only when there are disputable points without a suitable migrated pattern/example.
 
 ## Mandatory Workflow For Next Session
 - Apply changes only after explicit user confirmation.
@@ -39,7 +40,22 @@ Primary rules source:
   - Controllers routes were enabled in `src/router/index.js`.
   - Controllers sidebar menu entry was enabled in `src/constants/menuItems.js`.
   - Controllers create blank state was fixed: `ItemPage.vue` defaults `/controllers/new` without query type to PDM/Banner and `ItemForm.vue` gates formulas content by tab presence.
-  - Legacy devices tab is intentionally deferred because `Sensors/BannerSensorsList.vue` is not present in Vue3 yet.
+  - Controllers devices tab dependency is now partly available because `src/views/Sensors/BannerSensorsList.vue` has been added in Vue3 style.
+- `Sensors` migration is complete for the current Vue3 scope:
+  - Added `src/composables/useSensors.js` for sensor-specific API requests.
+  - Added Pinia filter/state actions to `src/stores/SensorsStore.js`.
+  - Added generic `set_filters` support to `src/stores/mixins/commonStoreMixin.js`.
+  - Added `src/views/Sensors/ItemsList.vue`, `NCDSensorsList.vue`, and `BannerSensorsList.vue` in Vue3 style.
+  - Added `src/views/Sensors/ItemPage.vue` and base sensor forms under `src/views/Sensors/sensorForm`.
+  - Added threshold/level-zone support files: `ThresholdPeriodItem.vue`, `LevelZoneForm.vue`, `LevelZoneFormWrapper.vue`, and empty legacy-compatible `ReportBlock.vue`.
+  - Added table-cell/action helpers: `SensorFFTRequestButton.vue`, `SensorFirmwareStatusCell.vue`, `SensorTypeTableCell.vue`.
+  - Added `src/views/Sensors/FilterBlock/FFTRequestBlock.vue` as the list-level FFT request dialog.
+  - Added chart support wrappers under `src/components/charts` and `src/views/Sensors/charts`.
+  - Added final statistics/chart pages: `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, and `OneChartPage.vue`.
+  - Added Analysis FFT helpers and statistics filter blocks.
+  - Enabled `/sensors`, `/sensors/new`, `/sensors/:id`, `/sensors/ncd`, `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, and `/sensors/:id/chart` routes.
+  - Enabled Sensors sidebar menu entry.
+  - Legacy Sensors-local mixin files were not copied as mixins; their behavior was folded into Vue3 components/composables, primarily `src/composables/useSensors.js`.
 - `BrandModels` details stack is now migrated in Vue3:
   - `src/views/BrandModels/Details/MoveForm.vue`
   - `src/views/BrandModels/Details/LocationList.vue`
@@ -71,12 +87,65 @@ Primary rules source:
 - `src/components/itemDetails/ItemImagesBlock.vue`
 
 ## Recommended Next Focus
-- Smoke-test Controllers list/create/edit flows in the app, including PDM/LubeMatrix/OEE/NCD create type links.
+- Smoke-test Sensors list/create/edit/statistics/FFT/chart routes in browser.
+- Review runtime completeness of the simplified chart/statistics controls against production data.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.
+
+## Build Status
+- `npm run build` passes after follow-up compile fixes.
+- Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
 
 ## Files Already Modified In This Migration Batch
 - `src/router/index.js`
 - `src/constants/menuItems.js`
+- `src/composables/useSensors.js`
+- `src/stores/SensorsStore.js`
+- `src/stores/mixins/commonStoreMixin.js`
+- `src/components/common/DynamicComponentWrapper.vue`
+- `src/views/Sensors/ItemsList.vue`
+- `src/views/Sensors/NCDSensorsList.vue`
+- `src/views/Sensors/BannerSensorsList.vue`
+- `src/views/Sensors/ItemPage.vue`
+- `src/views/Sensors/FilterBlock/FFTRequestBlock.vue`
+- `src/views/Sensors/FilterBlock/BannerFilterBlock.vue`
+- `src/views/Sensors/FilterBlock/CustomPDMFilterBlock.vue`
+- `src/views/Sensors/FilterBlock/PDFandFFTrequestsBlock.vue`
+- `src/views/Sensors/FilterBlock/RPMSettingsDialog.vue`
+- `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue`
+- `src/views/Sensors/StatisticsPage.vue`
+- `src/views/Sensors/FFTStatisticsPage.vue`
+- `src/views/Sensors/MultiViewStatisticsPage.vue`
+- `src/views/Sensors/OneChartPage.vue`
+- `src/views/Sensors/ChartMessageForm.vue`
+- `src/views/Sensors/PossibleProblemsBlock.vue`
+- `src/views/Sensors/AnalysisFFT/AnalysisFFTContainer.vue`
+- `src/views/Sensors/AnalysisFFT/ChildComponentItem.vue`
+- `src/views/Sensors/AnalysisFFT/TypeOptionValueItem.vue`
+- `src/views/Sensors/charts/ChartItemContainer.vue`
+- `src/views/Sensors/charts/ChartsListWrapper.vue`
+- `src/views/Sensors/charts/UpdateThresholdsDialog.vue`
+- `src/views/Sensors/charts/pdmChartSettingsFactory.js`
+- `src/views/Sensors/charts/fft/ChartFFTAnalysisRulesBar.vue`
+- `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
+- `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`
+- `src/views/Sensors/charts/fft/WaterfallStatisticsContainer.vue`
+- `src/components/charts/ChartsPreloader.vue`
+- `src/components/charts/CommonChartItemContainer.vue`
+- `src/components/charts/CommonChartItemWrapper.vue`
+- `src/views/Sensors/SensorFFTRequestButton.vue`
+- `src/views/Sensors/SensorFirmwareStatusCell.vue`
+- `src/views/Sensors/SensorTypeTableCell.vue`
+- `src/views/Sensors/ThresholdPeriodItem.vue`
+- `src/views/Sensors/LevelZoneForm.vue`
+- `src/views/Sensors/LevelZoneFormWrapper.vue`
+- `src/views/Sensors/ReportBlock.vue`
+- `src/views/Sensors/sensorForm/BannerSensorItemWrapper.vue`
+- `src/views/Sensors/sensorForm/ItemForm.vue`
+- `src/views/Sensors/sensorForm/ItemFormNCD.vue`
+- `src/views/Sensors/sensorForm/ItemFormUltraSound.vue`
+- `src/views/Sensors/sensorForm/ItemFormWrapper.vue`
+- `src/views/Sensors/sensorForm/RunningThresholdItem.vue`
+- `src/views/Sensors/sensorForm/SubTypeParameterItem.vue`
 - `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue`
 - `src/views/Controllers/ItemFormNCD.vue`
 - `src/views/Controllers/ItemFormCounter.vue`

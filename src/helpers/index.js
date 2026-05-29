@@ -1502,6 +1502,16 @@ export const concatValues = (initialData, additionalData, payload) =>
 export const getItemValue = (id, prop, list, index) =>
 	getItemValue1(id, prop, list, index);
 export const groupBy = (array, key, prefix) => groupBy1(array, key, prefix);
+export const sortArrayByKeyNumber = (array = [], key, direction = 'asc') =>
+	array.slice().sort((a, b) => {
+		const aHasValue = a?.[key] != null;
+		const bHasValue = b?.[key] != null;
+		if (!aHasValue && !bHasValue) return 0;
+		if (!aHasValue) return 1;
+		if (!bHasValue) return -1;
+		const diff = Number(a[key]) - Number(b[key]);
+		return direction === 'asc' ? diff : -diff;
+	});
 export const hasRightsToRoute = route => hasRightsToRoute1(route);
 export const validateRouteParams = id => validateRouteParams1(id);
 export const getParentPageRoute = (path, steps) => getParentPageRoute1(path, steps);
@@ -1558,6 +1568,15 @@ export const getMaxValue = (array, settings) => getMaxValue1(array, settings);
 export const filterByIds = (array, ids) => filterByIds1(array, ids);
 export const removeDuplicatesFromArray = (array, key) =>
 	removeDuplicatesFromArray1(array, key);
+export const removeDuplicatesObjectsArray = (array = [], key) => {
+	const seen = new Set();
+	return array.filter((item) => {
+		const value = item?.[key];
+		if (seen.has(value)) return false;
+		seen.add(value);
+		return true;
+	});
+};
 export const getRoundedValue = (value, multiplier, afterDot) =>
 	getRoundedValue1(value, multiplier, afterDot);
 export const countDecimalOrder = value => countDecimalOrder1(value);
@@ -1570,3 +1589,15 @@ export const setupTableCellImage = (picturesList, settings) =>
 	setupTableCellImage1(picturesList, settings);
 export const getFileName = str => getFileName1(str);
 export const getRandomInt = (min, max) => getRandomInt1(min, max);
+export const buildFormula = (formula = '') => {
+	const expression = formula.replace(/\{(\w+)\}/g, (_, key) => `data.${key}`);
+	return new Function('data', `return ${expression};`);
+};
+export const hexToRgba = (hex, alpha = 1) => {
+	if (!hex || typeof hex !== 'string') return `rgba(0, 0, 0, ${alpha})`;
+	const normalized = hex.replace('#', '');
+	const r = parseInt(normalized.slice(0, 2), 16);
+	const g = parseInt(normalized.slice(2, 4), 16);
+	const b = parseInt(normalized.slice(4, 6), 16);
+	return `rgba(${r || 0}, ${g || 0}, ${b || 0}, ${alpha})`;
+};

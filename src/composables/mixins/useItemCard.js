@@ -1,5 +1,13 @@
 import { setFiltersViaList } from '@/helpers/specialHelpers';
 
+export const buildProps = (extra = {}) => ({
+	cardData: { type: Object, default: () => ({}) },
+	selectedIds: { type: Array, default: () => [] },
+	operationsSettings: { type: Object, default: () => ({}) },
+	additionalProps: { type: Object, default: () => ({}) },
+	...extra,
+});
+
 export function useItemCard({ cardData, changeRoute, titleLinkRoute, resetPageFiltersList, emit } = {}) {
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;

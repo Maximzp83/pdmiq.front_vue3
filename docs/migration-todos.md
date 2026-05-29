@@ -99,8 +99,16 @@
 - DONE (single-file): added `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue` in Vue3 style for the legacy White River controller form.
 - DONE (coupled step): enabled Controllers routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
 - DONE (bugfix): fixed Controllers create blank state by adding a default PDM/Banner type fallback in `src/views/Controllers/ItemPage.vue` and gating formulas tab rendering in `src/views/Controllers/ItemForm.vue`.
+- DONE (foundation): started `Sensors` migration with `src/composables/useSensors.js`, `SensorsStore` filter/state actions, shared `set_filters`, and dynamic view component loading support.
+- DONE (Sensors lists): added Vue3 `ItemsList.vue`, `NCDSensorsList.vue`, `BannerSensorsList.vue`, `FFTRequestBlock.vue`, and table helper cells/actions.
+- DONE (Sensors forms/page): added Vue3 `ItemPage.vue` plus base `sensorForm` files: `ItemForm.vue`, `ItemFormNCD.vue`, `ItemFormUltraSound.vue`, `ItemFormWrapper.vue`, `BannerSensorItemWrapper.vue`, `RunningThresholdItem.vue`, and `SubTypeParameterItem.vue`.
+- DONE (Sensors thresholds): added Vue3 `ThresholdPeriodItem.vue`, `LevelZoneForm.vue`, `LevelZoneFormWrapper.vue`, and empty legacy-compatible `ReportBlock.vue`.
+- DONE (Sensors routes/menu): enabled `/sensors`, `/sensors/new`, `/sensors/:id`, `/sensors/ncd` routes and Sensors sidebar menu entry.
+- DONE (Sensors final stage): migrated statistics/charts stack including `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, `OneChartPage.vue`, `AnalysisFFT/**`, chart list/item wrappers, FFT chart wrappers, chart support dialogs, and remaining filter blocks.
+- DONE (Sensors routes): enabled `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, and `/sensors/:id/chart`.
+- Current next focus: smoke-test Sensors runtime flows with real data and fix any runtime gaps from simplified chart controls.
+- DONE (build): fixed the existing non-Sensors build blocker and follow-up compile blockers; `npm run build` now passes.
 - Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.
-- Current next focus: smoke-test Controllers list/create/edit flows in the app.
 
 - useCreateFormItem: when migrating components, pass list as ref/array (string prop is not supported).
 - useDashboardListsReorder: pass tt, emit, itemsList, reorderAction, filters, itemsLoading, globalFilters, fromDetailsPage, showEditModal.

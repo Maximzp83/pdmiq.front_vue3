@@ -36,7 +36,7 @@
 				:menu-trigger="isCollapse ? 'hover' : 'click'"
 				@select="changeRoute"
 			>
-				<el-submenu
+				<el-sub-menu
 					:index="`category-${menuCategory.name}`"
 					v-for="menuCategory in navMenuItems"
 					:key="'sidebar_nav_cat-' + menuCategory.name"
@@ -56,7 +56,7 @@
 							{{ menuItem.name }}
 						</el-menu-item>
 					</div>
-				</el-submenu>
+				</el-sub-menu>
 			</el-menu>
 		</div>
 	</div>
@@ -64,11 +64,9 @@
 
 <script>
 import { menuItems } from '@/constants/menuItems';
-import { navigation } from '@/mixins';
+import { useNavigation } from '@/composables/mixins/useNavigation';
 
 export default {
-	mixins: [navigation()],
-
 	components: {
 		// NavbarToggleButton,
 		// MovingArrow
@@ -87,6 +85,11 @@ export default {
 			default: '/static/img/logo_atlantis_2.svg',
 			description: 'Sidebar Logo mini'
 		}
+	},
+
+	setup() {
+		const { changeRoute } = useNavigation();
+		return { changeRoute };
 	},
 
 	/*provide() {

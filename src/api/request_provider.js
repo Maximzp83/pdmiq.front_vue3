@@ -57,7 +57,7 @@ const isSuccessStatus = (response, statusCheckSettings) => {
  * @returns {*} Response value
  */
 const getResponseValue = (response, payload) => {
-	const { prepareData, prepareDataSettings, dataPath, incudeMeta } = payload;
+	const { prepareData, prepareDataSettings, dataPath } = payload;
 
 	if (dataPath) {
 		// Extract data from specific path
@@ -372,6 +372,4 @@ api_request.put = (url, payload = {}) => api_request(url, {...payload, method: '
 api_request.patch = (url, payload = {}) => api_request(url, {...payload, method: 'PATCH' });
 api_request.delete = (url, payload = {}) => api_request(url, {...payload, method: 'DELETE' });
 
-export { api_request };
-
-
+export { api_request, getResponseValue, isSuccessStatus };

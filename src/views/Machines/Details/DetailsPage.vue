@@ -2,37 +2,27 @@
 	<div class="details-page main-instance-item">
 		<VueElementLoadingWrapper :isLoading="itemLoading" :itemsName="itemsName.one" />
 
-		<div class="view-wrapper item-page-wrapper" v-if="loadContent">
+		<div v-if="loadContent" class="view-wrapper item-page-wrapper">
 			<div class="mcontainer">
 				<div class="nested-view-content-wrapper">
 					<div class="view-content-card">
 						<div class="section-row header-block">
 							<div class="card">
 								<div class="card-content flex">
-									<!-- <div class="filter-item"> -->
 									<Datepicker
 										setupDaterangeFilter
 										enableShortcuts
-										@input="
-											range =>
-												set_filters({
-													...filters,
-													daterange: range,
-													daterange_setted_at: Date.now()
-												})
-										"
 										:value="filters.daterange"
 										clearingTo="last_7_days"
 										type="daterange"
+										@input="setFilters"
 									/>
-									<!-- </div> -->
 
 									<el-button
-										v-if="$hasAccessTo(['edit_dashboard'])"
-										@click="editItem"
 										type="tertiary"
 										class="ml-auto action-button"
 										icon="icomoon icon-pencil"
+										@click="editItem"
 									/>
 								</div>
 							</div>
@@ -52,240 +42,142 @@
 
 								<div class="mcol-xs-12 mcol-lg-6">
 									<ItemImagesBlock
-										@event="handleEventNew"
 										:itemData="itemData"
 										showMockSrc="/static/img/machine_mock.jpg"
 										mockClass="machine"
+										@event="handleEvent"
 									/>
 								</div>
 
 								<div class="mcol-xs-12 mcol-lg-6">
 									<ItemPDMsStatisticBlock
-										@event="handleEventNew"
 										:itemData="itemData"
 										:filters="filters"
 										:predefinedFilters="predefinedFilters"
 										:chartLegendEvents="chartLegendEvents"
+										@event="handleEvent"
 									/>
 								</div>
 
-								<div
-									class="mcol-xs-12 mcol-lg-6"
-									v-if="$hasAccessTo(['view_maintenance'])"
-								>
+								<div class="mcol-xs-12 mcol-lg-6">
 									<ItemWOStatisticBlock
 										:createWOButtonFormSetup="createWOButtonFormSetup"
-										@event="handleEventNew"
 										:itemData="itemData"
 										:filters="filters"
 										:predefinedFilters="predefinedFilters"
+										@event="handleEvent"
 									/>
 								</div>
 
-								<div class="mcol-xs-12">
-									<AssetsList
-										@event="handleEventNew"
-										preventSetNavbar
-										hideDropdownFilterbar
-										disableDraggingFeature
-										fromDashboard
-										fromDetailsPage
-										showCardHeader
-										:propsFilters="itemsListsFilters"
-									/>
-								</div>
-
-								<div class="mcol-xs-12">
-									<EquipmentsLayout
-										ref="EquipmentsLayout"
-										@event="handleEventNew"
-										hideDropdownFilterbar
-										hideDatepicker
-										disableDraggingFeature
-										fromDashboard
-										fromDetailsPage
-										showCardHeader
-										preventSetNavbar
-										:propsFilters="itemsListsFilters"
-									/>
-								</div>
-
-								<MaintenanceListWrapper
-									v-if="$hasAccessTo(['view_maintenance'])"
-									ref="MaintenanceListWrapper"
-									hideDatepicker
-									:woFilters="woFilters"
-									:logFilters="logFilters"
-								/>
 							</div>
 						</div>
 					</div>
 				</div>
-
-				<!-- <div v-else class="text-center">This asset has not equipments</div> -->
 			</div>
 		</div>
-
-		<!-- <ImagePreviewModal
-			@closeModal="imgPreviewOpen = false"
-			:imgDialogOpen="imgPreviewOpen"
-			:imgId="currentImageId"
-			:pictures="imagesList"
-		/> -->
 	</div>
 </template>
 
-<script>
-import Vue from 'vue';
-import HighchartsVue from 'highcharts-vue';
-Vue.use(HighchartsVue);
+<script setup>
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
-import { mapActions, mapState } from 'vuex';
+import { api_request } from '@/api/request_provider';
+import { Lang } from '@/localization';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useNavigation } from '@/composables/mixins/useNavigation';
+import { useMachinesStore } from '@/stores/MachinesStore';
 
-import {
-	initPageDataMixin,
-	tabsMixin,
-	eventHandler,
-	mainInstanceDetailsPage
-} from '@/mixins';
+import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
+import Datepicker from '@/components/common/Datepicker.vue';
+import ItemInfoBlock from '@/components/itemDetails/ItemInfoBlock.vue';
+import ItemImagesBlock from '@/components/itemDetails/ItemImagesBlock.vue';
+import ItemPDMsStatisticBlock from '@/components/itemDetails/ItemPDMsStatisticBlock.vue';
+import ItemWOStatisticBlock from '@/components/itemDetails/ItemWOStatisticBlock.vue';
 
-export default {
-	mixins: [
-		initPageDataMixin(),
-		tabsMixin(),
-		eventHandler(),
-		mainInstanceDetailsPage()
-	],
+const { tt } = Lang;
+
+defineOptions({
 	name: 'MachineDetailsPage',
+});
 
-	components: {
-		Datepicker: () => import('@/components/common/Datepicker.vue'),
-		ItemInfoBlock: () => import('@/components/itemDetails/ItemInfoBlock.vue'),
-		ItemImagesBlock: () => import('@/components/itemDetails/ItemImagesBlock.vue'),
-		ItemPDMsStatisticBlock: () =>
-			import('@/components/itemDetails/ItemPDMsStatisticBlock.vue'),
-		ItemWOStatisticBlock: () =>
-			import('@/components/itemDetails/ItemWOStatisticBlock.vue'),
-		// ImagePreviewModal: () => import('@/components/common/ImagePreviewModal.vue'),
+const route = useRoute();
+const machinesStore = useMachinesStore();
+const { statistics_filters: filters } = storeToRefs(machinesStore);
+const { changeRoute } = useNavigation();
 
-		AssetsList: () => import('@/views/Assets/ItemsList.vue'),
-		EquipmentsLayout: () => import('@/views/Equipments/EquipmentsLayout.vue'),
-		MaintenanceListWrapper: () =>
-			import('@/components/itemDetails/MaintenanceListWrapper.vue')
-		// TabsBar: () => import('@/components/common/TabsBar.vue'),
+const itemData = ref({});
+const itemLoading = ref(false);
+const loadContent = ref(false);
+
+const itemsName = computed(() => ({
+	one: tt('Machine'),
+	mult: tt('Machines'),
+}));
+const predefinedFilters = computed(() => Object.freeze({
+	machineId: itemData.value.id,
+	productionLineId: itemData.value.production_line_id,
+	plantId: itemData.value.plant_id,
+}));
+const mainInfoSettingsList = computed(() => Object.freeze([
+	{ prop: 'productionLine.name', label: tt('production_Line') },
+	{
+		prop: 'locations',
+		label: tt('Locations'),
+		meta: { fromArray: { subProp: 'name' } },
 	},
-
-	data() {
-		return {
-			imgPreviewOpen: false,
-			currentImageId: null,
-			imagesList: []
-		};
-	},
-
-	computed: {
-		...mapState({
-			filters: state => state.machines.statistics_filters,
-			authUser: state => state.auth.authUser
-		}),
-
-		itemsName() {
-			return {
-				one: this.$t('Machine'),
-				mult: this.$t('Machines')
-			};
+	{ prop: 'application.name', label: tt('Application') },
+]));
+const countersSettings = computed(() => Object.freeze({
+	filter: { key: 'machineId', valueProp: 'id' },
+	items: [
+		{
+			title: tt('Assets'),
+			count: 'assets_count',
+			iconName: 'assets',
+			sectionClass: '.assets-list',
 		},
-
-		instanceViewName: () => 'Machines',
-
-		itemsListsFilters: that =>
-			Object.freeze({
-				machineId: that.itemData.id
-			}),
-
-		navbarSettings() {
-			const { itemData } = this;
-			if (itemData) {
-				return Object.freeze({
-					showStandardNavItem: true,
-					pageTitle: itemData.name || this.$t('phrases.machine_without_name'),
-					showCompareButton: true,
-					showPlantName: { name: itemData.plant ? itemData.plant.name : '' }
-				});
-			}
-
-			return {};
+		{
+			title: tt('Items'),
+			count: 'equipments_count',
+			iconName: 'equipments',
+			sectionClass: '.equipments-layout',
 		},
-
-		tabsList: that =>
-			Object.freeze(
-				that.$translate([
-					{ title: 'WORK_ORDERS', prop: 'woTab' },
-					{ title: 'MAINTENANCE_LOGS', prop: 'logsTab' }
-				])
-			),
-
-		predefinedFilters: that =>
-			Object.freeze({
-				machineId: that.itemData.id,
-				productionLineId: that.itemData.production_line_id,
-				plantId: that.itemData.plant_id
-			}),
-
-		mainInfoSettingsList: that =>
-			Object.freeze(
-				that.$translate([
-					{
-						prop: 'productionLine.name',
-						label: 'production_Line'
-					},
-					{
-						prop: 'locations',
-						label: 'Locations',
-						meta: {
-							fromArray: { subProp: 'name' }
-						}
-					},
-					{
-						prop: 'application.name',
-						label: 'Application'
-					}
-				])
-			),
-
-		countersSettings: that =>
-			Object.freeze({
-				filter: { key: 'machineId', valueProp: 'id' },
-				items: that.$translate([
-					// { title: 'Machines', count:'machines_count', iconName: 'machines' },
-					{
-						title: 'Assets',
-						count: 'assets_count',
-						iconName: 'assets',
-						sectionClass: '.assets-list'
-					},
-					{
-						title: 'Items',
-						count: 'equipments_count',
-						iconName: 'equipments',
-						sectionClass: '.equipments-layout'
-					}
-				])
-			}),
-
-		createWOButtonFormSetup: () =>
-			Object.freeze([
-				{ formKey: 'production_line_id', valKey: 'production_line_id' },
-				{ formKey: 'machine_id', valKey: 'id' }
-			])
-	},
-
-	methods: {
-		...mapActions({
-			fetch_item: 'machines/fetch_machine',
-			show_edit_modal: 'show_edit_modal',
-			set_filters: 'machines/set_statistics_filters'
-		})
+	],
+}));
+const createWOButtonFormSetup = Object.freeze([
+	{ formKey: 'production_line_id', valKey: 'production_line_id' },
+	{ formKey: 'machine_id', valKey: 'id' },
+]);
+const chartLegendEvents = Object.freeze({});
+const setFilters = (range) => {
+	machinesStore.set_value('statistics_filters', {
+		...filters.value,
+		daterange: range,
+		daterange_setted_at: Date.now(),
+	}, {
+		toLocalStorage: { prop: 'machines_statistics_filters' },
+	});
+};
+const editItem = () => {
+	if (itemData.value.id) {
+		changeRoute({ path: `/machines/${itemData.value.id}` });
 	}
 };
+const fetchItem = () => {
+	itemLoading.value = true;
+	api_request.get(`/machines/${route.params.id}`, { notNotify: true })
+		.then(({ value }) => {
+			itemData.value = value || {};
+			loadContent.value = true;
+		})
+		.finally(() => {
+			itemLoading.value = false;
+		});
+};
+
+const { handleEvent } = useEventHandler({}, null);
+
+onMounted(fetchItem);
 </script>

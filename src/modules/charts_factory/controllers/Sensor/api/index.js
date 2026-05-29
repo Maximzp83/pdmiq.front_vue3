@@ -1,6 +1,6 @@
 import { request } from '../../../api/request_provider.js';
 import { mergeArrays } from '@/helpers';
-import { getResponseValue } from '@/services/api/api_helpers';
+import { getResponseValue } from '@/api/request_provider';
 
 const fetchStatisticsRequestUtil = payload => {
 	return new Promise((resolve, reject) => {
@@ -70,8 +70,8 @@ const fetch_sensor_statistics1 = payload => {
 				// let baseURL = 'https://e4qsnej4po7dizmnk4p2vfrv3m0ggvpj.lambda-url.ca-central-1.on.aws';
 				// let baseURL = 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws' // old;
 
-				if (process.env.VUE_APP_SENSOR_STATISTICS_API_URL) {
-					baseURL = process.env.VUE_APP_SENSOR_STATISTICS_API_URL;
+				if (import.meta.env.VITE_SENSOR_STATISTICS_API_URL) {
+					baseURL = import.meta.env.VITE_SENSOR_STATISTICS_API_URL;
 				} else {
 					if (
 						window.location.origin === 'https://app.industrialmatrix.com'
@@ -127,8 +127,8 @@ const fetch_ncd_sensor_fft_statistics1 = payload => {
 		'https://7i4l4qqai25gqquke4teubtkt40hjcaw.lambda-url.ca-central-1.on.aws';
 	//let baseURL = 'https://graph.industrialmatrix.com/fft';
 	
-	if (process.env.VUE_APP_FFT_STATISTICS_API_URL) {
-		baseURL = process.env.VUE_APP_FFT_STATISTICS_API_URL;
+	if (import.meta.env.VITE_FFT_STATISTICS_API_URL) {
+		baseURL = import.meta.env.VITE_FFT_STATISTICS_API_URL;
 	} else {
 		if (
 			window.location.origin === 'https://app.industrialmatrix.com'

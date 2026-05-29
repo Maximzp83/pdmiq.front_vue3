@@ -1,7 +1,6 @@
 import ChartBase from '../../../classes/Chart';
 
-import Notification from 'element-ui/lib/notification';
-import MessageBox from 'element-ui/lib/message-box';
+import { ElMessageBox as MessageBox, ElNotification as Notification } from 'element-plus';
 
 import {
 	fetch_sensor_statistics,

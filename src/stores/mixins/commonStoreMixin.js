@@ -18,6 +18,13 @@ export const commonStoreMixin = {
         localStorage.setItem(prop, JSON.stringify(value));
       }
     },
+    set_filters(prefix, filters, settings = {}) {
+      const stateProp = settings.stateProp || 'filters';
+      const value = filters || { ...commonStoreMixin.state.filters };
+      this.set_value(stateProp, value, {
+        toLocalStorage: { prop: `${prefix}_filters` },
+      });
+    },
   },
   getters: {
     // totalItems: state => state.items.length,
