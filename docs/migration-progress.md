@@ -13,6 +13,12 @@
 - Current selected migration target is `vue2_project/src/views/Sensors`.
 - User instruction for Sensors: migrate continuously without per-file confirmation; defer `statistics` and `charts` to the final Sensors stage.
 - `Controllers` views have been added in Vue3 style and routes/menu are enabled.
+- `Controllers` devices tab is now wired to the migrated Banner sensors list.
+- `Maintenance` section is migrated for the current Vue3 compile scope and routes/menu are enabled.
+- `Maintenance` Work Orders list has been hardened toward legacy behavior with advanced filters, closer table columns, create/export plant guard, and detail/preview actions.
+- `Maintenance` Logs list has been hardened toward legacy behavior with advanced filters, closer table columns, file/parent actions, preview modals, and export guard.
+- `WorkOrderRequests` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `StoreRooms` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
 - Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
@@ -245,6 +251,51 @@ await fetchUsers({ page: 1 });
   - Enabled Sensors list/create/edit/NCD routes and sidebar menu entry
   - Added `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, `OneChartPage.vue`, `AnalysisFFT/**`, chart wrappers, FFT chart wrappers, chart support dialogs, and remaining filter blocks
   - Enabled Sensors statistics/chart routes
+- [x] `Controllers` devices tab completed for current Vue3 scope
+  - Updated `src/views/Controllers/ItemForm.vue`
+  - Added lazy `BannerSensorsList` tab content for `devicesTabActive`
+  - Passed controller-scoped filters into the migrated `src/views/Sensors/BannerSensorsList.vue`
+  - Hid form operation buttons on the devices tab as in legacy behavior
+  - `npm run build` passes
+- [x] `Maintenance` section migrated for current Vue3 compile scope
+  - Added `src/composables/useMaintenance.js`
+  - Added `src/views/Maintenance/MaintenanceDashboard.vue`
+  - Added `src/views/Maintenance/MaintenanceFormWrapper.vue`
+  - Added logs list/form/details and support cells/previews under `src/views/Maintenance/Logs`
+  - Added work-orders list/form/details/import and support files under `src/views/Maintenance/WorkOrders`
+  - Added Maintenance entity configs for logs and work orders
+  - Enabled Maintenance routes in `src/router/index.js`
+  - Enabled CMMS/Maintenance sidebar menu entries in `src/constants/menuItems.js`
+  - Wired `src/components/itemDetails/MaintenanceListWrapper.vue` to migrated lists
+  - `npm run build` and `git diff --check` pass
+- [x] `Maintenance` WorkOrders form hardening
+  - Updated `src/views/Maintenance/WorkOrders/ItemForm.vue`
+  - Added attachments/images, parts, snooze, recurring periods/dates, task procedure selection, and `users_ids`
+  - Added main-instance validation and multipart payload handling in `WorkOrdersDetails.vue`
+  - `npm run build` and `git diff --check` pass
+- [x] `Maintenance` Logs form hardening
+  - Updated `src/views/Maintenance/Logs/ItemForm.vue`
+
+- [x] `WorkOrderRequests` section migrated for current Vue3 compile scope
+  - Added `src/views/WorkOrderRequests/ItemsList.vue`
+  - Added `src/views/WorkOrderRequests/ItemForm.vue`
+  - Added `src/views/WorkOrderRequests/ConvertForm.vue`
+  - Added `src/views/WorkOrderRequests/ItemDetailsPreview.vue`
+  - Added `WorkOrderRequests` entity config in `src/config/entities.js`
+  - Added request save/convert/reject actions in `src/composables/useMaintenance.js`
+  - Enabled `/maintenance-requests` route in `src/router/index.js`
+  - Enabled Work Order Requests sidebar entry in `src/constants/menuItems.js`
+
+- [x] `StoreRooms` section migrated for current Vue3 compile scope
+  - Added `src/views/StoreRooms/ItemsList.vue`
+  - Added `src/views/StoreRooms/ItemForm.vue`
+  - Added `src/views/StoreRooms/ItemPage.vue`
+  - Added `src/views/StoreRooms/LocationItem.vue`
+  - Enabled `/store-rooms`, `/store-rooms/new`, `/store-rooms/:id`, and `/store-rooms/:id/items` routes in `src/router/index.js`
+  - Enabled StoreRooms sidebar entry in `src/constants/menuItems.js`
+  - Added total/start-finish time handling, attachments/images, supervisor/sanitization/acknowledge/shift flags, breakdown type, and main-instance validation
+  - Added multipart payload handling in `LogsDetails.vue`
+  - `npm run build` and `git diff --check` pass
 - [x] `src/views/Brands/ItemsList.vue` added in Vue3 style
   - Migrated from legacy `vue2_project/src/views/Brands/ItemsList.vue`
   - Switched list page flow to `useItemsData` + `useEventHandler`

@@ -181,32 +181,29 @@ const menuItems1 = [
 	// 	enableInCompanyMenuForm: true
 	// },
 
-	// {
-	// 	name: 'sidebar_menu.CMMS',
-	// 	category_label: 'cmms'
-	// },
-	// {
-	// 	name: 'sidebar_menu.work_orders_maintenance_logs',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.MAINTENANCE,
-	// 	icon: 'icon-maintenance',
-	// 	path: '/maintenance',
-	// 	meta: { permissions: ['view_maintenance'] },
-	// 	enableInCompanyMenuForm: true
-
-	// 	/*children: [
-	// 		{
-	// 			// name: 'Maintenance Log',
-	// 			name: 'maintenance_log',
-	// 			path: '/maintenance-logs'
-	// 		},
-	// 		{
-	// 			// name: 'Work Order',
-	// 			name: 'work_order',
-	// 			path: '/work-orders'
-	// 		}
-	// 	]*/
-	// },
+	{
+		name: 'sidebar_menu.CMMS',
+		category_label: 'cmms'
+	},
+	{
+		name: 'sidebar_menu.work_orders_maintenance_logs',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.MAINTENANCE,
+		icon: 'icon-maintenance',
+		path: '/maintenance/dashboard',
+		meta: { permissions: ['view_maintenance'] },
+		enableInCompanyMenuForm: true,
+		children: [
+			{
+				name: 'maintenance_log',
+				path: '/maintenance/logs'
+			},
+			{
+				name: 'work_order',
+				path: '/maintenance/work-orders'
+			}
+		]
+	},
 	// {
 	// 	name: 'Requisition',
 	// 	belongs_to_label: 'cmms',
@@ -287,16 +284,16 @@ const menuItems1 = [
 	// 		}
 	// 	]
 	// },
-	// {
-	// 	name: 'sidebar_menu.work_order_requests',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.WORK_ORDER_REQUESTS,
-	// 	icon: 'icon-edit3',
-	// 	path: '/maintenance-requests',
-	// 	requestCounter: true,
-	// 	meta: { permissions: ['view_work_order_requests'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.work_order_requests',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.WORK_ORDER_REQUESTS,
+		icon: 'icon-edit3',
+		path: '/maintenance-requests',
+		requestCounter: true,
+		meta: { permissions: ['view_work_order_requests'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'task_Procedures',
 		belongs_to_label: 'cmms',
@@ -440,14 +437,14 @@ const menuItems1 = [
 		path: '/applications',
 		meta: { permissions: ['view_applications'] }
 	},
-	// {
-	// 	name: 'storerooms',
-	// 	belongs_to_label: 'asset_management',
-	// 	id: MENU_TYPES.STOREROOMS,
-	// 	icon: 'icon-store-room',
-	// 	path: '/store-rooms',
-	// 	meta: { permissions: ['view_storerooms'] }
-	// }
+	{
+		name: 'storerooms',
+		belongs_to_label: 'asset_management',
+		id: MENU_TYPES.STOREROOMS,
+		icon: 'icon-store-room',
+		path: '/store-rooms',
+		meta: { permissions: ['view_storerooms'] }
+	}
 ];
 
 const menuSectionsList1 = [

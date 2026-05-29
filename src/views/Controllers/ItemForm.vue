@@ -231,10 +231,26 @@
 						:controllerData="itemData"
 					/>
 				</div>
+
+				<div
+					v-if="isDevicesTabPresent"
+					v-show="activeTab.prop === 'devicesTabActive'"
+					key="tab-3"
+					class="tab-container"
+				>
+					<BannerSensorsList
+						insideOtherPage
+						:propsFilters="sensorsListFilters"
+					/>
+				</div>
 			</CustomTransition>
 
 			<FormOperationsButtons
-				v-if="!fromModal && (!isDXMCommandsTabPresent || activeTab.prop !== 'commandsTabActive')"
+				v-if="
+					!fromModal &&
+					(!isDXMCommandsTabPresent || activeTab.prop !== 'commandsTabActive') &&
+					(!isDevicesTabPresent || activeTab.prop !== 'devicesTabActive')
+				"
 				@onCancel="handleCancel"
 				@onSave="validateForm"
 			/>
@@ -268,6 +284,7 @@ import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 
 const FormulasRow = defineAsyncComponent(() => import('./FormulasRow.vue'));
 const DXMCommandsTab = defineAsyncComponent(() => import('./DXMCommandsTab.vue'));
+const BannerSensorsList = defineAsyncComponent(() => import('../Sensors/BannerSensorsList.vue'));
 
 const { tt } = Lang;
 
@@ -351,6 +368,18 @@ const isDXMCommandsTabPresent = computed(() =>
 );
 const isFormulasTabPresent = computed(() =>
 	props.tabsList.some((tab) => tab.prop === 'formulasTabActive')
+);
+const isDevicesTabPresent = computed(() =>
+	props.tabsList.some((tab) => tab.prop === 'devicesTabActive')
+);
+
+const sensorsListFilters = computed(() =>
+	props.itemData
+		? Object.freeze({
+				controllerId: itemId.value,
+				dataSet: [],
+			})
+		: {}
 );
 
 const itemConfigFile = computed(() => {

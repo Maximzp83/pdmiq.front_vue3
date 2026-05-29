@@ -99,6 +99,7 @@
 - DONE (single-file): added `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue` in Vue3 style for the legacy White River controller form.
 - DONE (coupled step): enabled Controllers routes in `src/router/index.js` and sidebar menu entry in `src/constants/menuItems.js`.
 - DONE (bugfix): fixed Controllers create blank state by adding a default PDM/Banner type fallback in `src/views/Controllers/ItemPage.vue` and gating formulas tab rendering in `src/views/Controllers/ItemForm.vue`.
+- DONE (single-file): wired Controllers devices tab in `src/views/Controllers/ItemForm.vue` to the migrated `src/views/Sensors/BannerSensorsList.vue` with controller-scoped filters; `npm run build` passes.
 - DONE (foundation): started `Sensors` migration with `src/composables/useSensors.js`, `SensorsStore` filter/state actions, shared `set_filters`, and dynamic view component loading support.
 - DONE (Sensors lists): added Vue3 `ItemsList.vue`, `NCDSensorsList.vue`, `BannerSensorsList.vue`, `FFTRequestBlock.vue`, and table helper cells/actions.
 - DONE (Sensors forms/page): added Vue3 `ItemPage.vue` plus base `sensorForm` files: `ItemForm.vue`, `ItemFormNCD.vue`, `ItemFormUltraSound.vue`, `ItemFormWrapper.vue`, `BannerSensorItemWrapper.vue`, `RunningThresholdItem.vue`, and `SubTypeParameterItem.vue`.
@@ -106,6 +107,13 @@
 - DONE (Sensors routes/menu): enabled `/sensors`, `/sensors/new`, `/sensors/:id`, `/sensors/ncd` routes and Sensors sidebar menu entry.
 - DONE (Sensors final stage): migrated statistics/charts stack including `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, `OneChartPage.vue`, `AnalysisFFT/**`, chart list/item wrappers, FFT chart wrappers, chart support dialogs, and remaining filter blocks.
 - DONE (Sensors routes): enabled `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, and `/sensors/:id/chart`.
+- DONE (section): migrated `vue2_project/src/views/Maintenance` into `src/views/Maintenance` for the current Vue3 compile scope, including logs, work orders, dashboard, modal wrapper, details/create pages, import page, support cells/previews, `useMaintenance`, route/menu enablement, and `MaintenanceListWrapper` integration.
+- DONE (hardening): expanded `src/views/Maintenance/WorkOrders/ItemForm.vue` toward legacy behavior with attachments/images, parts, snooze, recurring period fields, task procedure selection, `users_ids`, main-instance validation, and multipart payload handling.
+- DONE (hardening): expanded `src/views/Maintenance/Logs/ItemForm.vue` toward legacy behavior with total/start-finish time handling, attachments/images, supervisor/sanitization/acknowledge/shift flags, breakdown type, main-instance validation, and multipart payload handling.
+- DONE (single-file): hardened `src/views/Maintenance/WorkOrders/ItemsList.vue` toward legacy behavior with production line/machine/asset/equipment filters, category "Without Category" filter option, filtered status options, plant guard for create/export, closer legacy table columns, details/preview actions, and Vue3 async-select settings for asset/equipment lookup.
+- DONE (single-file): hardened `src/views/Maintenance/Logs/ItemsList.vue` toward legacy behavior with production line/machine/asset/equipment filters, plant/date guard for export, closer legacy table columns, file and parent work-order actions, log/parent preview modals, and Vue3 async-select settings for asset/equipment lookup.
+- DONE (section): migrated `vue2_project/src/views/WorkOrderRequests` into Vue3 with `ItemsList.vue`, `ItemForm.vue`, `ConvertForm.vue`, and `ItemDetailsPreview.vue`; added Work Order Requests entity config, maintenance composable request actions, `/maintenance-requests` route, and sidebar menu entry.
+- DONE (section): migrated `vue2_project/src/views/StoreRooms` into Vue3 with `ItemsList.vue`, `ItemForm.vue`, `ItemPage.vue`, and `LocationItem.vue`; enabled `/store-rooms`, `/store-rooms/new`, `/store-rooms/:id`, `/store-rooms/:id/items` routes and sidebar menu entry.
 - Current next focus: smoke-test Sensors runtime flows with real data and fix any runtime gaps from simplified chart controls.
 - DONE (build): fixed the existing non-Sensors build blocker and follow-up compile blockers; `npm run build` now passes.
 - Current next focus: do not reopen completed `BrandModels` details work unless a new issue is reported.

@@ -12,15 +12,21 @@
 		/>
 
 		<div v-if="activeTab.prop === tabsList[0].prop" :key="tabsList[0].prop" class="tab-container">
-			<div class="card-content text-center gray-color">
-				{{ Lang.tt('WORK_ORDERS') }}
-			</div>
+			<WorkOrdersList
+				ref="WorkOrdersList"
+				insideOtherPage
+				:propsFilters="woFilters"
+				:hideDatepicker="hideDatepicker"
+			/>
 		</div>
 
 		<div v-if="activeTab.prop === tabsList[1].prop" :key="tabsList[1].prop" class="tab-container">
-			<div class="card-content text-center gray-color">
-				{{ Lang.tt('MAINTENANCE_LOGS') }}
-			</div>
+			<MaintenanceLogsList
+				ref="MaintenanceLogsList"
+				insideOtherPage
+				:propsFilters="logFilters"
+				:hideDatepicker="hideDatepicker"
+			/>
 		</div>
 	</div>
 </template>
@@ -32,6 +38,8 @@ import { Lang } from '@/localization';
 import { useTabs } from '@/composables/mixins/useTabs';
 
 const TabsBar = defineAsyncComponent(() => import('@/components/common/TabsBar.vue'));
+const WorkOrdersList = defineAsyncComponent(() => import('@/views/Maintenance/WorkOrders/ItemsList.vue'));
+const MaintenanceLogsList = defineAsyncComponent(() => import('@/views/Maintenance/Logs/ItemsList.vue'));
 
 defineProps({
 	woFilters: { type: Object, default: () => ({}) },

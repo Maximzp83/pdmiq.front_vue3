@@ -40,7 +40,7 @@ Primary rules source:
   - Controllers routes were enabled in `src/router/index.js`.
   - Controllers sidebar menu entry was enabled in `src/constants/menuItems.js`.
   - Controllers create blank state was fixed: `ItemPage.vue` defaults `/controllers/new` without query type to PDM/Banner and `ItemForm.vue` gates formulas content by tab presence.
-  - Controllers devices tab dependency is now partly available because `src/views/Sensors/BannerSensorsList.vue` has been added in Vue3 style.
+  - Controllers devices tab is wired in `src/views/Controllers/ItemForm.vue` and uses migrated `src/views/Sensors/BannerSensorsList.vue` with controller-scoped filters.
 - `Sensors` migration is complete for the current Vue3 scope:
   - Added `src/composables/useSensors.js` for sensor-specific API requests.
   - Added Pinia filter/state actions to `src/stores/SensorsStore.js`.
@@ -64,6 +64,22 @@ Primary rules source:
 - `src/config/entities.js` now includes `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow and remove local endpoint hardcodes.
 - Runtime fix applied: `src/components/itemDetails/ItemImagesBlock.vue` now imports `Lang.tt`, which resolved the `_ctx.tt is not a function` crash on `BrandModelDetailsPage`.
 - Supporting request/item-card infrastructure from the earlier `BrandModels` migration remains active and was reused by the details stack.
+- `Maintenance` section is migrated for the current Vue3 compile scope:
+  - Added `src/composables/useMaintenance.js`.
+  - Added `src/views/Maintenance/MaintenanceDashboard.vue` and `MaintenanceFormWrapper.vue`.
+  - Added logs list/form/details and support cells/previews under `src/views/Maintenance/Logs`.
+  - Added work-orders list/form/details/import and support files under `src/views/Maintenance/WorkOrders`.
+  - Added Maintenance entity configs for logs and work orders in `src/config/entities.js`.
+  - Enabled Maintenance routes in `src/router/index.js`.
+  - Enabled CMMS/Maintenance sidebar menu entries in `src/constants/menuItems.js`.
+  - Wired `src/components/itemDetails/MaintenanceListWrapper.vue` to migrated lists.
+  - Hardened `src/views/Maintenance/WorkOrders/ItemForm.vue` with attachments/images, parts, snooze, recurring periods/dates, task procedure selection, `users_ids`, main-instance validation, and multipart payload handling.
+  - Hardened `src/views/Maintenance/Logs/ItemForm.vue` with total/start-finish time handling, attachments/images, supervisor/sanitization/acknowledge/shift flags, breakdown type, main-instance validation, and multipart payload handling.
+  - Hardened `src/views/Maintenance/WorkOrders/ItemsList.vue` with production line/machine/asset/equipment filters, category "Without Category" option, filtered status options, plant guard for create/export, closer legacy table columns, details/preview actions, and Vue3 async-select settings for asset/equipment lookup.
+  - Hardened `src/views/Maintenance/Logs/ItemsList.vue` with production line/machine/asset/equipment filters, plant/date guard for export, closer legacy table columns, file and parent work-order actions, log/parent preview modals, and Vue3 async-select settings for asset/equipment lookup.
+  - Migrated `vue2_project/src/views/WorkOrderRequests` into Vue3 with list, form, convert form, details preview, entity config, maintenance composable actions, `/maintenance-requests` route, and sidebar menu entry.
+  - Migrated `vue2_project/src/views/StoreRooms` into Vue3 with list, form, item page, location subitem, `/store-rooms` routes, `/store-rooms/:id/items` route, and sidebar menu entry.
+  - `npm run build` and `git diff --check` pass.
 
 ## Latest Completed Files
 - `src/router/index.js`
@@ -85,8 +101,16 @@ Primary rules source:
 - `src/views/BrandModels/Details/DetailsPage.vue`
 - `src/router/index.js`
 - `src/components/itemDetails/ItemImagesBlock.vue`
+- `src/views/Maintenance/**`
+- `src/views/Maintenance/WorkOrders/ItemsList.vue`
+- `src/views/Maintenance/Logs/ItemsList.vue`
+- `src/views/WorkOrderRequests/**`
+- `src/views/StoreRooms/**`
+- `src/composables/useMaintenance.js`
+- `src/components/itemDetails/MaintenanceListWrapper.vue`
 
 ## Recommended Next Focus
+- Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
 - Smoke-test Sensors list/create/edit/statistics/FFT/chart routes in browser.
 - Review runtime completeness of the simplified chart/statistics controls against production data.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.

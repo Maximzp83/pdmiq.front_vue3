@@ -9,53 +9,50 @@
 
 ## Key Architecture Rules
 - Migrate from `vue2_project` into Vue3 architecture only; do not reintroduce Vue2 mixins or Vuex runtime patterns.
-- Prefer shared composables: `useItemsData`, `useItemPage`, `useItemForm`, `useRequestsList`, `useSubItem`, `useSubItemsList`.
+- Prefer existing shared composables: `useItemsData`, `useItemPage`, `useItemForm`, `useRequestsList`, `useSubItem`, `useSubItemsList`.
 - Use `src/config/entities.js` as entity API/route metadata source where available.
 - Replace `@event="handleEventNew"` with `@event="handleEvent"`.
 - Replace `<CustomSelect>` with global `<CustomSelectV2>`; do not locally import `CustomSelectV2` or `CustomInput`.
-- Do not keep legacy `requestsListMixin` / `requestsToDoList` loaders for `<FetchByQuerySelect>`; pass async request functions through settings.
-- Current collaboration mode: no code/diff output in responses; ask only on real ambiguity/risk. `docs/` and `SESSION_CONTEXT.md` may be updated automatically.
+- Do not keep legacy `requestsListMixin` / `requestsToDoList` async loaders for `<FetchByQuerySelect>`; pass async request functions through component settings instead.
+- Current collaboration mode: no code/diff output in responses. Apply non-doc changes only after confirmation unless the user explicitly asks to migrate a whole section without intermediate confirmations.
 
 ## Current Task Status
-- `vue2_project/src/views/Sensors` has been migrated into Vue3, including final `statistics` and `charts` stage.
-- Sensors routes are enabled: `/sensors`, `/sensors/ncd`, `/sensors/new`, `/sensors/:id`, `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, `/sensors/:id/chart`.
-- Sensors menu entry is enabled.
-- `npm run build` passes after follow-up compile fixes.
-- Focused checks passed for Sensors and related build-fix files; `git diff --check` passed.
+- `vue2_project/src/views/Maintenance` is migrated for the current Vue3 compile scope.
+- Maintenance routes/menu are enabled for dashboard, logs, work orders, details/create pages, and work-order import.
+- Maintenance Work Orders and Logs forms/lists were hardened toward legacy behavior, including advanced filters, attachments/images, recurring/snooze-related form fields, preview/detail actions, and export guards.
+- `vue2_project/src/views/WorkOrderRequests` is migrated into Vue3:
+  `src/views/WorkOrderRequests/ItemsList.vue`, `ItemForm.vue`, `ConvertForm.vue`, `ItemDetailsPreview.vue`.
+- Work Order Requests route/menu/entity/API support is enabled through `src/router/index.js`, `src/constants/menuItems.js`, `src/config/entities.js`, and `src/composables/useMaintenance.js`.
+- `vue2_project/src/views/StoreRooms` is migrated into Vue3:
+  `src/views/StoreRooms/ItemsList.vue`, `ItemForm.vue`, `ItemPage.vue`, `LocationItem.vue`.
+- StoreRooms routes/menu are enabled for `/store-rooms`, `/store-rooms/new`, `/store-rooms/:id`, and `/store-rooms/:id/items`; the items route uses existing `src/views/BrandModels/StoreroomWrapper.vue`.
+- `npm run build` passes.
+- `git diff --check` passes.
 
 ## Files Already Modified
-- `src/views/Sensors/**`
-- `src/components/charts/ChartsPreloader.vue`
-- `src/components/charts/CommonChartItemContainer.vue`
-- `src/components/charts/CommonChartItemWrapper.vue`
-- `src/composables/useSensors.js`
-- `src/stores/SensorsStore.js`
-- `src/stores/mixins/commonStoreMixin.js`
-- `src/components/common/DynamicComponentWrapper.vue`
-- `src/router/index.js`
-- `src/constants/menuItems.js`
-- `vite.config.js`
-- `src/api/request_provider.js`
-- `src/modules/charts_factory/api/request_provider.js`
-- `src/modules/charts_factory/controllers/Sensor/api/index.js`
-- `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
-- `src/helpers/index.js`
-- `src/helpers/specialHelpers.js`
-- `src/composables/mixins/useItemCard.js`
-- `src/components/layout/Sidebar/SidebarWithSubs.vue`
+- `src/composables/useMaintenance.js`
+- `src/views/Maintenance/**`
+- `src/views/WorkOrderRequests/**`
+- `src/views/StoreRooms/**`
 - `src/components/itemDetails/MaintenanceListWrapper.vue`
-- `src/views/Machines/Details/DetailsPage.vue`
-- `src/views/Machines/ItemForm.vue`
-- `src/views/Machines/CharacterItem.vue`
-- `src/views/Machines/AttachmentItem.vue`
-- `src/views/Machines/ItemCard.vue`
-- Docs updated: `docs/migration-progress.md`, `docs/migration-todos.md`, `docs/new-session-handoff.md`, `SESSION_CONTEXT.md`
+- `src/config/entities.js`
+- `src/constants/menuItems.js`
+- `src/router/index.js`
+- `src/views/Controllers/ItemForm.vue`
+- `components.d.ts`
+- Docs updated:
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
 
 ## Unresolved Issues
-- Sensors statistics/charts need browser smoke testing with real data; several legacy chart controls were simplified into Vue3 wrappers.
-- Controllers runtime flow still needs browser smoke testing.
-- `devicesTab` in `src/views/Controllers/ItemForm.vue` is still intentionally not wired in.
-- Some compile-only fixes touched Machines and `MaintenanceListWrapper`; runtime completeness for those non-current areas is not guaranteed.
+- Authenticated browser runtime smoke testing with real data is still needed.
+- Highest-risk Maintenance areas: work-order/log create/edit payload completeness, attachments/images upload, recurring work orders, snooze, work-order import/upload/revert, list action behavior, modal header/footer actions, PDF/print behavior, and recurring/unlock flows.
+- Highest-risk Work Order Requests areas: create/edit payloads, convert/reject actions, modal callbacks, route/menu visibility, and list/detail modal behavior.
+- Highest-risk StoreRooms areas: create/edit/delete payloads, locations subitems, plant lookup, and `/store-rooms/:id/items` integration with `BrandModels/StoreroomWrapper`.
+- Browser automation is not installed in project dependencies.
 
 ## Next Actionable Step
-- Browser smoke-test Sensors routes on real data: list, NCD list, create/edit, stats, FFT, one-chart, and multiview.
+- Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
+- Focus first on StoreRooms list/create/edit/delete, locations subitems, and `/store-rooms/:id/items`; then Work Order Requests create/edit/convert/reject; then Maintenance create/edit/import/export/preview flows.

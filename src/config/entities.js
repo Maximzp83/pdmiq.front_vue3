@@ -201,6 +201,57 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_work_order_type',
 		}),
 	}),
+	MaintenanceLogs: Object.freeze({
+		key: 'maintenance_logs',
+		apiBase: '/maintenance',
+		routeBase: '/maintenance/logs',
+		filtersStorageKey: 'maintenance_logs_filters',
+		itemsName: Object.freeze({
+			one: 'Maintenance_Log',
+			mult: 'Maintenance_Logs',
+			instanceName: 'maintenance',
+		}),
+		permissions: Object.freeze({
+			view: 'view_maintenance',
+			create: 'create_maintenance',
+			edit: 'edit_maintenance',
+			delete: 'delete_maintenance',
+		}),
+	}),
+	WorkOrders: Object.freeze({
+		key: 'work_orders',
+		apiBase: '/maintenance',
+		routeBase: '/maintenance/work-orders',
+		filtersStorageKey: 'maintenance_wo_filters',
+		itemsName: Object.freeze({
+			one: 'Work_Order',
+			mult: 'Work_Orders',
+			instanceName: 'maintenance',
+		}),
+		permissions: Object.freeze({
+			view: 'view_maintenance',
+			create: 'create_maintenance',
+			edit: 'edit_maintenance',
+			delete: 'delete_maintenance',
+		}),
+	}),
+	WorkOrderRequests: Object.freeze({
+		key: 'work_order_requests',
+		apiBase: '/maintenance/requests',
+		routeBase: '/maintenance-requests',
+		filtersStorageKey: 'maintenance_requests_filters',
+		itemsName: Object.freeze({
+			one: 'Work_Order_Request',
+			mult: 'Work_Order_Requests',
+			instanceName: 'maintenance',
+		}),
+		permissions: Object.freeze({
+			view: 'view_work_order_requests',
+			create: 'create_work_order_requests',
+			edit: 'edit_work_order_requests',
+			delete: 'delete_work_order_requests',
+		}),
+	}),
 	IndustrialServices: Object.freeze({
 		key: 'industrial_services',
 		apiBase: '/settings/industrial-services',
