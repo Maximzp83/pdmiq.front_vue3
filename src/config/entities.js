@@ -252,6 +252,40 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_work_order_requests',
 		}),
 	}),
+	Requisitions: Object.freeze({
+		key: 'plant_requisitions',
+		apiBase: '/plants/work-orders',
+		routeBase: '/requisitions',
+		filtersStorageKey: 'plant-requisitions_filters',
+		itemsName: Object.freeze({
+			one: 'Requisition',
+			mult: 'Requisitions',
+			instanceName: 'plant_requisitions',
+		}),
+		permissions: Object.freeze({
+			view: 'view_requisitions',
+			create: 'create_requisitions',
+			edit: 'edit_requisitions',
+			delete: 'delete_requisitions',
+		}),
+	}),
+	Rfqs: Object.freeze({
+		key: 'rfqs',
+		apiBase: '/rfqs',
+		routeBase: '/rfqs',
+		filtersStorageKey: 'rfqs_filters',
+		itemsName: Object.freeze({
+			one: 'phrases.Request_for_quotation',
+			mult: 'phrases.Request_for_quotations',
+			instanceName: 'rfqs',
+		}),
+		permissions: Object.freeze({
+			view: 'view_rfqs',
+			create: 'create_rfqs',
+			edit: 'edit_rfqs',
+			delete: 'delete_rfqs',
+		}),
+	}),
 	IndustrialServices: Object.freeze({
 		key: 'industrial_services',
 		apiBase: '/settings/industrial-services',

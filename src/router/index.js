@@ -61,6 +61,18 @@ const routes = [
 						component: () => import('@/views/Machines/ItemsList.vue'),
 						meta: { auth: true },
 					},
+					{
+						path: 'production-lines',
+						name: 'ProductionLines',
+						component: () => import('@/views/ProductionLines/ItemsList.vue'),
+						meta: { auth: true },
+					},
+					{
+						path: 'utilities',
+						name: 'Utilities',
+						component: () => import('@/views/ProductionLines/UtilitiesListWrapper.vue'),
+						meta: { auth: true },
+					},
 				],
 			},
 			{
@@ -304,6 +316,24 @@ const routes = [
 				meta: { auth: true, permissions: ['edit_controllers'] },
 			},
 			{
+				path: 'production-lines/new',
+				name: 'ProductionLineCreate',
+				component: () => import('@/views/ProductionLines/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_dashboard'] },
+			},
+			{
+				path: 'production-lines/:id',
+				name: 'ProductionLineEdit',
+				component: () => import('@/views/ProductionLines/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_dashboard'] },
+			},
+			{
+				path: 'production-lines/:id/details',
+				name: 'ProductionLineDetailsPage',
+				component: () => import('@/views/ProductionLines/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_dashboard'] },
+			},
+			{
 				path: 'store-rooms',
 				name: 'StoreRooms',
 				component: () => import('@/views/StoreRooms/ItemsList.vue'),
@@ -326,6 +356,24 @@ const routes = [
 				name: 'StoreRoomItems',
 				component: () => import('@/views/BrandModels/StoreroomWrapper.vue'),
 				meta: { auth: true, permissions: ['view_storerooms'] },
+			},
+			{
+				path: 'rfqs',
+				name: 'RFQS',
+				component: () => import('@/views/RFQS/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_rfqs'] },
+			},
+			{
+				path: 'rfqs/new',
+				name: 'RFQSCreate',
+				component: () => import('@/views/RFQS/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_rfqs'] },
+			},
+			{
+				path: 'rfqs/:id',
+				name: 'RFQSPage',
+				component: () => import('@/views/RFQS/ItemPage.vue'),
+				meta: { auth: true, permissions: ['view_rfqs'] },
 			},
 			{
 				path: 'parts',
@@ -560,6 +608,47 @@ const routes = [
 				name: 'SensorOneChart',
 				component: () => import('@/views/Sensors/OneChartPage.vue'),
 				meta: { auth: true, permissions: ['view_sensors'] },
+			},
+			{
+				path: 'requisitions',
+				name: 'Requisitions',
+				component: () => import('@/views/Requisitions/RequisitionsDashboard.vue'),
+				meta: {
+					auth: true,
+					permissions: ['view_requisitions'],
+					conditionSettings: {
+						checkMethod: 'some',
+						conditions: [
+							{ array_method: 'some', prop: 'role.type', control_value: [1] },
+							{ prop: 'role.is_requisitioner', control_value: true },
+							{ prop: 'role.is_fab_shop_manager', control_value: true },
+							{ prop: 'role.is_technic', control_value: true },
+						],
+					},
+				},
+			},
+			{
+				path: 'requisitions/:id',
+				name: 'RequisitionPage',
+				component: () => import('@/views/Requisitions/ItemPage.vue'),
+				meta: {
+					auth: true,
+					permissionsMethod: 'some',
+					permissions: ['edit_requisitions', 'create_requisitions'],
+				},
+			},
+			{
+				path: 'roi-calculator',
+				name: 'ROICalculator',
+				component: () => import('@/views/Requisitions/ROICalculator/ROICalculatorContainer.vue'),
+				meta: {
+					auth: true,
+					permissions: ['view_requisitions_roi_calculator'],
+					conditionSettings: {
+						checkMethod: 'some',
+						conditions: [{ prop: 'role.is_fab_shop_manager', control_value: true }],
+					},
+				},
 			},
 			// {
 			// 	path: 'requisitions',

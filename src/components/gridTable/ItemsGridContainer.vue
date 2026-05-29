@@ -25,7 +25,7 @@
 					:componentPath="componentPath"
 					:operationsSettings="operationsSettings"
 					:additionalProps="additionalProps"
-					@event="handleEventNew"
+					@event="handleEvent"
 				/>
 			</div>
 		</div>
@@ -99,7 +99,7 @@ defineExpose({
 	selectedIds,
 });
 
-const { handleEvent: handleEventNew } = useEventHandler(methodsMap, emit);
+const { handleEvent } = useEventHandler(methodsMap, emit);
 
 void Lang;
 </script>

@@ -17,42 +17,42 @@
 - Current collaboration mode: no code/diff output in responses. Apply non-doc changes only after confirmation unless the user explicitly asks to migrate a whole section without intermediate confirmations.
 
 ## Current Task Status
-- `vue2_project/src/views/Maintenance` is migrated for the current Vue3 compile scope.
-- Maintenance routes/menu are enabled for dashboard, logs, work orders, details/create pages, and work-order import.
-- Maintenance Work Orders and Logs forms/lists were hardened toward legacy behavior, including advanced filters, attachments/images, recurring/snooze-related form fields, preview/detail actions, and export guards.
-- `vue2_project/src/views/WorkOrderRequests` is migrated into Vue3:
-  `src/views/WorkOrderRequests/ItemsList.vue`, `ItemForm.vue`, `ConvertForm.vue`, `ItemDetailsPreview.vue`.
-- Work Order Requests route/menu/entity/API support is enabled through `src/router/index.js`, `src/constants/menuItems.js`, `src/config/entities.js`, and `src/composables/useMaintenance.js`.
-- `vue2_project/src/views/StoreRooms` is migrated into Vue3:
-  `src/views/StoreRooms/ItemsList.vue`, `ItemForm.vue`, `ItemPage.vue`, `LocationItem.vue`.
-- StoreRooms routes/menu are enabled for `/store-rooms`, `/store-rooms/new`, `/store-rooms/:id`, and `/store-rooms/:id/items`; the items route uses existing `src/views/BrandModels/StoreroomWrapper.vue`.
+- `vue2_project/src/views/Requisitions` is migrated for current Vue3 compile scope with dashboard, list, detail page, requisition form, details/action forms, counters, ROI calculator, `usePlantRequisitions`, entity config, routes, and menu entries.
+- `vue2_project/src/views/RFQS` is migrated for current Vue3 compile scope with list, form, item page, `useRfqs`, entity config, routes, and menu entry.
+- `vue2_project/src/views/ProductionLines` is migrated for current Vue3 compile scope with list/grid, form, item page, item card, utility wrapper, details page, support subitems, `useProductionLines`, store filter extensions, and routes.
+- `src/components/gridTable/ItemsGridContainer.vue` was aligned with the current `handleEvent` rule.
+- Earlier migrated sections remain in scope: Maintenance, WorkOrderRequests, StoreRooms, Sensors, Controllers, BrandModels details.
 - `npm run build` passes.
 - `git diff --check` passes.
 
 ## Files Already Modified
-- `src/composables/useMaintenance.js`
-- `src/views/Maintenance/**`
-- `src/views/WorkOrderRequests/**`
-- `src/views/StoreRooms/**`
-- `src/components/itemDetails/MaintenanceListWrapper.vue`
+- `src/composables/usePlantRequisitions.js`
+- `src/composables/useRfqs.js`
+- `src/composables/useProductionLines.js`
+- `src/views/Requisitions/**`
+- `src/views/RFQS/**`
+- `src/views/ProductionLines/**`
+- `src/stores/ProductionLinesStore.js`
+- `src/components/gridTable/ItemsGridContainer.vue`
 - `src/config/entities.js`
-- `src/constants/menuItems.js`
 - `src/router/index.js`
-- `src/views/Controllers/ItemForm.vue`
-- `components.d.ts`
+- `src/constants/menuItems.js`
 - Docs updated:
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
+- Pre-existing unrelated dirty file:
+  - `codex_session_end_prompts.yaml`
 
 ## Unresolved Issues
-- Authenticated browser runtime smoke testing with real data is still needed.
-- Highest-risk Maintenance areas: work-order/log create/edit payload completeness, attachments/images upload, recurring work orders, snooze, work-order import/upload/revert, list action behavior, modal header/footer actions, PDF/print behavior, and recurring/unlock flows.
-- Highest-risk Work Order Requests areas: create/edit payloads, convert/reject actions, modal callbacks, route/menu visibility, and list/detail modal behavior.
-- Highest-risk StoreRooms areas: create/edit/delete payloads, locations subitems, plant lookup, and `/store-rooms/:id/items` integration with `BrandModels/StoreroomWrapper`.
+- Browser/runtime smoke testing with authenticated real data is still needed.
+- Highest-risk ProductionLines areas: drag/drop reorder behavior, modal create/edit payload with image/library uploads, locations lookup binding, RPM node selection, utility vs production-line filter persistence, and details child-list parity because Assets/Equipments lists are not currently migrated.
+- Highest-risk Requisitions areas: approval/deny/unapprove/on-hold/complete payload details, attachment upload behavior, ROI calculation filter parity, chart/runtime data parity, details modal/action parity, and authenticated role-condition behavior.
+- Highest-risk RFQS areas: equipment label fetch/display, vendor multiselect save payload, delete action behavior, and route/menu permission visibility.
 - Browser automation is not installed in project dependencies.
 
 ## Next Actionable Step
-- Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
-- Focus first on StoreRooms list/create/edit/delete, locations subitems, and `/store-rooms/:id/items`; then Work Order Requests create/edit/convert/reject; then Maintenance create/edit/import/export/preview flows.
+- Runtime smoke-test `ProductionLines` first:
+  `/dashboard/production-lines`, `/dashboard/utilities`, create/edit modal, image/library upload, drag/drop reorder, `/production-lines/:id/details`, and details widgets/statistics.
+- Then smoke-test `Requisitions` and `RFQS` with authenticated real data.

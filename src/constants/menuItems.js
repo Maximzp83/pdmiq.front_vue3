@@ -204,6 +204,54 @@ const menuItems1 = [
 			}
 		]
 	},
+	{
+		name: 'Requisitions',
+		belongs_to_label: 'cmms',
+		icon: 'icon-requisitions',
+		meta: {
+			permissions: ['view_requisitions'],
+			conditionSettings: {
+				checkMethod: 'some',
+				conditions: [
+					{
+						array_method: 'some',
+						prop: 'role.type',
+						control_value: [
+							USER_ROLES_TYPES.INDUSTRIAL_MATRIX,
+							USER_ROLES_TYPES.DEVELOPER
+						]
+					},
+					{
+						array_method: 'some',
+						prop: 'role.type',
+						control_value: [USER_ROLES_TYPES.CUSTOMER],
+						next_conditions: [
+							{
+								prop: 'role.is_fab_shop_manager',
+								control_value: true
+							}
+						]
+					}
+				]
+			}
+		},
+		children: [
+			{
+				id: MENU_TYPES.REQUISITIONS,
+				name: 'sidebar_menu.Dashboard',
+				path: '/requisitions',
+				meta: { permissions: ['view_requisitions'] },
+				enableInCompanyMenuForm: true
+			},
+			{
+				id: MENU_TYPES.REQUISITIONS_ROI_CALCULATOR,
+				name: 'sidebar_menu.cost_savings_calculator',
+				path: '/roi-calculator',
+				meta: { permissions: ['view_requisitions_roi_calculator'] },
+				enableInCompanyMenuForm: true
+			}
+		]
+	},
 	// {
 	// 	name: 'Requisition',
 	// 	belongs_to_label: 'cmms',
@@ -292,6 +340,14 @@ const menuItems1 = [
 		path: '/maintenance-requests',
 		requestCounter: true,
 		meta: { permissions: ['view_work_order_requests'] },
+		enableInCompanyMenuForm: true
+	},
+	{
+		name: 'Requests',
+		belongs_to_label: 'cmms',
+		icon: 'icon-fix',
+		path: '/rfqs',
+		meta: { permissions: ['view_rfqs'] },
 		enableInCompanyMenuForm: true
 	},
 	{

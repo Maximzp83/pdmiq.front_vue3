@@ -19,6 +19,9 @@
 - `Maintenance` Logs list has been hardened toward legacy behavior with advanced filters, closer table columns, file/parent actions, preview modals, and export guard.
 - `WorkOrderRequests` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `StoreRooms` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `Requisitions` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `RFQS` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `ProductionLines` section is migrated for the current Vue3 compile scope and routes are enabled.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
 - Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.

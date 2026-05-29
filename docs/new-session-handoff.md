@@ -79,6 +79,9 @@ Primary rules source:
   - Hardened `src/views/Maintenance/Logs/ItemsList.vue` with production line/machine/asset/equipment filters, plant/date guard for export, closer legacy table columns, file and parent work-order actions, log/parent preview modals, and Vue3 async-select settings for asset/equipment lookup.
   - Migrated `vue2_project/src/views/WorkOrderRequests` into Vue3 with list, form, convert form, details preview, entity config, maintenance composable actions, `/maintenance-requests` route, and sidebar menu entry.
   - Migrated `vue2_project/src/views/StoreRooms` into Vue3 with list, form, item page, location subitem, `/store-rooms` routes, `/store-rooms/:id/items` route, and sidebar menu entry.
+  - Migrated `vue2_project/src/views/Requisitions` into Vue3 with dashboard, list, item page, requisition form, details/action forms, counters, ROI calculator, `usePlantRequisitions`, entity config, routes, and sidebar menu entries.
+  - Migrated `vue2_project/src/views/RFQS` into Vue3 with list, form, item page, `useRfqs`, entity config, `/rfqs` routes, and sidebar menu entry.
+  - Migrated `vue2_project/src/views/ProductionLines` into Vue3 with list/grid, form, item page, item card, utility wrapper, details page, support subitems, `useProductionLines`, store filter extensions, and routes.
   - `npm run build` and `git diff --check` pass.
 
 ## Latest Completed Files
@@ -106,6 +109,13 @@ Primary rules source:
 - `src/views/Maintenance/Logs/ItemsList.vue`
 - `src/views/WorkOrderRequests/**`
 - `src/views/StoreRooms/**`
+- `src/views/Requisitions/**`
+- `src/composables/usePlantRequisitions.js`
+- `src/views/RFQS/**`
+- `src/composables/useRfqs.js`
+- `src/views/ProductionLines/**`
+- `src/composables/useProductionLines.js`
+- `src/stores/ProductionLinesStore.js`
 - `src/composables/useMaintenance.js`
 - `src/components/itemDetails/MaintenanceListWrapper.vue`
 
