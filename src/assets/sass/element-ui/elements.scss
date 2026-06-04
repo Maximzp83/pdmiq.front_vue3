@@ -4,6 +4,7 @@ body {
 	.el-select-dropdown__wrap.el-scrollbar__wrap {
 		transform: translateZ(0);
 	}
+	--el-component-size: 0 !important;
 
 	.el-input  {
 		height: $formElementsHeight;
@@ -61,6 +62,14 @@ body {
 		}
 	}
 
+	.el-select > div, .el-input > div {
+		&.is-disabled {
+			background-color: #f5f7fa;
+			border-color: #e4e7ed;
+			color: #c0c4cc;
+		}
+	}
+
 	.datepicker-container .el-date-editor.el-input,
 	.el-date-editor.el-input__wrapper.el-range-editor,
 	.el-input__inner {
@@ -83,7 +92,16 @@ body {
 
 		.el-date-editor {
 			width: 100%;
-			&.el-input {
+			height: $formElementsHeight;	
+
+			&.el-input > .el-input__wrapper	{
+				height: 40px;
+				border: 0;
+			}
+
+
+			&.el-input,
+			.el-input__wrapper {
 				width: 100%;
 				box-sizing: border-box;
 				height: $formElementsHeight;		
@@ -121,7 +139,7 @@ body {
 	}
 
 	.el-checkbox {
-		
+		height: auto;
 		.el-checkbox__input.is-checked,
 		.el-checkbox__input.is-indeterminate {
 			.el-checkbox__inner {
@@ -187,6 +205,8 @@ body {
 			padding-top: 0;
 			padding-bottom: 0;
 		}
+
+		&.el-button > .el-select__wrapper {border: 0;}
 
 		&:not(.small):not(.multiple-select):not(.mini) {
 			.el-select__wrapper {
@@ -322,10 +342,12 @@ body {
 		border-radius: 4px;
 		border: 1px solid #DCDFE6;
 		// transition-duration: 0.1s;
-		&:not(.small) {
+		&:not(.el-button--small) {
 			height: 40px;
 		}
 	}
+
+	a.el-button {padding-top: 12px; padding-bottom: 12px;}
 
 	.el-button, .el-button:focus  {
 		.icomoon {min-width: 16px;}
@@ -483,7 +505,7 @@ body {
 			}
 		}*/
 		
-		&.active {
+		&.active, &.router-link-active {
 			&:not(.is-disabled.with-pointer-events) {	
 				&.el-button--primary {
 					background-color: transparent !important;

@@ -87,6 +87,15 @@
 		.radio-item .el-button {
 			background-color: #f4f4f4 !important;			
 		}
+
+		&.perPage-item {
+			max-width:87px;
+
+			.el-input__inner {
+				padding-left: 15px !important;		
+			}
+		}
+
 		@media (max-width: 1439px) {
 			&.checkbox-item {
 				.el-checkbox__label {
@@ -1712,7 +1721,7 @@
 		} 
 	}
 
-	.type-option-item, .process-option-item {
+	.type-option-item, .process-option-item  {
 		display: block !important;
 
 		&.fromModal {
@@ -1732,12 +1741,23 @@
 			// align-self: start;
 			min-width: 101px;
 			max-width: 101px;
+
 			label {
 				&.small-lh {line-height: 12px;}
 				& + .el-switch:not(.without-margin) {margin-top: 13px;}
+				margin-top: 8px;
 			}
 
-			.el-switch {display: block;}
+
+			.el-switch {
+				display: block;
+				height: 20px;
+				width: 100%;
+
+				&.half-margin {
+					margin-top: 1px !important;
+				}
+			}
 
 
 			/*& > div {
@@ -1745,6 +1765,20 @@
 				padding-bottom: 2px;
 			}*/
 		}
+
+		.sub-row {
+			.el-form-item__label { margin-bottom: 3px; }
+			.el-switch {margin: 8px 0;}
+
+			.remove-button {margin-bottom: 8px;}
+		}
+	}
+
+	.vibration-analysis-items-block .type-option-item .analysis {
+		.el-form-item__label { margin-bottom: 3px; }
+		.el-switch {margin: 8px 0 !important;}
+
+		.remove-button {margin-bottom: 8px;}
 	}
 
 	.type-option-item {
@@ -1775,7 +1809,7 @@
 		}
 
 
-		.predefined-switch {max-width: 112px;}
+		.predefined-switch {max-width: 115px; min-width: 108px;}
 
 		.predefined-values {
 			.options-container {
@@ -4401,7 +4435,7 @@
 		.change-wo-status-selector {
 			margin-left: 0;
 			.custom-select {
-				height: 44px;
+				height: 40px;
 
 				.prefix-text {
 					color: $secondaryFontColor;
@@ -4418,7 +4452,13 @@
 
 			.el-select {
 				padding: 0;
+				height: inherit;
 				width: 150px;
+
+				.el-select__wrapper {
+					height: 40px !important;
+					min-height: 40px !important;
+				}
 			}
 
 		}
@@ -5361,9 +5401,7 @@
 			font-weight: 600;
 			width: 100px !important;
 		}
-		.el-form-item__content {
-			margin-left: 100px !important;
-		}
+
 		.card-content {
 			background-color: #fcfcfc;
 		}

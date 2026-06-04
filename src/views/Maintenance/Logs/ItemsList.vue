@@ -74,11 +74,12 @@
 					<div class="filter-item">
 						<el-button
 							type="success"
-							icon="icomoon icon-doc_xls"
 							class="action-button inverted"
 							native-type="button"
 							@click="handleExportToExcel"
-						/>
+						>
+							<i class="icomoon icon-doc_xls"></i>
+						</el-button>
 					</div>
 
 					<div class="filter-item">
@@ -156,6 +157,9 @@ defineOptions({
 const props = defineProps({
 	perPageItems: { type: Array, default: () => [] },
 	hideDatepicker: Boolean,
+	preventSetNavbar: Boolean,
+	fromDashboard: Boolean,
+	insideOtherPage: Boolean,
 	propsFilters: { type: Object, default: () => ({}) },
 });
 const emit = defineEmits(['event']);
@@ -247,11 +251,26 @@ const {
 	options: {
 		tableRef: itemsTableRef,
 		propsFilters: propsFiltersRef,
+		fromDashboard: props.fromDashboard || props.insideOtherPage,
+		formComponentFileLoader: () => import('../MaintenanceFormWrapper.vue'),
+		additionalModalSettings: {
+			editModalProp: 'editModalClassic',
+			className: 'maintenance-modal',
+			modalClassName: 'fixed-header-footer small-header small-footer',
+			additionalSettings: {
+				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
+				plantId: globalFilters.value?.plantId,
+				...propsFiltersRef.value,
+				callback: () => {
+					refetchItemsList();
+					globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
+				},
+			},			
+		},
 		predefinedFilters: {
 			orderByColumn: 'created_at',
 			orderByMethod: 'desc',
 		},
-		localCreateItem: () => editItem({ row: { id: 'new' } }),
 	},
 });
 
@@ -268,7 +287,8 @@ const filterbarActionButtons = computed(() => {
 
 const setupReason = (reasonType) => {
 	const item = findItemBy('id', reasonType, maintenanceReasonTypesList());
-	return item?.label || '';
+	// console.log(reasonType,item, maintenanceReasonTypesList());
+	return item?.name || '';
 };
 
 const setupTotalTime = ({ total_time: totalTime, start_time: startTime, finish_time: finishTime } = {}) => {
@@ -292,13 +312,13 @@ const tableSettings = computed(() => {
 			{ label: 'Date', prop: 'created_at', sortable: true, min_width: 100, max_width: 155, meta: { prepareValue: { localMethod: cleanDateString } } },
 			{ label: 'Machine', prop: 'machine.name', min_width: 100, max_width: 220 },
 			{ label: 'Creator', prop: 'creator.full_name', min_width: 110, max_width: 120 },
-			{ label: 'Log', prop: 'description', min_width: 300, max_width: 350, meta: { cellComponent: { componentPath: 'views/Maintenance/Logs/DescriptionTableCell' } } },
+			{ label: 'Log', prop: 'description', min_width: 300, max_width: 350, meta: { cellComponent: { componentFileLoader: () => import('./DescriptionTableCell.vue') } } },
 			{ label: 'Shift', prop: 'shift', max_width: 60 },
 			{ label: 'Reason', prop: 'reason_type', min_width: 90, max_width: 90, meta: { prepareValue: { localMethod: setupReason } } },
 			{ label: 'Time', prop: ' ', min_width: 105, max_width: 105, meta: { cell_class: 'text-center', prepareValue: { localMethod: setupTotalTime, useAllInstanceData: true } } },
 			{ label: 'Solved', prop: 'is_problem_solved', width: 85, meta: { cell_class: 'text-center', prepareValue: { localMethod: setupTrueFalseCellIcon } } },
 			{ label: 'phrases.Acknowledge_by_supervisor', prop: 'is_acknowledge_by_supervisor', width: 120, meta: { cell_class: 'text-center', prepareValue: { localMethod: setupTrueFalseCellIcon } } },
-			{ label: 'phrases.Supervisor_notes', prop: 'supervisor_notes', min_width: 200, max_width: 260, meta: { cellComponent: { componentPath: 'views/Maintenance/Logs/DescriptionTableCell' } } },
+			{ label: 'phrases.Supervisor_notes', prop: 'supervisor_notes', min_width: 200, max_width: 260, meta: { cellComponent: { componentFileLoader: () => import('./DescriptionTableCell.vue') } } },
 			{
 				label: 'Files',
 				min_width: 110,
@@ -318,7 +338,7 @@ const tableSettings = computed(() => {
 							img: images_icon,
 							className: 'borderless button-with-img',
 							disablePopover: true,
-							buttonContent: { component: { componentPath: 'views/Maintenance/Logs/fileButtonContent' } },
+							buttonContent: { component: { componentFileLoader: () => import('./fileButtonContent.vue') } },
 							conditionSettings: { conditions: [{ prop: 'images', method: 'notEmpty' }] },
 						},
 						{
@@ -328,8 +348,8 @@ const tableSettings = computed(() => {
 							className: 'borderless button-with-img',
 							tooltip_text: ' ',
 							tool_tip_class: 'files-list-popover',
-							buttonContent: { component: { componentPath: 'views/Maintenance/Logs/fileButtonContent' } },
-							popoverContent: { component: { componentPath: 'views/Maintenance/Logs/filePopoverContent' } },
+							buttonContent: { component: { componentFileLoader: () => import('./fileButtonContent.vue') } },
+							popoverContent: { component: { componentFileLoader: () => import('./filePopoverContent.vue') } },
 							conditionSettings: { conditions: [{ prop: 'attachments', method: 'notEmpty' }] },
 						},
 					],
@@ -347,7 +367,7 @@ const tableSettings = computed(() => {
 							className: 'vertical-fluid link underline info-color',
 							disablePopover: true,
 							conditionSettings: { conditions: [{ prop: 'parent', method: 'notEmpty' }] },
-							buttonContent: { component: { componentPath: 'views/Maintenance/WorkOrders/WOButtonContent' } },
+							buttonContent: { component: { componentFileLoader: () => import('../WorkOrders/WOButtonContent.vue') } },
 						},
 					],
 				},
@@ -365,9 +385,6 @@ const tableSettings = computed(() => {
 		},
 	};
 
-	if (hasAccessToEdit.value) {
-		settings.operations.actions.push(standardTableOperations.edit);
-	}
 	if (hasAccessToDelete.value) {
 		settings.operations.actions.push(standardTableOperations.delete);
 	}
@@ -410,7 +427,16 @@ const handleExportToExcel = () => {
 	});
 };
 
-const openDetailsModal = ({ row, title, itemName, formComponentFileLoader }) => {
+const openDetailsModal = ({
+	row,
+	title,
+	itemName,
+	formComponentFileLoader,
+	headerActions = [],
+	footerActions = [],
+	hideFooter = true,
+	additionalModalSettings = {},
+}) => {
 	globalStore.show_edit_modal({
 		show: true,
 		editModalProp: 'editModalClassic',
@@ -419,34 +445,115 @@ const openDetailsModal = ({ row, title, itemName, formComponentFileLoader }) => 
 		title,
 		itemName,
 		hideSubmitButtons: true,
-		hideFooter: true,
+		hideFooter,
 		settings: {},
-		additionalModalSettings: {
+		additionalSettings: {
 			productionLinesList: productionLinesList.value,
 			maintenanceReasonTypesList: maintenanceReasonTypesList(),
+			...additionalModalSettings,
 		},
-		headerActions: [],
-		footerActions: [],
+		headerActions,
+		footerActions,
 	});
 };
 
 const handleShowDetails = ({ row }) => {
+	const headerActions = translate([
+		{
+			name: 'exportLog',
+			type: 'transparent',
+			icon: 'icomoon icon-pdf',
+			tooltip_text: 'phrases.Export_To_PDF',
+		},
+	], { key: 'tooltip_text' });
+
+	if (hasAccessToEdit.value) {
+		headerActions.push(...translate([{ ...standardTableOperations.edit, type: 'transparent' }], { key: 'tooltip_text' }));
+	}
+
+	const footerActions = [];
+	if (hasAccessToCreate.value && hasAccessToEdit.value) {
+		footerActions.push({
+			name: 'handleCreateRequest',
+			button_text: tt('phrases.CREATE_WORK_ORDER_REQUEST'),
+			disablePopover: true,
+			type: 'primary',
+			className: 'item-action-button',
+			parentLog: row,
+		});
+	}
+
 	openDetailsModal({
 		row,
 		title: tt('phrases.Maintenance_Log_Details'),
 		itemName: tt('Maintenance_Log'),
 		formComponentFileLoader: () => import('./ItemDetailsPreview.vue'),
+		headerActions,
+		footerActions,
+		hideFooter: !footerActions.length,
 	});
 };
 
 const handleShowParentWO = ({ row }) => {
 	if (!row?.parent) return;
 
+	const headerActions = translate([
+		{
+			name: 'handlePrintWO',
+			type: 'transparent',
+			icon: 'icomoon icon-printer',
+			tooltip_text: 'Print',
+		},
+	], { key: 'tooltip_text' });
+
+	if (hasAccessToEdit.value) {
+		headerActions.push(...translate([
+			{
+				name: 'editItem',
+				icon: 'icomoon icon-pencil',
+				tooltip_text: 'Edit',
+				type: 'transparent',
+				conditionSettings: {
+					checkMethod: 'some',
+					conditions: [
+						{
+							prop: 'is_periodic',
+							control_value: true,
+							next_conditions: [{ prop: 'is_closed', control_value: false }],
+						},
+						{
+							prop: 'is_periodic',
+							method: '!=',
+							control_value: true,
+							next_conditions: [{ prop: 'is_closed', control_value: false }],
+						},
+					],
+				},
+			},
+		], { key: 'tooltip_text' }));
+	}
+
+	const footerActions = [];
+	if (row.parent.is_closed && hasAccessToDelete.value) {
+		footerActions.push({
+			name: 'handleUnlockWorkOrder',
+			button_text: tt('UNLOCK'),
+			disablePopover: true,
+			type: 'primary',
+		});
+	}
+
 	openDetailsModal({
 		row: row.parent,
 		title: tt('phrases.Work_Order_Details'),
 		itemName: tt('Work_Order'),
 		formComponentFileLoader: () => import('../WorkOrders/ItemDetailsPreview.vue'),
+		headerActions,
+		footerActions,
+		hideFooter: !footerActions.length,
+		additionalModalSettings: {
+			productionLinesList: productionLinesList.value,
+		},
 	});
 };
 

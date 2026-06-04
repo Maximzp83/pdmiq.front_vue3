@@ -3,6 +3,7 @@
 		ref="itemFormRef"
 		:class="['option-item-container mrow sub-row']"
 		:model="formData"
+		label-position="top"
 	>
 		<el-form-item prop="value" :label="tt('Predefined_value')" required>
 			<CustomInput v-model="formData.value" :placeholder="tt('value')" />
@@ -15,6 +16,8 @@
 					rotate
 					deleteFileId
 					:pictures="picture"
+					buttonClass="inverted"
+					buttonSize="small"
 				/>
 			</el-form-item>
 		</div>

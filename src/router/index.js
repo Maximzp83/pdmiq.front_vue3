@@ -62,6 +62,12 @@ const routes = [
 						meta: { auth: true },
 					},
 					{
+						path: 'assets',
+						name: 'Assets',
+						component: () => import('@/views/Assets/ItemsList.vue'),
+						meta: { auth: true },
+					},
+					{
 						path: 'production-lines',
 						name: 'ProductionLines',
 						component: () => import('@/views/ProductionLines/ItemsList.vue'),
@@ -208,40 +214,35 @@ const routes = [
 			// 	meta: { auth: true, permissions: ['view_sensors'] },
 			// },
 			{
-				path: 'maintenance/logs',
-				name: 'MaintenanceLogs',
-				component: () => import('@/views/Maintenance/Logs/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_maintenance'] },
-			},
-			{
-				path: 'maintenance/logs/new',
-				name: 'MaintenanceLogCreate',
-				component: () => import('@/views/Maintenance/Logs/LogsDetails.vue'),
-				meta: { auth: true, permissions: ['create_maintenance'] },
-			},
-			{
-				path: 'maintenance/work-orders',
-				name: 'WorkOrders',
-				component: () => import('@/views/Maintenance/WorkOrders/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_maintenance'] },
-			},
-			{
-				path: 'maintenance/work-orders/new',
-				name: 'WorkOrderCreate',
-				component: () => import('@/views/Maintenance/WorkOrders/WorkOrdersDetails.vue'),
-				meta: { auth: true, permissions: ['create_maintenance'] },
-			},
-			{
-				path: 'maintenance/work-orders/import',
-				name: 'WorkOrdersImport',
-				component: () => import('@/views/Maintenance/WorkOrdersImport/ItemPage.vue'),
-				meta: { auth: true, permissions: ['view_import_work_orders'] },
-			},
-			{
-				path: 'maintenance/dashboard',
+				path: 'maintenance',
 				name: 'MaintenanceDashboard',
+				redirect: '/maintenance/work-orders',
 				component: () => import('@/views/Maintenance/MaintenanceDashboard.vue'),
 				meta: { auth: true, permissions: ['view_maintenance'] },
+				children: [
+					{
+						path: 'work-orders',
+						name: 'WorkOrdersDetails',
+						component: () => import('@/views/Maintenance/WorkOrders/WorkOrdersDetails.vue'),
+						meta: { auth: true, permissions: ['view_maintenance'] },
+					},
+					{
+						path: 'logs',
+						name: 'LogsDetails',
+						component: () => import('@/views/Maintenance/Logs/LogsDetails.vue'),
+						meta: { auth: true, permissions: ['view_maintenance'] },
+					},
+				],
+			},
+			{
+				path: 'maintenance-import',
+				name: 'WorkOrdersImport',
+				component: () => import('@/views/Maintenance/WorkOrdersImport/ItemPage.vue'),
+				meta: {
+					auth: true,
+					permissionsMethod: 'some',
+					permissions: ['edit_import_work_orders', 'create_import_work_orders'],
+				},
 			},
 			{
 				path: 'maintenance-requests',
@@ -250,16 +251,55 @@ const routes = [
 				meta: { auth: true, permissions: ['view_work_order_requests'] },
 			},
 			{
-				path: 'maintenance/logs/:id',
-				name: 'MaintenanceLogDetails',
-				component: () => import('@/views/Maintenance/Logs/LogsDetails.vue'),
-				meta: { auth: true, permissions: ['view_maintenance'] },
-			},
-			{
-				path: 'maintenance/work-orders/:id',
-				name: 'WorkOrdersDetails',
-				component: () => import('@/views/Maintenance/WorkOrders/WorkOrdersDetails.vue'),
-				meta: { auth: true, permissions: ['view_maintenance'] },
+				path: 'success-dashboard',
+				name: 'SuccessDashboardContainer',
+				redirect: '/success-dashboard/main',
+				component: () => import('@/views/SuccessDashboard/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_customer_success'] },
+				children: [
+					{
+						path: 'main',
+						name: 'SuccesMainDashboard',
+						component: () => import('@/views/SuccessDashboard/MainDashboard/MainDashboard.vue'),
+						meta: { auth: true, permissions: ['view_customer_success'] },
+					},
+					{
+						path: 'meeting-tracker',
+						name: 'SuccessMeetingTracker',
+						component: () => import('@/views/SuccessDashboard/MeetingTracker/MeetingTracker.vue'),
+						meta: { auth: true, permissions: ['view_customer_success'] },
+					},
+					{
+						path: 'roi-one-pager',
+						name: 'ROIOnePager',
+						component: () => import('@/views/SuccessDashboard/ROIOnePager/ROIOnePager.vue'),
+						meta: { auth: true, permissions: ['view_customer_success'] },
+					},
+					{
+						path: 'meeting-tracker/new',
+						name: 'SuccessMeetingTrackerCreate',
+						component: () => import('@/views/SuccessDashboard/MeetingTracker/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_customer_success'] },
+					},
+					{
+						path: 'meeting-tracker/:id',
+						name: 'SuccessMeetingTrackerPage',
+						component: () => import('@/views/SuccessDashboard/MeetingTracker/ItemPage.vue'),
+						meta: { auth: true, permissions: ['view_customer_success'] },
+					},
+					{
+						path: 'roi-one-pager/new',
+						name: 'ROIOnePagerCreate',
+						component: () => import('@/views/SuccessDashboard/ROIOnePager/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_customer_success'] },
+					},
+					{
+						path: 'roi-one-pager/:id',
+						name: 'ROIOnePagerPage',
+						component: () => import('@/views/SuccessDashboard/ROIOnePager/ItemPage.vue'),
+						meta: { auth: true, permissions: ['view_customer_success'] },
+					},
+				],
 			},
 			{
 				path: 'brands',
@@ -525,18 +565,42 @@ const routes = [
 			// 	component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
 			// 	meta: { auth: true, permissions: ['view_items'] },
 			// },
-			// {
-			// 	path: 'machines/:id/details',
-			// 	name: 'MachineDetails',
-			// 	component: () => import('@/views/Machines/Details/DetailsPage.vue'),
-			// 	meta: { auth: true, permissions: ['view_machines'] },
-			// },
-			// {
-			// 	path: 'machines/:id',
-			// 	name: 'MachineEdit',
-			// 	component: () => import('@/views/Machines/ItemPage.vue'),
-			// 	meta: { auth: true, permissions: ['edit_machines'] },
-			// },
+			{
+				path: 'machines/new',
+				name: 'MachineCreate',
+				component: () => import('@/views/Machines/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_machines'] },
+			},
+			{
+				path: 'machines/:id/details',
+				name: 'MachineDetails',
+				component: () => import('@/views/Machines/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_machines'] },
+			},
+			{
+				path: 'machines/:id',
+				name: 'MachineEdit',
+				component: () => import('@/views/Machines/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_machines'] },
+			},
+			{
+				path: 'assets/new',
+				name: 'AssetCreate',
+				component: () => import('@/views/Assets/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_assets'] },
+			},
+			{
+				path: 'assets/:id/details',
+				name: 'AssetDetails',
+				component: () => import('@/views/Assets/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_assets'] },
+			},
+			{
+				path: 'assets/:id',
+				name: 'AssetEdit',
+				component: () => import('@/views/Assets/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_assets'] },
+			},
 			{
 				path: 'plants/new',
 				name: 'PlantCreate',
@@ -644,11 +708,164 @@ const routes = [
 				meta: {
 					auth: true,
 					permissions: ['view_requisitions_roi_calculator'],
-					conditionSettings: {
+					/*conditionSettings: {
 						checkMethod: 'some',
 						conditions: [{ prop: 'role.is_fab_shop_manager', control_value: true }],
-					},
+					},*/
 				},
+			},
+			{
+				path: 'settings',
+				name: 'SettingsPage',
+				redirect: '/settings/faults?type=1',
+				component: () => import('@/views/Settings/SettingsPage.vue'),
+				meta: { auth: true, permissions: ['view_settings'] },
+				children: [
+					{
+						path: 'lube-type',
+						name: 'LubeTypes',
+						component: () => import('@/views/Settings/LubeTypes/ItemsList.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'lube-type/create',
+						redirect: '/settings/lube-type/new',
+					},
+					{
+						path: 'lube-type/new',
+						name: 'LubeTypeCreate',
+						component: () => import('@/views/Settings/LubeTypes/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'lube-type/:id',
+						name: 'LubeTypeEdit',
+						component: () => import('@/views/Settings/LubeTypes/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'bearing',
+						name: 'Bearings',
+						component: () => import('@/views/Settings/Bearings/ItemsList.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'bearing/create',
+						redirect: '/settings/bearing/new',
+					},
+					{
+						path: 'bearing/new',
+						name: 'BearingCreate',
+						component: () => import('@/views/Settings/Bearings/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'bearing/:id',
+						name: 'BearingEdit',
+						component: () => import('@/views/Settings/Bearings/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'industrial-services',
+						name: 'IndustrialServices',
+						component: () => import('@/views/Settings/IndustrialServices/ItemsList.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'industrial-services/create',
+						redirect: '/settings/industrial-services/new',
+					},
+					{
+						path: 'industrial-services/new',
+						name: 'IndustrialServiceCreate',
+						component: () => import('@/views/Settings/IndustrialServices/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'industrial-services/:id',
+						name: 'IndustrialServiceEdit',
+						component: () => import('@/views/Settings/IndustrialServices/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'banner-v2-subtypes',
+						name: 'BannerV2Subtypes',
+						component: () => import('@/views/Settings/BannerV2Subtype/ItemsList.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'banner-v2-subtypes/create',
+						redirect: '/settings/banner-v2-subtypes/new',
+					},
+					{
+						path: 'banner-v2-subtypes/new',
+						name: 'BannerV2SubtypeCreate',
+						component: () => import('@/views/Settings/BannerV2Subtype/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'banner-v2-subtypes/:id',
+						name: 'BannerV2SubtypeEdit',
+						component: () => import('@/views/Settings/BannerV2Subtype/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'faults',
+						name: 'FaultsSettings',
+						component: () => import('@/views/Settings/Faults/ItemsList.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'faults/create',
+						redirect: '/settings/faults/new',
+					},
+					{
+						path: 'faults/new',
+						name: 'FaultCreate',
+						component: () => import('@/views/Settings/Faults/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'faults/:id',
+						name: 'FaultEdit',
+						component: () => import('@/views/Settings/Faults/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'faults/ncd/create',
+						redirect: '/settings/faults/ncd/new',
+					},
+					{
+						path: 'faults/ncd/new',
+						name: 'FaultNcdCreate',
+						component: () => import('@/views/Settings/Faults/ItemPage.vue'),
+						meta: { auth: true, permissions: ['create_settings'] },
+					},
+					{
+						path: 'faults/ncd/:id',
+						name: 'FaultNcdEdit',
+						component: () => import('@/views/Settings/Faults/ItemPage.vue'),
+						meta: { auth: true, permissions: ['edit_settings'] },
+					},
+					{
+						path: 'custom-formulas',
+						name: 'CustomFormulas',
+						component: () => import('@/views/Settings/CustomFormulas/FormulasTab.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'backend-registers',
+						name: 'BackEndRegisters',
+						component: () => import('@/views/Settings/BackEndRegisters/BackEndRegistersTab.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'statistics',
+						name: 'StatisticsExport',
+						component: () => import('@/views/Settings/Statistics/ExportPage.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+				],
 			},
 			// {
 			// 	path: 'requisitions',
@@ -690,10 +907,6 @@ const routes = [
 			// 			conditions: [{ prop: 'role.is_fab_shop_manager', control_value: true }],
 			// 		},
 			// 	},
-			// },
-			// {
-			// 	path: 'maintenance/logs/details/:id',
-			// 	redirect: '/maintenance/logs/:id',
 			// },
 			// {
 			// 	path: 'plants/details/:id',
@@ -759,171 +972,7 @@ const routes = [
 				component: () => import('@/views/Processes/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_oee'] },
 			},
-			{
-				path: 'settings/lube-type',
-				name: 'LubeTypes',
-				component: () => import('@/views/Settings/LubeTypes/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/lube-type/create',
-				name: 'LubeTypeCreate',
-				component: () => import('@/views/Settings/LubeTypes/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/lube-type/:id',
-				name: 'LubeTypeEdit',
-				component: () => import('@/views/Settings/LubeTypes/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/bearing',
-				name: 'Bearings',
-				component: () => import('@/views/Settings/Bearings/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/bearing/create',
-				name: 'BearingCreate',
-				component: () => import('@/views/Settings/Bearings/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/bearing/:id',
-				name: 'BearingEdit',
-				component: () => import('@/views/Settings/Bearings/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/industrial-services',
-				name: 'IndustrialServices',
-				component: () => import('@/views/Settings/IndustrialServices/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/industrial-services/create',
-				name: 'IndustrialServiceCreate',
-				component: () => import('@/views/Settings/IndustrialServices/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/industrial-services/:id',
-				name: 'IndustrialServiceEdit',
-				component: () => import('@/views/Settings/IndustrialServices/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/banner-v2-subtypes',
-				name: 'BannerV2Subtypes',
-				component: () => import('@/views/Settings/BannerV2Subtype/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/banner-v2-subtypes/create',
-				name: 'BannerV2SubtypeCreate',
-				component: () => import('@/views/Settings/BannerV2Subtype/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/banner-v2-subtypes/:id',
-				name: 'BannerV2SubtypeEdit',
-				component: () => import('@/views/Settings/BannerV2Subtype/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/faults',
-				name: 'FaultsSettings',
-				component: () => import('@/views/Settings/Faults/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/faults/create',
-				name: 'FaultCreate',
-				component: () => import('@/views/Settings/Faults/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/faults/:id',
-				name: 'FaultEdit',
-				component: () => import('@/views/Settings/Faults/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/faults/ncd/create',
-				name: 'FaultNcdCreate',
-				component: () => import('@/views/Settings/Faults/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_settings'] },
-			},
-			{
-				path: 'settings/faults/ncd/:id',
-				name: 'FaultNcdEdit',
-				component: () => import('@/views/Settings/Faults/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_settings'] },
-			},
-			{
-				path: 'settings/import',
-				redirect: '/settings/import/logs',
-				name: 'SettingsImport',
-				component: () => import('@/views/Settings/Import/ImportTab.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-				children: [
-					{
-						path: 'logs',
-						name: 'SettingsImportPlant',
-						component: () => import('@/views/Settings/Import/Plant/PlantPage.vue'),
-						meta: { auth: true, permissions: ['view_settings'] },
-					},
-					{
-						path: 'master',
-						name: 'SettingsImportMaster',
-						component: () => import('@/views/Settings/Import/MasterPage.vue'),
-						meta: { auth: true, permissions: ['view_settings'] },
-					},
-					{
-						path: 'history',
-						name: 'SettingsImportHistory',
-						component: () => import('@/views/Settings/Import/ItemsList.vue'),
-						meta: { auth: true, permissions: ['view_settings'] },
-					},
-				],
-			},
-			{
-				path: 'plant-import-logs',
-				name: 'PlantImportLogs',
-				component: () => import('@/views/Settings/Import/Plant/Logs/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'plant-import-logs/:id',
-				name: 'PlantImportLogErrors',
-				component: () => import('@/views/Settings/Import/Plant/Logs/RowsList.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/import/:id',
-				name: 'SettingsImportLogDetails',
-				component: () => import('@/views/Settings/Import/ItemPage.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/custom-formulas',
-				name: 'CustomFormulas',
-				component: () => import('@/views/Settings/CustomFormulas/FormulasTab.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/backend-registers',
-				name: 'BackEndRegisters',
-				component: () => import('@/views/Settings/BackEndRegisters/BackEndRegistersTab.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},
-			{
-				path: 'settings/statistics',
-				name: 'StatisticsExport',
-				component: () => import('@/views/Settings/Statistics/ExportPage.vue'),
-				meta: { auth: true, permissions: ['view_settings'] },
-			},*/
+				*/
 		],
 	},
 	{ path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/components/pages/NotFoundPage.vue') },
@@ -946,6 +995,9 @@ const hasRightsToRoute = (to, authStore) => {
 
 	if (meta.permissions) {
 		const method = meta.permissionsMethod || undefined;
+		/*if (to.path == '/roi-calculator') {
+			debugger
+		}*/
 		const hasAccess =
 			authStore.hasAccessTo?.(meta.permissions, method) ||
 			hasAccessToUtil({
@@ -979,7 +1031,7 @@ router.beforeEach((to, from, next) => {
 	}
 
 	const { hasAccess, reason, authUser } = hasRightsToRoute(to, authStore);
-
+	// console.log('hasAccess', to, hasAccess, reason, authUser);
 	if (hasAccess) {
 		if (authUser?.role?.is_forced_mfa && !authUser.is_mfa_enabled && to.path !== '/profile') {
 			Notify({
@@ -999,7 +1051,7 @@ router.beforeEach((to, from, next) => {
 			message: tt('phrases.you_do_not_have_permissions_to_view_this_page'),
 		});
 		authStore.set_redirect_to?.(to.fullPath);
-		return next('/login');
+		return next(from.fullPath);
 	}
 
 	if (reason === 'not_auth') {

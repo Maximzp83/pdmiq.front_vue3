@@ -258,14 +258,6 @@
 	transition: all 0.2s;
 }
 
-.perPage-item {
-	max-width:87px;
-
-	.el-input__inner {
-		padding-left: 15px !important;		
-	}
-}
-
 .search-bar {
 	.resetButton {
 		position: absolute;
@@ -4006,12 +3998,12 @@
 
 @media (min-width: 991px) {
 	.custom-form-item {
-		.el-form-item__label {width: 170px;}
-		.el-form-item__content {margin-left: 150px;}
+		.el-form-item__label {width: 150px;}
+		// .el-form-item__content {margin-left: 150px;}
 
 		&.short {
 			.el-form-item__label {width: 100px;}
-			.el-form-item__content {margin-left: 100px;}
+			// .el-form-item__content {margin-left: 100px;}
 		}
 	}
 

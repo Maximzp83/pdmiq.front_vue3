@@ -15,9 +15,10 @@
 				class="action-button remove-button"
 				size="small"
 				type="danger"
-				icon="icomoon icon-cross"
 				@click="$emit('onRemove', itemData.id)"
-			/>
+			>
+				<i class="icomoon icon-cross"></i>
+			</el-button>
 		</div>
 	</el-form>
 </template>
@@ -44,8 +45,10 @@ const formData = reactive({
 	value: '',
 });
 
-const collectData = () => ({ ...formData });
+const getFormData = () => ({ ...formData });
+const collectData = getFormData;
 const validateForm = () => true;
+const validateItemForm = validateForm;
 
 watch(
 	() => props.itemData,
@@ -58,7 +61,9 @@ watch(
 
 defineExpose({
 	collectData,
+	getFormData,
 	validateForm,
+	validateItemForm,
 	formData,
 });
 </script>

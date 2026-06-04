@@ -42,10 +42,10 @@ defineOptions({
 const { changeRoute } = useNavigation();
 const itemFormRef = ref(null);
 
-const uploadSettings = {
-	fileProp: 'pictures',
-	multiple: true,
-};
+const uploadSettings = Object.freeze([
+	{ fileProp: 'pictures', multiple: true },
+	{ fileProp: 'libraries', multiple: true },
+]);
 
 const {
 	itemData,

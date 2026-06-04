@@ -35,9 +35,10 @@
 					type="primary"
 					native-type="button"
 					:class="['action-button inverted', { active: showFilterbar }]"
-					:icon="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"
 					@click="toggleFilterbar"
-				/>
+				>
+					<i :class="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"></i>
+				</el-button>
 			</div>
 		</div>
 

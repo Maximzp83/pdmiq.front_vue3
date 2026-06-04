@@ -97,7 +97,7 @@ const {
 	editItem,
 	handleDeleteItems,
 } = useItemsData({
-	entityKey: 'WorkOrderRequests',
+	entityKey: 'WorkOrders',
 	itemStore: maintenanceStore,
 	options: {
 		filtersStateProp: 'filters_requests',

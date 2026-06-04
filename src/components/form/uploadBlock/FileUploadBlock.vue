@@ -59,9 +59,12 @@
 			</div>
 		</template>
 
-		<el-button :class="[buttonClass]" size="small" type="primary" v-if="!disabled">
+		<el-button :class="[buttonClass, 'upload-button']" :size="buttonSize" type="primary" v-if="!disabled">
 			<span>{{ buttonText || 'Upload img' }}</span>
-			<i :class="['suffix-icon', buttonIcon || 'el-icon-picture-outline']"></i>
+			<el-icon :class="['suffix-icon']" size="14">
+				<PictureIcon />
+			</el-icon>
+			<!-- <i :class="['suffix-icon', buttonIcon || 'el-icon-picture-outline']"></i> -->
 		</el-button>
 		<b v-else-if="!filesList.length" class="showJustInfo inherit-color">-</b>
 	</el-upload>
@@ -75,6 +78,7 @@ import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable'
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import FileUploadBlockItem from './FileUploadBlockItem.vue';
+import { Picture as PictureIcon } from '@element-plus/icons-vue';
 
 defineOptions({
 	name: 'FileUploadBlock',
@@ -111,6 +115,7 @@ const props = defineProps({
 	uploadBlockType: { type: String, default: 'standard-images' },
 	enableReorderFiles: { type: Object, default: () => null },
 	blockId: null,
+	buttonSize: { type: String, default: 'small' },
 });
 
 const emit = defineEmits(['event', 'onSelectFile', 'onImgClick']);

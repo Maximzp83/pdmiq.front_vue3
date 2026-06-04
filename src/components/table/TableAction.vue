@@ -38,6 +38,7 @@
 						ref="actionButtonContent"
 						:propsData="rowData"
 						:additionalProps="action"
+						:componentFileLoader="action.buttonContent.component.componentFileLoader"
 						:componentPath="action.buttonContent.component.componentPath"
 						@event="handleEvent"
 					/>
@@ -60,6 +61,7 @@
 						ref="actionButtonContent"
 						:propsData="rowData"
 						:additionalProps="action"
+						:componentFileLoader="action.buttonContent.component.componentFileLoader"
 						:componentPath="action.buttonContent.component.componentPath"
 						@event="handleEvent"
 					/>
@@ -76,6 +78,7 @@
 				ref="actionPopoverContent"
 				:propsData="rowData"
 				:additionalProps="action"
+				:componentFileLoader="action.popoverContent.component.componentFileLoader"
 				:componentPath="action.popoverContent.component.componentPath"
 			/>
 		</ElPopover>

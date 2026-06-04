@@ -138,7 +138,9 @@
 							</div>
 						</div>
 
-						<el-form-item :label="tt('phrases.cloud_connection_type')" prop="cloud_connection_type">
+						<el-form-item :label="tt('phrases.cloud_connection_type')" prop="cloud_connection_type"
+							class="content-row"
+						>
 							<CustomSelectV2
 								v-model="formData.cloud_connection_type"
 								:optionsList="cloudConnectionTypesList"
@@ -147,7 +149,7 @@
 							/>
 						</el-form-item>
 
-						<div v-show="formData.cloud_connection_type === CLOUD_CONNECTION_TYPES.CELL_MODEM" class="el-form-item">
+						<div v-show="formData.cloud_connection_type === CLOUD_CONNECTION_TYPES.CELL_MODEM" class="content-row">
 							<el-form-item :label="tt('phrases.router_sim_card_number')" prop="router_sim_card_number">
 								<CustomInput v-model="formData.router_sim_card_number" :placeholder="`${tt('input')} ${tt('number')}`" />
 							</el-form-item>
@@ -157,7 +159,7 @@
 							</el-form-item>
 						</div>
 
-						<el-form-item class="upload-form-item" :label="`${tt('Cofigure')} ${tt('file')}`" prop="configure_file">
+						<el-form-item class="content-row upload-form-item" :label="`${tt('Cofigure')} ${tt('file')}`" prop="configure_file">
 							<FileUploadBlock
 								:ref="(el) => setSubItemRef('FileUploadBlock1', el, 0)"
 								uploadBlockType="inline"

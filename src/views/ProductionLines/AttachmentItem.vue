@@ -22,9 +22,10 @@
 				class="action-button remove-button"
 				size="small"
 				type="danger"
-				icon="icomoon icon-cross"
 				@click="removeItem"
-			/>
+			>
+				<i class="icomoon icon-cross"></i>
+			</el-button>
 		</div>
 	</el-form>
 </template>

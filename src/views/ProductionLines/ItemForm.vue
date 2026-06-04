@@ -46,9 +46,10 @@
 							class="action-button create-button"
 							size="small"
 							type="success"
-							icon="icomoon icon-cross"
 							@click="addFormItem(charactersItemsList, 'c_i-')"
-						/>
+						>
+							<i class="icomoon icon-cross"></i>
+						</el-button>
 					</div>
 				</div>
 			</el-form-item>
@@ -114,9 +115,10 @@
 							class="action-button create-button"
 							size="small"
 							type="success"
-							icon="icomoon icon-cross"
 							@click="addFormItem(librariesItemsList, 'a_i-')"
-						/>
+						>
+							<i class="icomoon icon-cross"></i>
+						</el-button>
 					</div>
 				</div>
 			</el-form-item>

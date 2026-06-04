@@ -200,7 +200,7 @@ const tableSettings = computed(() =>
 			},
 			{ prop: 'mac_address', label: 'MAC_Address', max_width: 200 },
 			{
-				label: ' ',
+				label: '',
 				prop: 'is_inactive',
 				width: 55,
 				conditionSettings: {

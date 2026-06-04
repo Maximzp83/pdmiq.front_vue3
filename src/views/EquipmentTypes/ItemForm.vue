@@ -70,34 +70,36 @@
 			</el-form-item>
 
 			<el-form-item prop="child_components">
-				<div class="semi-bold article-title uppercase">
-					{{ tt('Components') }}:
-				</div>
-				<div class="options-container wrapperBlock">
-					<div v-if="childComponentsList.length" :class="['content-row', { fluid: fromModal }]">
-						<ComponentItem
-							v-for="(item, idx) in childComponentsList"
-							:key="`ci-${item.id}`"
-							:ref="(el) => setSubItemRef('ComponentItem', el, idx)"
-							v-show="newOptionsOnly ? item.new : true"
-							:item-data="item"
-							:item-index="idx"
-							:equipmentTypesList="filteredEquipmentTypesList"
-							:equipmentTypesLoading="equipmentTypesLoading"
-							@onRemove="(id) => removeFormItem(id, childComponentsList)"
-						/>
+				<div>
+					<div class="semi-bold article-title uppercase">
+						{{ tt('Components') }}:
 					</div>
+					<div class="options-container wrapperBlock">
+						<div v-if="childComponentsList.length" :class="['content-row', { fluid: fromModal }]">
+							<ComponentItem
+								v-for="(item, idx) in childComponentsList"
+								:key="`ci-${item.id}`"
+								:ref="(el) => setSubItemRef('ComponentItem', el, idx)"
+								v-show="newOptionsOnly ? item.new : true"
+								:item-data="item"
+								:item-index="idx"
+								:equipmentTypesList="filteredEquipmentTypesList"
+								:equipmentTypesLoading="equipmentTypesLoading"
+								@onRemove="(id) => removeFormItem(id, childComponentsList)"
+							/>
+						</div>
 
-					<div class="margin-top-row button-row">
-						<el-button
-							class="action-button create-button small with-text"
-							size="small"
-							type="success"
-							@click="addFormItem(childComponentsList, 'c_i-')"
-						>
-							<span class="capitalize">{{ `${tt('add')} ${tt('component')}` }}</span>
-							<i class="suffix-icon icomoon icon-cross"></i>
-						</el-button>
+						<div class="margin-top-row button-row">
+							<el-button
+								class="action-button create-button small with-text"
+								size="small"
+								type="success"
+								@click="addFormItem(childComponentsList, 'c_i-')"
+							>
+								<span class="capitalize">{{ `${tt('add')} ${tt('component')}` }}</span>
+								<i class="suffix-icon icomoon icon-cross"></i>
+							</el-button>
+						</div>
 					</div>
 				</div>
 			</el-form-item>
@@ -124,34 +126,36 @@
 
 			<div v-show="activeTab?.prop === 'optionsTab'" class="content-row tab-container">
 				<el-form-item prop="type_options">
-					<div class="semi-bold article-title uppercase">
-						{{ tt('TYPE_OPTIONS') }}
-					</div>
-					<div class="options-container flex wrap">
-						<div v-if="typesItemsList.length" :class="['content-row', { fluid: fromModal }]">
-							<TypeOptionItem
-								v-for="(item, idx) in typesItemsList"
-								:key="`types_item-${item.id}`"
-								:ref="(el) => setSubItemRef('TypeOptionItem', el, idx)"
-								v-show="newOptionsOnly ? item.new : true"
-								:item-data="item"
-								:item-index="idx"
-								:fromModal="fromModal"
-								:typesCategoriesList="typesCategoriesList"
-								@onRemove="(id) => removeFormItem(id, typesItemsList)"
-							/>
+					<div>
+						<div class="semi-bold article-title uppercase">
+							{{ tt('TYPE_OPTIONS') }}
 						</div>
+						<div class="options-container flex wrap">
+							<div v-if="typesItemsList.length" :class="['content-row', { fluid: fromModal }]">
+								<TypeOptionItem
+									v-for="(item, idx) in typesItemsList"
+									:key="`types_item-${item.id}`"
+									:ref="(el) => setSubItemRef('TypeOptionItem', el, idx)"
+									v-show="newOptionsOnly ? item.new : true"
+									:item-data="item"
+									:item-index="idx"
+									:fromModal="fromModal"
+									:typesCategoriesList="typesCategoriesList"
+									@onRemove="(id) => removeFormItem(id, typesItemsList)"
+								/>
+							</div>
 
-						<div class="margin-top-row button-row">
-							<el-button
-								class="action-button create-button small with-text"
-								size="small"
-								type="success"
-								@click="addFormItem(typesItemsList, 'to_i-')"
-							>
-								<span class="capitalize">{{ `${tt('add')} ${tt('option')}` }}</span>
-								<i class="suffix-icon icomoon icon-cross"></i>
-							</el-button>
+							<div class="margin-top-row button-row">
+								<el-button
+									class="action-button create-button small with-text"
+									size="small"
+									type="success"
+									@click="addFormItem(typesItemsList, 'to_i-')"
+								>
+									<span class="capitalize">{{ `${tt('add')} ${tt('option')}` }}</span>
+									<i class="suffix-icon icomoon icon-cross"></i>
+								</el-button>
+							</div>
 						</div>
 					</div>
 				</el-form-item>
@@ -159,32 +163,34 @@
 
 			<div v-show="activeTab?.prop === 'mediaTab'" class="content-row tab-container">
 				<el-form-item prop="type_medias">
-					<div class="semi-bold article-title uppercase">
-						{{ `${tt('Type')} ${tt('media')}` }}
-					</div>
-					<div class="options-container wrapperBlock">
-						<div v-if="typesMediaList.length" :class="['content-row', { fluid: fromModal }]">
-							<TypeMediaItem
-								v-for="(item, idx) in typesMediaList"
-								:key="`types_media-${item.id}`"
-								:ref="(el) => setSubItemRef('TypeMediaItem', el, idx)"
-								v-show="newOptionsOnly ? item.new : true"
-								:item-data="item"
-								:item-index="idx"
-								@onRemove="(id) => removeFormItem(id, typesMediaList)"
-							/>
+					<div>
+						<div class="semi-bold article-title uppercase">
+							{{ `${tt('Type')} ${tt('media')}` }}
 						</div>
+						<div class="options-container wrapperBlock">
+							<div v-if="typesMediaList.length" :class="['content-row', { fluid: fromModal }]">
+								<TypeMediaItem
+									v-for="(item, idx) in typesMediaList"
+									:key="`types_media-${item.id}`"
+									:ref="(el) => setSubItemRef('TypeMediaItem', el, idx)"
+									v-show="newOptionsOnly ? item.new : true"
+									:item-data="item"
+									:item-index="idx"
+									@onRemove="(id) => removeFormItem(id, typesMediaList)"
+								/>
+							</div>
 
-						<div class="margin-top-row button-row">
-							<el-button
-								class="action-button create-button small with-text"
-								size="small"
-								type="success"
-								@click="addFormItem(typesMediaList, 'tm_i-')"
-							>
-								<span class="capitalize">{{ `${tt('add')} ${tt('Media')}` }}</span>
-								<i class="suffix-icon icomoon icon-cross"></i>
-							</el-button>
+							<div class="margin-top-row button-row">
+								<el-button
+									class="action-button create-button small with-text"
+									size="small"
+									type="success"
+									@click="addFormItem(typesMediaList, 'tm_i-')"
+								>
+									<span class="capitalize">{{ `${tt('add')} ${tt('Media')}` }}</span>
+									<i class="suffix-icon icomoon icon-cross"></i>
+								</el-button>
+							</div>
 						</div>
 					</div>
 				</el-form-item>
@@ -192,32 +198,34 @@
 
 			<div v-show="activeTab?.prop === 'drivesTab'" class="content-row tab-container">
 				<el-form-item prop="drives">
-					<div class="semi-bold article-title uppercase">
-						{{ `${tt('Drive')} ${tt('Type')}` }}
-					</div>
-					<div class="options-container wrapperBlock">
-						<div v-if="drivesList.length" :class="['content-row', { fluid: fromModal }]">
-							<DriveItem
-								v-for="(item, idx) in drivesList"
-								:key="`drive-${item.id}`"
-								:ref="(el) => setSubItemRef('DriveItem', el, idx)"
-								v-show="newOptionsOnly ? item.new : true"
-								:item-data="item"
-								:item-index="idx"
-								@onRemove="(id) => removeFormItem(id, drivesList)"
-							/>
+					<div>
+						<div class="semi-bold article-title uppercase">
+							{{ `${tt('Drive')} ${tt('Type')}` }}
 						</div>
+						<div class="options-container wrapperBlock">
+							<div v-if="drivesList.length" :class="['content-row', { fluid: fromModal }]">
+								<DriveItem
+									v-for="(item, idx) in drivesList"
+									:key="`drive-${item.id}`"
+									:ref="(el) => setSubItemRef('DriveItem', el, idx)"
+									v-show="newOptionsOnly ? item.new : true"
+									:item-data="item"
+									:item-index="idx"
+									@onRemove="(id) => removeFormItem(id, drivesList)"
+								/>
+							</div>
 
-						<div class="margin-top-row button-row">
-							<el-button
-								class="action-button create-button small with-text"
-								size="small"
-								type="success"
-								@click="addFormItem(drivesList, 'd_i-')"
-							>
-								<span class="capitalize">{{ `${tt('add')} ${tt('Drive_Type')}` }}</span>
-								<i class="suffix-icon icomoon icon-cross"></i>
-							</el-button>
+							<div class="margin-top-row button-row">
+								<el-button
+									class="action-button create-button small with-text"
+									size="small"
+									type="success"
+									@click="addFormItem(drivesList, 'd_i-')"
+								>
+									<span class="capitalize">{{ `${tt('add')} ${tt('Drive_Type')}` }}</span>
+									<i class="suffix-icon icomoon icon-cross"></i>
+								</el-button>
+							</div>
 						</div>
 					</div>
 				</el-form-item>
@@ -225,6 +233,7 @@
 
 			<div v-show="activeTab?.prop === 'analysisTab'" class="content-row tab-container">
 				<VibrationAnalysisItemsBlock
+					class="vibration-analysis-items-block"
 					v-if="itemId"
 					ref="vibrationAnalysisItemsBlockRef"
 					:equipmentTypeId="itemId"

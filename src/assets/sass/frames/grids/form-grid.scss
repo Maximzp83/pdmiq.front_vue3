@@ -75,6 +75,8 @@
 	.el-form-item {
 		margin-bottom: 0;
 
+		// & + .el-form-item { margin-top: 15px; }
+
 		&.error-block-not-absolute {
 			.el-form-item__error {
 				position: relative;
@@ -241,6 +243,7 @@
 	}
 	&.showJustInfo,
 	.showJustInfo {
+		height: auto;
 		.el-input, .el-select, .el-textarea {pointer-events: none;}
 		.el-input__inner, .el-textarea__inner {
 			background-color: transparent !important	;
@@ -260,6 +263,7 @@
 		pointer-events: none;
 
 		textarea { resize: none; }
+		.el-form-item__label {height: auto;}
 
 		.el-form-item__content {
 			// line-height: 20px;
@@ -267,6 +271,7 @@
 				line-height: 30px;
 			}
 			font-weight: 600;
+
 
 			.el-input {
 				// height: 22px;

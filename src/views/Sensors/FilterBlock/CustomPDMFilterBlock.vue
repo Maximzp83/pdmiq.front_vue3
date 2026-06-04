@@ -8,9 +8,10 @@
 						<el-button
 							native-type="button"
 							:class="['small', { 'is-active': statsThresholdsActive }]"
-							icon="icomoon icon-eye"
 							@click="event('toggleStatsThresholds')"
-						/>
+						>
+							<i class="icomoon icon-eye"></i>
+						</el-button>
 					</div>
 				</div>
 			</div>

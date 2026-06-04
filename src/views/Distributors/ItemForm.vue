@@ -12,7 +12,7 @@
 				<CustomInput v-model="formData.company_name" />
 			</el-form-item>
 
-			<el-form-item :label="tt('Type')" prop="scope">
+			<el-form-item class="content-row" :label="tt('Type')" prop="scope">
 				<CustomSelectV2
 					v-model="formData.scope"
 					:optionsList="availableScopesList"
@@ -20,7 +20,7 @@
 				/>
 			</el-form-item>
 
-			<div :label="tt('Locations')" prop="locations" class="el-form-item">
+			<div :label="tt('Locations')" prop="locations" class="content-row">
 				<div class="title article-title">{{ tt('Locations') }}:</div>
 				<div class="options-container locations-container">
 					<div v-if="locationsItemsList.length" class="content-row">

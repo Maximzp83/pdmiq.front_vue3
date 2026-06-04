@@ -1,5 +1,5 @@
 <template>
-	<div class="details-page main-instance-item">
+	<div class="details-page fix-height main-instance-item">
 		<VueElementLoadingWrapper :isLoading="itemLoading" :itemsName="itemsName.one" />
 
 		<div v-if="loadContent" class="view-wrapper item-page-wrapper">
@@ -19,11 +19,13 @@
 									/>
 
 									<el-button
+										v-if="canEdit"
 										type="tertiary"
 										class="ml-auto action-button"
-										icon="icomoon icon-pencil"
 										@click="editItem"
-									/>
+									>
+										<i class="icomoon icon-pencil"></i>
+									</el-button>
 								</div>
 							</div>
 						</div>
@@ -43,7 +45,7 @@
 								<div class="mcol-xs-12 mcol-lg-6">
 									<ItemImagesBlock
 										:itemData="itemData"
-										showMockSrc="/static/img/machine_mock.jpg"
+										:showMockSrc="machineMockSrc"
 										mockClass="machine"
 										@event="handleEvent"
 									/>
@@ -59,7 +61,7 @@
 									/>
 								</div>
 
-								<div class="mcol-xs-12 mcol-lg-6">
+								<div v-if="canViewMaintenance" class="mcol-xs-12 mcol-lg-6">
 									<ItemWOStatisticBlock
 										:createWOButtonFormSetup="createWOButtonFormSetup"
 										:itemData="itemData"
@@ -68,6 +70,13 @@
 										@event="handleEvent"
 									/>
 								</div>
+
+								<MaintenanceListWrapper
+									v-if="canViewMaintenance"
+									hideDatepicker
+									:woFilters="woFilters"
+									:logFilters="logFilters"
+								/>
 
 							</div>
 						</div>
@@ -79,12 +88,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
+import { MAINTENANCE_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
+import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useMachinesStore } from '@/stores/MachinesStore';
@@ -95,6 +107,8 @@ import ItemInfoBlock from '@/components/itemDetails/ItemInfoBlock.vue';
 import ItemImagesBlock from '@/components/itemDetails/ItemImagesBlock.vue';
 import ItemPDMsStatisticBlock from '@/components/itemDetails/ItemPDMsStatisticBlock.vue';
 import ItemWOStatisticBlock from '@/components/itemDetails/ItemWOStatisticBlock.vue';
+import MaintenanceListWrapper from '@/components/itemDetails/MaintenanceListWrapper.vue';
+import machineMockSrc from '@/assets/img/machine_mock.jpg';
 
 const { tt } = Lang;
 
@@ -103,6 +117,8 @@ defineOptions({
 });
 
 const route = useRoute();
+const authStore = useAuthStore();
+const globalStore = useGlobalStore();
 const machinesStore = useMachinesStore();
 const { statistics_filters: filters } = storeToRefs(machinesStore);
 const { changeRoute } = useNavigation();
@@ -115,11 +131,26 @@ const itemsName = computed(() => ({
 	one: tt('Machine'),
 	mult: tt('Machines'),
 }));
+const canEdit = computed(() => authStore.hasAccessTo(['edit_dashboard']));
+const canViewMaintenance = computed(() => authStore.hasAccessTo(['view_maintenance']));
 const predefinedFilters = computed(() => Object.freeze({
 	machineId: itemData.value.id,
 	productionLineId: itemData.value.production_line_id,
 	plantId: itemData.value.plant_id,
+	daterange: filters.value?.daterange,
 }));
+const woFilters = computed(() =>
+	Object.freeze({
+		...predefinedFilters.value,
+		type: MAINTENANCE_TYPES.WORK_ORDER,
+	}),
+);
+const logFilters = computed(() =>
+	Object.freeze({
+		...predefinedFilters.value,
+		type: MAINTENANCE_TYPES.LOG,
+	}),
+);
 const mainInfoSettingsList = computed(() => Object.freeze([
 	{ prop: 'productionLine.name', label: tt('production_Line') },
 	{
@@ -165,12 +196,21 @@ const editItem = () => {
 		changeRoute({ path: `/machines/${itemData.value.id}` });
 	}
 };
+const setupNavbar = () => {
+	globalStore.setup_navbar({
+		showStandardNavItem: true,
+		showCompareButton: true,
+		pageTitle: itemData.value?.name || tt('phrases.machine_without_name'),
+		showPlantName: itemData.value?.plant ? { name: itemData.value.plant.name } : undefined,
+	});
+};
 const fetchItem = () => {
 	itemLoading.value = true;
 	api_request.get(`/machines/${route.params.id}`, { notNotify: true })
 		.then(({ value }) => {
 			itemData.value = value || {};
 			loadContent.value = true;
+			setupNavbar();
 		})
 		.finally(() => {
 			itemLoading.value = false;
@@ -180,4 +220,5 @@ const fetchItem = () => {
 const { handleEvent } = useEventHandler({}, null);
 
 onMounted(fetchItem);
+onBeforeUnmount(() => globalStore.setup_navbar({}));
 </script>

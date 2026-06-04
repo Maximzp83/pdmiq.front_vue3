@@ -643,9 +643,10 @@ const setupAssignedUsers1 = (cellValue, args) => {
 };
 
 const getWOStatus1 = (status, args = {}) => {
-	const { listName } = args;
-
-	const item = findItemBy('id', status, getList[listName]());
+	const { list, listName = 'workOrdersStatusesList' } = args;
+	const statusesList = typeof list === 'function' ? list() : list;
+	const listGetter = getList[listName] || getList.workOrdersStatusesList;
+	const item = findItemBy('id', status, statusesList || listGetter()) || {};
 	// console.log(status, getList[listName])
 	return `<span class="requisition-status-label"
 						style="background-color: ${item.color}"

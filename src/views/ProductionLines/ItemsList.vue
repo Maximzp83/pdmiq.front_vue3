@@ -49,9 +49,10 @@
 								type="primary"
 								native-type="button"
 								:class="['action-button inverted', { active: showFilterbar }]"
-								:icon="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"
 								@click="toggleFilterbar"
-							/>
+							>
+								<i :class="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"></i>
+							</el-button>
 						</div>
 					</template>
 				</Filterbar>
@@ -308,7 +309,7 @@ const cardOperationsSettings = computed(() => {
 			tooltip_text: tt('phrases.create_work_order'),
 			className: 'create-wo-button',
 			type: 'primary inverted',
-			buttonContent: { component: { componentPath: 'components/itemDetails/CreateWOButton' } },
+			buttonContent: { component: { componentFileLoader: () => import('@/components/itemDetails/CreateWOButton.vue') } },
 		});
 	}
 	if (hasAccessToEdit.value) {

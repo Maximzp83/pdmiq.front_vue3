@@ -18,6 +18,7 @@
 							labelKey="label"
 							valueKey="actionName"
 							:prefixText="tt('phrases.Change_Status')"
+							placeholder=" "
 							@change="changeStatusOperation"
 						/>
 					</div>
@@ -36,11 +37,12 @@
 					<div class="filter-item">
 						<el-button
 							type="success"
-							icon="icomoon icon-doc_xls"
 							class="action-button inverted"
 							native-type="button"
 							@click="handleExportToExcel"
-						/>
+						>
+							<i class="icomoon icon-doc_xls"></i>
+						</el-button>
 					</div>
 
 					<div class="filter-item">
@@ -209,13 +211,14 @@ import { ElNotification } from 'element-plus';
 import {
 	MAINTENANCE_TYPES,
 	WORK_ORDER_STATUSES_TYPES,
+	maintenanceReasonTypesList,
 	maintenanceTypesList,
 	woFrequencyTypesList as getWoFrequencyTypesList,
 	woStageTypesList as getWoStageTypesList,
 	workOrdersStatusesList as getWorkOrdersStatusesList,
 } from '@/constants/global';
 import { standardTableOperations } from '@/constants/table';
-import { cleanDateString, findItemBy, getTimeDifference, getWOStatus, setupAssignedUsers } from '@/helpers';
+import { cleanDateString, findItemBy, getTimeDifference, getWOStatus, setupAssignedUsers, cloneDeep } from '@/helpers';
 import { Lang } from '@/localization';
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
@@ -243,12 +246,16 @@ defineOptions({
 
 const props = defineProps({
 	perPageItems: { type: Array, default: () => [] },
+	preventSetNavbar: Boolean,
+	fromDashboard: Boolean,
+	insideOtherPage: Boolean,
 	usersList: { type: Array, default: () => [] },
 	usersLoading: Boolean,
 	hideDatepicker: Boolean,
 	fromPlantDashboard: Boolean,
 	propsFilters: { type: Object, default: () => ({}) },
 });
+const emit = defineEmits(['event']);
 
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
@@ -259,7 +266,6 @@ const {
 	setInWorkWorkOrders,
 	completeWorkOrders,
 	closeWorkOrders,
-	closeWorkOrder,
 	exportMaintenanceLogToExcel,
 } = useMaintenance();
 
@@ -360,11 +366,40 @@ const {
 		filtersStateProp: 'filters_wo',
 		tableRef: itemsTableRef,
 		propsFilters: propsFiltersRef,
-		predefinedFilters: {
+		fromDashboard: props.fromDashboard || props.insideOtherPage,
+		formComponentFileLoader: () => import('../MaintenanceFormWrapper.vue'),
+		additionalModalSettings: {
+			editModalProp: 'editModalClassic',
+			className: 'maintenance-modal',
+			modalClassName: 'fixed-header-footer small-header small-footer',
+			additionalSettings: {
+				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
+				plantId: globalFilters.value?.plantId,
+				...propsFiltersRef.value,
+			},
+			callback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
+			},
+		},
+		localModalSettingsHook: ({ itemData, modalSettings }) => {
+			let newModalSettings = cloneDeep(modalSettings);
+			if (itemData && itemData.is_periodic) {
+				// console.log(itemData.is_periodic)
+				newModalSettings.additionalModalSettings.switchTabTo = {
+					key: 'isRecurring',
+					value: true
+				};
+			}
+			/*if (modalSettings.callback) {
+				newModalSettings.callback = modalSettings.callback;
+			}*/
+			return newModalSettings;			
+		},
+		/*predefinedFilters: {
 			orderByColumn: 'created_at',
 			orderByMethod: 'desc',
-		},
-		localCreateItem: () => editItem({ row: { id: 'new' } }),
+		},*/
 	},
 });
 
@@ -396,11 +431,38 @@ const tableSettings = computed(() => {
 			{ label: 'WO', label_postfix: '#', prop: 'serial_number', width: 80 },
 			{ label: 'Date', prop: 'created_at', sortable: true, min_width: 120, meta: { prepareValue: { localMethod: cleanDateString } } },
 			{ label: 'Due_Date', prop: 'finish_date', sortable: true, min_width: 120, meta: { prepareValue: { localMethod: setupTotalDays, useAllInstanceData: true } } },
-			{ label: 'Status', prop: 'status', width: 120, meta: { prepareValue: { localMethod: getWOStatus } } },
+			{ label: 'Status', prop: 'status', width: 120, meta: { prepareValue: { localMethod: getWOStatus, args: { list: getWorkOrdersStatusesList() } } } },
 			{ label: 'phrases.Machine_name', prop: 'machine.name', min_width: 110, meta: { sortBy: 'company' } },
 			{ label: 'phrases.WO_Name', prop: 'title', sortable: true, min_width: 120 },
 			{ label: 'phrases.Required_items', prop: 'parts', min_width: 120, meta: { prepareValue: { localMethod: setupRequiredItems, useAllInstanceData: true } } },
 			{ label: 'Assigned', prop: 'mock', min_width: 120, meta: { prepareValue: { localMethod: setupAssignedUsers, useAllInstanceData: true, args: { usersList: props.usersList, max: 1 } } } },
+			{
+				label: 'Logs',
+				max_width: 70,
+				meta: {
+					additionalActionsClassName: 'column',
+					additionalActions: [
+						{
+							className: 'vertical-fluid link underline info-color',
+							disablePopover: true,
+							conditionSettings: {
+								conditions: [{ prop: 'logs', method: 'notEmpty' }],
+							},
+							buttonContent: {
+								component: {
+									componentFileLoader: () => import('./LogsButtonContent.vue'),
+								},
+							},
+						},
+						{
+							name: 'handleCreateLog',
+							type: 'success',
+							icon: 'icomoon icon-plus',
+							disablePopover: true,
+						},
+					],
+				},
+			},
 		]),
 		operations: { actions: [] },
 	};
@@ -422,20 +484,6 @@ const tableSettings = computed(() => {
 		tooltip_text: 'phrases.Open_Details',
 	});
 
-	if (hasAccessToEdit.value) {
-		settings.operations.actions.push(
-			{
-				name: 'closeSingleWorkOrder',
-				type: 'warning',
-				icon: 'icomoon icon-check',
-				tooltip_text: 'Close',
-				conditionSettings: {
-					conditions: [{ prop: 'status', method: '!=', control_value: WORK_ORDER_STATUSES_TYPES.CLOSED }],
-				},
-			},
-			standardTableOperations.edit,
-		);
-	}
 	if (hasAccessToDelete.value) {
 		settings.operations.actions.push({ ...standardTableOperations.delete, name: 'handleDeleteWorkOrders' });
 	}
@@ -516,9 +564,6 @@ const closeSelected = () => {
 	const ids = getSelectedIds();
 	if (ids.length) closeWorkOrders({ data: { ids } }).then(refetchItemsList);
 };
-const closeSingleWorkOrder = ({ row }) => {
-	closeWorkOrder({ itemId: row.id }).then(refetchItemsList);
-};
 const handleExportToExcel = () => {
 	if (!globalFilters.value?.plantId) {
 		ElNotification.warning({ message: tt('phrases.select_plant_first') });
@@ -533,21 +578,144 @@ const handleExportToExcel = () => {
 };
 
 const handleShowDetails = ({ row }) => {
-	editItem({ row });
+	emit('event', {
+		eventName: 'handleShowDetails',
+		data: { row },
+		onward: true,
+	});
+};
+
+const handleCreateLog = ({ row }) => {
+	createItem({
+		modal_settings: {
+			title: tt('phrases.Create_Maintenance_log'),
+			formSettings: {
+				parent_id: row.id,
+				production_line_id: row.production_line_id,
+				machine_id: row.machine_id,
+				asset_id: row.asset_id,
+				equipment_id: row.equipment_id,
+				status: row.status,
+			},
+			settings: {
+				parentOrderData: row,
+			},
+			additionalModalSettings: {
+				disableTabs: !hasAccessToCreate.value,
+				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
+				plantId: row.plant_id,
+				...propsFiltersRef.value,
+			},
+		},
+	});
 };
 
 const handleShowDetailsPreview = ({ row }) => {
-	editItem({
-		row,
-		modal_settings: {
-			componentPath: 'Maintenance/WorkOrders/ItemDetailsPreview',
-			title: `${tt('Work_Order')} ${tt('Details')}`,
-			hideFooter: true,
-			hideSubmitButtons: true,
-			settings: {},
-			itemName: tt('Work_Order'),
-			headerActions: [],
-			footerActions: [],
+	const headerActions = translate([
+		{
+			name: 'handlePrintWO',
+			type: 'transparent',
+			icon: 'icomoon icon-printer',
+			tooltip_text: 'Print',
+		},
+	], { key: 'tooltip_text' });
+
+	if (hasAccessToEdit.value && !row.has_trashed_entities) {
+		headerActions.push(...translate([
+			{
+				name: 'editItem',
+				type: 'transparent',
+				icon: 'icomoon icon-pencil',
+				tooltip_text: 'Edit',
+				conditionSettings: {
+					checkMethod: 'some',
+					conditions: [
+						{
+							prop: 'is_periodic',
+							control_value: true,
+							next_conditions: [{ prop: 'is_closed', control_value: false }],
+						},
+						{
+							prop: 'is_periodic',
+							method: '!=',
+							control_value: true,
+							next_conditions: [{ prop: 'is_closed', control_value: false }],
+						},
+					],
+				},
+			},
+		], { key: 'tooltip_text' }));
+	}
+
+	const footerActions = [];
+	if (row.is_closed && hasAccessToDelete.value) {
+		footerActions.push({
+			name: 'handleUnlockWorkOrder',
+			button_text: tt('UNLOCK'),
+			disablePopover: true,
+			type: 'primary',
+		});
+	}
+
+	globalStore.show_edit_modal({
+		show: true,
+		editModalProp: 'editModalClassic',
+		instanceData: row,
+		formComponentFileLoader: () => import('./ItemDetailsPreview.vue'),
+		title: `${tt('Work_Order')} ${tt('Details')}`,
+		hideFooter: !footerActions.length,
+		hideSubmitButtons: true,
+		settings: {},
+		itemName: tt('Work_Order'),
+		headerActions,
+		footerActions,
+		additionalModalSettings: {
+			productionLinesList: productionLinesList.value,
+		},
+		callback: refetchItemsList,
+	});
+};
+
+const handleShowLog = ({ order, log }) => {
+	const headerActions = [];
+	if (hasAccessToEdit.value) {
+		headerActions.push(...translate([{ ...standardTableOperations.edit, type: 'transparent', name: 'editLogFromWOList' }], { key: 'tooltip_text' }));
+	}
+
+	const footerActions = [];
+	if (hasAccessToCreate.value && hasAccessToEdit.value) {
+		footerActions.push({
+			name: 'handleCreateRequest',
+			button_text: tt('phrases.CREATE_WORK_ORDER_REQUEST'),
+			disablePopover: true,
+			type: 'primary',
+			className: 'item-action-button',
+			parentLog: log,
+		});
+	}
+
+	globalStore.show_edit_modal({
+		show: true,
+		editModalProp: 'editModalClassic',
+		instanceData: log,
+		formComponentFileLoader: () => import('../Logs/ItemDetailsPreview.vue'),
+		title: `${tt('Maintenance_Log')} ${tt('Details')}`,
+		hideFooter: !footerActions.length,
+		hideSubmitButtons: true,
+		settings: {
+			showJustInfo: true,
+			parentOrderData: order,
+		},
+		itemName: tt('Maintenance_Log'),
+		headerActions,
+		footerActions,
+		additionalModalSettings: {
+			plantId: order.plant_id,
+			parentWO: order,
+			maintenanceReasonTypesList: maintenanceReasonTypesList(),
+			productionLinesList: productionLinesList.value,
+			taskProcedure: order.taskProcedure,
+			...propsFiltersRef.value,
 		},
 	});
 };
@@ -592,8 +760,9 @@ const { handleEvent } = useEventHandler({
 	handleDeleteItems,
 	handleDeleteWorkOrders,
 	changeStatusOperation,
-	closeSingleWorkOrder,
 	handleShowDetails,
 	handleShowDetailsPreview,
+	handleCreateLog,
+	handleShowLog,
 });
 </script>

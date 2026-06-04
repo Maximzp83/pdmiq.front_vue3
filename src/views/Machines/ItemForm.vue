@@ -21,7 +21,6 @@
 					:placeholder="tt('select')"
 					:setupLabelMethod="getProdlineLabel"
 					useHtml
-					@change="formData.location_ids = []"
 				/>
 			</el-form-item>
 
@@ -47,6 +46,16 @@
 							:placeholder="`${tt('Select')} ${tt('application')}`"
 						/>
 					</div>
+
+					<el-button
+						v-if="!fromAnotherInstance"
+						:class="'create-button span-block'"
+						size="small"
+						type="danger"
+						@click="createApplication"
+					>
+						<i class="icomoon icon-plus"></i>
+					</el-button>
 				</div>
 			</el-form-item>
 
@@ -72,7 +81,7 @@
 						<CharacterItem
 							v-for="(item, idx) in charactersItemsList"
 							:key="`character_item-${item.id}`"
-							:ref="(el) => setCharacterRef(el, idx)"
+							:ref="(el) => setSubItemRef('CharacterItem', el, idx)"
 							:item-data="item"
 							:item-index="idx"
 							@onRemove="(id) => removeFormItem(id, charactersItemsList)"
@@ -84,9 +93,10 @@
 							class="action-button create-button"
 							size="small"
 							type="success"
-							icon="icomoon icon-cross"
 							@click="addFormItem(charactersItemsList, 'c_i-')"
-						/>
+						>
+							<i class="icomoon icon-cross"></i>
+						</el-button>
 					</div>
 				</div>
 			</el-form-item>
@@ -106,7 +116,7 @@
 						<AttachmentItem
 							v-for="(item, idx) in librariesItemsList"
 							:key="`attach_item-${item.id}`"
-							:ref="(el) => setAttachmentRef(el, idx)"
+							:ref="(el) => setSubItemRef('AttachmentItem', el, idx)"
 							:item-data="item"
 							:item-index="idx"
 							@onRemove="(id) => removeFormItem(id, librariesItemsList)"
@@ -118,14 +128,15 @@
 							class="action-button create-button"
 							size="small"
 							type="success"
-							icon="icomoon icon-cross"
 							@click="addFormItem(librariesItemsList, 'a_i-')"
-						/>
+						>
+							<i class="icomoon icon-cross"></i>
+						</el-button>
 					</div>
 				</div>
 			</el-form-item>
 
-			<el-form-item v-if="itemData && itemData.id" :label="tt('Order')">
+			<el-form-item v-if="itemData?.id" :label="tt('Order')">
 				<CustomSelectV2
 					v-model="desiredId"
 					filterable
@@ -135,65 +146,64 @@
 				/>
 			</el-form-item>
 
-			<FormOperationsButtons
-				v-if="!fromModal"
-				@onCancel="$emit('onCancel')"
-				@onSave="validateForm"
-			/>
+			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
 		</el-form>
 	</div>
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, ref, shallowRef, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 
-import { api_request } from '@/api/request_provider';
-import { findItemBy, cleanDateString } from '@/helpers';
-import { required } from '@/constants/validation';
+import { createGetRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { productionLineTypesList } from '@/constants/global';
+import { required } from '@/constants/validation';
+import { cleanDateString, findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
+import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
+import { useMachines } from '@/composables/useMachines';
 
 import Datepicker from '@/components/common/Datepicker.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
+import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import CharacterItem from './CharacterItem.vue';
 import AttachmentItem from './AttachmentItem.vue';
 
 const { tt } = Lang;
 
-defineOptions({
-	name: 'MachineForm',
-});
+defineOptions({ name: 'MachineForm' });
 
-const props = defineProps({
-	itemData: { type: Object, default: null },
-	fromModal: Boolean,
-	fromAnotherInstance: Boolean,
-	itemsName: { type: Object, default: () => ({}) },
-});
+const props = defineProps(buildProps());
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 
-const emit = defineEmits(['submit', 'onCancel']);
 const globalStore = useGlobalStore();
+const { globalFilters } = storeToRefs(globalStore);
+const { reorderMachine } = useMachines();
 
 const itemFormRef = ref(null);
 const fileUploadBlockRef = ref(null);
-const desiredId = ref(null);
-const isMobile = ref(false);
 const applicationsLoading = ref(false);
-const applicationsList = ref([]);
+const applicationsList = shallowRef([]);
 const productionLinesLoading = ref(false);
-const productionLinesList = ref([]);
-const locationsList = ref([]);
+const productionLinesList = shallowRef([]);
+const locationsList = shallowRef([]);
 const locationsLoading = ref(false);
-const machinesList = ref([]);
+const machinesList = shallowRef([]);
 const machinesLoading = ref(false);
 const librariesItemsList = ref([]);
 const charactersItemsList = ref([]);
-const characterRefs = ref([]);
-const attachmentRefs = ref([]);
+const desiredId = ref(null);
+const refsMap = ref({
+	CharacterItem: [],
+	AttachmentItem: [],
+	FileUploadBlock: [fileUploadBlockRef],
+});
 
-const formData = reactive({
+const initialFormData = {
 	name: '',
 	application_id: null,
 	production_line_id: null,
@@ -207,30 +217,90 @@ const formData = reactive({
 	downtime_cost: 0,
 	libraries: [],
 	linespeed_sensor_id: null,
-});
+};
+const formData = ref({ ...initialFormData });
 
+const itemData = computed(() => props.itemData);
+const showPlant = computed(() => globalStore.navbarSettings?.showPlantName || null);
+const itemPictures = computed(() => props.itemData?.pictures || []);
+const filteredMachinesList = computed(() =>
+	props.itemData?.id
+		? machinesList.value.filter((item) => item.id !== props.itemData.id)
+		: [],
+);
 const rules = {
 	name: required,
 	application_id: required,
 };
+const subItemsSettings = computed(() =>
+	Object.freeze([
+		{ ref: 'CharacterItem', targetProp: 'characters' },
+		{ ref: 'AttachmentItem', targetProp: 'libraries', removeFilePropIfNull: true },
+		{ ref: 'FileUploadBlock', targetProp: 'pictures' },
+	]),
+);
 
-const globalFilters = computed(() => globalStore.globalFilters || {});
-const itemPictures = computed(() => props.itemData?.pictures || []);
-const filteredMachinesList = computed(() => {
-	if (props.itemData?.id && machinesList.value.length) {
-		return machinesList.value.filter((item) => item.id !== props.itemData.id);
-	}
-	return machinesList.value;
-});
+const {
+	setupFormSubItemsList,
+	addFormItem,
+	removeFormItem,
+	setSubItemRef,
+	validateSubItemsForm,
+	collectDataFromSubItems,
+	resetFormDataBySubItems,
+} = useSubItemsList({ formData, refsMap });
 
-const { addFormItem, removeFormItem, setupFormSubItemsList } = useSubItemsList();
-
-const setCharacterRef = (el, idx) => {
-	if (el) characterRefs.value[idx] = el;
+const methodsMap = {
+	fetch_applications: createGetRequest(ENTITIES.Applications.apiBase),
+	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
+	fetch_locations: createGetRequest(ENTITIES.Plants.apiBase + '/locations'),
+	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 };
-const setAttachmentRef = (el, idx) => {
-	if (el) attachmentRefs.value[idx] = el;
-};
+const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || formData.value.plant_id;
+const requestsToDoList = computed(() =>
+	Object.freeze([
+		{
+			actionName: 'fetch_production_lines',
+			payload: { params: { max: -1, plantId: currentPlantId } },
+			localProp: productionLinesList,
+			localLoadProp: productionLinesLoading,
+		},
+		{
+			actionName: 'fetch_locations',
+			bindTo: [
+				{
+					getValue: () => formData.value.production_line_id,
+					param: 'productionLineId',
+					onTrigger: () => {
+						if (!props.itemData?.id) formData.value.location_ids = [];
+					},
+				},
+				{
+					getValue: currentPlantId,
+					param: 'plantId',
+					onTrigger: () => {
+						if (!props.itemData?.id) formData.value.location_ids = [];
+					},
+				},
+			],
+			localProp: locationsList,
+			localLoadProp: locationsLoading,
+		},
+		{
+			actionName: 'fetch_applications',
+			payload: { params: { max: -1, plantId: currentPlantId } },
+			localProp: applicationsList,
+			localLoadProp: applicationsLoading,
+		},
+		{
+			actionName: 'fetch_machines',
+			payload: { params: { max: -1, plantId: currentPlantId } },
+			localProp: machinesList,
+			localLoadProp: machinesLoading,
+		},
+	]),
+);
+
 const getProdlineLabel = (option) => {
 	const type = findItemBy('id', option.type, productionLineTypesList);
 	return Object.freeze({
@@ -238,89 +308,87 @@ const getProdlineLabel = (option) => {
 		html: `<div class="flex"><span>${option.name}</span><span class="ml-auto gray-color">${type?.name || ''}</span></div>`,
 	});
 };
-const fetchList = ({ url, params, listRef, loadingRef }) => {
-	loadingRef.value = true;
-	return api_request.get(url, {
-		params: { max: -1, ...(params || {}) },
-		notNotify: true,
-	})
-		.then(({ value }) => {
-			listRef.value = value || [];
-		})
-		.finally(() => {
-			loadingRef.value = false;
-		});
-};
-const fetchInitialLists = () => {
-	const plantId = globalFilters.value.plantId || props.itemData?.plant_id;
-	fetchList({ url: '/production-lines', params: { plantId }, listRef: productionLinesList, loadingRef: productionLinesLoading });
-	fetchList({ url: '/applications', params: { plantId }, listRef: applicationsList, loadingRef: applicationsLoading });
-	fetchList({ url: '/machines', params: { plantId }, listRef: machinesList, loadingRef: machinesLoading });
-	if (formData.production_line_id || plantId) {
-		fetchList({
-			url: '/plants/locations',
-			params: { productionLineId: formData.production_line_id, plantId },
-			listRef: locationsList,
-			loadingRef: locationsLoading,
-		});
+const localSetupPage = (item) => {
+	if (item) {
+		charactersItemsList.value = setupFormSubItemsList(item.characters, 'c_i');
+		librariesItemsList.value = setupFormSubItemsList(item.libraries, 'a_i');
+		return;
 	}
+
+	formData.value.plant_id = currentPlantId() || null;
+	charactersItemsList.value = [];
+	librariesItemsList.value = [];
 };
-const setupPage = (item = {}) => {
-	Object.keys(formData).forEach((key) => {
-		if (item[key] !== undefined) formData[key] = item[key];
-	});
-	charactersItemsList.value = setupFormSubItemsList(item.characters || [], 'c_i');
-	librariesItemsList.value = setupFormSubItemsList(item.libraries || [], 'a_i');
-};
-const collectSubItems = () => {
-	formData.characters = characterRefs.value.map((item) => item?.collectData?.()).filter(Boolean);
-	formData.libraries = attachmentRefs.value.map((item) => item?.collectData?.()).filter(Boolean);
-};
-const prepareSubmitData = () => {
-	collectSubItems();
-	const data = { ...formData };
-	if (!data.plant_id) data.plant_id = globalFilters.value.plantId || props.itemData?.plant_id;
+const localPrepareSubmitData = (data) => {
+	if (!data.plant_id) data.plant_id = currentPlantId();
 	if (data.installed_at) {
 		data.installed_at = cleanDateString(data.installed_at, { withoutTime: 1 });
 	}
-	if (props.itemData?.id) data.id = props.itemData.id;
 	return data;
 };
-const validateForm = () => {
-	itemFormRef.value?.validate((valid) => {
-		if (valid) {
-			emit('submit', {
-				formData: prepareSubmitData(),
-				desiredId: desiredId.value,
-			});
-		}
+const createApplication = () => {
+	globalStore.show_edit_modal({
+		editModalProp: 'editModalSecond',
+		show: true,
+		instanceName: 'Applications',
+		instanceData: { plant_id: globalFilters.value?.plantId },
+		settings: {
+			fromAnotherInstance: true,
+			disablePlant: true,
+		},
+		title: 'Create Application',
+		callback: applicationCreated,
 	});
 };
-
-watch(
-	() => props.itemData,
-	(item) => setupPage(item || {}),
-	{ immediate: true },
-);
-
-watch(
-	() => formData.production_line_id,
-	() => {
-		const plantId = globalFilters.value.plantId || props.itemData?.plant_id;
-		formData.location_ids = [];
-		fetchList({
-			url: '/plants/locations',
-			params: { productionLineId: formData.production_line_id, plantId },
-			listRef: locationsList,
-			loadingRef: locationsLoading,
+const applicationCreated = ({ data } = {}) => {
+	if (data?.data?.id) {
+		formData.value.application_id = data.data.id;
+	}
+	globalStore.show_edit_modal({ show: false, editModalProp: 'editModalSecond' });
+};
+const successSubmitCallback = () => {
+	if (props.itemData?.id && desiredId.value) {
+		reorderMachine({
+			notNotify: true,
+			data: {
+				currentId: +props.itemData.id,
+				desiredId: +desiredId.value,
+				className: props.itemData.className,
+			},
 		});
+	}
+};
+
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'Machines',
+	itemData,
+	formData,
+	initialFormData,
+	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	localSetupPage,
+	localPrepareSubmitData,
+	subItemsSettings,
+	validateSubItemsForm,
+	collectDataFromSubItems,
+	resetFormDataBySubItems,
+	uploadSettings: Object.freeze([
+		{ fileProp: 'pictures', multiple: true },
+		{ fileProp: 'libraries', multiple: true },
+	]),
+	successSubmitCallback,
+	emit,
+});
+
+watch(
+	() => formData.value.production_line_id,
+	() => {
+		if (!props.itemData?.id) formData.value.location_ids = [];
 	},
 );
 
-onMounted(fetchInitialLists);
+useRequestsList({ methodsMap, requestsToDoList });
 
-defineExpose({
-	validateForm,
-	formData,
-});
+defineExpose({ validateForm });
 </script>

@@ -3,6 +3,10 @@
 ## Current Objective
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/Assets` has been completed for the current compile/build scope.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/Settings` has been completed for the current compile/build scope, excluding `vue2_project/src/views/Settings/Import` by user request.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/SuccessDashboard` has been completed for the current compile/build scope.
 - Ask only when there are disputable points without a suitable migrated pattern/example.
 
 ## Mandatory Workflow For Next Session
@@ -82,6 +86,10 @@ Primary rules source:
   - Migrated `vue2_project/src/views/Requisitions` into Vue3 with dashboard, list, item page, requisition form, details/action forms, counters, ROI calculator, `usePlantRequisitions`, entity config, routes, and sidebar menu entries.
   - Migrated `vue2_project/src/views/RFQS` into Vue3 with list, form, item page, `useRfqs`, entity config, `/rfqs` routes, and sidebar menu entry.
   - Migrated `vue2_project/src/views/ProductionLines` into Vue3 with list/grid, form, item page, item card, utility wrapper, details page, support subitems, `useProductionLines`, store filter extensions, and routes.
+  - Migrated `vue2_project/src/views/Machines` into Vue3 with list/grid, form, item page, details page, attachment/character subitems, `useMachines`, machine mock image asset, dashboard route reuse, and machine create/edit/details routes.
+  - Migrated `vue2_project/src/views/Assets` into Vue3 with list/grid, form, item page, details page, attachment/composed subitems, `useAssets`, Assets store statistics filters, dashboard assets route, and asset create/edit/details routes.
+  - Migrated `vue2_project/src/views/Settings` into Vue3 except `Settings/Import`, with Settings shell navigation, Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and Settings sidebar menu entry.
+  - Migrated `vue2_project/src/views/SuccessDashboard` into Vue3 with Success Dashboard container, MainDashboard, MeetingTracker, ROIOnePager, ROIAnalysis placeholder files, shared common components, `useSuccessDashboard`, entity configs, routes, and Customer Success sidebar menu entry.
   - `npm run build` and `git diff --check` pass.
 
 ## Latest Completed Files
@@ -115,12 +123,26 @@ Primary rules source:
 - `src/composables/useRfqs.js`
 - `src/views/ProductionLines/**`
 - `src/composables/useProductionLines.js`
+- `src/views/Machines/**`
+- `src/composables/useMachines.js`
+- `src/assets/img/machine_mock.jpg`
+- `src/views/Assets/**`
+- `src/composables/useAssets.js`
+- `src/stores/AssetsStore.js`
 - `src/stores/ProductionLinesStore.js`
 - `src/composables/useMaintenance.js`
 - `src/components/itemDetails/MaintenanceListWrapper.vue`
+- `src/views/Settings/**`
+- `src/composables/useSettings.js`
+- `src/config/entities.js`
+- `src/views/SuccessDashboard/**`
+- `src/composables/useSuccessDashboard.js`
 
 ## Recommended Next Focus
+- Runtime smoke-test Settings with authenticated real data, especially Back-End Register Writing, Custom Formulas save, Industrial Services image upload/delete, Banner V2 Subtypes IO parameters, and Faults/NCD Faults save flows.
 - Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
+- Smoke-test Assets list/create/edit/details with authenticated real data, especially machine/location binding, library uploads, create Work Order action, and reorder.
+- Smoke-test Machines list/create/edit/details with authenticated real data, especially uploads, create Application modal callback, create Work Order action, and reorder.
 - Smoke-test Sensors list/create/edit/statistics/FFT/chart routes in browser.
 - Review runtime completeness of the simplified chart/statistics controls against production data.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.
@@ -173,6 +195,8 @@ Primary rules source:
 - `src/views/Sensors/LevelZoneForm.vue`
 - `src/views/Sensors/LevelZoneFormWrapper.vue`
 - `src/views/Sensors/ReportBlock.vue`
+- `src/views/UserRoles/ItemForm.vue`
+- `src/views/UserRoles/PermissionItem.vue`
 - `src/views/Sensors/sensorForm/BannerSensorItemWrapper.vue`
 - `src/views/Sensors/sensorForm/ItemForm.vue`
 - `src/views/Sensors/sensorForm/ItemFormNCD.vue`
@@ -201,6 +225,9 @@ Primary rules source:
 - `src/views/BrandModels/Details/MoveForm.vue`
 - `src/views/BrandModels/Details/LocationList.vue`
 - `src/views/BrandModels/Details/DetailsPage.vue`
+- `src/views/Maintenance/MaintenanceFormWrapper.vue`
+- `src/views/Maintenance/Logs/ItemForm.vue`
+- `src/views/Maintenance/WorkOrders/ItemForm.vue`
 - `src/config/entities.js`
 - `src/components/form/FetchByQuerySelect.vue`
 - `src/components/itemDetails/ItemImagesBlock.vue`

@@ -143,14 +143,14 @@ const file = computed(() => props.itemData || {});
 
 const fileType = computed(() => {
 	const item = props.itemData || {};
-	console.log(getFileType(
+	/*console.log(getFileType(
 		item.name ||
 			item.url ||
 			item.full_file_name ||
 			item.file_path ||
 			item.attachment_file_name ||
 			item.file
-	))
+	))*/
 	return getFileType(
 		item.name ||
 			item.url ||

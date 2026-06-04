@@ -86,6 +86,7 @@ const apiInstance = axios.create({
 	headers: {
 		'Content-Type': 'application/json',
 		'Accept': 'application/json',
+		'X-Timezone-Offset': -new Date().getTimezoneOffset()
 	},
 });
 

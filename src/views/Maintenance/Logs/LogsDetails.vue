@@ -1,75 +1,39 @@
 <template>
-	<div>
-		<VueElementLoadingWrapper :isLoading="itemLoading" :isSaving="itemSaving" :itemsName="itemsName.one" />
+	<div class="nested-view-content-wrapper">
+		<div class="content-row">
+			<BreakdownMachinesList :perPageItems="perPageItems" preventSetNavbar />
+		</div>
 
-		<div class="view-wrapper item-page-wrapper">
-			<div class="mcontainer">
-				<div class="view-content-card card">
-					<div v-if="loadContent" class="form-wrapper card-content">
-						<ItemForm
-							ref="itemFormRef"
-							:itemData="itemData"
-							:itemsName="itemsName"
-							@submit="handleSubmitForm"
-							@onCancel="handleCloseButton"
-						/>
-					</div>
-				</div>
-			</div>
+		<div>
+			<ItemsList
+				preventSetNavbar
+				fromDashboard
+				:propsFilters="predefinedFilters"
+				@event="handleEvent"
+			/>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { MAINTENANCE_TYPES } from '@/constants/global';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
 
-import { useItemPage } from '@/composables/mixins/useItemPage';
-
-import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
-import ItemForm from './ItemForm.vue';
+import BreakdownMachinesList from './BreakdownMachinesList.vue';
+import ItemsList from './ItemsList.vue';
 
 defineOptions({
-	name: 'MaintenanceLogDetails',
+	name: 'LogsDetails',
 });
 
-const itemFormRef = ref(null);
+const emit = defineEmits(['event']);
+const predefinedFilters = Object.freeze({ type: MAINTENANCE_TYPES.LOG });
+const perPageItems = Object.freeze([
+	{ value: 5, label: '5' },
+	{ value: 10, label: '10' },
+	{ value: 20, label: '20' },
+	{ value: 50, label: '50' },
+]);
 
-const preparePayload = (payload) => {
-	const nextPayload = {
-		...payload,
-		data: {
-			...payload.data,
-			attachments: payload.data.attachments || [],
-			images: payload.data.images || [],
-			production_line_id: payload.data.production_line_id || null,
-			machine_id: payload.data.machine_id || null,
-			asset_id: payload.data.asset_id || null,
-			equipment_id: payload.data.equipment_id || null,
-		},
-	};
-
-	const hasNewAttach = nextPayload.data.attachments.some((item) => !!item.file);
-	const hasNewImg = nextPayload.data.images.some((item) => !!item.file);
-
-	if (hasNewAttach || hasNewImg) {
-		nextPayload.withFile = true;
-	}
-
-	return nextPayload;
-};
-
-const {
-	itemData,
-	itemLoading,
-	loadContent,
-	itemSaving,
-	itemsName,
-	handleSubmitForm,
-	handleCloseButton,
-} = useItemPage({
-	entityKey: 'MaintenanceLogs',
-	itemFormRef,
-	goToListAfterSave: true,
-	preparePayload,
-});
+const { handleEvent } = useEventHandler({}, emit);
 </script>

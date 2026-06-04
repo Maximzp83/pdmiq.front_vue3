@@ -1,4 +1,4 @@
-import { /*USER_TYPES, USER_ROLES_TYPES, SCOPES*/ } from '@/constants/global';
+import { /*USER_TYPES,*/ USER_ROLES_TYPES /*, SCOPES*/ } from '@/constants/global';
 import { Lang } from '@/localization';
 
 // import store from '@/store';
@@ -65,15 +65,15 @@ const menuItems1 = [
 		enableInCompanyMenuForm: true,
 		// roles: ['manager', 'operator']
 	},*/
-	// {
-	// 	name: 'sidebar_menu.CUSTOMER_SUCCESS',
-	// 	belongs_to_label: 'predictive_maintenance',
-	// 	id: MENU_TYPES.CUSTOMER_SUCCESS,
-	// 	icon: 'icon-dashboard2',
-	// 	path: '/success-dashboard',
-	// 	meta: { permissions: ['view_customer_success'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.CUSTOMER_SUCCESS',
+		belongs_to_label: 'predictive_maintenance',
+		id: MENU_TYPES.CUSTOMER_SUCCESS,
+		icon: 'icon-dashboard2',
+		path: '/success-dashboard',
+		meta: { permissions: ['view_customer_success'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'Controllers',
 		belongs_to_label: 'predictive_maintenance',
@@ -81,15 +81,6 @@ const menuItems1 = [
 		icon: 'icon-controllers',
 		path: '/controllers',
 		meta: { permissions: ['view_controllers'] },
-		enableInCompanyMenuForm: true
-	},
-	{
-		name: 'sidebar_menu.sensors',
-		belongs_to_label: 'predictive_maintenance',
-		id: MENU_TYPES.SENSORS,
-		icon: 'icon-sensors',
-		path: '/sensors',
-		meta: { permissions: ['view_sensors'] },
 		enableInCompanyMenuForm: true
 	},
 
@@ -171,15 +162,15 @@ const menuItems1 = [
 		meta: { permissions: ['view_vendors'] },
 		enableInCompanyMenuForm: true
 	},
-	// {
-	// 	name: 'sidebar_menu.Settings',
-	// 	belongs_to_label: 'system',
-	// 	id: MENU_TYPES.SETTINGS,
-	// 	icon: 'icon-settings',
-	// 	path: '/settings',
-	// 	meta: { permissions: ['view_settings'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.Settings',
+		belongs_to_label: 'system',
+		id: MENU_TYPES.SETTINGS,
+		icon: 'icon-settings',
+		path: '/settings',
+		meta: { permissions: ['view_settings'] },
+		enableInCompanyMenuForm: true
+	},
 
 	{
 		name: 'sidebar_menu.CMMS',
@@ -190,10 +181,10 @@ const menuItems1 = [
 		belongs_to_label: 'cmms',
 		id: MENU_TYPES.MAINTENANCE,
 		icon: 'icon-maintenance',
-		path: '/maintenance/dashboard',
+		path: '/maintenance',
 		meta: { permissions: ['view_maintenance'] },
 		enableInCompanyMenuForm: true,
-		children: [
+		/*children: [
 			{
 				name: 'maintenance_log',
 				path: '/maintenance/logs'
@@ -202,7 +193,7 @@ const menuItems1 = [
 				name: 'work_order',
 				path: '/maintenance/work-orders'
 			}
-		]
+		]*/
 	},
 	{
 		name: 'Requisitions',

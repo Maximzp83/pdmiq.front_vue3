@@ -13,7 +13,7 @@
 			:dynamicProps="dynamicProps"
 			@event="handleEvent"
 		>
-			<template #custom_mock>
+			<template #custom_mock_sub>
 				<slot name="custom_mock"></slot>
 			</template>
 		</component>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 
 import { executeChartFactoryContainer } from '@/modules/charts_factory/index.js';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -37,7 +37,10 @@ const props = defineProps({
 	chartFactoryName: String,
 	configsKey: String,
 	chartKey: String,
-	chartItemComponentPath: String,
+	chartComponentFileLoader: {
+		type: Function,
+		default: () => import('@/components/charts/CommonChartItemContainer.vue'),
+	},
 	rootStatisticsData: null,
 	chartWrapperIdx: null,
 });
@@ -54,14 +57,13 @@ const chartContainerLoading = ref(false);
 const updateChartInstance = ref(0);
 const chartInstanceInitialBuild = ref(true);
 
-const componentModules = {
-	...import.meta.glob('/src/components/**/*.vue'),
-	...import.meta.glob('/src/views/**/*.vue'),
-};
-
 const componentFile = computed(() => {
-	const path = props.chartItemComponentPath || 'components/charts/CommonChartItemContainer';
-	return componentModules[`/src/${path}.vue`] || null;
+	const { chartComponentFileLoader } = props;
+
+	if (chartComponentFileLoader) {
+		return defineAsyncComponent(chartComponentFileLoader);
+	}
+	return null;
 });
 
 const chartInstanceContainerEventsList = computed(() => {

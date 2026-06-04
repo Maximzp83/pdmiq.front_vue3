@@ -118,7 +118,7 @@ const tableSettings = computed(() => {
 				prop: 'mac_address',
 				min_width: 180,
 				meta: {
-					cellComponent: { componentPath: 'views/Sensors/SensorTypeTableCell' },
+					cellComponent: { componentFileLoader: () => import('./SensorTypeTableCell.vue') },
 				},
 				payload: { isMacAddress: true },
 			},
@@ -127,7 +127,7 @@ const tableSettings = computed(() => {
 				prop: 'type',
 				min_width: 140,
 				meta: {
-					cellComponent: { componentPath: 'views/Sensors/SensorTypeTableCell' },
+					cellComponent: { componentFileLoader: () => import('./SensorTypeTableCell.vue') },
 				},
 				payload: {
 					dataSetsList: dataSetsList(),

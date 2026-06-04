@@ -228,7 +228,7 @@
 <script setup>
 import { computed, reactive, ref, shallowRef, watch } from 'vue';
 
-import { createGetRequest } from '@/api/request_factories';
+import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import {
 	BREAKDOWN_TYPES,
@@ -331,23 +331,87 @@ const totalTime = computed(() => {
 	}
 	return 0;
 });
+const plantId = computed(
+	() =>
+		props.itemData?.plant_id ||
+		props.additionalSettings?.plantId ||
+		formData.value.plant_id ||
+		null,
+);
+
 const methodsMap = {
 	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 	fetch_assets: createGetRequest(ENTITIES.Assets.apiBase),
+	fetch_asset: createGetByIdRequest(ENTITIES.Assets.apiBase),
 	fetch_equipments: createGetRequest(ENTITIES.Equipments.apiBase),
+	fetch_equipment: createGetByIdRequest(ENTITIES.Equipments.apiBase),
 	fetch_task_procedures: createGetRequest(ENTITIES.TaskProcedures.apiBase),
 };
 
-const requestsToDoList = computed(() =>
-	Object.freeze([
-		{ actionName: 'fetch_production_lines', localProp: productionLinesList, localLoadProp: productionLinesLoading },
-		{ actionName: 'fetch_machines', localProp: machinesList, localLoadProp: machinesLoading },
-		{ actionName: 'fetch_assets', localProp: assetsList, localLoadProp: assetsLoading },
-		{ actionName: 'fetch_equipments', localProp: equipmentsList, localLoadProp: equipmentsLoading },
-		{ actionName: 'fetch_task_procedures', localProp: taskProceduresList, localLoadProp: taskProceduresLoading },
-	])
-);
+const requestsToDoList = computed(() => {
+	const list = [
+		{
+			actionName: 'fetch_production_lines',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [{ getValue: () => plantId.value, param: 'plantId' }],
+			localProp: productionLinesList,
+			localLoadProp: productionLinesLoading,
+		},
+		{
+			actionName: 'fetch_machines',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId' },
+				{ getValue: () => formData.value.production_line_id, param: 'productionLineId' },
+			],
+			localProp: machinesList,
+			localLoadProp: machinesLoading,
+		},
+		{
+			actionName: 'fetch_assets',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			hasValueCase: {
+				getValue: () => formData.value.asset_id,
+				fetchItemActionName: 'fetch_asset',
+			},
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId', noFetch: true },
+				{ getValue: () => formData.value.production_line_id, param: 'productionLineId' },
+				{ getValue: () => formData.value.machine_id, param: 'machineId' },
+			],
+			localProp: assetsList,
+			localLoadProp: assetsLoading,
+		},
+		{
+			actionName: 'fetch_equipments',
+			hasValueCase: {
+				getValue: () => formData.value.equipment_id,
+				fetchItemActionName: 'fetch_equipment',
+			},
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId', noFetch: true },
+				{ getValue: () => formData.value.production_line_id, param: 'productionLineId' },
+				{ getValue: () => formData.value.machine_id, param: 'machineId' },
+				{ getValue: () => formData.value.asset_id, param: 'assetId' },
+			],
+			localProp: equipmentsList,
+			localLoadProp: equipmentsLoading,
+		},
+	];
+
+	if (props.additionalSettings?.taskProcedure) {
+		list.push({
+			actionName: 'fetch_task_procedures',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [{ getValue: () => plantId.value, param: 'plantId' }],
+			localProp: taskProceduresList,
+			localLoadProp: taskProceduresLoading,
+		});
+	}
+
+	return Object.freeze(list);
+});
 
 const subItemsSettings = computed(() =>
 	Object.freeze([

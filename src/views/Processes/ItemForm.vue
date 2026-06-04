@@ -194,9 +194,10 @@
 								class="action-button create-button"
 								size="mini"
 								type="success"
-								icon="icomoon icon-cross"
 								@click="addFormItem(breakTimeItemsList, 'bt_i-')"
-							/>
+							>
+								<i class="icomoon icon-cross"></i>
+							</el-button>
 						</div>
 					</div>
 				</el-form-item>
@@ -226,9 +227,10 @@
 								class="action-button create-button"
 								size="mini"
 								type="success"
-								icon="icomoon icon-cross"
 								@click="addFormItem(workDatesItemsList, 'wd_i-')"
-							/>
+							>
+								<i class="icomoon icon-cross"></i>
+							</el-button>
 						</div>
 					</div>
 				</el-form-item>
@@ -253,9 +255,10 @@
 								class="action-button create-button"
 								size="mini"
 								type="success"
-								icon="icomoon icon-cross"
 								@click="addFormItem(faultsItemsList, 'f_i-')"
-							/>
+							>
+								<i class="icomoon icon-cross"></i>
+							</el-button>
 						</div>
 					</div>
 				</el-form-item>

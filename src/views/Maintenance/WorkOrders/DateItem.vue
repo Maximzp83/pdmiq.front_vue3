@@ -4,9 +4,10 @@
 		<el-button
 			type="danger"
 			class="action-button mini"
-			icon="icomoon icon-cross"
 			@click="$emit('onRemove', itemData.id)"
-		/>
+		>
+			<i class="icomoon icon-cross"></i>
+		</el-button>
 	</div>
 </template>
 

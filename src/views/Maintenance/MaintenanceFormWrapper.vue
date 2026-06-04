@@ -5,7 +5,8 @@
 				card
 				:activeTab="activeTab"
 				:tabsList="tabsList"
-				:buttonsType="'info inverted'"
+				buttonsType="info"
+				buttonsClass="inverted"
 				@switchTab="switchTab"
 			/>
 		</div>

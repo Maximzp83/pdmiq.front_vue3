@@ -102,7 +102,7 @@ const createWOAction = computed(() =>
 		type: 'primary inverted',
 		buttonContent: {
 			component: {
-				componentPath: 'components/itemDetails/CreateWOButton',
+				componentFileLoader: () => import('@/components/itemDetails/CreateWOButton.vue'),
 			},
 		},
 	})

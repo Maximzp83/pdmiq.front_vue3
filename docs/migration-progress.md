@@ -10,8 +10,7 @@
 ## Current Focus
 
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
-- Current selected migration target is `vue2_project/src/views/Sensors`.
-- User instruction for Sensors: migrate continuously without per-file confirmation; defer `statistics` and `charts` to the final Sensors stage.
+- Current selected migration target `vue2_project/src/views/Assets` is migrated for the current Vue3 compile scope.
 - `Controllers` views have been added in Vue3 style and routes/menu are enabled.
 - `Controllers` devices tab is now wired to the migrated Banner sensors list.
 - `Maintenance` section is migrated for the current Vue3 compile scope and routes/menu are enabled.
@@ -22,8 +21,13 @@
 - `Requisitions` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `RFQS` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `ProductionLines` section is migrated for the current Vue3 compile scope and routes are enabled.
+- `Machines` section is migrated for the current Vue3 compile scope with list/grid, form, item page, details page, attachment/character subitems, `useMachines`, machine mock image asset, and machine create/edit/details routes enabled.
+- `Assets` section is migrated for the current Vue3 compile scope with list/grid, form, item page, details page, attachment/composed subitems, `useAssets`, store statistics filters, dashboard assets route, and asset create/edit/details routes enabled.
+- `Settings` section is migrated for the current Vue3 compile scope except `Settings/Import`, including Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and sidebar menu entry.
+- `SuccessDashboard` section is migrated for the current Vue3 compile scope with Success Dashboard container, main dashboard, Meeting Tracker, ROI One Pager, common chart/support components, `useSuccessDashboard`, entity configs, routes, and sidebar menu entry.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
 - Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
+- Project production build passes after `SuccessDashboard` migration.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE
@@ -641,3 +645,26 @@ await fetchUsers({ page: 1 });
   - Replaced deprecated pagination event usage with `v-model:current-page`
   - Fixed page-change emit payload to preserve selected page (`preventResetPage`)
   - ESLint check passed
+- [x] Maintenance WorkOrders form request list alignment
+  - Updated `src/views/Maintenance/WorkOrders/ItemForm.vue`
+  - Reworked `requestsToDoList` to match the Vue2 WorkOrders original using the Vue3 `useRequestsList` format and `src/views/Machines/ItemForm.vue` as the local pattern
+  - Restored plant-bound task procedure/team/user/type/production line/machine/asset/equipment/parts requests
+  - Restored dependent field cleanup and selected asset/equipment fetch-by-id handling
+  - `npm run build` passed
+- [x] Maintenance WorkOrders form Element Plus button type warning fix
+  - Updated `src/views/Maintenance/MaintenanceFormWrapper.vue`
+  - Split legacy `buttonsType="info inverted"` into valid Element Plus `buttonsType="info"` and CSS `buttonsClass="inverted"`
+  - Fixes invalid `ElButton` `type` warning when opening the WorkOrders form tabs
+  - `npm run build` passed
+- [x] Maintenance Logs form request list alignment
+  - Updated `src/views/Maintenance/Logs/ItemForm.vue`
+  - Reworked `requestsToDoList` to match the Vue2 Logs original using the Vue3 `useRequestsList` format and the migrated WorkOrders form as the local pattern
+  - Restored plant-bound production line/machine/asset/equipment requests and conditional task procedure request
+  - Restored selected asset/equipment fetch-by-id handling
+  - `npm run build` passed
+- [x] UserRoles permissions tab restored to original component structure
+  - Added `src/views/UserRoles/PermissionItem.vue`
+  - Updated `src/views/UserRoles/ItemForm.vue`
+  - Replaced inlined `permissionsTab` permission controls with `<PermissionItem />` list like the Vue2 original
+  - Connected permission collection through `useSubItemsList` and `subItemsSettings`
+  - `npm run build` passed

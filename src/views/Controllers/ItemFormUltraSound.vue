@@ -95,7 +95,9 @@
 						<CustomInput v-model="formData.binding_code" :placeholder="`${tt('input')} ${tt('code')}`" />
 					</el-form-item>
 
-					<el-form-item :label="tt('phrases.cloud_connection_type')" prop="cloud_connection_type">
+					<el-form-item :label="tt('phrases.cloud_connection_type')" prop="cloud_connection_type"
+						class="content-row"
+					>
 						<CustomSelectV2
 							v-model="formData.cloud_connection_type"
 							:optionsList="cloudConnectionTypesList"
@@ -106,7 +108,7 @@
 
 					<div
 						v-show="formData.cloud_connection_type === CLOUD_CONNECTION_TYPES.CELL_MODEM"
-						class="el-form-item"
+						class="content-row"
 					>
 						<el-form-item :label="tt('phrases.router_SIM_card_number')" prop="router_sim_card_number">
 							<CustomInput v-model="formData.router_sim_card_number" :placeholder="`${tt('input')} ${tt('number')}`" />

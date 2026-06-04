@@ -55,6 +55,7 @@
 			<DynamicComponentWrapper
 				ref="actionButtonContent"
 				:propsData="rowData"
+				:componentFileLoader="expandedRowSettings.componentFileLoader"
 				:componentPath="expandedRowSettings.componentPath"
 			/>
 		</div>

@@ -1,5 +1,6 @@
 <template>
 	<component
+		v-if="componentFile"
 		:is="componentFile"
 		ref="additionalBlock"
 		:propsData="propsData"
@@ -10,7 +11,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 
 import { Lang } from '@/localization';
 
@@ -20,7 +21,8 @@ defineOptions({
 
 const props = defineProps({
 	propsData: { type: Object, default: () => ({}) },
-	componentPath: { type: String, required: true },
+	componentFileLoader: { type: Function, default: null },
+	componentPath: { type: String, default: '' },
 	additionalProps: { type: null, default: null },
 });
 
@@ -33,6 +35,14 @@ const componentModules = {
 };
 
 const componentFile = computed(() => {
+	if (props.componentFileLoader) {
+		return defineAsyncComponent(props.componentFileLoader);
+	}
+
+	if (!props.componentPath) {
+		return null;
+	}
+
 	const modulePath = `/src/${props.componentPath}.vue`;
 	return componentModules[modulePath];
 });

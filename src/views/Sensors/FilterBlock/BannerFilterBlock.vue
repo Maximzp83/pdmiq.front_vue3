@@ -8,9 +8,10 @@
 						<el-button
 							native-type="button"
 							:class="['small', { 'is-active': v21ViewActive }]"
-							icon="icomoon icon-eye"
 							@click="event('toggleV2_1View')"
-						/>
+						>
+							<i class="icomoon icon-eye"></i>
+						</el-button>
 					</div>
 				</div>
 			</div>
@@ -24,9 +25,10 @@
 						<el-button
 							native-type="button"
 							:class="['small', { 'is-active': statsThresholdsActive }]"
-							icon="icomoon icon-eye"
 							@click="event('toggleStatsThresholds')"
-						/>
+						>
+							<i class="icomoon icon-eye"></i>
+						</el-button>
 					</div>
 				</div>
 			</div>
@@ -79,9 +81,9 @@
 					type="primary"
 					native-type="button"
 					:class="['report-button inverted', { active: joinChartsBy?.prop === 'axis' }]"
-					icon="icomoon icon-overlay"
 					@click="event('handleJoinCharts', 'axis')"
 				>
+					<i class="icomoon icon-overlay"></i>
 					{{ tt('Axis') }}
 				</el-button>
 
@@ -90,9 +92,9 @@
 					type="primary"
 					native-type="button"
 					:class="['report-button inverted', { active: joinChartsBy?.prop === 'type' }]"
-					icon="icomoon icon-overlay"
 					@click="event('handleJoinCharts', 'type')"
 				>
+					<i class="icomoon icon-overlay"></i>
 					{{ tt('Params') }}
 				</el-button>
 
@@ -101,9 +103,9 @@
 					type="primary"
 					native-type="button"
 					:class="['report-button inverted', { active: splitNCDCharts }]"
-					icon="icomoon icon-overlay"
 					@click="event('handleSplitNCDCharts')"
 				>
+					<i class="icomoon icon-overlay"></i>
 					{{ tt('Split') }}
 				</el-button>
 			</el-button-group>

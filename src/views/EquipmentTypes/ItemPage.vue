@@ -52,6 +52,7 @@ const {
 	handleSubmitForm,
 	handleCloseButton,
 } = useItemPage({
+	// debug: true,
 	entityKey: 'EquipmentTypes',
 	uploadSettings: {
 		fileProp: 'file',

@@ -29,7 +29,7 @@
 				:fromModal="true"
 				:settings="editModal.settings"
 				:formSettings="editModal.formSettings"
-				:additionalSettings="editModal.additionalModalSettings"
+				:additionalSettings="editModal.additionalSettings"
 				@event="handleEvent"
 			/>
 

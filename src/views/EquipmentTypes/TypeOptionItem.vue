@@ -4,7 +4,7 @@
 		:class="['option-item-container type-option-item', { fromModal }]"
 		:model="formData"
 	>
-		<div :class="['flex mrow content-container content-row', { wrap: fromModal }]">
+		<div :class="['flex mrow content-container content-row top', { wrap: fromModal }]">
 			<el-form-item prop="category_ids" :class="[fromModal ? 'mcol-xs-4' : 'mcol-xs-2']">
 				<label>{{ `${tt('Type')} ${tt('Category')}` }}</label>
 				<CustomSelectV2
@@ -25,6 +25,7 @@
 			<el-form-item prop="crossover_rule_type" :class="[fromModal ? 'mcol-xs-4' : 'mcol-xs-2', 'relative']">
 				<label>{{ tt('phrases.Crossover_Rule_Type') }}</label>
 				<CustomSelectV2
+					className="mini"
 					v-model="formData.crossover_rule_type"
 					clearable
 					:optionsList="crossoverRulesTypesOptions"
@@ -61,38 +62,39 @@
 				<label class="small-lh">{{ `${tt('has')} ${tt('predefined')}` }}</label>
 				<el-switch
 					v-model="formData.has_predefined_values"
-					class="without-margin"
 					:active-value="1"
 					:inactive-value="0"
 				/>
 
-				<div v-if="formData.has_predefined_values" class="flex mrow wrap">
-					<el-form-item prop="predefined_values" class="predefined-values">
-						<div class="options-container relative">
-							<div v-if="predefinedValuesItemsList.length" class="content-row">
-								<PredefinedValueItem
-									v-for="(item, idx) in predefinedValuesItemsList"
-									:key="`pv_item-${item.id}`"
-									:ref="(el) => setSubItemRef('PredefinedValueItem', el, idx)"
-									:item-data="item"
-									:item-index="idx"
-									@onRemove="(id) => removeFormItem(id, predefinedValuesItemsList)"
-								/>
-							</div>
+				<div v-if="formData.has_predefined_values" class="">
+					<div class="flex mrow wrap">
+						<el-form-item prop="predefined_values" class="predefined-values">
+							<div class="options-container relative">
+								<div v-if="predefinedValuesItemsList.length" class="content-row">
+									<PredefinedValueItem
+										v-for="(item, idx) in predefinedValuesItemsList"
+										:key="`pv_item-${item.id}`"
+										:ref="(el) => setSubItemRef('PredefinedValueItem', el, idx)"
+										:item-data="item"
+										:item-index="idx"
+										@onRemove="(id) => removeFormItem(id, predefinedValuesItemsList)"
+									/>
+								</div>
 
-							<div class="create-button-container">
-								<el-button
-									:disabled="!formData.has_predefined_values"
-									class="action-button create-button"
-									size="small"
-									type="success"
-									@click="addFormItem(predefinedValuesItemsList, 'pv_i-')"
-								>
-									<i class="icomoon icon-cross"></i>
-								</el-button>
+								<div class="create-button-container">
+									<el-button
+										:disabled="!formData.has_predefined_values"
+										class="action-button create-button"
+										size="small"
+										type="success"
+										@click="addFormItem(predefinedValuesItemsList, 'pv_i-')"
+									>
+										<i class="icomoon icon-cross"></i>
+									</el-button>
+								</div>
 							</div>
-						</div>
-					</el-form-item>
+						</el-form-item>
+					</div>
 				</div>
 			</el-form-item>
 
@@ -100,14 +102,13 @@
 				<label class="small-lh">{{ `${tt('phrases.show_in_filter')}` }}</label>
 				<el-switch
 					v-model="formData.is_in_dashboard_view"
-					class="without-margin"
 					:active-value="1"
 					:inactive-value="0"
 				/>
 			</el-form-item>
 
 			<el-form-item prop="is_in_equipment_card" class="mcol-xs-1 switchers-block">
-				<label>{{ `${tt('phrases.show_in_item')}` }}</label>
+				<label class="small-lh">{{ `${tt('phrases.show_in_item')}` }}</label>
 				<el-switch
 					v-model="formData.is_in_equipment_card"
 					:active-value="1"
@@ -119,7 +120,7 @@
 				<label class="small-lh">{{ `${tt('phrases.show_in_Analysis')}` }}</label>
 				<el-switch
 					v-model="formData.is_visible_in_vibration_analysis"
-					class="without-margin"
+					class="half-margin"
 					:active-value="1"
 					:inactive-value="0"
 				/>
@@ -129,23 +130,23 @@
 				<label class="small-lh">{{ `${tt('phrases.convert_to_predefined')}` }}</label>
 				<el-switch
 					v-model="formData.convert_to_predefined_values"
-					class="without-margin"
+					class="half-margin"
 					:active-value="1"
 					:inactive-value="0"
 				/>
 			</el-form-item>
 
 			<el-form-item prop="is_rpm" class="mcol-xs-1 switchers-block">
-				<label>{{ tt('Is_RPM') }}</label>
+				<label class="small-lh">{{ tt('Is_RPM') }}</label>
 				<el-switch v-model="formData.is_rpm" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
-			<el-form-item prop="is_fla" class="mcol-xs-1 switchers-block">
-				<label>{{ tt('Is_FLA') }}</label>
+			<el-form-item prop="is_fla" class="mcol-xs-1 switchers-block content-row">
+				<label class="small-lh">{{ tt('Is_FLA') }}</label>
 				<el-switch v-model="formData.is_fla" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
-			<div>
+			<div class="content-row">
 				<el-button
 					class="action-button remove-button"
 					size="small"

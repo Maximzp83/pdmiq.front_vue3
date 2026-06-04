@@ -88,9 +88,10 @@
 								<el-button
 									class="action-button create-button"
 									type="success"
-									icon="icomoon icon-cross"
 									@click="addFormItem(datesItemsList, 'd_i-')"
-								/>
+								>
+									<i class="icomoon icon-cross"></i>
+								</el-button>
 							</div>
 						</el-form-item>
 					</template>
@@ -168,9 +169,10 @@
 							<el-button
 								class="action-button create-button"
 								type="success"
-								icon="icomoon icon-cross"
 								@click="addFormItem(partsItemsList, 'p_i-')"
-							/>
+							>
+								<i class="icomoon icon-cross"></i>
+							</el-button>
 						</div>
 					</el-form-item>
 				</div>
@@ -266,7 +268,7 @@
 <script setup>
 import { computed, reactive, ref, shallowRef } from 'vue';
 
-import { createGetRequest } from '@/api/request_factories';
+import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import {
 	MAINTENANCE_TYPES,
@@ -389,12 +391,21 @@ const frequenciesList = computed(() => {
 	}
 	return Object.freeze(list);
 });
+const plantId = computed(
+	() =>
+		props.itemData?.plant_id ||
+		props.additionalSettings?.plantId ||
+		formData.value.plant_id ||
+		null,
+);
 
 const methodsMap = {
 	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 	fetch_assets: createGetRequest(ENTITIES.Assets.apiBase),
+	fetch_asset: createGetByIdRequest(ENTITIES.Assets.apiBase),
 	fetch_equipments: createGetRequest(ENTITIES.Equipments.apiBase),
+	fetch_equipment: createGetByIdRequest(ENTITIES.Equipments.apiBase),
 	fetch_teams: createGetRequest(ENTITIES.Teams.apiBase),
 	fetch_users: createGetRequest(ENTITIES.Users.apiBase),
 	fetch_work_order_types: createGetRequest(ENTITIES.MaintenanceCategories.apiBase),
@@ -404,16 +415,145 @@ const methodsMap = {
 
 const requestsToDoList = computed(() =>
 	Object.freeze([
-		{ actionName: 'fetch_production_lines', localProp: productionLinesList, localLoadProp: productionLinesLoading },
-		{ actionName: 'fetch_machines', localProp: machinesList, localLoadProp: machinesLoading },
-		{ actionName: 'fetch_assets', localProp: assetsList, localLoadProp: assetsLoading },
-		{ actionName: 'fetch_equipments', localProp: equipmentsList, localLoadProp: equipmentsLoading },
-		{ actionName: 'fetch_teams', localProp: teamsList, localLoadProp: teamsLoading },
-		{ actionName: 'fetch_users', localProp: usersList, localLoadProp: usersLoading },
-		{ actionName: 'fetch_work_order_types', localProp: woTypesList, localLoadProp: woTypesLoading },
-		{ actionName: 'fetch_task_procedures', localProp: taskProceduresList, localLoadProp: taskProceduresLoading },
-		{ actionName: 'fetch_parts', localProp: partsList, localLoadProp: partsLoading },
-	])
+		{
+			actionName: 'fetch_task_procedures',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [{ getValue: () => plantId.value, param: 'plantId' }],
+			localProp: taskProceduresList,
+			localLoadProp: taskProceduresLoading,
+		},
+		{
+			actionName: 'fetch_teams',
+			bindTo: [
+				{
+					getValue: () => plantId.value,
+					param: 'plantId',
+					onTrigger: () => {
+						formData.value.team_id = null;
+					},
+				},
+			],
+			localProp: teamsList,
+			localLoadProp: teamsLoading,
+		},
+		{
+			actionName: 'fetch_users',
+			bindTo: [
+				{
+					getValue: () => plantId.value,
+					param: 'plantId',
+					onTrigger: () => {
+						formData.value.users_ids = [];
+					},
+				},
+			],
+			localProp: usersList,
+			localLoadProp: usersLoading,
+		},
+		{
+			actionName: 'fetch_parts',
+			payload: { params: { plantId: () => plantId.value } },
+			localProp: partsList,
+			localLoadProp: partsLoading,
+		},
+		{
+			actionName: 'fetch_work_order_types',
+			bindTo: [
+				{
+					getValue: () => plantId.value,
+					param: 'plantId',
+					onTrigger: () => {
+						formData.value.category_id = null;
+					},
+				},
+			],
+			localProp: woTypesList,
+			localLoadProp: woTypesLoading,
+		},
+		{
+			actionName: 'fetch_production_lines',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [{ getValue: () => plantId.value, param: 'plantId' }],
+			localProp: productionLinesList,
+			localLoadProp: productionLinesLoading,
+		},
+		{
+			actionName: 'fetch_machines',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId' },
+				{
+					getValue: () => formData.value.production_line_id,
+					param: 'productionLineId',
+					onTrigger: () => {
+						formData.value.machine_id = null;
+					},
+				},
+			],
+			localProp: machinesList,
+			localLoadProp: machinesLoading,
+		},
+		{
+			actionName: 'fetch_assets',
+			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
+			hasValueCase: {
+				getValue: () => formData.value.asset_id,
+				fetchItemActionName: 'fetch_asset',
+			},
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId', noFetch: true },
+				{
+					getValue: () => formData.value.production_line_id,
+					param: 'productionLineId',
+					onTrigger: () => {
+						formData.value.asset_id = null;
+					},
+				},
+				{
+					getValue: () => formData.value.machine_id,
+					param: 'machineId',
+					onTrigger: () => {
+						formData.value.asset_id = null;
+					},
+				},
+			],
+			localProp: assetsList,
+			localLoadProp: assetsLoading,
+		},
+		{
+			actionName: 'fetch_equipments',
+			hasValueCase: {
+				getValue: () => formData.value.equipment_id,
+				fetchItemActionName: 'fetch_equipment',
+			},
+			bindTo: [
+				{ getValue: () => plantId.value, param: 'plantId', noFetch: true },
+				{
+					getValue: () => formData.value.production_line_id,
+					param: 'productionLineId',
+					onTrigger: () => {
+						formData.value.equipment_id = null;
+					},
+				},
+				{
+					getValue: () => formData.value.machine_id,
+					param: 'machineId',
+					onTrigger: () => {
+						formData.value.equipment_id = null;
+					},
+				},
+				{
+					getValue: () => formData.value.asset_id,
+					param: 'assetId',
+					onTrigger: () => {
+						formData.value.equipment_id = null;
+					},
+				},
+			],
+			localProp: equipmentsList,
+			localLoadProp: equipmentsLoading,
+		},
+	]),
 );
 
 const subItemsSettings = computed(() =>

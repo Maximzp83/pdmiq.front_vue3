@@ -223,7 +223,7 @@ const tableSettings = computed(() => {
 			skipTranslate: true,
 			width: 76,
 			meta: {
-				cellComponent: { componentPath: 'views/Sensors/SensorFirmwareStatusCell' },
+				cellComponent: { componentFileLoader: () => import('./SensorFirmwareStatusCell.vue') },
 			},
 		},
 		{
@@ -279,7 +279,7 @@ const tableSettings = computed(() => {
 					],
 				},
 				buttonContent: {
-					component: { componentPath: 'views/Sensors/SensorFFTRequestButton' },
+					component: { componentFileLoader: () => import('./SensorFFTRequestButton.vue') },
 				},
 			},
 			{

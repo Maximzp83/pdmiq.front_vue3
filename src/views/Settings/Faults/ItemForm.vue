@@ -1,0 +1,157 @@
+<template>
+	<div class="edit-form-container" :class="{ 'half-width': !fromAnotherInstance && !isMobile }">
+		<el-form
+			ref="itemFormRef"
+			class="item-edit-form"
+			:model="formData"
+			:rules="rules"
+			label-width="150px"
+			:label-position="isMobile ? 'top' : 'left'"
+		>
+			<el-form-item :label="`${tt('Name')} EN`" prop="title_en" class="mcol-xs-12">
+				<CustomInput v-model="formData.title_en" :placeholder="tt('name')" />
+			</el-form-item>
+
+			<el-form-item :label="`${tt('Name')} ESP`" prop="title_es" class="mcol-xs-12">
+				<CustomInput v-model="formData.title_es" :placeholder="tt('name')" />
+			</el-form-item>
+
+			<el-form-item class="mcol-xs-12" label="Type of equipments" prop="equipment_types">
+				<SimpleSpinner :active="equipmentTypesLoading" />
+				<el-select
+					v-model="formData.equipment_types"
+					collapse-tags
+					multiple
+					:placeholder="`${tt('select')} ${tt('phrases.type_of_equipments')}`"
+					:disabled="!equipmentTypesList.length"
+				>
+					<el-option
+						v-for="item in equipmentTypesList"
+						:key="`equipment_type-id-${item.id}`"
+						:label="item.name"
+						:value="item.id"
+					/>
+				</el-select>
+			</el-form-item>
+
+			<el-form-item class="mcol-xs-12" label="Parameters" prop="sensor_parameter_types">
+				<el-select
+					v-model="formData.sensor_parameter_types"
+					collapse-tags
+					multiple
+					:placeholder="`${tt('select')} ${tt('parameters')}`"
+					:disabled="!sensorParametersList.length"
+				>
+					<el-option
+						v-for="item in sensorParametersList"
+						:key="`parameter_type-id-${item.id}`"
+						:label="item.name"
+						:value="item.id"
+					/>
+				</el-select>
+			</el-form-item>
+
+			<el-form-item class="mcol-xs-12" label="Alert rules" prop="alert_rules">
+				<el-select
+					v-model="formData.alert_rules"
+					collapse-tags
+					multiple
+					:placeholder="`${tt('select')} ${tt('alert')} ${tt('rules')}`"
+					:disabled="!alertRulesList.length"
+				>
+					<el-option
+						v-for="item in alertRulesList"
+						:key="`alert_rules-id-${item.id}`"
+						:label="item.name"
+						:value="item.id"
+					/>
+				</el-select>
+			</el-form-item>
+
+			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
+		</el-form>
+	</div>
+</template>
+
+<script setup>
+import { computed, ref, shallowRef } from 'vue';
+
+import { FAULTS_TYPES, alertRulesList as getAlertRulesList } from '@/constants/global';
+import { sensorParametersList as getSensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
+import { required } from '@/constants/validation';
+import { Lang } from '@/localization';
+import { buildProps, useItemForm } from '@/composables/mixins/useItemForm';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
+import { useSettings } from '@/composables/useSettings';
+
+import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
+import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
+
+const { tt } = Lang;
+
+defineOptions({
+	name: 'SettingsFaultForm',
+});
+
+const props = defineProps(buildProps());
+const emit = defineEmits(['submit', 'onCancel', 'event']);
+const { fetchEquipmentTypes } = useSettings();
+const itemFormRef = ref(null);
+const equipmentTypesList = shallowRef([]);
+const equipmentTypesLoading = ref(false);
+
+const formData = ref({
+	type: FAULTS_TYPES.BASE,
+	title: null,
+	title_en: null,
+	title_es: null,
+	equipment_types: [],
+	sensor_parameter_types: [],
+	alert_rules: [],
+});
+
+const rules = {
+	title_en: required,
+	equipment_types: required,
+	sensor_parameter_types: required,
+	alert_rules: required,
+};
+
+const sensorParametersList = computed(() => Object.freeze(getSensorParametersList()));
+const alertRulesList = computed(() => Object.freeze(getAlertRulesList()));
+
+const localSetupPage = (item) => {
+	if (item) formData.value.type = item.type;
+};
+
+const localPrepareSubmitData = (data) => {
+	const nextData = { ...data };
+	if (!nextData.title_en) delete nextData.title_en;
+	if (!nextData.title_es) delete nextData.title_es;
+	return nextData;
+};
+
+const requestsToDoList = computed(() => [
+	{
+		action: fetchEquipmentTypes,
+		localProp: equipmentTypesList,
+		localLoadProp: equipmentTypesLoading,
+	},
+]);
+
+const { isMobile, validateForm, handleCancel } = useItemForm({
+	entityKey: 'EquipmentFaults',
+	itemData: computed(() => props.itemData),
+	formData,
+	formRef: itemFormRef,
+	fromModal: props.fromModal,
+	editModal: props.editModal,
+	emit,
+	localSetupPage,
+	localPrepareSubmitData,
+});
+
+useRequestsList({ requestsToDoList });
+
+defineExpose({ validateForm });
+</script>

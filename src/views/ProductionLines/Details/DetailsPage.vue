@@ -22,9 +22,10 @@
 										v-if="canEdit"
 										type="tertiary"
 										class="ml-auto action-button"
-										icon="icomoon icon-pencil"
 										@click="editItem"
-									/>
+									>
+										<i class="icomoon icon-pencil"></i>
+									</el-button>
 								</div>
 							</div>
 						</div>

@@ -1,58 +1,103 @@
 # Continuation Briefing
 
 ## Project Stack
-- Vue 3 with `<script setup>`
-- Vite
-- Vue Router 4
-- Pinia
-- Element Plus
+- Vue 3 with `<script setup>`, Vite, Vue Router 4, Pinia, Element Plus.
+- Migration source lives under `vue2_project`; target app lives under `src`.
 
 ## Key Architecture Rules
-- Migrate from `vue2_project` into Vue3 architecture only; do not reintroduce Vue2 mixins or Vuex runtime patterns.
-- Prefer existing shared composables: `useItemsData`, `useItemPage`, `useItemForm`, `useRequestsList`, `useSubItem`, `useSubItemsList`.
-- Use `src/config/entities.js` as entity API/route metadata source where available.
-- Replace `@event="handleEventNew"` with `@event="handleEvent"`.
-- Replace `<CustomSelect>` with global `<CustomSelectV2>`; do not locally import `CustomSelectV2` or `CustomInput`.
-- Do not keep legacy `requestsListMixin` / `requestsToDoList` async loaders for `<FetchByQuerySelect>`; pass async request functions through component settings instead.
-- Current collaboration mode: no code/diff output in responses. Apply non-doc changes only after confirmation unless the user explicitly asks to migrate a whole section without intermediate confirmations.
+- Preserve Vue2 behavior, but implement with existing Vue3 composables and local patterns.
+- Prefer existing composables: `useItemsData`, `useItemForm`, `useItemPage`, `useRequestsList`, `useEventHandler`, and domain composables such as `useMaintenance`.
+- Use `componentFileLoader` / async import functions for migrated dynamic components; avoid adding legacy string `componentPath`.
+- Element Plus button `type` must be a valid Element Plus value only. Put legacy visual classes like `inverted` in class props/classes, not in `type`.
+- For icomoon icons, render `<i class="icomoon ...">` inside buttons instead of passing icomoon classes to Element Plus `icon`.
+- Keep user-facing updates brief and do not output code/diffs unless explicitly requested.
+- Update docs after migration/fix steps, especially `docs/migration-progress.md` and `docs/new-session-handoff.md`.
 
 ## Current Task Status
-- `vue2_project/src/views/Requisitions` is migrated for current Vue3 compile scope with dashboard, list, detail page, requisition form, details/action forms, counters, ROI calculator, `usePlantRequisitions`, entity config, routes, and menu entries.
-- `vue2_project/src/views/RFQS` is migrated for current Vue3 compile scope with list, form, item page, `useRfqs`, entity config, routes, and menu entry.
-- `vue2_project/src/views/ProductionLines` is migrated for current Vue3 compile scope with list/grid, form, item page, item card, utility wrapper, details page, support subitems, `useProductionLines`, store filter extensions, and routes.
-- `src/components/gridTable/ItemsGridContainer.vue` was aligned with the current `handleEvent` rule.
-- Earlier migrated sections remain in scope: Maintenance, WorkOrderRequests, StoreRooms, Sensors, Controllers, BrandModels details.
-- `npm run build` passes.
-- `git diff --check` passes.
+- `src/views/SuccessDashboard` has been migrated and wired:
+  - routes, sidebar menu, entities, `useSuccessDashboard`, dashboard/main/Meeting Tracker/ROI One Pager/common components.
+  - Runtime chart fixes applied: `SuccessGaugeChart` receives Highcharts with `highcharts-more`; chart readiness/load event warnings handled.
+- `src/views/Maintenance` is actively being aligned to the Vue2 original:
+  - `/maintenance` redirects to `/maintenance/work-orders`.
+  - Work Orders / Logs dashboard structure, details modals, table behavior, create-log flow, and dynamic component loading were restored closer to Vue2.
+  - `src/views/Maintenance/WorkOrders/ItemForm.vue` `requestsToDoList` was reworked to match Vue2 original using Vue3 `useRequestsList`.
+  - `src/views/Maintenance/Logs/ItemForm.vue` `requestsToDoList` was reworked to match Vue2 original using WorkOrders form as the local pattern.
+  - `src/views/Maintenance/MaintenanceFormWrapper.vue` fixed invalid Element Plus tab button type by splitting `buttonsType="info"` and `buttonsClass="inverted"`.
+- Latest verification:
+  - `npm run build` passes after the last Logs form change.
+  - Targeted `git diff --check` passed for the last changed files.
+  - Full `git diff --check` still reports older unrelated trailing whitespace in existing dirty files.
 
 ## Files Already Modified
-- `src/composables/usePlantRequisitions.js`
-- `src/composables/useRfqs.js`
-- `src/composables/useProductionLines.js`
-- `src/views/Requisitions/**`
-- `src/views/RFQS/**`
-- `src/views/ProductionLines/**`
-- `src/stores/ProductionLinesStore.js`
-- `src/components/gridTable/ItemsGridContainer.vue`
-- `src/config/entities.js`
-- `src/router/index.js`
-- `src/constants/menuItems.js`
-- Docs updated:
+- Documentation/context:
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-- Pre-existing unrelated dirty file:
-  - `codex_session_end_prompts.yaml`
+- Routing/config/shared:
+  - `src/router/index.js`
+  - `src/constants/menuItems.js`
+  - `src/config/entities.js`
+  - `src/helpers/index.js`
+  - `src/api/index.js`
+- Core migrated/shared components and composables:
+  - `src/components/common/DynamicComponentWrapper.vue`
+  - `src/components/common/DropdownFilterbar.vue`
+  - `src/components/form/DynamicFormContainer.vue`
+  - `src/components/form/uploadBlock/FileUploadBlock.vue`
+  - `src/components/form/uploadBlock/FileUploadBlockItem.vue`
+  - `src/components/charts/CommonChartItemWrapper.vue`
+  - `src/components/table/Row.vue`
+  - `src/components/table/TableAction.vue`
+  - `src/components/table/TableCell.vue`
+  - `src/components/itemDetails/ItemWOStatisticBlock.vue`
+  - `src/composables/useAssets.js`
+  - `src/composables/useMachines.js`
+  - `src/composables/useSettings.js`
+  - `src/composables/useSuccessDashboard.js`
+- Maintenance:
+  - `src/views/Maintenance/MaintenanceDashboard.vue`
+  - `src/views/Maintenance/MaintenanceFormWrapper.vue`
+  - `src/views/Maintenance/WorkOrders/ItemForm.vue`
+  - `src/views/Maintenance/WorkOrders/ItemsList.vue`
+  - `src/views/Maintenance/WorkOrders/ItemDetailsPreview.vue`
+  - `src/views/Maintenance/WorkOrders/WorkOrdersDetails.vue`
+  - `src/views/Maintenance/WorkOrders/LogsButtonContent.vue`
+  - `src/views/Maintenance/WorkOrders/DateItem.vue`
+  - `src/views/Maintenance/WorkOrders/statistics/ListItemDetailsBlock.vue`
+  - `src/views/Maintenance/Logs/ItemForm.vue`
+  - `src/views/Maintenance/Logs/ItemsList.vue`
+  - `src/views/Maintenance/Logs/ItemDetailsPreview.vue`
+  - `src/views/Maintenance/Logs/LogsDetails.vue`
+  - `src/views/Maintenance/Logs/BreakdownMachinesList.vue`
+  - `src/views/Maintenance/Logs/DescriptionTableCell.vue`
+  - `src/views/Maintenance/Logs/fileButtonContent.vue`
+  - `src/views/Maintenance/Logs/filePopoverContent.vue`
+- SuccessDashboard:
+  - `src/views/SuccessDashboard/**`
+- Other migrated/dirty sections present in worktree:
+  - `src/views/Assets/**`
+  - `src/views/Settings/**`
+  - `src/views/Machines/**`
+  - `src/views/ProductionLines/**`
+  - `src/views/Processes/**`
+  - `src/views/EquipmentTypes/**`
+  - `src/views/Controllers/**`
+  - `src/views/Sensors/**`
+  - `src/views/Requisitions/**`
+  - `src/views/WorkOrderRequests/ItemsList.vue`
+  - Several SCSS files under `src/assets/sass/**`
 
 ## Unresolved Issues
-- Browser/runtime smoke testing with authenticated real data is still needed.
-- Highest-risk ProductionLines areas: drag/drop reorder behavior, modal create/edit payload with image/library uploads, locations lookup binding, RPM node selection, utility vs production-line filter persistence, and details child-list parity because Assets/Equipments lists are not currently migrated.
-- Highest-risk Requisitions areas: approval/deny/unapprove/on-hold/complete payload details, attachment upload behavior, ROI calculation filter parity, chart/runtime data parity, details modal/action parity, and authenticated role-condition behavior.
-- Highest-risk RFQS areas: equipment label fetch/display, vendor multiselect save payload, delete action behavior, and route/menu permission visibility.
+- Authenticated browser/runtime smoke testing is still needed for:
+  - `/maintenance/work-orders`: create/edit/details/open details/print/unlock/create log from `+`.
+  - `/maintenance/logs`: create/edit/details/export PDF/create work order request/parent WO modal.
+  - `/success-dashboard/main`, `/success-dashboard/meeting-tracker`, `/success-dashboard/roi-one-pager` with real data.
+- Full `git diff --check` has unrelated pre-existing trailing whitespace in dirty files.
+- Previously found invalid Element Plus `type="secondary"` remains in Sensors FFT chart components:
+  - `src/views/Sensors/charts/fft/ChartFFTAnalysisRulesBar.vue`
+  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
 - Browser automation is not installed in project dependencies.
 
 ## Next Actionable Step
-- Runtime smoke-test `ProductionLines` first:
-  `/dashboard/production-lines`, `/dashboard/utilities`, create/edit modal, image/library upload, drag/drop reorder, `/production-lines/:id/details`, and details widgets/statistics.
-- Then smoke-test `Requisitions` and `RFQS` with authenticated real data.
+- Continue Maintenance runtime cleanup with authenticated smoke testing, starting from opening Work Orders and Logs create/edit forms and verifying request params, dependent selects, and console warnings.

@@ -33,9 +33,10 @@
 							class="action-button"
 							size="small"
 							type="success"
-							icon="icomoon icon-docs"
 							@click="handleShowDetails"
-						/>
+						>
+							<i class="icomoon icon-docs"></i>
+						</el-button>
 					</div>
 				</div>
 

@@ -30,7 +30,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('force_MFA')" prop="is_forced_mfa" class="right-label">
+					<el-form-item :label="tt('force_MFA')" prop="is_forced_mfa" class="right-label switcher">
 						<el-switch
 							v-model="formData.is_forced_mfa"
 							:active-value="1"
@@ -56,7 +56,7 @@
 					:key="'tab-requisition'"
 					class="tab-container"
 				>
-					<el-form-item :label="tt('requisitioner')" prop="is_requisitioner" class="right-label">
+					<el-form-item :label="tt('requisitioner')" prop="is_requisitioner" class="right-label switcher">
 						<el-switch
 							:model-value="formData.is_requisitioner"
 							:active-value="1"
@@ -65,7 +65,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('fab_shop_manager')" prop="is_fab_shop_manager" class="right-label">
+					<el-form-item :label="tt('fab_shop_manager')" prop="is_fab_shop_manager" class="right-label switcher">
 						<el-switch
 							:model-value="formData.is_fab_shop_manager"
 							:active-value="1"
@@ -74,7 +74,7 @@
 						/>
 					</el-form-item>
 
-					<el-form-item :label="tt('technician')" prop="is_technic" class="right-label">
+					<el-form-item :label="tt('technician')" prop="is_technic" class="right-label switcher">
 						<el-switch
 							:model-value="formData.is_technic"
 							:active-value="1"
@@ -92,78 +92,14 @@
 					<el-form-item :label="`${tt('Permissions')}:`" prop="permissions" class="label_padding_top-0 width-75">
 						<div class="options-container">
 							<div class="content-row">
-								<div
+								<PermissionItem
 									v-for="(item, idx) in permissionsItemsList"
 									:key="`permission_item-${item.app_section}`"
 									class="permission-item content-row relative"
-								>
-									<div class="flex mrow align-center">
-										<div class="el-form-item mcol-xs-12 mcol-sm-3 capitalize">
-											{{ item.name }}
-										</div>
-
-										<el-form-item class="mcol-xs-12 mcol-sm-1">
-											<el-switch
-												v-model="permissionsItemsList[idx].is_viewing"
-												:active-value="1"
-												:inactive-value="0"
-												@change="(val) => handleIsView(val, idx)"
-											/>
-										</el-form-item>
-
-										<el-form-item
-											v-if="permissionsItemsList[idx].is_viewing && !isApiSection(item.app_section)"
-											class="mcol-xs-12 mcol-sm-2"
-										>
-											<el-checkbox
-												v-model="permissionsItemsList[idx].is_creating"
-												:true-value="1"
-												:false-value="0"
-											>
-												{{ tt('creating') }}
-											</el-checkbox>
-										</el-form-item>
-
-										<el-form-item
-											v-if="permissionsItemsList[idx].is_viewing && !isApiSection(item.app_section)"
-											class="mcol-xs-12 mcol-sm-2"
-										>
-											<el-checkbox
-												v-model="permissionsItemsList[idx].is_updating"
-												:true-value="1"
-												:false-value="0"
-											>
-												{{ tt('updating') }}
-											</el-checkbox>
-										</el-form-item>
-
-										<el-form-item
-											v-if="permissionsItemsList[idx].is_viewing && !isApiSection(item.app_section)"
-											class="mcol-xs-12 mcol-sm-2"
-										>
-											<el-checkbox
-												v-model="permissionsItemsList[idx].is_deleting"
-												:true-value="1"
-												:false-value="0"
-											>
-												{{ tt('deleting') }}
-											</el-checkbox>
-										</el-form-item>
-
-										<el-form-item
-											v-if="permissionsItemsList[idx].is_viewing && canArchive(item.app_section)"
-											class="mcol-xs-12 mcol-sm-2"
-										>
-											<el-checkbox
-												v-model="permissionsItemsList[idx].is_archiving"
-												:true-value="1"
-												:false-value="0"
-											>
-												{{ tt('archiving') }}
-											</el-checkbox>
-										</el-form-item>
-									</div>
-								</div>
+									:ref="(el) => setSubItemRef('PermissionItem', el, idx)"
+									:item-data="item"
+									:item-index="idx"
+								/>
 							</div>
 						</div>
 					</el-form-item>
@@ -176,19 +112,21 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, reactive, ref, shallowRef } from 'vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { userRolesTypesList } from '@/constants/global';
-import { MENU_TYPES, menuSectionsList } from '@/constants/menuItems';
+import { menuSectionsList } from '@/constants/menuItems';
 import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { buildProps, useItemForm } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
+import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import CustomTransition from '@/components/common/CustomTransition.vue';
+import PermissionItem from './PermissionItem.vue';
 
 const { tt } = Lang;
 
@@ -204,6 +142,7 @@ const props = defineProps(buildProps({
 const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const itemFormRef = ref(null);
+const refsMap = reactive({});
 const userRolesLoading = ref(false);
 const userRolesList = shallowRef([]);
 const permissionsItemsList = ref([]);
@@ -256,19 +195,6 @@ const createPermissionItem = (item = {}) => ({
 	is_archiving: item.is_archiving ?? 0,
 });
 
-const isApiSection = (sectionId) => sectionId === MENU_TYPES.CLIENT_API;
-const canArchive = (sectionId) =>
-	sectionId === MENU_TYPES.COMPANIES || sectionId === MENU_TYPES.PLANTS;
-
-const handleIsView = (val, idx) => {
-	if (!val && permissionsItemsList.value[idx]) {
-		permissionsItemsList.value[idx].is_creating = 0;
-		permissionsItemsList.value[idx].is_updating = 0;
-		permissionsItemsList.value[idx].is_deleting = 0;
-		permissionsItemsList.value[idx].is_archiving = 0;
-	}
-};
-
 const handleMaintenanceRole = ({ val, key }) => {
 	formData.value[key] = val;
 	['is_requisitioner', 'is_fab_shop_manager', 'is_technic'].forEach((propKey) => {
@@ -277,6 +203,19 @@ const handleMaintenanceRole = ({ val, key }) => {
 		}
 	});
 };
+
+const subItemsSettings = computed(() =>
+	Object.freeze([
+		{ ref: 'PermissionItem', targetProp: 'permissions' },
+	])
+);
+
+const {
+	setSubItemRef,
+	validateSubItemsForm,
+	collectDataFromSubItems,
+	resetFormDataBySubItems,
+} = useSubItemsList({ formData, refsMap });
 
 const localSetupPage = (itemData) => {
 	formData.value.child_role_ids = itemData?.child_role_ids
@@ -300,18 +239,6 @@ const localSetupPage = (itemData) => {
 	});
 };
 
-const localPrepareSubmitData = (data) => ({
-	...data,
-	permissions: permissionsItemsList.value.map((item) => ({
-		app_section: item.app_section,
-		is_viewing: item.is_viewing || 0,
-		is_creating: item.is_creating || 0,
-		is_updating: item.is_updating || 0,
-		is_deleting: item.is_deleting || 0,
-		is_archiving: item.is_archiving || 0,
-	})),
-});
-
 const methodsMap = {
 	fetch_user_roles: createGetRequest(userRolesEntity.apiBase),
 };
@@ -324,7 +251,10 @@ const { isMobile, itemId, validateForm, handleCancel } = useItemForm({
 	fromModal: props.fromModal,
 	editModal: props.editModal,
 	localSetupPage,
-	localPrepareSubmitData,
+	subItemsSettings,
+	validateSubItemsForm,
+	collectDataFromSubItems,
+	resetFormDataBySubItems,
 	emit,
 });
 

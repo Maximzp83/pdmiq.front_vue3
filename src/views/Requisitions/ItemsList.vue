@@ -36,12 +36,13 @@
 					<div class="filter-item export-buttons">
 						<el-button
 							type="success"
-							icon="icomoon icon-doc_xls"
 							class="inverted"
 							size="small"
 							native-type="button"
 							@click="showExportDateRangeFilter = true"
-						/>
+						>
+							<i class="icomoon icon-doc_xls"></i>
+						</el-button>
 					</div>
 
 					<div v-show="showExportDateRangeFilter" class="filter-item text-right">
@@ -49,20 +50,22 @@
 							<Datepicker v-model="exportDaterange" enableShortcuts type="daterange" />
 							<el-button
 								type="danger"
-								icon="icomoon icon-cross"
 								size="small"
 								native-type="button"
 								:loading="exportingInProgress"
 								@click="showExportDateRangeFilter = false"
-							/>
+							>
+								<i class="icomoon icon-cross"></i>
+							</el-button>
 							<el-button
 								type="success"
-								icon="icomoon icon-check"
 								size="small"
 								native-type="button"
 								:loading="exportingInProgress"
 								@click="handleExportToExcel"
-							/>
+							>
+								<i class="icomoon icon-check"></i>
+							</el-button>
 						</div>
 					</div>
 				</template>
@@ -180,7 +183,8 @@ const radioBlockOptions = computed(() =>
 		title: tt('status'),
 		inline: true,
 		hideTitle: true,
-		buttonType: 'secondary',
+		buttonType: 'default',
+		className: 'secondary',
 	}),
 );
 const radioButtonsList = computed(() =>
@@ -299,7 +303,7 @@ const tableSettings = computed(() => {
 			{ prop: 'requisition_details', label: 'Details', min_width: 150, meta: { cell_class: 'ellipsis' } },
 			{ prop: 'technicians', label: 'Assigned', min_width: 200, meta: { fromArray: { subProp: 'full_name', delimeter: ', ' } } },
 			{ label: 'PO', label_postfix: '#', prop: 'po_number' },
-			{ prop: 'status', label: 'Status', width: 120, meta: { prepareValue: { localMethod: getWOStatus, args: { listName: 'requisitionStatusesList' } } } },
+			{ prop: 'status', label: 'Status', width: 120, meta: { prepareValue: { localMethod: getWOStatus, args: { list: requisitionStatusesList() } } } },
 			{ prop: 'actual_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
 			{ prop: 'proposed_cost', label: 'Budget', width: 70 },
 			{ prop: 'actual_cost', label: 'Fab_Shop_Budget', width: 82 },
