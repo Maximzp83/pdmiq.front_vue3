@@ -819,9 +819,9 @@ export default {
 			this.ChartsListInstance.setYFiltersToCharts(y_filters);
 		},
 
-		sensorData(x) {
+		/*sensorData(x) {
 			console.log(x)
-		}
+		}*/
 	},
 
 	created() {
@@ -852,7 +852,7 @@ export default {
 	},
 
 	beforeDestroy() {
-			console.log('wrapper beforeDestroy', this.statistics_socket)
+			// console.log('wrapper beforeDestroy', this.statistics_socket)
 		if (this.statistics_socket) {
 			this.closeWebSocket({ socketName: 'statistics_socket' });
 		}

@@ -2060,7 +2060,7 @@ const defaultSeriesConfig1 = {
 						]
 					}
 				},
-				{
+				/*{
 					id: 'lube-flag-serie_successfull',
 					data_path: 'lube_statistics_successfull',
 					template: 'sensor.lube_flag_successfull',
@@ -2073,7 +2073,7 @@ const defaultSeriesConfig1 = {
 							}
 						]
 					}
-				},
+				},*/
 				{
 					id: 'lube-flag-serie',
 					data_path: 'lube_statistics',

@@ -151,7 +151,12 @@ export default {
 
 			this.handleExportItem({
 				url: `sensors/jobs/${this.sensorId}/export`,
-				filters: { parameterType, ...this.rootFilters }
+				filters: { 
+					parameterType,
+					...this.rootFilters,
+					metricSystemType: this.rootFilters.measurement,
+					'X-Timezone-Offset': -new Date().getTimezoneOffset()
+				}
 			});
 		}
 	}

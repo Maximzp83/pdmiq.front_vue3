@@ -185,7 +185,7 @@ export default {
 		sensorId: that => that.sensorData.id,
 		isSensorOnly: that => that.sensorData.functionality_type === ULTRASOUND_SENSOR_TYPES.SENSOR_ONLY,
 
-		socketChannelDXMCommand() {
+		socketChannelDXMCommandRequest() {
 			const { authUser } = this;
 
 			if (authUser) {
@@ -284,52 +284,6 @@ export default {
 			set_sensor_state: 'sensors/set_sensor_state'
 		}),
 
-		togglePurgeMode(val) {
-			const action = val ? 'start' : 'stop';
-			const { tt } = this;
-			this.lube_shot_id = null;
-
-			this.confirmHelper({
-				insertToMessage: `<b>${tt(action)} ${tt('lubrication')}</b>`
-			})
-				.then(() => {
-					const payload = {
-						url: `/ultrasound/commands/${this.sensorId}/${action}/lubrication${
-							val ? '?autoStop=0' : ''
-						}`,
-						resultMessage: {
-							text: `${tt('phrases.Purge_Mode_is')} ${val ? tt('On') : tt('Off')}`
-						}
-					};
-
-					this.sendingDXMCommandRequest = true;
-
-					// console.log('togglePurgeMode', payload)
-					this.toggle_ultrasound_command(payload)
-						.then(response => {
-							// this.lube_shot_id = response.data.lube_shot_id;
-							this.sendingDXMCommandRequest = false;
-							this.handleDXMCommandResponse(response);
-						})
-						.catch((response) => {
-							this.sendingDXMCommandRequest = false;
-							const responseData = response.data || response;
-							if (responseData.status) {
-								this.$notify({
-									type: 'error',
-									title: tt('Error'),
-									message: responseData.status
-								});
-							}
-						});
-
-					/*this.toggle_ultrasound_command(payload).then(() => {
-						this.isPurgeOn = val;
-					});*/
-				})
-				.catch(() => {});
-		},
-
 		toggleHighSpeed(val) {
 			const action = val ? 'start' : 'stop';
 			const { tt } = this;
@@ -384,8 +338,57 @@ export default {
 				resultMessage: { text: tt(`phrases.manual_lubrication_command_sent`) },
 			};
 
+			this.intiateSetupWebSocket(payload, {isLubeShotRequest: true});
 			// console.log('triggerLubeCycle', payload)
+		},
+
+		togglePurgeMode(val) {
+			const action = val ? 'start' : 'stop';
+			const { tt } = this;
+			this.lube_shot_id = null;
+
+			this.confirmHelper({
+				insertToMessage: `<b>${tt(action)} ${tt('lubrication')}</b>`
+			})
+				.then(() => {
+					const payload = {
+						url: `/ultrasound/commands/${this.sensorId}/${action}/lubrication${
+							val ? '?autoStop=0' : ''
+						}`,
+						resultMessage: {
+							text: `${tt('phrases.Purge_Mode_is')} ${val ? tt('On') : tt('Off')}`
+						}
+					};
+
+					this.intiateSetupWebSocket(payload);					
+
+					/*this.toggle_ultrasound_command(payload).then(() => {
+						this.isPurgeOn = val;
+					});*/
+				})
+				.catch(() => {});
+		},
+
+		intiateSetupWebSocket(payload, settings = {}) {
+			try {
+				this.processingDXMCommandRequest = true;
+				this.setupWebSocket({
+					socketName: 'dxm_command_socket',
+					socketNameReadyProp: 'dxm_command_socket_ready',
+					socketChannel: this.socketChannelDXMCommandRequest,
+					subscriptionSuccededCallback: () => this.sendRequestDXMCommand(payload, settings),
+					socketCallback: (type, data) => this.dxmCommand_socketCallback({ type, data })
+				});
+
+				// this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
+			} catch (e) {
+				console.log(e);
+			}
+		},
+
+		sendRequestDXMCommand(payload, settings = {}) {
 			this.sendingDXMCommandRequest = true;
+			const { tt } = this;
 
 			/*if (payload) {
 				console.log(payload)
@@ -395,16 +398,33 @@ export default {
 
 			this.toggle_ultrasound_command(payload)
 				.then(({value}) => {
-					this.lube_shot_id = value.id;
-					this.lubeShotDataFromSocket = value;
+					if (settings.isLubeShotRequest) {
+						// console.log('lube_shot', value)
+						this.lube_shot_id = value.id;
+						this.lubeShotDataFromSocket = value;						
+					}
+
 					this.sendingDXMCommandRequest = false;
-					this.handleDXMCommandResponse(value);
+					// this.handleDXMCommandResponse(value);
 				})
-				.catch(() => {
+				.catch(response => {
 					// console.log('catch', response)
 					this.sendingDXMCommandRequest = false;
+					this.lubeShotDataFromSocket = null;
+					this.processingDXMCommandRequest = false;
+
+					const responseData = response.data || response;
+					if (responseData.status) {
+						this.$notify({
+							type: 'error',
+							title: tt('Error'),
+							message: responseData.status
+						});
+					}
 				});
 		},
+
+		// ----------------------------
 
 		handleLubeCycleResult({ isSuccess }) {
 			if (isSuccess) {
@@ -456,13 +476,13 @@ export default {
 			}
 		},
 
-		handleDXMCommandResponse() {
+		/*handleDXMCommandResponse() {
 			try {
 				this.processingDXMCommandRequest = true;
 				this.setupWebSocket({
 					socketName: 'dxm_command_socket',
 					socketNameReadyProp: 'dxm_command_socket_ready',
-					socketChannel: this.socketChannelDXMCommand,
+					socketChannel: this.socketChannelDXMCommandRequest,
 					socketCallbackName: 'dxmCommand_socketCallback',
 				});
 
@@ -470,24 +490,26 @@ export default {
 			} catch (e) {
 				console.log(e);
 			}
-		},
+		},*/
 
 		dxmCommand_socketCallback(response = {}) {
 			const { type, data } = response;
-			// console.log('dxmCommand_socketCallback', response)
+			const safeData = data.data || {};
+			
+			// console.log('dxmCommand_socketCallback', response, 'controller_id ', this.sensorData.controller_id, 'lube_shot_id ', this.lube_shot_id);
 
 			const { tt } = this;
 
 			/*if (type === 'LUBRICATION.SHOT') {
 				this.lubeShotDataFromSocket[data.id] = data;
 			} else*/
-			if (type === 'DXM.COMMAND' && data.controller_id === this.sensorData.controller_id) {
+			if (type === 'DXM.COMMAND' && safeData.controller_id === this.sensorData.controller_id) {
 				let isSuccess = false;
 				let message = '';
 
-				if (data.status == DXM_COMMANDS_REQUEST_STATUSES.SUCCESS) {
-					// const lubeShotData = this.lubeShotDataFromSocket[data.lube_shot_id];
-					if ((data.lube_shot_id === this.lube_shot_id) && data.type === 3) {
+				if (safeData.status == DXM_COMMANDS_REQUEST_STATUSES.SUCCESS) {
+					// const lubeShotData = this.lubeShotDataFromSocket[safeData.lube_shot_id];
+					if ((safeData.lube_shot_id === this.lube_shot_id) && safeData.type === 3) {
 						this.$emit('event', {
 							eventName: 'handleUltrasoundWebSocketSuccess',
 							data: this.lubeShotDataFromSocket,
@@ -500,7 +522,7 @@ export default {
 					this.handleLubeCycleSocketFinish({ isSuccess, message });
 				}
 
-				if (data.status == DXM_COMMANDS_REQUEST_STATUSES.FAIL) {
+				if (safeData.status == DXM_COMMANDS_REQUEST_STATUSES.FAIL) {
 					message = `${tt('Error')} - ${tt('phrases.check_controller_connectivity')}`;
 
 					this.handleLubeCycleSocketFinish({ isSuccess, message });
@@ -514,6 +536,7 @@ export default {
 		},
 
 		handleLubeCycleSocketFinish(result) {
+			// console.log('handleLubeCycleSocketFinish', result);
 			this.lube_cycle_request_result = result;
 
 			this.lubeShotDataFromSocket = null;

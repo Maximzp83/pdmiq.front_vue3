@@ -2704,6 +2704,17 @@ class MultiViewChart extends ChartBase {
 					}
 				}
 			];
+
+			if (seriesConfig.flagsData.seriesConfigsList[idx]) {
+				seriesConfig.flagsData.seriesConfigsList[idx] = seriesConfig.flagsData.seriesConfigsList[idx].map(sci => {
+					return {
+						...sci,
+						responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+					}				
+				});
+			}
+
+			// console.log('modifySeriesConfig', parameterItem, idx, seriesConfig.flagsData.seriesConfigsList[idx])
 		});
 
 		// console.log('seriesConfig', seriesConfig)

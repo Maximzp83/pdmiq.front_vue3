@@ -507,20 +507,24 @@ const chartSeriesTemplates1 = {
 		},
 
 		// ----------------------
-		lube_flag_successfull: {
+		/*lube_flag_successfull: {
 			...flags_template,
 			color: '#3366cc',
 			style: { color: '#3366cc' },
 			shape: 'squarepin',
+			allowOverlapX: false,
+			stackDistance: 5,
 			// enableMouseTracking: false,
 			y: -270,
 			width: 26
-		},
+		},*/
 		lube_flag: {
 			...flags_template,
 			color: '#3366cc',
 			style: { color: '#3366cc' },
 			shape: 'squarepin',
+			// allowOverlapX: false,
+			stackDistance: -25,
 			// enableMouseTracking: false,
 			y: -270,
 			width: 26,

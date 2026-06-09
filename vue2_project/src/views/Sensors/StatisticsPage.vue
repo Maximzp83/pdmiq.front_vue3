@@ -629,11 +629,13 @@ export default {
 					rpm_source_item, rpmSources,
 					// rpm_external_source_type, rpm_external_value,
 					rpm_external_node_parameter, rpm_external_node_id,
-					rpm_formula, is_rpm_visible
+					rpm_formula, is_rpm_visible, linespeedSensor
 				} = this.equipmentData;
 				let data = { is_rpm_visible };
 
-				// console.log('rpmSources', rpmSources)
+				if (linespeedSensor && linespeedSensor.is_deleted) {
+					return null
+				};
 
 				// rpm_source_item = 4
 
@@ -700,7 +702,12 @@ export default {
 
 		linespeedOverlaySensorData() {
 			const { equipmentData, rpmOverlayData } = this;
+
+			if (equipmentData.linespeedSensor && equipmentData.linespeedSensor.is_deleted) {
+				return null
+			};
 			// console.log('linespeedOverlaySensorData')
+			
 			if (rpmOverlayData && rpmOverlayData.rpm_request) {
 					return rpmOverlayData.isMaxPeakFrequency
 										? cloneDeep(this.sensorData)
@@ -1000,6 +1007,7 @@ export default {
 		},
 
 		fetchSensorsAction(ids, sensorIdx) {
+			// console.log('fetchSensorsAction', ids, sensorIdx);
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
 				.then(({ value }) => {
 					const dashboardSensors = this.equipmentData
@@ -1041,6 +1049,7 @@ export default {
 		},
 
 		fetchOverlaySensor(id) {
+			// console.log('fetchOverlaySensor', id)
 			this.overlaySensorLoading = true;
 			this.fetch_sensor({ itemId: id })
 				.then(({ value }) => {

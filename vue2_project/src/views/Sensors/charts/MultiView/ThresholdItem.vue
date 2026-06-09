@@ -197,6 +197,11 @@ export default {
 
 			formData.monitor_metrics = formData.monitor_metrics.filter(mm => !!mm);
 
+			if (!this.enableTimeDelta) {
+				delete formData.time_delta;
+				delete formData.time_delta_unit;
+			}
+
 			return formData;
 		}
 	},

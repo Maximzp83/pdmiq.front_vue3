@@ -77,11 +77,10 @@ export function useSubItem({
 			validationResults.push(validateSubItemsForm(subItemsSettings));
 		}
 
-		let isValid = validationResults.every((item) => item);
 		if (localValidationHook) {
-			isValid = localValidationHook(options);
+			validationResults.push(localValidationHook(options));
 		}
-		return isValid;
+		return validationResults.every((item) => item);
 	};
 
 	const getFormData = (options) => {

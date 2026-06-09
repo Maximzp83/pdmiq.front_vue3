@@ -319,8 +319,9 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 							pumpData: this.sensorItem.pump
 						});
 
-						statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(si => si.isSuccess)
-						statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(si => !si.isSuccess)
+						// statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(si => si.isSuccess)
+						// statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(si => !si.isSuccess)
+						statistics_result.flagsData.lube_statistics = all_lube_statistics;
 					}
 
 					if (enable_lube && lube.lock_log.length) {

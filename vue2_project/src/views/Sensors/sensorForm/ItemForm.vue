@@ -891,7 +891,7 @@ export default {
 			return Object.freeze(list);
 		},
 
-		isLubeMatrixV3: that => that.formData.data_set === DATASET.LUBEMATRIX_V3,
+		isLubeMatrixV3: that => that.formData.data_set === DATASET.LUBEMATRIX_V3 && !!that.formData.is_lube_mode,
 		// formData.is_lube_mode: that => that.formData.data_set === DATASET.LUBEMATRIX_V3,
 		showLubeMatrixButton: that => that.formData.data_set === DATASET.BANNER_TEMP_VIBE_V2_1 || that.formData.data_set === DATASET.BANNER_M25,
 		isLubeMatrixV4: that => that.showLubeMatrixButton && !!that.formData.is_lube_mode,
@@ -1212,7 +1212,8 @@ export default {
 
 				if (item.lube_version === LUBE_VERSIONS.V3) {
 					this.formData.type = SENSOR_TYPES.BANNER;
-					if (!isLubeMatrixV4) {
+					if (item.is_lube_mode && !isLubeMatrixV4) {
+						// console.log('lube matrix v3');
 						this.formData.data_set = DATASET.LUBEMATRIX_V3;
 					}
 				} else {
@@ -1514,12 +1515,6 @@ export default {
 		'formData.data_set'(id) {
 			if (id === DATASET.CM1L) {
 				this.rules.data_set_converter = required;
-			} else {
-				this.rules.data_set_converter = null;
-				this.formData.data_set_converter = null;
-			}
-
-			if (id === DATASET.CM1L) {
 				this.rules.data_set_convert_value = required;
 				// console.log(this.formData.data_set_convert_value)
 
@@ -1527,6 +1522,8 @@ export default {
 					this.formData.data_set_convert_value = '0.000253*{reg}+36.67';
 				} */
 			} else {
+				this.rules.data_set_converter = null;
+				this.formData.data_set_converter = null;
 				this.rules.data_set_convert_value = null;
 				this.formData.data_set_convert_value = '';
 			}
@@ -1548,6 +1545,7 @@ export default {
 			}
 
 			if (!this.isInitialSetup) {
+				this.formData.is_lube_mode = id === DATASET.LUBEMATRIX_V3;
 				this.runningThresholdItemsList = [];				
 			}
 		},

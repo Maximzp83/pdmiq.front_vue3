@@ -1039,7 +1039,10 @@ export default {
 				// ----sensor-----
 				equipment_id: required,
 				controller_id: required,
-				data_set: required,
+				data_set: [
+					required,
+					{ validator: this.validateDataSet, trigger: 'blur' }
+				],
 				lube_cycle: [{ validator: this.validatePositiveNumber, trigger: 'change' }],
 				lube_cycle_dwell_time: [
 					{ validator: this.validatePositiveNumber, trigger: 'change' }
@@ -1052,7 +1055,7 @@ export default {
 				// lube_cycle_cool_down_minutes: required,
 				// lube_cycle_percent_danger_points: required,
 				// data_set_convert_value: null,
-				location_in_equipment: required
+				location_in_equipment: required,
 			},
 
 			pumpRules: {
@@ -1297,15 +1300,6 @@ export default {
 	},
 
 	methods: {
-		validatePositiveNumber(rule, value, callback) {
-			if (value === null || value === undefined || value === '' || Number(value) <= 0) {
-				callback(new Error('Value should be greater than 0'));
-				return;
-			}
-
-			callback();
-		},
-
 		...mapActions({
 			save_item: 'sensors/save_sensor',
 			save_level_zone: 'sensors/save_sensor_level_zones',
@@ -1316,6 +1310,27 @@ export default {
 
 			// fetch_equipments: 'equipments/fetch_equipments_crashes',
 		}),
+
+		validatePositiveNumber(rule, value, callback) {
+			if (value === null || value === undefined || value === '' || Number(value) <= 0) {
+				callback(new Error('Value should be greater than 0'));
+				return;
+			}
+
+			callback();
+		},
+
+		validateDataSet (rule, value, callback) {
+			if (this.isLubeMatrixV3) {
+				// console.log(this.filteredDataSetsList, value);
+				if (!this.filteredDataSetsList.some(di => di.id === value)) {
+					this.datasetChanged = true;
+					callback(new Error('Wrong data set'));
+					return;
+				}
+			}
+			callback();
+		},
 
 		handlePositionChange(val) {
 			this.formData.ultrasound_position = val;
@@ -1498,6 +1513,12 @@ export default {
 				}
 			}
 
+			/*if (this.isLubeMatrixV3) {
+				if (!this.filteredDataSetsList.includes(this.formData.data_set)) {
+					return false;
+				}
+			}*/
+			// console.log('next us', next)
 			if (next.every(v => v)) {
 				return true;
 			} else {

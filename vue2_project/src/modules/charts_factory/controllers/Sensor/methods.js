@@ -436,7 +436,7 @@ const setupLubeStatistics1 = ({ lubeData, pumpData }) => {
 				tooltip_text += `<br>${getRoundedValue(amount_lube_injected, 0, 2)} g`;
 			}
 		}
-
+		// console.log(title, date, status, tooltip_text );
 		lube_statistics.push({
 			x: Date.parse(date),
 			title: title,

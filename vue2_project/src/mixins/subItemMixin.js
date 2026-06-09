@@ -83,13 +83,13 @@ const subItemMixin = {
 				}
 			}
 
-			let isValid = validationResults.every(item => item);
+			// let isValid = validationResults.every(item => item);
 
 			if (this.localValidationHook) {
-				isValid = this.localValidationHook(options);
+				validationResults.push(this.localValidationHook(options));
 			} 
 			// console.log('sub item validation', this, validationResults)
-			return isValid;
+			return validationResults.every(item => item);
 		},
 
 		getFormData(options) {
