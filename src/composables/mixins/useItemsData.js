@@ -102,6 +102,7 @@ export function useItemsData({
 		debug,
 		enableDeepUpdateForList,
 		filtersStateProp = 'filters',
+		relatedFiltersStoresMap = {},
 	} = options;
 
 	// ========== State ==========
@@ -305,6 +306,50 @@ export function useItemsData({
 		setFilters(newFiltersValues, settings);
 	};
 
+	const setRelatedFilters = (row, settings = []) => {
+		settings.forEach((setting) => {
+			const [storeKey] = (setting.action || '').split('/');
+			const target = relatedFiltersStoresMap[storeKey];
+			if (!target?.store) return;
+
+			const stateProp = target.stateProp || 'filters';
+			const currentFilters = target.store[stateProp] || {};
+			const newFilters = {};
+			const params = setting.params || setting.param || [];
+
+			params.forEach((param) => {
+				if (typeof param === 'object') {
+					newFilters[param.key] = param.val;
+				} else {
+					newFilters[param] = row?.id;
+				}
+			});
+			if (currentFilters.plantId) newFilters.plantId = null;
+
+			const nextFilters = { ...currentFilters, ...newFilters, page: 1 };
+			const actionName = target.actionName || setting.action?.split('/')[1];
+
+			if (actionName && typeof target.store[actionName] === 'function') {
+				target.store[actionName](nextFilters);
+			} else {
+				target.store.set_value?.(stateProp, nextFilters, {
+					toLocalStorage: { prop: target.storageKey },
+				});
+			}
+		});
+	};
+
+	const handleShowNextInstanceItem = (data = {}) => {
+		const { row } = data;
+		const action = data.action || data;
+
+		setRelatedFilters(row, action?.setFilters);
+		if (action?.path) {
+			set_global_store('navbarSettings', {});
+			changeRoute({ path: action.path });
+		}
+	};
+
 	const resolveOpenStrategy = () => ((fromDashboard || editInModal) ? 'modal' : 'route');
 
 	const buildBaseModalSettings = () => ({
@@ -388,7 +433,7 @@ export function useItemsData({
 
 		const itemData = payload.row || payload.rowData || null;
 		const itemId = payload?.row?.id || payload?.rowData?.id || null;
-
+		// console.log('editItem', payload, itemData, itemId, resolveOpenStrategy());
 		if (resolveOpenStrategy() === 'modal') {
 			return openModal(buildModalSettings({ payload, itemData }), payload);
 		}
@@ -581,9 +626,11 @@ export function useItemsData({
 		prepareFilters,
 		setFilters,
 		setFiltersWithoutFetch,
+		setRelatedFilters,
 		createItem,
 		editItem,
 		deleteItem,
 		handleDeleteItems,
+		handleShowNextInstanceItem,
 	};
 }

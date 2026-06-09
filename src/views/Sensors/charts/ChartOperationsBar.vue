@@ -52,9 +52,9 @@
 
 							<div class="mcol-xs-auto submit-button">
 								<el-button
-									type="primary inverted"
+									type="primary"
 									native-type="button"
-									:class="['item-action-button capitalize small']"
+									:class="['item-action-button capitalize small inverted']"
 									@click="generatePeriodicCursors"
 								>
 									{{ tt('Enter') }}

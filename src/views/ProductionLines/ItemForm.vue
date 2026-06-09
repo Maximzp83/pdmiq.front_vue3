@@ -247,7 +247,7 @@ const {
 } = useSubItemsList({ formData, refsMap });
 
 const methodsMap = {
-	fetch_locations: createGetRequest(ENTITIES.Plants.apiBase + '/locations'),
+	fetch_locations: createGetRequest(ENTITIES.Locations.apiBase),
 	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
 	fetch_production_line_rpm_nodes: (payload = {}) => fetchProductionLineRpmNodes(payload.params || {}),
 };

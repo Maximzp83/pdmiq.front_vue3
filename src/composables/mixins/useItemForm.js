@@ -11,8 +11,11 @@ import { Lang } from '@/localization';
 export const buildProps = (extra = {}) => ({
 	itemData: { type: Object, default: null },
 	fromModal: Boolean,
+	fromMultiformModal: Boolean,
 	editModal: { type: Object, default: null },
 	fromAnotherInstance: Boolean,
+	instancesItemsData: { type: Object, default: null },
+	multiFormFilters: { type: Object, default: null },
 	settings: { type: Object, default: () => ({}) },
 	additionalSettings: { type: Object, default: () => ({}) },
 	...extra,

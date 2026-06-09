@@ -3,9 +3,9 @@
 		<el-button
 			v-for="rule in rules"
 			:key="`analysis-rule-${rule.id || rule.original_rule_id}`"
-			type="secondary"
+			type=""
 			native-type="button"
-			:class="['item-action-button capitalize', { active: isSelected(rule) }]"
+			:class="['item-action-button capitalize secondary', { active: isSelected(rule) }]"
 			:style="{ borderColor: rule.color }"
 			@click="toggleRule(rule)"
 		>

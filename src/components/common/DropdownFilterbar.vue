@@ -142,6 +142,8 @@ const toggleAdditionalFilters = (e) => {
 	dropDown(e, { target: 'additionalFiltersDropdown', timeout: 300 });
 };
 
+defineExpose({ toggleFilterbar });
+
 watch(
 	() => props.secondaryFilters,
 	() => {

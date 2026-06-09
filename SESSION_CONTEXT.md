@@ -1,103 +1,58 @@
 # Continuation Briefing
 
 ## Project Stack
-- Vue 3 with `<script setup>`, Vite, Vue Router 4, Pinia, Element Plus.
-- Migration source lives under `vue2_project`; target app lives under `src`.
+- Vue 3 app using Vite, Vue Router 4, Pinia, Element Plus, and `<script setup>`.
+- Migration source is `vue2_project/`; Vue3 target is `src/`.
+- Current area: Plant Details dashboard hierarchy and Equipments dashboard card/list behavior.
 
 ## Key Architecture Rules
-- Preserve Vue2 behavior, but implement with existing Vue3 composables and local patterns.
-- Prefer existing composables: `useItemsData`, `useItemForm`, `useItemPage`, `useRequestsList`, `useEventHandler`, and domain composables such as `useMaintenance`.
-- Use `componentFileLoader` / async import functions for migrated dynamic components; avoid adding legacy string `componentPath`.
-- Element Plus button `type` must be a valid Element Plus value only. Put legacy visual classes like `inverted` in class props/classes, not in `type`.
-- For icomoon icons, render `<i class="icomoon ...">` inside buttons instead of passing icomoon classes to Element Plus `icon`.
-- Keep user-facing updates brief and do not output code/diffs unless explicitly requested.
-- Update docs after migration/fix steps, especially `docs/migration-progress.md` and `docs/new-session-handoff.md`.
+- Preserve Vue2 behavior while using existing Vue3 composables and local patterns.
+- Apply code changes only after user confirmation; docs and `SESSION_CONTEXT.md` may be updated automatically.
+- Work one step/file at a time unless files are structurally coupled.
+- Do not print code/diff in responses unless a risky or ambiguous point needs discussion.
+- Use `src/views/Plants` and existing migrated dashboard/list patterns as references.
+- Plant Details must embed `src/views/Equipments/EquipmentsLayout.vue`; Equipments ownership stays under `src/views/Equipments`.
+- Dashboard create/edit flows should use `src/views/Dashboard/MultiFormWrapper.vue` / `MultiFormItemWrapper.vue`.
+- Forward grid/card events through `useEventHandler` chains.
 
 ## Current Task Status
-- `src/views/SuccessDashboard` has been migrated and wired:
-  - routes, sidebar menu, entities, `useSuccessDashboard`, dashboard/main/Meeting Tracker/ROI One Pager/common components.
-  - Runtime chart fixes applied: `SuccessGaugeChart` receives Highcharts with `highcharts-more`; chart readiness/load event warnings handled.
-- `src/views/Maintenance` is actively being aligned to the Vue2 original:
-  - `/maintenance` redirects to `/maintenance/work-orders`.
-  - Work Orders / Logs dashboard structure, details modals, table behavior, create-log flow, and dynamic component loading were restored closer to Vue2.
-  - `src/views/Maintenance/WorkOrders/ItemForm.vue` `requestsToDoList` was reworked to match Vue2 original using Vue3 `useRequestsList`.
-  - `src/views/Maintenance/Logs/ItemForm.vue` `requestsToDoList` was reworked to match Vue2 original using WorkOrders form as the local pattern.
-  - `src/views/Maintenance/MaintenanceFormWrapper.vue` fixed invalid Element Plus tab button type by splitting `buttonsType="info"` and `buttonsClass="inverted"`.
-- Latest verification:
-  - `npm run build` passes after the last Logs form change.
-  - Targeted `git diff --check` passed for the last changed files.
-  - Full `git diff --check` still reports older unrelated trailing whitespace in existing dirty files.
+- Plant Details now renders `src/views/Equipments/EquipmentsLayout.vue`; temporary `src/views/Plants/Details/EquipmentsList.vue` was removed.
+- `src/components/itemDetails/ItemPDMsStatisticBlock.vue` has the missing `CommonChartItemWrapper` restored, so the Plant Details PDM statistics chart should render.
+- `src/views/Plants/Details/Counters.vue` fetches `/dashboard/counters` with `prepareData: 'prepareCountersData'`. Do not add `dataPath: 'data'`; Vue3 `dataPath` reads one level deeper than the legacy `alternateResponseProp: 'data'`.
+- Equipments card header now uses the original add/remove favorites content instead of the temporary eye icon.
+- `src/components/common/addToFavoriteButton.vue` is Vue3 `<script setup>`, uses `useAuthStore().hasAccessTo()`, imports Element Plus `Star` / `StarFilled`, and stops click bubbling for its hover popover.
+- `src/views/Equipments/Card/CardSensorItem.vue` restores the original sensor-card buttons/icons/counters/runtime block.
+- `src/views/Equipments/Card/ItemCard.vue` passes `equipmentStatusClass` into `GridItemCardHeader`.
+- Latest verification: `npm run build` passed; targeted `git diff --check` passed for touched files.
 
 ## Files Already Modified
-- Documentation/context:
-  - `SESSION_CONTEXT.md`
-  - `docs/migration-progress.md`
-  - `docs/migration-todos.md`
-  - `docs/new-session-handoff.md`
-- Routing/config/shared:
-  - `src/router/index.js`
-  - `src/constants/menuItems.js`
-  - `src/config/entities.js`
-  - `src/helpers/index.js`
-  - `src/api/index.js`
-- Core migrated/shared components and composables:
-  - `src/components/common/DynamicComponentWrapper.vue`
-  - `src/components/common/DropdownFilterbar.vue`
-  - `src/components/form/DynamicFormContainer.vue`
-  - `src/components/form/uploadBlock/FileUploadBlock.vue`
-  - `src/components/form/uploadBlock/FileUploadBlockItem.vue`
-  - `src/components/charts/CommonChartItemWrapper.vue`
-  - `src/components/table/Row.vue`
-  - `src/components/table/TableAction.vue`
-  - `src/components/table/TableCell.vue`
-  - `src/components/itemDetails/ItemWOStatisticBlock.vue`
-  - `src/composables/useAssets.js`
-  - `src/composables/useMachines.js`
-  - `src/composables/useSettings.js`
-  - `src/composables/useSuccessDashboard.js`
-- Maintenance:
-  - `src/views/Maintenance/MaintenanceDashboard.vue`
-  - `src/views/Maintenance/MaintenanceFormWrapper.vue`
-  - `src/views/Maintenance/WorkOrders/ItemForm.vue`
-  - `src/views/Maintenance/WorkOrders/ItemsList.vue`
-  - `src/views/Maintenance/WorkOrders/ItemDetailsPreview.vue`
-  - `src/views/Maintenance/WorkOrders/WorkOrdersDetails.vue`
-  - `src/views/Maintenance/WorkOrders/LogsButtonContent.vue`
-  - `src/views/Maintenance/WorkOrders/DateItem.vue`
-  - `src/views/Maintenance/WorkOrders/statistics/ListItemDetailsBlock.vue`
-  - `src/views/Maintenance/Logs/ItemForm.vue`
-  - `src/views/Maintenance/Logs/ItemsList.vue`
-  - `src/views/Maintenance/Logs/ItemDetailsPreview.vue`
-  - `src/views/Maintenance/Logs/LogsDetails.vue`
-  - `src/views/Maintenance/Logs/BreakdownMachinesList.vue`
-  - `src/views/Maintenance/Logs/DescriptionTableCell.vue`
-  - `src/views/Maintenance/Logs/fileButtonContent.vue`
-  - `src/views/Maintenance/Logs/filePopoverContent.vue`
-- SuccessDashboard:
-  - `src/views/SuccessDashboard/**`
-- Other migrated/dirty sections present in worktree:
-  - `src/views/Assets/**`
-  - `src/views/Settings/**`
-  - `src/views/Machines/**`
-  - `src/views/ProductionLines/**`
-  - `src/views/Processes/**`
-  - `src/views/EquipmentTypes/**`
-  - `src/views/Controllers/**`
-  - `src/views/Sensors/**`
-  - `src/views/Requisitions/**`
-  - `src/views/WorkOrderRequests/ItemsList.vue`
-  - Several SCSS files under `src/assets/sass/**`
+- `SESSION_CONTEXT.md`
+- `src/components/common/addToFavoriteButton.vue`
+- `src/components/itemDetails/ItemPDMsStatisticBlock.vue`
+- `src/views/Plants/Details/Counters.vue`
+- `src/views/Plants/Details/DetailsPage.vue`
+- `src/views/Plants/Details/EquipmentsList.vue` deleted
+- `src/views/Equipments/EquipmentsLayout.vue`
+- `src/views/Equipments/ItemsList.vue`
+- `src/views/Equipments/Card/ItemCard.vue`
+- `src/views/Equipments/Card/CardSensorItem.vue`
+- `src/views/Equipments/Card/CardMultiViewItem.vue`
+- `src/views/Equipments/Card/TypeOptionBlock.vue`
+- `src/views/Equipments/ItemPage.vue`
+- `src/views/Equipments/ItemFormWrapper.vue`
+- `src/views/Equipments/ItemForm.vue`
+- `src/views/Dashboard/Dashboard.vue`
+- `src/views/Dashboard/MultiFormWrapper.vue`
+- `src/views/Dashboard/MultiFormItemWrapper.vue`
+- Related prior migration files may also be dirty; do not revert user changes.
 
 ## Unresolved Issues
-- Authenticated browser/runtime smoke testing is still needed for:
-  - `/maintenance/work-orders`: create/edit/details/open details/print/unlock/create log from `+`.
-  - `/maintenance/logs`: create/edit/details/export PDF/create work order request/parent WO modal.
-  - `/success-dashboard/main`, `/success-dashboard/meeting-tracker`, `/success-dashboard/roi-one-pager` with real data.
-- Full `git diff --check` has unrelated pre-existing trailing whitespace in dirty files.
-- Previously found invalid Element Plus `type="secondary"` remains in Sensors FFT chart components:
-  - `src/views/Sensors/charts/fft/ChartFFTAnalysisRulesBar.vue`
-  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
-- Browser automation is not installed in project dependencies.
+- User still reports Plant Details counters showing zeros after the latest `prepareCountersData` fix; needs runtime confirmation with the real `/dashboard/counters` response shape.
+- Equipments card edit event chain previously needed runtime confirmation.
+- Full Equipments details stack is not migrated; details routes remain pending.
+- Equipments form is still simplified; advanced RPM/vibration/subtype/sensor/multiview tabs remain pending.
+- Browser automation is not installed. Do not start a dev server unless user explicitly asks.
+- Worktree is dirty with unrelated existing changes; do not revert them.
 
 ## Next Actionable Step
-- Continue Maintenance runtime cleanup with authenticated smoke testing, starting from opening Work Orders and Logs create/edit forms and verifying request params, dependent selects, and console warnings.
+- If counters still show zero, inspect the real `/dashboard/counters` response in browser/network or add a temporary local diagnostic only with user confirmation, then adjust `src/views/Plants/Details/Counters.vue` / `prepareCountersData` to match the actual payload.

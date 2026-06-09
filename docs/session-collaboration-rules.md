@@ -15,6 +15,7 @@
 - During migration, replace all `<CustomSelect` usages with `<CustomSelectV2`.
 - During migration, do not import `CustomSelectV2` or `CustomInput` locally; they are registered globally.
 - During migration, do not keep legacy `requestsListMixin` / `requestsToDoList` option loaders for `<FetchByQuerySelect>` when migrating to Vue3. In `src`, `FetchByQuerySelect` already owns its async list / fetch-by-id logic, so pass request functions through component settings (`fetchAction`, `fetchByIdAction`, `bindTo`, etc.) instead of duplicating the same request in `useRequestsList`.
+- During migration, keep `<el-button>` `type` limited to Element Plus-valid values only: `default`, `primary`, `success`, `warning`, `info`, `danger`, `text`, or empty string. Legacy visual names/modifiers such as `secondary`, `tertiary`, and `inverted` must go into `class` / `buttonsClass` / a dedicated class prop, not into `type`.
 - Do not display code/diff in terminal responses unless there is a risky or ambiguous point that requires discussion.
 - After each completed migration, provide only the newly migrated file path in plain text format like `src/path/file.vue — ...` (no markdown links); use an absolute path only when explicitly requested.
 - After each migration step, do not report docs file updates; mention docs changes only when updating process/rules documents.

@@ -177,12 +177,12 @@ const routes = [
 				component: () => import('@/views/Teams/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_users_teams'] },
 			},
-			// {
-			// 	path: 'equipments',
-			// 	name: 'EquipmentsLayout',
-			// 	component: () => import('@/views/Equipments/EquipmentsLayout.vue'),
-			// 	meta: { auth: true, permissions: ['view_items'] },
-			// },
+			{
+				path: 'equipments',
+				name: 'EquipmentsLayout',
+				component: () => import('@/views/Equipments/EquipmentsLayout.vue'),
+				meta: { auth: true, permissions: ['view_items'] },
+			},
 			// {
 			// 	path: 'machines',
 			// 	name: 'MachinesList',

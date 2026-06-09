@@ -1,65 +1,115 @@
 <template>
-	<div class="plant-details details-page main-instance-item">
-		<VueElementLoadingWrapper :isLoading="itemLoading" :itemsName="itemsName.one" />
+	<div class="plant-details details-page fix-height main-instance-item">
+		<VueElementLoadingWrapper
+			v-if="!plantItem"
+			:isLoading="plantLoading"
+			:itemsName="itemsName.one"
+		/>
 
-		<div v-if="loadContent && itemData" class="view-wrapper item-page-wrapper">
-			<div class="mcontainer">
-				<div class="nested-view-content-wrapper">
-					<div class="view-content-card">
-						<div class="section-row">
-							<div class="mrow flex wrap big-padding">
-								<div class="mcol-xs-12 mcol-lg-6">
-									<ItemInfoBlock
-										:blockTitle="`${tt('Plant')} ${tt('details')}`"
-										dotsInText
-										:itemData="itemData"
-										:settingsList="mainInfoSettingsList"
-									/>
-								</div>
-
-								<div class="mcol-xs-12 mcol-lg-6">
-									<ItemImagesBlock
-										title="Logo"
-										:itemData="itemData"
-										showMockSrc="/static/img/plant_logo_mock.jpg"
-										@event="handleEvent"
-									/>
-								</div>
-
-								<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-									<ItemPDMsStatisticBlock
-										:title="tt('phrases.overall_asset_health')"
-										:filters="filters"
-										:predefinedFilters="predefinedFilters"
-										:chartLegendEvents="chartLegendEvents"
-										@event="handleEvent"
-									/>
-								</div>
-
-								<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
-									<Counters
-										disableViewAll
-										standardIconBlock
-										:plantId="itemData.id"
-										@event="handleEvent"
-									/>
-								</div>
-
-								<div
-									v-if="canViewMaintenance"
-									class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6"
-								>
-									<ItemWOStatisticBlock
-										:createWOButtonFormSetup="createWOButtonFormSetup"
-										:itemData="itemData"
-										:filters="filters"
-										:predefinedFilters="predefinedFilters"
-										@event="handleEvent"
-									/>
-								</div>
-							</div>
-						</div>
+		<div v-if="currentPlant?.id" class="view-content-card">
+			<div class="section-row">
+				<div class="mrow flex wrap big-padding">
+					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
+						<ItemPDMsStatisticBlock
+							:title="tt('phrases.overall_asset_health')"
+							:itemData="currentPlant"
+							:filters="filters"
+							:predefinedFilters="predefinedFilters"
+							:chartLegendEvents="chartLegendEvents"
+							@event="handleEvent"
+						/>
 					</div>
+
+					<div class="mcol-xs-12 mcol-sm-6 mcol-md-12 mcol-lg-6">
+						<Counters
+							:plantId="currentPlant.id"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<div class="mcol-xs-12">
+						<EquipmentsLayout
+							ref="equipmentsLayoutRef"
+							hideDropdownFilterbar
+							hideDatepicker
+							fromDashboard
+							fromDetailsPage
+							showCardHeader
+							showToggleListButton
+							preventSetNavbar
+							:additionalModalSettings="additionalModalSettings"
+							:propsFilters="equipmentsListFilters"
+							:plantId="predefinedFilters.plantId"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<div class="mcol-xs-12">
+						<AssetsList
+							fromDashboard
+							fromDetailsPage
+							showCardHeader
+							showToggleListButton
+							preventSetNavbar
+							:additionalModalSettings="additionalModalSettings"
+							:propsFilters="itemsListsFilters"
+							:plantId="predefinedFilters.plantId"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<div class="mcol-xs-12">
+						<MachinesList
+							fromDashboard
+							fromDetailsPage
+							showCardHeader
+							showToggleListButton
+							preventSetNavbar
+							:additionalModalSettings="additionalModalSettings"
+							:propsFilters="itemsListsFilters"
+							:plantId="predefinedFilters.plantId"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<div class="mcol-xs-12">
+						<ProductionLinesList
+							:productionLineType="PRODUCTION_LINES_TYPES.PRODUCTION_LINE"
+							fromDashboard
+							fromDetailsPage
+							showCardHeader
+							showToggleListButton
+							preventSetNavbar
+							:additionalModalSettings="additionalModalSettings"
+							:propsFilters="itemsListsFilters"
+							:plantId="predefinedFilters.plantId"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<div class="mcol-xs-12">
+						<ProductionLinesList
+							:productionLineType="PRODUCTION_LINES_TYPES.UTILITY"
+							fromDashboard
+							fromDetailsPage
+							showCardHeader
+							showToggleListButton
+							preventSetNavbar
+							:additionalModalSettings="additionalModalSettings"
+							:propsFilters="itemsListsFilters"
+							:plantId="predefinedFilters.plantId"
+							@event="handleEvent"
+						/>
+					</div>
+
+					<MaintenanceListWrapper
+						v-if="canViewMaintenance"
+						ref="maintenanceListWrapperRef"
+						:woFilters="woFilters"
+						:logFilters="logFilters"
+						hideDatepicker
+						fromPlantDashboard
+					/>
 				</div>
 			</div>
 		</div>
@@ -72,137 +122,147 @@ import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 
 import { api_request } from '@/api/request_provider';
+import { PRODUCTION_LINES_TYPES } from '@/constants/global';
 import { scrollToElement, waitForElement } from '@/helpers/specialHelpers';
+import { Lang } from '@/localization';
+import { useAssetsStore } from '@/stores/AssetsStore';
+import { useAuthStore } from '@/stores/AuthStore';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
+import { useMachinesStore } from '@/stores/MachinesStore';
+import { usePlantsStore } from '@/stores/PlantsStore';
+import { useProductionLinesStore } from '@/stores/ProductionLinesStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useMainInstanceDetailsPage } from '@/composables/mixins/useMainInstanceDetailsPage';
-import { Lang } from '@/localization';
-import { useAuthStore } from '@/stores/AuthStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
-import { usePlantsStore } from '@/stores/PlantsStore';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
-import ItemImagesBlock from '@/components/itemDetails/ItemImagesBlock.vue';
-import ItemInfoBlock from '@/components/itemDetails/ItemInfoBlock.vue';
 import ItemPDMsStatisticBlock from '@/components/itemDetails/ItemPDMsStatisticBlock.vue';
-import ItemWOStatisticBlock from '@/components/itemDetails/ItemWOStatisticBlock.vue';
+import MaintenanceListWrapper from '@/components/itemDetails/MaintenanceListWrapper.vue';
+import AssetsList from '@/views/Assets/ItemsList.vue';
+import MachinesList from '@/views/Machines/ItemsList.vue';
+import ProductionLinesList from '@/views/ProductionLines/ItemsList.vue';
 import Counters from './Counters.vue';
+import EquipmentsLayout from '@/views/Equipments/EquipmentsLayout.vue';
 
-const { tt, translate } = Lang;
+const { tt } = Lang;
 
-defineOptions({
-	name: 'PlantDetailsPage',
+defineOptions({ name: 'PlantDetails' });
+
+const props = defineProps({
+	plantItem: { type: Object, default: null },
+	plantId: { type: [Number, String], default: null },
+	additionalModalSettings: { type: Object, default: null },
 });
-
 const emit = defineEmits(['event']);
 
-const authStore = useAuthStore();
 const route = useRoute();
-const globalStore = useGlobalStore();
+const assetsStore = useAssetsStore();
+const authStore = useAuthStore();
+const equipmentsStore = useEquipmentsStore();
+const machinesStore = useMachinesStore();
 const plantsStore = usePlantsStore();
+const productionLinesStore = useProductionLinesStore();
 const { statistics_filters: filters } = storeToRefs(plantsStore);
-const { globalFilters } = storeToRefs(globalStore);
 
-const itemData = ref(null);
-const itemLoading = ref(false);
-const loadContent = ref(false);
+const fallbackPlant = ref(null);
+const plantLoading = ref(false);
+const maintenanceListWrapperRef = ref(null);
+const equipmentsLayoutRef = ref(null);
 
-const itemsName = Object.freeze({
+const currentPlant = computed(() => props.plantItem || fallbackPlant.value);
+const itemsName = computed(() => ({
 	one: tt('Plant'),
 	mult: tt('Plants'),
-});
-
-const mainInfoSettingsList = computed(() =>
-	Object.freeze(
-		translate([
-			{ label: 'Company', prop: 'company.name' },
-			{ label: 'Region', prop: 'region' },
-			{ label: 'Address', prop: 'address' },
-			{ label: 'Billing_Plan_Cost', prop: 'billing_plan_cost' },
-		]),
-	),
-);
-
-const additionalNavbarSettings = computed(() =>
-	Object.freeze({
-		showFilter: true,
-		showCompareButton: true,
-		datepickerSettings: {
-			label: `${tt('phrases.statistics_for_period')}:`,
-			storeSettings: {
-				storeName: 'PlantsStore',
-				stateKey: 'statistics_filters',
-			},
-		},
-	}),
-);
-
-const effectivePlantId = computed(() => route.params?.id || globalFilters.value?.plantId || null);
-
+}));
+const canViewMaintenance = computed(() => authStore.hasAccessTo(['view_maintenance']));
 const predefinedFilters = computed(() =>
 	Object.freeze({
-		plantId: itemData.value?.id,
+		plantId: currentPlant.value?.id,
+		daterange: filters.value?.daterange,
+	}),
+);
+const itemsListsFilters = computed(() =>
+	Object.freeze({
+		plantId: currentPlant.value?.id,
+	}),
+);
+const equipmentsListFilters = computed(() =>
+	Object.freeze({
+		plantId: currentPlant.value?.id,
 		daterange: filters.value?.daterange,
 	}),
 );
 
-const canViewMaintenance = computed(() => authStore.hasAccessTo(['view_maintenance']));
-const createWOButtonFormSetup = computed(() =>
-	Object.freeze([{ formKey: 'plant_id', valKey: 'id' }]),
-);
-
-const setupNavbar = () => {
-	globalStore.setup_navbar({
-		pageTitle:
-			itemData.value?.name ||
-			(route.name === 'PlantDetails' ? tt('phrases.Plant_Dashboard') : tt('Plant')),
-		...additionalNavbarSettings.value,
-		showPlantName: itemData.value?.name
-			? { id: itemData.value.id, name: itemData.value.name }
-			: undefined,
-	});
-};
-
-const fetchPlant = async (plantId) => {
-	if (!plantId) {
-		itemData.value = null;
-		loadContent.value = false;
-		setupNavbar();
-		return;
-	}
-
-	itemLoading.value = true;
-	try {
-		const { value } = await api_request.get(`/plants/${plantId}`, {
-			notNotify: true,
-			itemId: plantId,
-		});
-		itemData.value = value;
-		loadContent.value = true;
-		setupNavbar();
-	} catch (error) {
-		console.warn(error);
-		itemData.value = null;
-		loadContent.value = false;
-	} finally {
-		itemLoading.value = false;
-	}
-};
-
-const initialPageSetup = () => fetchPlant(effectivePlantId.value);
-
-const { chartLegendEvents, showItemsWithSensors, handleCreateWorkOrderButton } =
-	useMainInstanceDetailsPage({
-	itemData,
+const {
+	woFilters,
+	logFilters,
+	chartLegendEvents,
+	showItemsWithSensors,
+	handleCreateWorkOrderButton,
+} = useMainInstanceDetailsPage({
+	itemData: currentPlant,
+	instanceDataKey: 'plantItem',
 	instanceViewName: 'Plants',
 	itemsName,
 	predefinedFilters,
 	filters,
-	initialPageSetup,
+	maintenanceListWrapperRef,
+	equipmentsLayoutRef,
+	initialPageSetup: () => fetchFallbackPlant(),
 });
 
+const fetchFallbackPlant = () => {
+	if (props.plantItem) return Promise.resolve();
+
+	const id = props.plantId || route.params?.id;
+	if (!id) {
+		fallbackPlant.value = null;
+		return Promise.resolve();
+	}
+
+	plantLoading.value = true;
+	return api_request.get(`/plants/${id}`, {
+		itemId: id,
+		notNotify: true,
+	})
+		.then(({ value }) => {
+			fallbackPlant.value = value || null;
+		})
+		.finally(() => {
+			plantLoading.value = false;
+		});
+};
+const setListVisible = (store, stateProp = 'filters') => {
+	const currentFilters = store[stateProp] || {};
+	store.set_value(stateProp, {
+		...currentFilters,
+		isShowList: true,
+		page: 1,
+	});
+};
+const viewTable = ({ iconName }) => {
+	if (iconName === 'equipments') {
+		setListVisible(equipmentsStore);
+		setTimeout(() => scrollToElement('.equipments-layout'), 270);
+		return;
+	}
+	if (iconName === 'assets') {
+		setListVisible(assetsStore);
+		setTimeout(() => scrollToElement('.assets-list'), 270);
+		return;
+	}
+	if (iconName === 'machines') {
+		setListVisible(machinesStore);
+		setTimeout(() => scrollToElement('.machines-list'), 270);
+		return;
+	}
+	if (iconName === 'production_lines') {
+		setListVisible(productionLinesStore);
+		setListVisible(productionLinesStore, 'utility_filters');
+		setTimeout(() => scrollToElement('.production_lines-list'), 270);
+	}
+};
 const handleScrollTo = () => {
-	const query = window.location.search ? new URLSearchParams(window.location.search) : null;
-	const scrollTo = query?.get('scrollTo');
+	const scrollTo = route.query?.scrollTo;
 	if (scrollTo) {
 		waitForElement(scrollTo, () => {
 			scrollToElement(scrollTo);
@@ -210,19 +270,17 @@ const handleScrollTo = () => {
 	}
 };
 
-const methodsMap = {
+const { handleEvent } = useEventHandler({
+	viewTable,
 	showItemsWithSensors,
 	handleCreateWorkOrderButton,
-};
+}, emit);
 
-const { handleEvent } = useEventHandler(methodsMap, emit);
+watch(
+	() => [props.plantItem, props.plantId, route.params?.id],
+	() => fetchFallbackPlant(),
+	{ immediate: true },
+);
 
-watch(effectivePlantId, () => {
-	initialPageSetup();
-}, { immediate: true });
-
-onMounted(() => {
-	setupNavbar();
-	handleScrollTo();
-});
+onMounted(handleScrollTo);
 </script>

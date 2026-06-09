@@ -24,7 +24,7 @@ export function useEmitter(emit) {
 	return { emitEvent };
 }
 
-export function useEventHandler(methodsMap, emit) {
+export function useEventHandler(methodsMap, emit, settingsForDebug) {
 	const handleEvent = (eventOrName, payload) => {
 		/*if (eventOrName == 'handleDeleteItems') {
 			debugger
@@ -41,9 +41,11 @@ export function useEventHandler(methodsMap, emit) {
 					: payload;
 
 		if (typeof methodsMap?.[eventName] === 'function') {
+			// console.log('methodsMap', eventName, methodsMap, settingsForDebug);
 			methodsMap[eventName](data);
 		} else {
 			if (isObjectPayload && eventOrName.onward && emit) {
+				// console.log('eventOrName', eventOrName, settingsForDebug);
 				emit('event', eventOrName);
 			} else {
 				console.warn(`[handleEvent] Method "${eventName}" not found`);

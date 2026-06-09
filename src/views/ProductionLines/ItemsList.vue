@@ -110,6 +110,7 @@
 					:itemsList="itemsList"
 					:itemsName="itemsName"
 					:instanceName="instanceName"
+					:componentFileLoader="productionLineItemCardLoader"
 					:operationsSettings="cardOperationsSettings"
 					:additionalProps="additionalProps"
 					@event="handleEvent"
@@ -128,7 +129,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, onBeforeMount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
@@ -141,10 +142,14 @@ import { useGlobalStore } from '@/stores/GlobalStore';
 import { useProductionLinesStore } from '@/stores/ProductionLinesStore';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSwitchGridView } from '@/composables/mixins/useSwitchGridView';
 import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
 import { useDashboardListsReorder } from '@/composables/mixins/useDashboardListsReorder';
 import { useProductionLines } from '@/composables/useProductionLines';
+import { useMachinesStore } from '@/stores/MachinesStore';
+import { useAssetsStore } from '@/stores/AssetsStore';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
@@ -172,15 +177,20 @@ const emit = defineEmits(['event']);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const productionLinesStore = useProductionLinesStore();
+const machinesStore = useMachinesStore();
+const assetsStore = useAssetsStore();
+const equipmentsStore = useEquipmentsStore();
 const { globalFilters } = storeToRefs(globalStore);
 const { filters: productionLineFilters, utility_filters: utilityFilters } = storeToRefs(productionLinesStore);
 const { reorderProductionLine } = useProductionLines();
+const { doFetchAction } = useRequestsList();
 
 const itemsTableRef = ref(null);
 const dropdownFilterbarRef = ref(null);
 const showFilterbar = ref(false);
 const locationsList = ref([]);
 const locationsLoading = ref(false);
+const fetchLocationsRequest = createGetRequest('/locations');
 
 const isUtility = computed(() => props.productionLineType === PRODUCTION_LINES_TYPES.UTILITY);
 const isProdLine = computed(() => props.productionLineType === PRODUCTION_LINES_TYPES.PRODUCTION_LINE);
@@ -190,6 +200,7 @@ const filtersStorageKey = computed(() =>
 	isUtility.value ? 'production_lines_utility_filters' : ENTITIES.ProductionLines.filtersStorageKey,
 );
 const instanceName = 'ProductionLines';
+const productionLineItemCardLoader = () => import('@/views/ProductionLines/ItemCard.vue');
 const additionalProps = computed(() => ({ isUtility: isUtility.value, isProdLine: isProdLine.value }));
 const hasAccessToCreate = computed(() => authStore.hasAccessTo(['create_dashboard']));
 const hasAccessToEdit = computed(() => authStore.hasAccessTo(['edit_dashboard']));
@@ -209,6 +220,7 @@ const {
 	createItem,
 	editItem,
 	handleDeleteItems,
+	handleShowNextInstanceItem,
 	refetchItemsList,
 } = useItemsData({
 	entityKey: 'ProductionLines',
@@ -222,9 +234,28 @@ const {
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',
 			instanceName: isProdLine.value ? 'ProductionLines' : 'Utilities',
+			multiform: true,
+			componentPath: 'Dashboard/MultiFormWrapper',
 			callback: () => refetchItemsList(),
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
+		relatedFiltersStoresMap: {
+			machines: {
+				store: machinesStore,
+				stateProp: 'filters',
+				storageKey: 'machines_filters',
+			},
+			assets: {
+				store: assetsStore,
+				stateProp: 'filters',
+				storageKey: 'assets_filters',
+			},
+			equipments: {
+				store: equipmentsStore,
+				stateProp: 'filters',
+				storageKey: 'equipments_filters',
+			},
+		},
 	},
 	itemFiltersName: filtersStorageKey.value,
 });
@@ -235,8 +266,15 @@ const setFilters = (value, settings = {}) => {
 		...settings,
 	});
 };
-const { perPageItems, activeGrid, gridTypesList, ITEMS_GRID_TYPES, gridSwitcherOptions, toggleItemsGrid } =
-	useSwitchGridView({ filters, setFilters });
+const {
+	perPageItems,
+	activeGrid,
+	gridTypesList,
+	ITEMS_GRID_TYPES,
+	gridSwitcherOptions,
+	toggleItemsGrid,
+	gridViewBeforeMount,
+} = useSwitchGridView({ filters, setFilters });
 const { draggingLocked } = useDragNdropSortable({
 	wrapperSelector: '.drag-n-drop-wrapper',
 	reorderHandler: (event) => reorderHandler(event),
@@ -287,6 +325,30 @@ const tableSettings = computed(() => {
 			},
 			{ prop: 'plant.name', label: 'Plant', sortable: true },
 			{ prop: 'locations', label: 'Locations', meta: { fromArray: { subProp: 'name', delimeter: ', ', inline: true } } },
+			{
+				label: 'View',
+				max_width: 130,
+				show_anyway: true,
+				meta: {
+					additionalActions: [
+						{
+							name: 'handleShowNextInstanceItem',
+							type: 'success',
+							button_text: tt('phrases.view_machines'),
+							tooltip_text: tt('phrases.show_binding_machines'),
+							path: '/dashboard/machines',
+							nextInstanceName: 'Machines',
+							className: 'width-auto',
+							setFilters: [
+								{
+									action: 'machines/set_machines_filters',
+									params: ['productionLineId'],
+								},
+							],
+						},
+					],
+				},
+			},
 		]),
 		operations: { actions: translate(actions, { key: 'tooltip_text' }) },
 	});
@@ -295,11 +357,26 @@ const cardOperationsSettings = computed(() => {
 	const buttons = [
 		{
 			name: 'handleShowNextInstanceItem',
-			type: 'primary inverted',
+			type: 'primary',
+			className: 'inverted',
 			icon: 'icomoon icon-assets',
 			tooltip_text: tt('phrases.show_binding_machines'),
 			path: '/dashboard/machines',
 			nextInstanceName: 'Machines',
+			setFilters: [
+				{
+					action: 'machines/set_machines_filters',
+					params: ['productionLineId'],
+				},
+				{
+					action: 'assets/set_assets_filters',
+					params: ['productionLineId'],
+				},
+				{
+					action: 'equipments/set_equipments_filters',
+					params: ['productionLineId'],
+				},
+			],
 		},
 	];
 	if (authStore.hasAccessTo(['create_maintenance'])) {
@@ -307,8 +384,8 @@ const cardOperationsSettings = computed(() => {
 			name: 'handleCreateWorkOrderButton',
 			formSetup: [{ formKey: 'production_line_id', valKey: 'id' }],
 			tooltip_text: tt('phrases.create_work_order'),
-			className: 'create-wo-button',
-			type: 'primary inverted',
+			className: 'create-wo-button inverted',
+			type: 'primary',
 			buttonContent: { component: { componentFileLoader: () => import('@/components/itemDetails/CreateWOButton.vue') } },
 		});
 	}
@@ -316,7 +393,8 @@ const cardOperationsSettings = computed(() => {
 		buttons.push({
 			name: 'editItem',
 			icon: 'icomoon icon-pencil',
-			type: 'primary inverted',
+			type: 'primary',
+			className: 'inverted',
 			tooltip_text: tt('phrases.edit_line'),
 		});
 	}
@@ -330,24 +408,13 @@ const cardOperationsSettings = computed(() => {
 const fetchLocations = () => {
 	const plantId = props.plantId || globalFilters.value?.plantId;
 	if (!plantId) return;
-	locationsLoading.value = true;
-	createGetRequest('/plants/locations')({ params: { plantId, max: -1 } })
-		.then(({ value }) => {
-			locationsList.value = value || [];
-		})
-		.finally(() => {
-			locationsLoading.value = false;
-		});
+	doFetchAction(fetchLocationsRequest, locationsList, locationsLoading, { params: { plantId, max: -1 } });
 };
 const toggleFilterbar = (event) => {
 	dropdownFilterbarRef.value?.toggleFilterbar?.(event);
 	showFilterbar.value = !showFilterbar.value;
-	if (showFilterbar.value && !locationsList.value.length) fetchLocations();
-};
-const handleShowNextInstanceItem = ({ row, action }) => {
-	if (action?.path) {
-		globalStore.set_value('navbarSettings', {});
-		window.history.pushState({}, '', action.path);
+	if (showFilterbar.value && !locationsList.value.length) {
+		window.setTimeout(fetchLocations, 300);
 	}
 };
 
@@ -370,4 +437,6 @@ const { handleEvent } = useEventHandler({
 	handleCreateWorkOrderButton,
 	handleShowNextInstanceItem,
 }, emit);
+
+onBeforeMount(gridViewBeforeMount);
 </script>

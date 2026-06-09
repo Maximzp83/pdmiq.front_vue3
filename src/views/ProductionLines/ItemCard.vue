@@ -59,6 +59,9 @@ import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemCard, buildProps } from '@/composables/mixins/useItemCard';
 import { useNavigation } from '@/composables/mixins/useNavigation';
+import { useMachinesStore } from '@/stores/MachinesStore';
+import { useAssetsStore } from '@/stores/AssetsStore';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 
 import GridItemCardHeader from '@/components/gridTable/GridItemCardHeader.vue';
 import InfoItem from '@/components/itemDetails/InfoItem.vue';
@@ -70,6 +73,9 @@ defineOptions({ name: 'ProductionLinesItemCard' });
 const props = defineProps(buildProps());
 const emit = defineEmits(['event']);
 const { changeRoute } = useNavigation();
+const machinesStore = useMachinesStore();
+const assetsStore = useAssetsStore();
+const equipmentsStore = useEquipmentsStore();
 
 const titleLinkRoute = computed(() => `/production-lines/${props.cardData.id}/details`);
 const mainInfoSettingsList = computed(() =>
@@ -89,20 +95,20 @@ const itemsCountersList = computed(() =>
 		{ prop: 'equipments_count', label: `${tt('Item')}s` },
 	]),
 );
-const resetPageFiltersList = Object.freeze({
-	filters: [
-		{ action: 'machines/set_machines_filters', params: ['page'] },
-		{ action: 'assets/set_assets_filters', params: ['page'] },
-		{ action: 'equipments/set_equipments_filters', params: ['page'] },
-	],
-	value: 1,
-});
-const { togglePreviewModal, handleTitleClick } = useItemCard({
+const resetChildPages = () => {
+	machinesStore.set_value('filters', { ...(machinesStore.filters || {}), page: 1 }, {
+		toLocalStorage: { prop: 'machines_filters' },
+	});
+	assetsStore.set_assets_filters({ ...(assetsStore.filters || {}), page: 1 });
+	equipmentsStore.set_equipments_filters({ ...(equipmentsStore.filters || {}), page: 1 });
+};
+const { togglePreviewModal } = useItemCard({
 	cardData: computed(() => props.cardData),
-	changeRoute,
-	titleLinkRoute,
-	resetPageFiltersList,
 	emit,
 });
+const handleTitleClick = () => {
+	changeRoute({ path: titleLinkRoute.value });
+	resetChildPages();
+};
 const { handleEvent } = useEventHandler({ handleTitleClick }, emit);
 </script>

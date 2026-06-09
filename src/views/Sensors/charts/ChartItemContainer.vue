@@ -79,8 +79,8 @@
 				<el-button
 					:class="{ active: chartIsHidden }"
 					native-type="button"
-					type="tertiary"
-					class="action-button disable-chart-button is-plain"
+					type=""
+					class="action-button disable-chart-button is-plain tertiary"
 					size="small"
 					@click="toggleChart"
 				>

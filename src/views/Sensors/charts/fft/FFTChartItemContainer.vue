@@ -9,9 +9,9 @@
 				<div v-if="showDisableChartButton" class="fft-chart-actions mcol-xs-6 mcol-sm-auto capitalize">
 					<div class="chart-actions-block">
 						<el-button
-							type="secondary"
+							type=""
 							native-type="button"
-							class="item-action-button capitalize flex align-center"
+							class="item-action-button capitalize flex align-center secondary"
 							@click="toggleChart"
 						>
 							<i :class="['icomoon', chartIsHidden ? 'icon-eye' : 'icon-eye-slash']"></i>
@@ -25,7 +25,8 @@
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto capitalize fft-chart-actions"
 				>
 					<ChartZoom
-						buttonType="secondary inverted"
+						buttonType=""
+						buttonClass="secondary inverted"
 						class="mcol-xs-6 mcol-sm-auto"
 						:ChartInstance="ChartInstance"
 						:chartOptionsUpdate="chartOptionsUpdate"
@@ -196,7 +197,8 @@ const chartOperationsButtons = computed(() => {
 		buttons.push({
 			id: 6,
 			prefix_icon: 'el-icon-video-play',
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			event: 'handlePlaySound',
 			loadingKey: 'generatingWaveform',
 		});
@@ -207,7 +209,8 @@ const chartOperationsButtons = computed(() => {
 			id: 1,
 			text: `${tt('Add')} ${tt('Cursor')}`,
 			prefix_icon: 'icon-cursor',
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			activeKey: 'addCursorActive',
 			event: 'addCursor',
 		},
@@ -215,7 +218,8 @@ const chartOperationsButtons = computed(() => {
 			id: 3,
 			text: `${tt('Show')} ${tt('Peaks')}`,
 			event: 'showPeaks',
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			prefix_icon: 'icon-peaks',
 			activeKey: 'showPeaksActive',
 		},
@@ -223,7 +227,8 @@ const chartOperationsButtons = computed(() => {
 			id: 4,
 			text: `${tt('Periodic')} ${tt('Cursors')}`,
 			event: 'showPeriodicCursors',
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			prefix_icon: 'icon-periodic',
 			activeKey: 'showPeriodicActive',
 			isPeriodicCursors: true,
@@ -232,14 +237,16 @@ const chartOperationsButtons = computed(() => {
 			id: 5,
 			text: tt('Waterfall'),
 			event: 'showWaterfallCharts',
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			prefix_icon: 'icon-waterfall',
 			activeKey: 'showWaterfallActive',
 		},
 		{
 			id: 2,
 			text: tt('Remove'),
-			type: 'secondary inverted',
+			type: '',
+			className: 'secondary inverted',
 			prefix_icon: 'icon-plus rotate',
 			isDelete: true,
 			event: 'removeAllCursors',

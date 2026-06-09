@@ -16,7 +16,7 @@
 				:data-id="item.id"
 			>
 				<component
-					v-if="instanceName || componentPath"
+					v-if="instanceName || componentPath || componentFileLoader"
 					ref="ItemCardContent"
 					:is="componentFile"
 					:cardData="item"
@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { LANGUAGE_TYPES } from '@/localization/utils';
@@ -70,6 +70,7 @@ const props = defineProps({
 	emptyText: String,
 	instanceName: String,
 	componentPath: String,
+	componentFileLoader: Function,
 	cardClassName: String,
 	itemsListClassName: String,
 });
@@ -77,10 +78,20 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const selectedIds = ref([]);
+const cardComponentModules = import.meta.glob('/src/views/**/ItemCard.vue');
 
 const componentFile = computed(() => {
+	if (props.componentFileLoader) {
+		return defineAsyncComponent(props.componentFileLoader);
+	}
+
 	const path = props.componentPath ? `${props.componentPath}` : `${props.instanceName}/ItemCard`;
-	return () => import(`@/views/${path}.vue`);
+	const loader = cardComponentModules[`/src/views/${path}.vue`];
+	if (!loader) {
+		console.warn(`[ItemsGridContainer] Unknown item card component: ${path}.vue`);
+		return null;
+	}
+	return defineAsyncComponent(loader);
 });
 
 const handleSelectionChange = (id) => {
@@ -99,7 +110,7 @@ defineExpose({
 	selectedIds,
 });
 
-const { handleEvent } = useEventHandler(methodsMap, emit);
+const { handleEvent } = useEventHandler(methodsMap, emit, 'gridcontainer');
 
 void Lang;
 </script>

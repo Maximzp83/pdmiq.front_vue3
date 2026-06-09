@@ -7,6 +7,7 @@
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Assets` has been completed for the current compile/build scope.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Settings` has been completed for the current compile/build scope, excluding `vue2_project/src/views/Settings/Import` by user request.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/SuccessDashboard` has been completed for the current compile/build scope.
+- `src/views/Dashboard/Dashboard.vue` and `src/views/Plants/Details` have been re-migrated because the previous Vue3 version did not follow the legacy parent/child dashboard architecture.
 - Ask only when there are disputable points without a suitable migrated pattern/example.
 
 ## Mandatory Workflow For Next Session
@@ -68,6 +69,17 @@ Primary rules source:
 - `src/config/entities.js` now includes `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow and remove local endpoint hardcodes.
 - Runtime fix applied: `src/components/itemDetails/ItemImagesBlock.vue` now imports `Lang.tt`, which resolved the `_ctx.tt is not a function` crash on `BrandModelDetailsPage`.
 - Supporting request/item-card infrastructure from the earlier `BrandModels` migration remains active and was reused by the details stack.
+- `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:
+  - `src/views/Dashboard/Dashboard.vue` again acts as the plant dashboard container: it resolves the active plant from auth/global filters, fetches `plantItem`, resets child list filters on plant changes, and passes `plantItem`, `plantId`, and `additionalModalSettings` into the nested route.
+  - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.
+  - Plant details now uses `src/views/Equipments/EquipmentsLayout.vue` for equipments, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed; Equipments list ownership stays under `src/views/Equipments`.
+  - `src/views/Equipments/EquipmentsLayout.vue` and `src/views/Equipments/ItemsList.vue` were added as the first Vue3 Equipments migration step. Layout owns the original-style dropdown/filter toolbar with `useRequestsList` + `initiateRequestsToDoList`; nested list uses `/equipments/dashboard` with `prepareEquipmentsList`.
+  - `src/views/Equipments/Card` now has the first grid-card scope, and `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue` cover the first create/edit compile scope. Advanced RPM/vibration/subtype/sensor/multiview form behavior and Details pages remain pending.
+  - `src/router/index.js` enables `/dashboard/equipments` for the migrated list. Vue2 equipment create/edit routes were commented and details components are still pending, so those routes remain inactive.
+  - `src/views/Dashboard/MultiFormWrapper.vue` and `MultiFormItemWrapper.vue` were migrated from Vue2 for dashboard create/edit flows. `ProductionLines`, `Machines`, `Assets`, and `Equipments` lists now open the multiform modal; child forms receive parent instance data for chained ids.
+  - Equipment edit inside the multiform now force-fetches `/equipments/:id` before rendering `Equipments/ItemFormWrapper`, because list rows are not full form payloads.
+  - `src/composables/mixins/useMainInstanceDetailsPage.js` now opens Maintenance Work Order modals with `formComponentFileLoader` instead of legacy `componentPath`.
+  - `npm run build` and targeted `git diff --check` pass after the re-migration.
 - `Maintenance` section is migrated for the current Vue3 compile scope:
   - Added `src/composables/useMaintenance.js`.
   - Added `src/views/Maintenance/MaintenanceDashboard.vue` and `MaintenanceFormWrapper.vue`.
@@ -91,6 +103,13 @@ Primary rules source:
   - Migrated `vue2_project/src/views/Settings` into Vue3 except `Settings/Import`, with Settings shell navigation, Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and Settings sidebar menu entry.
   - Migrated `vue2_project/src/views/SuccessDashboard` into Vue3 with Success Dashboard container, MainDashboard, MeetingTracker, ROIOnePager, ROIAnalysis placeholder files, shared common components, `useSuccessDashboard`, entity configs, routes, and Customer Success sidebar menu entry.
   - `npm run build` and `git diff --check` pass.
+- `ProductionLines` list/card runtime alignment was refreshed against the Vue2 original:
+  - `src/views/ProductionLines/ItemsList.vue` now restores the legacy `View` table/card actions, sets child filters for Machines/Assets/Equipments from the selected production line, and navigates through Vue Router instead of direct `pushState`.
+  - `src/views/ProductionLines/ItemCard.vue` resets child list pages through Pinia stores instead of the old Vuex `setFiltersViaList` path.
+  - `src/composables/mixins/useItemCard.js` now falls back to router navigation when a card does not pass a custom `changeRoute`.
+  - `src/components/gridTable/ItemsGridContainer.vue` now supports explicit `componentFileLoader: () => import(...)` for item cards, with `import.meta.glob` only as a fallback; `ProductionLines/ItemsList.vue` passes `() => import('@/views/ProductionLines/ItemCard.vue')`.
+  - Dropdown location loading is deferred after opening starts so clicking the additional filters button opens the dropdown first.
+  - `npm run build` and targeted `git diff --check` pass after this update.
 
 ## Latest Completed Files
 - `src/router/index.js`
@@ -122,6 +141,7 @@ Primary rules source:
 - `src/views/RFQS/**`
 - `src/composables/useRfqs.js`
 - `src/views/ProductionLines/**`
+- `src/composables/mixins/useItemCard.js`
 - `src/composables/useProductionLines.js`
 - `src/views/Machines/**`
 - `src/composables/useMachines.js`
@@ -137,6 +157,9 @@ Primary rules source:
 - `src/config/entities.js`
 - `src/views/SuccessDashboard/**`
 - `src/composables/useSuccessDashboard.js`
+- `src/views/Plants/Details/DetailsPage.vue`
+- `src/views/Dashboard/Dashboard.vue`
+- `src/composables/mixins/useMainInstanceDetailsPage.js`
 
 ## Recommended Next Focus
 - Runtime smoke-test Settings with authenticated real data, especially Back-End Register Writing, Custom Formulas save, Industrial Services image upload/delete, Banner V2 Subtypes IO parameters, and Faults/NCD Faults save flows.

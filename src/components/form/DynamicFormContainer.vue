@@ -108,10 +108,25 @@ const editModal = computed(() => {
 });
 
 const componentFile = computed(() => {
-	const { formComponentFileLoader } = editModal.value;
+	const { componentPath, formComponentFileLoader, multiform } = editModal.value;
 
+	if (multiform && componentPath === 'Dashboard/MultiFormWrapper') {
+		return defineAsyncComponent(() => import('@/views/Dashboard/MultiFormWrapper.vue'));
+	}
 	if (formComponentFileLoader) {
 		return defineAsyncComponent(formComponentFileLoader);
+	}
+	if (componentPath === 'ProductionLines/ItemForm') {
+		return defineAsyncComponent(() => import('@/views/ProductionLines/ItemForm.vue'));
+	}
+	if (componentPath === 'Machines/ItemForm') {
+		return defineAsyncComponent(() => import('@/views/Machines/ItemForm.vue'));
+	}
+	if (componentPath === 'Assets/ItemForm') {
+		return defineAsyncComponent(() => import('@/views/Assets/ItemForm.vue'));
+	}
+	if (componentPath === 'Equipments/ItemFormWrapper') {
+		return defineAsyncComponent(() => import('@/views/Equipments/ItemFormWrapper.vue'));
 	}
 	return null;
 });

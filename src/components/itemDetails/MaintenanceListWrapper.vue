@@ -6,14 +6,15 @@
 			:activeTab="activeTab"
 			:tabsList="tabsList"
 			:height="40"
-			:buttonsType="'secondary'"
+			buttonsType=""
+			buttonsClass="secondary"
 			:initialAutoSelect="0"
 			@switchTab="switchTab"
 		/>
 
 		<div v-if="activeTab.prop === tabsList[0].prop" :key="tabsList[0].prop" class="tab-container">
 			<WorkOrdersList
-				ref="WorkOrdersList"
+				ref="workOrdersListRef"
 				insideOtherPage
 				:propsFilters="woFilters"
 				:hideDatepicker="hideDatepicker"
@@ -22,7 +23,7 @@
 
 		<div v-if="activeTab.prop === tabsList[1].prop" :key="tabsList[1].prop" class="tab-container">
 			<MaintenanceLogsList
-				ref="MaintenanceLogsList"
+				ref="maintenanceLogsListRef"
 				insideOtherPage
 				:propsFilters="logFilters"
 				:hideDatepicker="hideDatepicker"
@@ -32,7 +33,7 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 
 import { Lang } from '@/localization';
 import { useTabs } from '@/composables/mixins/useTabs';
@@ -58,4 +59,12 @@ const tabsList = computed(() =>
 );
 
 const { activeTab, switchTab } = useTabs({ tabsList });
+
+const workOrdersListRef = ref(null);
+const maintenanceLogsListRef = ref(null);
+
+defineExpose({
+	WorkOrdersList: workOrdersListRef,
+	MaintenanceLogsList: maintenanceLogsListRef,
+});
 </script>

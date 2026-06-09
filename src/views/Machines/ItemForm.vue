@@ -163,6 +163,7 @@ import { cleanDateString, findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useMultiform } from '@/composables/mixins/useMultiform';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 import { useMachines } from '@/composables/useMachines';
@@ -222,6 +223,7 @@ const formData = ref({ ...initialFormData });
 
 const itemData = computed(() => props.itemData);
 const showPlant = computed(() => globalStore.navbarSettings?.showPlantName || null);
+const instancesItemsData = computed(() => props.instancesItemsData || null);
 const itemPictures = computed(() => props.itemData?.pictures || []);
 const filteredMachinesList = computed(() =>
 	props.itemData?.id
@@ -316,6 +318,7 @@ const localSetupPage = (item) => {
 	}
 
 	formData.value.plant_id = currentPlantId() || null;
+	setupByParentInstance(instancesItemsData.value, 'productionLine', 'production_line_id');
 	charactersItemsList.value = [];
 	librariesItemsList.value = [];
 };
@@ -379,6 +382,13 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	]),
 	successSubmitCallback,
 	emit,
+});
+
+const { setupByParentInstance } = useMultiform({
+	emit,
+	formData,
+	instancesItemsData,
+	multiFormFilters: computed(() => props.multiFormFilters || null),
 });
 
 watch(

@@ -21,6 +21,19 @@
 		</div>
 
 		<div :class="['card-content relative', `columnsNumber-${selectedColumnsNumber.id}`]">
+			<CommonChartItemWrapper
+				ref="commonChartItemWrapper"
+				chartFactoryContainerName="MaintenanceChartFactoryContainer"
+				chartFactoryName="PDMStatisticsPieChart"
+				configsKey="maintenanceChartListsConfig"
+				chartKey="main"
+				:rootFilters="filters"
+				:predefinedFilters="predefinedFilters"
+				:additionalProps="chartProps"
+				:buildChartsPayloadProps="buildChartsPayload"
+				@event="handleEvent"
+			/>
+
 			<div
 				v-if="resultStatistics"
 				v-show="legendEnabled"
@@ -42,6 +55,9 @@ import { storeToRefs } from 'pinia';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 import { useGlobalStore } from '@/stores/GlobalStore';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
+
+import CommonChartItemWrapper from '@/components/charts/CommonChartItemWrapper.vue';
 
 const { tt } = Lang;
 
@@ -61,6 +77,17 @@ const commonChartItemWrapper = ref(null);
 const globalStore = useGlobalStore();
 const { printHTMLWindowIsOpen } = storeToRefs(globalStore);
 
+const chartProps = computed(() =>
+	Object.freeze({
+		useSimpleSpinnerAsPreloader: true,
+		chartSpecificEvents: props.chartLegendEvents,
+	})
+);
+const buildChartsPayload = computed(() =>
+	Object.freeze({
+		selectedColumnsNumber: props.selectedColumnsNumber.id,
+	})
+);
 const resultStatistics = computed(() => {
 	if (!chartContainerReady.value || !commonChartItemWrapper.value?.ChartInstance) {
 		return null;
@@ -75,12 +102,17 @@ const legendEnabled = computed(
 const handleShowAll = () => {
 	emit('event', { eventName: 'showItemsWithSensors' });
 };
+const handleChartContainerReady = ({ chartContainerReady: ready }) => {
+	chartContainerReady.value = ready;
+};
 
 const callChartMethod = (method, data) => {
 	if (commonChartItemWrapper.value?.callChartMethod) {
 		commonChartItemWrapper.value.callChartMethod(method, data);
 	}
 };
+
+const { handleEvent } = useEventHandler({ handleChartContainerReady }, emit);
 
 watch(
 	() => props.selectedColumnsNumber,

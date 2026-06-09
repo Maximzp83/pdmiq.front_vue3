@@ -359,6 +359,7 @@ export function useRequestsList({
 		reloadRequestOption,
 		handleToggleDropdown,
 		startFetchAction,
+		doFetchAction,
 		setupBindTo,
 		watchHandler,
 	};

@@ -83,10 +83,13 @@ const fetchCounters = async () => {
 				companyId: props.companyId || undefined,
 				plantId: effectivePlantId.value || undefined,
 			},
+			prepareData: 'prepareCountersData',
 			notNotify: true,
 		});
 		if (Array.isArray(value)) {
-			countersList.value = normalizeCounters(value);
+			countersList.value = value.some((item) => item?.count)
+				? value
+				: normalizeCounters(value);
 		}
 	} catch (error) {
 		console.warn(error);

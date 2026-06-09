@@ -165,7 +165,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
@@ -175,8 +175,11 @@ import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useMachinesStore } from '@/stores/MachinesStore';
+import { useAssetsStore } from '@/stores/AssetsStore';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSwitchGridView } from '@/composables/mixins/useSwitchGridView';
 import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
 import { useDashboardListsReorder } from '@/composables/mixins/useDashboardListsReorder';
@@ -210,6 +213,8 @@ const emit = defineEmits(['event']);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const machinesStore = useMachinesStore();
+const assetsStore = useAssetsStore();
+const equipmentsStore = useEquipmentsStore();
 const { globalFilters } = storeToRefs(globalStore);
 const { filters } = storeToRefs(machinesStore);
 const { reorderMachine } = useMachines();
@@ -223,6 +228,9 @@ const productionLinesList = shallowRef([]);
 const productionLinesLoading = ref(false);
 const applicationsList = shallowRef([]);
 const applicationsLoading = ref(false);
+const fetchLocationsRequest = createGetRequest(ENTITIES.Locations.apiBase);
+const fetchProductionLinesRequest = createGetRequest(ENTITIES.ProductionLines.apiBase);
+const fetchApplicationsRequest = createGetRequest(ENTITIES.Applications.apiBase);
 
 const instanceName = 'Machines';
 const clearableFiltersList = Object.freeze(['productionLineId', 'applicationId', 'locationId', 'q']);
@@ -232,6 +240,30 @@ const hasAccessToDelete = computed(() => authStore.hasAccessTo(['delete_dashboar
 const showClearFilters = computed(() =>
 	clearableFiltersList.some((key) => filters.value?.[key] !== undefined && filters.value?.[key] !== null && filters.value?.[key] !== ''),
 );
+const requestsToDoList = computed(() =>
+	Object.freeze([
+		{
+			action: fetchLocationsRequest,
+			bindTo: [{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' }],
+			localProp: locationsList,
+			localLoadProp: locationsLoading,
+		},
+		{
+			action: fetchApplicationsRequest,
+			bindTo: [{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' }],
+			localProp: applicationsList,
+			localLoadProp: applicationsLoading,
+		},
+		{
+			action: fetchProductionLinesRequest,
+			bindTo: [{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' }],
+			localProp: productionLinesList,
+			localLoadProp: productionLinesLoading,
+		},
+	]),
+);
+const { initiateRequestsToDoList } = useRequestsList({ requestsToDoList });
+initiateRequestsToDoList.value = false;
 
 const {
 	itemsList,
@@ -242,6 +274,7 @@ const {
 	createItem,
 	editItem,
 	handleDeleteItems,
+	handleShowNextInstanceItem,
 	refetchItemsList,
 } = useItemsData({
 	entityKey: 'Machines',
@@ -256,9 +289,23 @@ const {
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',
 			instanceName: 'Machines',
+			multiform: true,
+			componentPath: 'Dashboard/MultiFormWrapper',
 			callback: () => refetchItemsList(),
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
+		relatedFiltersStoresMap: {
+			assets: {
+				store: assetsStore,
+				stateProp: 'filters',
+				storageKey: 'assets_filters',
+			},
+			equipments: {
+				store: equipmentsStore,
+				stateProp: 'filters',
+				storageKey: 'equipments_filters',
+			},
+		},
 	},
 });
 
@@ -267,8 +314,15 @@ const setFilters = (value, settings = {}) => {
 	const nextValue = clearList ? Object.fromEntries(clearList.map((key) => [key, null])) : value;
 	setBaseFilters(nextValue, settings);
 };
-const { perPageItems, activeGrid, gridTypesList, ITEMS_GRID_TYPES, gridSwitcherOptions, toggleItemsGrid } =
-	useSwitchGridView({ filters, setFilters });
+const {
+	perPageItems,
+	activeGrid,
+	gridTypesList,
+	ITEMS_GRID_TYPES,
+	gridSwitcherOptions,
+	toggleItemsGrid,
+	gridViewBeforeMount,
+} = useSwitchGridView({ filters, setFilters });
 const { draggingLocked } = useDragNdropSortable({
 	wrapperSelector: '.drag-n-drop-wrapper',
 	reorderHandler: (event) => reorderHandler(event),
@@ -294,6 +348,16 @@ const tableSettings = computed(() => {
 			tooltip_text: 'phrases.Show_Binding_Assets',
 			path: '/dashboard/assets',
 			nextInstanceName: 'Assets',
+			setFilters: [
+				{
+					action: 'assets/set_assets_filters',
+					params: ['machineId'],
+				},
+				{
+					action: 'equipments/set_equipments_filters',
+					params: ['machineId'],
+				},
+			],
 		},
 	];
 	if (authStore.hasAccessTo(['create_maintenance'])) {
@@ -340,11 +404,22 @@ const cardOperationsSettings = computed(() => {
 	const buttons = [
 		{
 			name: 'handleShowNextInstanceItem',
-			type: 'primary inverted',
+			type: 'primary',
+			className: 'inverted',
 			icon: 'icomoon icon-assets',
 			tooltip_text: tt('phrases.Show_Binding_Assets'),
 			path: '/dashboard/assets',
 			nextInstanceName: 'Assets',
+			setFilters: [
+				{
+					action: 'assets/set_assets_filters',
+					params: ['machineId'],
+				},
+				{
+					action: 'equipments/set_equipments_filters',
+					params: ['machineId'],
+				},
+			],
 		},
 	];
 	if (authStore.hasAccessTo(['create_maintenance'])) {
@@ -354,8 +429,8 @@ const cardOperationsSettings = computed(() => {
 				{ formKey: 'production_line_id', valKey: 'production_line_id' },
 				{ formKey: 'machine_id', valKey: 'id' },
 			],
-			className: 'create-wo-button',
-			type: 'primary inverted',
+			className: 'create-wo-button inverted',
+			type: 'primary',
 			tooltip_text: tt('phrases.Create_Work_Order'),
 			buttonContent: { component: { componentFileLoader: () => import('@/components/itemDetails/CreateWOButton.vue') } },
 		});
@@ -364,7 +439,8 @@ const cardOperationsSettings = computed(() => {
 		buttons.push({
 			name: 'editItem',
 			icon: 'icomoon icon-pencil',
-			type: 'primary inverted',
+			type: 'primary',
+			className: 'inverted',
 			tooltip_text: tt('phrases.Edit_Machine'),
 		});
 	}
@@ -375,50 +451,11 @@ const cardOperationsSettings = computed(() => {
 	});
 });
 
-const fetchList = ({ request, params, listRef, loadingRef }) => {
-	loadingRef.value = true;
-	return request({ params: { max: -1, ...(params || {}) } })
-		.then(({ value }) => {
-			listRef.value = value || [];
-		})
-		.finally(() => {
-			loadingRef.value = false;
-		});
-};
-const fetchDropdownLists = () => {
-	const plantId = props.plantId || globalFilters.value?.plantId;
-	if (!plantId) return;
-	fetchList({
-		request: createGetRequest(ENTITIES.Plants.apiBase + '/locations'),
-		params: { plantId },
-		listRef: locationsList,
-		loadingRef: locationsLoading,
-	});
-	fetchList({
-		request: createGetRequest(ENTITIES.ProductionLines.apiBase),
-		params: { plantId },
-		listRef: productionLinesList,
-		loadingRef: productionLinesLoading,
-	});
-	fetchList({
-		request: createGetRequest(ENTITIES.Applications.apiBase),
-		params: { plantId },
-		listRef: applicationsList,
-		loadingRef: applicationsLoading,
-	});
-};
 const toggleFilterbar = (event) => {
 	dropdownFilterbarRef.value?.toggleFilterbar?.(event);
+	initiateRequestsToDoList.value = true;
 	showFilterbar.value = !showFilterbar.value;
-	if (showFilterbar.value && !locationsList.value.length) fetchDropdownLists();
 };
-const handleShowNextInstanceItem = ({ action }) => {
-	if (action?.path) {
-		globalStore.set_value('navbarSettings', {});
-		window.history.pushState({}, '', action.path);
-	}
-};
-
 watch(
 	() => globalFilters.value?.plantId,
 	(id) => {
@@ -439,4 +476,6 @@ const { handleEvent } = useEventHandler({
 	handleCreateWorkOrderButton,
 	handleShowNextInstanceItem,
 }, emit);
+
+onBeforeMount(gridViewBeforeMount);
 </script>

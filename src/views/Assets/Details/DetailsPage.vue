@@ -20,8 +20,8 @@
 
 									<el-button
 										v-if="canEdit"
-										type="tertiary"
-										class="ml-auto action-button"
+										type=""
+										class="ml-auto action-button tertiary"
 										@click="editItem"
 									>
 										<i class="icomoon icon-pencil"></i>

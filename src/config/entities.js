@@ -439,6 +439,17 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_plants',
 		}),
 	}),
+	Locations: Object.freeze({
+		key: 'locations',
+		apiBase: '/locations',
+		// routeBase: '/locations',
+		// filtersStorageKey: 'locations_filters',
+		itemsName: Object.freeze({
+			one: 'Location',
+			mult: 'Locations',
+			instanceName: 'locations',
+		}),
+	}),
 	PlantsVendors: Object.freeze({
 		key: 'plants_vendors',
 		apiBase: '/plants/vendors',

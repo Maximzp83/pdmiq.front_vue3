@@ -88,6 +88,7 @@ import { findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
+import { useMultiform } from '@/composables/mixins/useMultiform';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 import { useAssets } from '@/composables/useAssets';
@@ -129,6 +130,7 @@ const formData = ref({ ...initialFormData });
 
 const itemData = computed(() => props.itemData);
 const showPlant = computed(() => globalStore.navbarSettings?.showPlantName || null);
+const instancesItemsData = computed(() => props.instancesItemsData || null);
 const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || props.itemData?.plant_id;
 const selectedMachine = computed(() =>
 	formData.value.machine_id && machinesList.value.length
@@ -198,6 +200,7 @@ const localSetupPage = (item) => {
 	if (props.editModal?.formSettings?.machineId) {
 		formData.value.machine_id = props.editModal.formSettings.machineId;
 	}
+	setupByParentInstance(instancesItemsData.value, 'machine', 'machine_id');
 };
 const localPrepareSubmitData = (data) => {
 	if (!data.downtime_cost) {
@@ -235,6 +238,13 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	uploadSettings: Object.freeze([{ fileProp: 'libraries', multiple: true }]),
 	successSubmitCallback,
 	emit,
+});
+
+const { setupByParentInstance } = useMultiform({
+	emit,
+	formData,
+	instancesItemsData,
+	multiFormFilters: computed(() => props.multiFormFilters || null),
 });
 
 watch(

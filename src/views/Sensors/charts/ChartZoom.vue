@@ -2,8 +2,8 @@
 	<div>
 		<el-button
 			size="small"
-			:type="buttonType || 'primary inverted'"
-			class="block-item"
+			:type="buttonType || 'primary'"
+			:class="['block-item', buttonClass]"
 			@click="zoomYAxis(0)"
 		>
 			{{ tt('reset') }}
@@ -30,6 +30,7 @@ const props = defineProps({
 	chartOptionsUpdate: Number,
 	showHistory: Boolean,
 	buttonType: String,
+	buttonClass: String,
 });
 
 const emit = defineEmits(['event']);

@@ -98,8 +98,8 @@ const createWOAction = computed(() =>
 		name: 'handleCreateWorkOrderButton',
 		formSetup: props.createWOButtonFormSetup,
 		tooltip_text: tt('phrases.Create_Work_Order'),
-		className: 'create-wo-button',
-		type: 'primary inverted',
+		className: 'create-wo-button inverted',
+		type: 'primary',
 		buttonContent: {
 			component: {
 				componentFileLoader: () => import('@/components/itemDetails/CreateWOButton.vue'),

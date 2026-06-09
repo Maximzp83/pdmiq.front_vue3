@@ -1,4 +1,5 @@
 import { setFiltersViaList } from '@/helpers/specialHelpers';
+import { useNavigation } from '@/composables/mixins/useNavigation';
 
 export const buildProps = (extra = {}) => ({
 	cardData: { type: Object, default: () => ({}) },
@@ -9,6 +10,7 @@ export const buildProps = (extra = {}) => ({
 });
 
 export function useItemCard({ cardData, changeRoute, titleLinkRoute, resetPageFiltersList, emit } = {}) {
+	const { changeRoute: defaultChangeRoute } = useNavigation();
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
 
@@ -36,9 +38,14 @@ export function useItemCard({ cardData, changeRoute, titleLinkRoute, resetPageFi
 	};
 
 	const handleTitleClick = () => {
-		if (changeRoute) changeRoute({ path: resolve(titleLinkRoute) });
+		const navigate = changeRoute || defaultChangeRoute;
+		if (navigate) navigate({ path: resolve(titleLinkRoute) });
 		if (resetPageFiltersList) {
-			setFiltersViaList(resetPageFiltersList);
+			try {
+				setFiltersViaList(resolve(resetPageFiltersList));
+			} catch (error) {
+				console.warn('[useItemCard] resetPageFiltersList is not available in the current store setup', error);
+			}
 		}
 	};
 

@@ -23,11 +23,25 @@
 - `ProductionLines` section is migrated for the current Vue3 compile scope and routes are enabled.
 - `Machines` section is migrated for the current Vue3 compile scope with list/grid, form, item page, details page, attachment/character subitems, `useMachines`, machine mock image asset, and machine create/edit/details routes enabled.
 - `Assets` section is migrated for the current Vue3 compile scope with list/grid, form, item page, details page, attachment/composed subitems, `useAssets`, store statistics filters, dashboard assets route, and asset create/edit/details routes enabled.
+- `Plants/Dashboard` + `Plants/Details` have been re-migrated for the current Vue3 compile scope to match the legacy parent/child architecture: `Dashboard.vue` owns plant selection/loading and passes `plantItem`; `DetailsPage.vue` renders the nested dashboard content with PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, Maintenance tabs, and Work Order modal wiring through `componentFileLoader`.
 - `Settings` section is migrated for the current Vue3 compile scope except `Settings/Import`, including Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and sidebar menu entry.
 - `SuccessDashboard` section is migrated for the current Vue3 compile scope with Success Dashboard container, main dashboard, Meeting Tracker, ROI One Pager, common chart/support components, `useSuccessDashboard`, entity configs, routes, and sidebar menu entry.
+- `Equipments` migration has started for the current Vue3 compile scope:
+  - Added `src/views/Equipments/EquipmentsLayout.vue`.
+  - Added `src/views/Equipments/ItemsList.vue`.
+  - Added the first `src/views/Equipments/Card` grid-card scope.
+  - Added the first create/edit compile scope with `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue`.
+  - Layout uses the Vue2-style `requestsToDoList` / `initiateRequestsToDoList` dropdown loading pattern through `useRequestsList`.
+  - Nested list uses `/equipments/dashboard` with `prepareEquipmentsList`.
+  - `src/router/index.js` now enables `/dashboard/equipments` for the migrated list.
+  - Dashboard multiform create/edit flow is migrated through `src/views/Dashboard/MultiFormWrapper.vue` and `MultiFormItemWrapper.vue`; ProductionLines, Machines, Assets, and Equipments lists now use it for create/edit.
+  - Equipment edit in the multiform force-fetches `/equipments/:id` before handing data to `Equipments/ItemFormWrapper`.
+  - Plant details embeds `src/views/Equipments/EquipmentsLayout.vue` directly, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed.
+  - Advanced form tabs and full Details Equipments stack remain pending.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
 - Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
 - Project production build passes after `SuccessDashboard` migration.
+- Project production build passes after `Plants/Details` re-migration.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE
@@ -668,3 +682,11 @@ await fetchUsers({ page: 1 });
   - Replaced inlined `permissionsTab` permission controls with `<PermissionItem />` list like the Vue2 original
   - Connected permission collection through `useSubItemsList` and `subItemsSettings`
   - `npm run build` passed
+- [x] ProductionLines list/card legacy alignment
+  - Updated `src/views/ProductionLines/ItemsList.vue`
+  - Updated `src/views/ProductionLines/ItemCard.vue`
+  - Updated `src/composables/mixins/useItemCard.js`
+  - Restored legacy `View` action wiring for Machines from table/grid cards, including child filters for Machines/Assets/Equipments where the original card configured them
+  - Replaced direct history mutation with router navigation and delayed lazy location loading until after dropdown open starts
+  - Fixed grid item-card runtime loading by adding explicit `componentFileLoader: () => import(...)` support to `src/components/gridTable/ItemsGridContainer.vue`; ProductionLines now passes `() => import('@/views/ProductionLines/ItemCard.vue')`, with `import.meta.glob` retained as a fallback
+  - `npm run build` and targeted `git diff --check` passed
