@@ -2,6 +2,10 @@ import { api_request } from '@/api/request_provider';
 
 export const createGetRequest = (url, defaultPayload = {}) => (payload = {}) => {
 	// console.log('createGetRequest', url, defaultPayload, payload);
+	if (url === '/equipments') {
+		defaultPayload = { ...defaultPayload, prepareData: 'prepareEquipmentsList' };
+	}
+	
 	return api_request.get(url, {
 		notNotify: true,
 		...defaultPayload,

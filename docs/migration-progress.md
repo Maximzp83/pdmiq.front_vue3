@@ -26,6 +26,7 @@
 - `Plants/Dashboard` + `Plants/Details` have been re-migrated for the current Vue3 compile scope to match the legacy parent/child architecture: `Dashboard.vue` owns plant selection/loading and passes `plantItem`; `DetailsPage.vue` renders the nested dashboard content with PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, Maintenance tabs, and Work Order modal wiring through `componentFileLoader`.
 - `Settings` section is migrated for the current Vue3 compile scope except `Settings/Import`, including Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and sidebar menu entry.
 - `SuccessDashboard` section is migrated for the current Vue3 compile scope with Success Dashboard container, main dashboard, Meeting Tracker, ROI One Pager, common chart/support components, `useSuccessDashboard`, entity configs, routes, and sidebar menu entry.
+- `CorporateDashboard` section is migrated for the current Vue3 compile scope with container, main corporate view, plant details item, `/corporate/main` route, Corporate View sidebar/menu entry, and `view_corporate` permission mapping.
 - `Equipments` migration has started for the current Vue3 compile scope:
   - Added `src/views/Equipments/EquipmentsLayout.vue`.
   - Added `src/views/Equipments/ItemsList.vue`.
@@ -37,10 +38,16 @@
   - Dashboard multiform create/edit flow is migrated through `src/views/Dashboard/MultiFormWrapper.vue` and `MultiFormItemWrapper.vue`; ProductionLines, Machines, Assets, and Equipments lists now use it for create/edit.
   - Equipment edit in the multiform force-fetches `/equipments/:id` before handing data to `Equipments/ItemFormWrapper`.
   - Plant details embeds `src/views/Equipments/EquipmentsLayout.vue` directly, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed.
-  - Advanced form tabs and full Details Equipments stack remain pending.
+  - Migrated `vue2_project/src/views/Equipments/Details` into Vue3 with DetailsPage, EquipmentInfoBlock, Quote/Service tab, crossover/analogues tables, move history, PDM buttons, equipment mock image asset, nested `/equipments/:id/details/*` routes, and nested Sensors statistics route-param compatibility.
+  - Advanced form tabs remain pending.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
+- Sensors `PDFandFFTrequestsBlock` has been re-aligned with the Vue2 original for the current compile scope: restored grouped RPM/FFT/PDF controls, PDF websocket/download flow, compare PDF export, FFT request/last/unlock bridge, BannerFilterBlock unlock forwarding, and supporting `useSensors` request helpers.
+- ItemCard mixin behavior from Vue2 was re-applied across migrated cards for the current compile scope: `useItemCard` supports Vue3 reset callbacks; Assets, Machines, ProductionLines, and BrandModels route title clicks through it with Pinia page resets; Processes restored preview overlay handling.
+- `src/views/Maintenance/WorkOrders/ItemForm.vue` was re-checked against Vue2 and expanded for the current compile scope: restored `showJustInfo`, filtered statuses, task procedure info/dialog, technician users/teams tabs, create Part/WO Type modal callbacks, legacy snooze-change UI, equipment card grouping, and recurring period-date submit normalization.
+- `src/components/common/Datepicker.vue` was adjusted to lazy-mount Element Plus `el-date-picker` after first interaction, using a lightweight div placeholder styled like the datepicker input and `@element-plus/icons-vue` icons on initial render to avoid eager calendar table DOM.
 - Project production build passes after follow-up compile fixes for Sidebar, Machines legacy files, chart factory imports, and shared helpers.
 - Project production build passes after `SuccessDashboard` migration.
+- Project production build passes after `CorporateDashboard` migration.
 - Project production build passes after `Plants/Details` re-migration.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 

@@ -19,7 +19,6 @@
 					:hideDelete="!hasAccessToDelete"
 					:itemsLoading="itemsLoading"
 					:filters="filters"
-					:itemsName="itemsName"
 					:perPageItems="perPageItems"
 					@event="handleEvent"
 				>

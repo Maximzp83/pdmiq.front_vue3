@@ -104,6 +104,10 @@ const rolesHasAccessToMap = {
 		app_section: MENU_TYPES.CLIENT_API,
 		permissions: ['is_viewing']
 	},
+	view_corporate: {
+		app_section: MENU_TYPES.CORPORATE_ANALYTICS,
+		permissions: ['is_viewing']
+	},
 	// 'view_user_roles': { user_role_types: [USER_ROLES_TYPES.INDUSTRIAL_MATRIX] },
 
 	// --------------- Operate ------------

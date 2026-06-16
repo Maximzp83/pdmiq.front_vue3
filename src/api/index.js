@@ -164,7 +164,7 @@ apiInstance.interceptors.response.use(
  * @returns {Promise} Axios response
  */
 const api = (method, url, payload = {}) => {
-	let { params, data, withFile, headers, ...config } = payload;
+	let { params, data, withFile, headers, baseURL, ...config } = payload;
 	let finalMethod = method.toUpperCase();
 	let finalData = data;
 
@@ -191,6 +191,10 @@ const api = (method, url, payload = {}) => {
 		url,
 		...config,
 	};
+
+	if (baseURL) {
+		requestConfig.baseURL = baseURL;
+	}
 
 	// Add custom headers if provided
 	if (headers) {

@@ -78,21 +78,34 @@ body {
 		padding: 1px 12px;
 		box-sizing: border-box;
 		&:focus, &.is-focus {
-			border-color: $primary-color;	
+			border-color: $primary-color;
 		}
 	}
-	
+
 	.datepicker-container {
-		max-width: 237px;
+		&:not(.no-max-width) {max-width: 237px;}
 
 		.el-input__wrapper {
 			padding: 0;
 			box-shadow: none !important;
+
+			.el-input__prefix-inner {
+				padding: 0 !important;
+
+				.el-icon {
+					font-size: 16px !important;
+					margin: 0;
+				}
+			}
 		}
 
 		.el-date-editor {
 			width: 100%;
-			height: $formElementsHeight;	
+			height: $formElementsHeight;
+			justify-content: space-between;
+			border: 1px solid #DEE2E6;
+			border-radius: 4px;
+			box-sizing: border-box;
 
 			&.el-input > .el-input__wrapper	{
 				height: 40px;
@@ -104,21 +117,29 @@ body {
 			.el-input__wrapper {
 				width: 100%;
 				box-sizing: border-box;
-				height: $formElementsHeight;		
+					height: $formElementsHeight;
 
-				.el-input__icon {
-					line-height: 37px;
-					font-size: 16px !important;
 				}
 
-				.el-input__inner {
-					border: none;
-					padding-left: 8px;
-				}
-				.el-range-separator {line-height: 36px !important;}
+			.el-input__icon {
+				line-height: 37px;
+				// &.el-range__icon {
+					font-size: 16px;
+				// }
+				// font-size: 16px !important;
+			}
+
+			.el-input__inner {
+				border: none;
+				padding-left: 8px;
+			}
+			.el-range-separator {
+				flex: unset;
+				line-height: 36px !important;
+				padding: 0 !important;
 			}
 		}
-		
+
 		&:not(.no-min-width) {min-width: 222px;}
 
 		&.mini {
@@ -138,6 +159,32 @@ body {
 		}
 	}
 
+	.el-picker-panel__footer {
+		.el-picker-panel__link-btn.el-button--small {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 30px;
+			min-height: 30px;
+			padding: 5px 10px;
+			font-size: 12px;
+			line-height: 1;
+
+			> span {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: auto;
+				height: auto;
+				min-width: 0;
+				min-height: 0;
+				font-size: 12px;
+				line-height: 1;
+				color: inherit;
+			}
+		}
+	}
+
 	.el-checkbox {
 		height: auto;
 		.el-checkbox__input.is-checked,
@@ -146,6 +193,10 @@ body {
 				background-color: $primary-color;
 				border-color: $primary-color;
 			}
+		}
+
+		.el-checkbox__inner:after {
+			color: #fff;
 		}
 
 		.el-checkbox__input {
@@ -180,7 +231,7 @@ body {
 		th .cell {
 			line-height: 18px;
 			word-break: normal;
-			
+
 			.caret-wrapper {
 				height: 16px;
 				.sort-caret {
@@ -189,7 +240,7 @@ body {
 					&.descending {bottom: -2px;}
 				}
 			}
-		}	
+		}
 
 		td, tr {background-color: $table-cell-bg !important	;} //temp
 	}
@@ -219,7 +270,7 @@ body {
 			.el-select__wrapper {
 				min-height: $formElementsHeight;
 				/*.el-input__inner {
-					height: auto !important;				
+					height: auto !important;
 				}*/
 			}
 
@@ -256,22 +307,22 @@ body {
 			border: none;
 		}
 
-		.el-input__suffix {
-			// right: 0;
-			.el-select__caret {
-			 	line-height: $formElementsHeight;
-				 	&:before {
-				 		position: relative;
-				 		top: -2px;
-				 	} 		 	
-			 }
-		}
+			.el-input__suffix {
+				// right: 0;
+				.el-select__caret {
+					line-height: $formElementsHeight;
+					&:before {
+						position: relative;
+						top: -2px;
+					}
+				}
+			}
 
 		.el-select__wrapper {
 			height: auto;
 			border: 1px solid $formElementsBorderColor;
 			box-shadow: none !important;
-			background-color: transparent;
+			// background-color: transparent;
 
 			&:focus, &.is-focused {
 				border-color: $primary-color;
@@ -342,8 +393,26 @@ body {
 		border-radius: 4px;
 		border: 1px solid #DCDFE6;
 		// transition-duration: 0.1s;
-		&:not(.el-button--small) {
+		&:not(.el-button--small):not(.el-button--mini):not(.mini):not(.small) {
 			height: 40px;
+		}
+
+		&.el-button--small {
+			height: 30px;
+			font-size: inherit;
+			padding: 5px 10px;
+		}
+
+		&.el-button--mini {
+			height: 26px;
+			font-size: inherit;
+			padding: 5px 10px;
+		}
+
+		&.full-height {
+			height: 44px !important;
+			font-size: inherit;
+			// padding: 5px 10px;
 		}
 	}
 
@@ -368,14 +437,14 @@ body {
 		&.is-disabled {
 			opacity: 0.5;
 			&:not(.with-pointer-events) {
-				pointer-events: none !important;			
+				pointer-events: none !important;
 			}
 			&.el-button--primary:not(.inverted) {
-				background-color: $primary-color !important;			
+				background-color: $primary-color !important;
 			}
 			&.el-button--primary.inverted {
-				background-color: #fff !important;	
-				color: #424242 !important;		
+				background-color: #fff !important;
+				color: #424242 !important;
 			}
 
 		}
@@ -396,27 +465,27 @@ body {
 		&.el-button--primary.inverted {
 			background-color: transparent;
 			&:not(.initial-color) {
-				color: $secondaryFontColor;			
+				color: $secondaryFontColor;
 			}
 			&.initial-color {
 				color: $primary-color;
 			}
 		}
 
-		&.el-button--secondary {
-			color: $secondaryFontColor;
+			&.el-button--secondary {
+				color: $secondaryFontColor;
 
-		 	&.is-plain {
-		 		color: #fff;
-		 		background-color: transparent;
-				border-color: #fff !important;
-		 	}
+				&.is-plain {
+					color: #fff;
+					background-color: transparent;
+					border-color: #fff !important;
+				}
 
-		 	&.inverted {
-		 		background-color: transparent;
-		 		color: #fff;	 		
-		 	}
-		}
+				&.inverted {
+					background-color: transparent;
+					color: #fff;
+				}
+			}
 
 		&.el-button--tertiary {
 			color: #424242;
@@ -428,7 +497,7 @@ body {
 
 		 	/*&.inverted {
 		 		background-color: transparent;
-		 		color: #fff;	 		
+				color: #fff;
 		 	}*/
 		}
 
@@ -457,9 +526,9 @@ body {
 				background-color: #fff;
 				color: $secondaryFontColor;
 				opacity: 1 !important;
-				
+
 				&.filled {
-					background-color: #f4f4f4;				
+					background-color: #f4f4f4;
 				}
 			}
 		}
@@ -504,15 +573,15 @@ body {
 				}
 			}
 		}*/
-		
+
 		&.active, &.router-link-active {
-			&:not(.is-disabled.with-pointer-events) {	
+			&:not(.is-disabled.with-pointer-events) {
 				&.el-button--primary {
 					background-color: transparent !important;
 					color: $secondaryFontColor !important;
 					&.plain {
 						background-color: #fff !important;
-						color: $secondaryFontColor !important;			
+						color: $secondaryFontColor !important;
 					}
 				}
 
@@ -567,7 +636,7 @@ body {
 					background-color: transparent;
 				}
 			}
-		} 
+		}
 	}
 
 	.el-input-group {
@@ -593,7 +662,7 @@ body {
 			transition: background 0.3s;
 			&:hover {
 				background-color: #dfdfdf;
-			}	
+			}
 		}
 	}
 
@@ -638,28 +707,26 @@ body {
 		}
 	}
 
-	.el-dialog__wrapper {
+	.el-dialog {
+		padding: 0;
+
+		.el-dialog__body {
+			padding: 25px 25px 30px;
+		}
+
 		&.tiny {
-			.el-dialog {
-				max-width: 490px;
-			}
+			max-width: 490px;
 		}
 		&.small {
-			.el-dialog {
-				max-width: 620px;			
-			}
+			max-width: 620px;
 		}
 
-		.el-dialog {
-			min-width: 310px;
-			width: 70%;
-		}
+		min-width: 310px;
+		width: 70%;
 
 		&.big {
-			.el-dialog {
-				max-width: 1200px;
-				width: 90%;			
-			}
+			max-width: 1200px;
+			width: 90%;
 		}
 
 		.el-dialog__footer {
@@ -669,8 +736,12 @@ body {
 		&.rounded {
 			.el-dialog {
 				border-radius: 8px;
-				overflow: hidden;			
+				overflow: hidden;
 			}
+		}
+
+		.el-dialog__header {
+			padding-right: 0;
 		}
 
 		&.hide-header {
@@ -723,7 +794,7 @@ body {
 		&.mini {
 			.el-input {
 				height: 30px;
-				line-height: 30px;			
+				line-height: 30px;
 			}
 		}
 
@@ -754,7 +825,7 @@ body {
 
 	.el-radio-button {
 		.el-radio-button__inner {
-			box-shadow: none !important;		
+			box-shadow: none !important;
 		}
 	}
 	.el-radio-button.is-active {
@@ -772,7 +843,7 @@ body {
 			text-align: center;
 			margin-bottom: 0;
 			word-break: normal;
-			line-height: 22px;		
+			line-height: 22px;
 		}
 
 		&.standard-popover {
@@ -830,13 +901,13 @@ body {
 
 	@media (min-width: 991px) {
 		.el-button:hover {
-			&:not(.is-disabled.with-pointer-events) {	
+			&:not(.is-disabled.with-pointer-events) {
 				&.el-button--primary {
 					background-color: transparent !important;
 					color: $secondaryFontColor !important;
 					&.plain {
 						background-color: #fff !important;
-						color: $secondaryFontColor !important;			
+						color: $secondaryFontColor !important;
 					}
 				}
 

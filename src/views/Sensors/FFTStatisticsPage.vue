@@ -68,6 +68,7 @@ import draggablePoints from 'highcharts/modules/draggable-points';
 import highchartsMore from 'highcharts/highcharts-more';
 import annotations from 'highcharts/modules/annotations';
 
+import { initHighchartsModule } from '@/helpers/charts';
 import { Lang } from '@/localization';
 import { getRoundedValue } from '@/helpers';
 import { useSensors } from '@/composables/useSensors';
@@ -79,11 +80,11 @@ import Datepicker from '@/components/common/Datepicker.vue';
 import AnalysisFFTContainer from './AnalysisFFT/AnalysisFFTContainer.vue';
 import FFTChartsListWrapper from './charts/fft/FFTChartsListWrapper.vue';
 
-stockInit(Highcharts);
-boost(Highcharts);
-draggablePoints(Highcharts);
-highchartsMore(Highcharts);
-annotations(Highcharts);
+initHighchartsModule(stockInit, Highcharts);
+initHighchartsModule(boost, Highcharts);
+initHighchartsModule(draggablePoints, Highcharts);
+initHighchartsModule(highchartsMore, Highcharts);
+initHighchartsModule(annotations, Highcharts);
 
 const { tt } = Lang;
 const route = useRoute();

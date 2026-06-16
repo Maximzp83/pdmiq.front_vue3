@@ -28,8 +28,9 @@ export function useDashboardListsReorder({
 			editModalProp: 'editModalClassic',
 			modalClassName: 'fixed-header-footer small-header small-footer',
 			className: 'maintenance-modal',
-			componentPath: 'Maintenance/MaintenanceFormWrapper',
-			additionalModalSettings: {
+			formComponentFileLoader: () => import('@/views/Maintenance/MaintenanceFormWrapper.vue'),
+			// componentPath: 'Maintenance/MaintenanceFormWrapper',
+			additionalSettings: {
 				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
 				...woFilters.value,
 			},

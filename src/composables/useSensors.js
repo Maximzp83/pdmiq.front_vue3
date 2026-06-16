@@ -125,6 +125,18 @@ export function useSensors() {
 			...payload,
 		});
 
+	const plantGraphsPdfReport = ({ plantId, ...payload } = {}) =>
+		api_request.post(`/plants/${plantId}/graphical-comparison-reports`, {
+			notNotify: true,
+			...payload,
+		});
+
+	const fetchPlantGraphsPdfReportLast = ({ plantId, ...payload } = {}) =>
+		api_request.get(`/plants/${plantId}/graphical-comparison-reports/last`, {
+			notNotify: true,
+			...payload,
+		});
+
 	const saveChartNote = ({ sensorId, noteId, ...payload } = {}) =>
 		api_request(noteId ? `/sensors/${sensorId}/graphs/notes/${noteId}` : `/sensors/${sensorId}/graphs/notes`, {
 			storeName,
@@ -149,6 +161,9 @@ export function useSensors() {
 
 	const setFftRpmParams = ({ sensorId, fftId, ...payload } = {}) =>
 		api_request.put(`/sensors/${sensorId}/ncd/fft/${fftId}/rpm-params`, payload);
+
+	const unlockFft = ({ sensorId, ...payload } = {}) =>
+		api_request.post(`/sensors/${sensorId}/fft/unlock`, payload);
 
 	const createFftWaveform = ({ sensorId, fftId, axisId, ...payload } = {}) =>
 		api_request.post(`/sensors/${sensorId}/fft/${fftId}/sound-waveform/${axisId}`, {
@@ -215,11 +230,14 @@ export function useSensors() {
 		saveSensorLevelZones,
 		updateSensorLevelZone,
 		pdfReportRequest,
+		plantGraphsPdfReport,
+		fetchPlantGraphsPdfReportLast,
 		saveChartNote,
 		fetchDatasetFormulas,
 		saveDatasetFormulas,
 		sendRpm,
 		setFftRpmParams,
+		unlockFft,
 		createFftWaveform,
 		fetchFftWaveform,
 		resetSensorRuntime,

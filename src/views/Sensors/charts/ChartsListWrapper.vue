@@ -50,9 +50,10 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
-import { getValues } from '@/helpers';
+import { getValues, isTodayRange } from '@/helpers';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useSensorType } from '@/composables/mixins/useSensorType';
+import { useWebSocket } from '@/composables/mixins/useWebSocket';
 import { useSensorsStore } from '@/stores/SensorsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { executeChartsListFactory } from '@/modules/charts_factory/index.js';
@@ -98,11 +99,16 @@ const updateChartsList = ref(0);
 const chartsListInstancesInitialBuild = ref(true);
 const unsavedThresholdsDialogOpen = ref(false);
 const isRedirected = ref(false);
+const statisticsSocketReady = ref(false);
+const statisticsSocket = ref(null);
 const chartRefs = ref({});
 
 const { currentSensorType, currentChartSettingsKey, getType, getChartSettingsKey } = useSensorType({
 	currentSensorTypeData: computed(() => props.sensorData),
 });
+const { setupWebSocket, closeWebSocket } = useWebSocket();
+
+const socketChannel = computed(() => props.sensorData ? `sensor.${props.sensorData.uuid}` : null);
 
 const chartsListInstanceEventsList = computed(() => {
 	const events = {
@@ -121,6 +127,76 @@ const chartsListInstanceEventsList = computed(() => {
 	}
 
 	return Object.freeze(events);
+});
+
+const overlayChartInstanceEventsList = computed(() => Object.freeze({
+	isLoading: (value) => {
+		overlayChartsListWrapperLoading.value = value;
+	},
+}));
+
+const overlayChartsListInstance = computed(() => {
+	const { linespeedOverlaySensorData, sensorData, rpmOverlayData } = props;
+	const type = currentSensorType.value || {};
+	const isValidNCD = (
+		type.isNCDTempVibe ||
+		type.isNCDTempVibeCurr ||
+		type.isNCDWiredTempVibe ||
+		type.isNCDSDT ||
+		type.isNCDCustom_4_20
+	);
+	const isValidBanner = type.isBanner || type.isBannerTempVibe2 || type.isBannerV2Generic || type.isBannerV2_1;
+
+	if (
+		!linespeedOverlaySensorData ||
+		(
+			linespeedOverlaySensorData.id === sensorData.id &&
+			!rpmOverlayData?.isMaxPeakFrequency
+		)
+	) {
+		return null;
+	}
+
+	const sensorType = getType(linespeedOverlaySensorData);
+	const chartSettingsKey = getChartSettingsKey(linespeedOverlaySensorData, sensorType);
+	const shouldBuild = (
+		(linespeedOverlaySensorData.is_linespeed_node && isValidNCD) ||
+		isValidBanner ||
+		rpmOverlayData?.isMaxPeakFrequency
+	);
+	let getParamsByIds;
+
+	if (rpmOverlayData) {
+		if (!rpmOverlayData.is_rpm_visible) return null;
+		if (rpmOverlayData.rpm_request) {
+			getParamsByIds = [rpmOverlayData.rpm_request.parameter];
+		}
+	}
+
+	if (!shouldBuild) return null;
+
+	return executeChartsListFactory('sensorChartsListFactory', {
+		settings: {
+			events: {
+				chartsListWrapperReady: (hasStats) => handleOverlayChartWrapperReady({ hasStatistics: hasStats }),
+			},
+			chartFactoryName: 'SensorOverlayChart',
+			returnChartConfigByIdx: 0,
+			setupChartsConfigsListSettings: {
+				configsKey: 'sensorChartsListsConfig',
+				chartKey: chartSettingsKey,
+				getParamsByIds,
+				returnChartConfigByIdxIfEmptyAfterFiltration: 0,
+			},
+		},
+		payload_1: {
+			sensorType: chartSettingsKey,
+			sensorItem: linespeedOverlaySensorData,
+			currentSensorType: sensorType,
+			rpmOverlayRequest: rpmOverlayData?.rpm_request,
+			isMaxPeakFrequency: rpmOverlayData?.isMaxPeakFrequency,
+		},
+	});
 });
 
 const chartsListInstance = computed(() =>
@@ -227,6 +303,38 @@ const setChartRef = (chartId, el) => {
 	if (el) chartRefs.value[chartId] = el;
 };
 
+const handleOverlayChartWrapperReady = ({ hasStatistics: hasStats }) => {
+	overlayChartsListWrapperLoading.value = false;
+	if (!hasStats || !overlayChartsListInstance.value?.chartsInstancesList?.[0]) return;
+
+	callMethodInAllCharts({
+		ids: getValues('chart_id', chartsListInstance.value.getCharts()),
+		methodName: 'updateOverlayChartOptions',
+		fromInstance: true,
+		payload: overlayChartsListInstance.value.chartsInstancesList[0].getChartOptions(),
+	});
+};
+
+const buildOverlayCharts = ({ settings, payload } = {}) => {
+	if (!overlayChartsListInstance.value) return;
+
+	overlayChartsListInstance.value.buildCharts({
+		settings: settings || {},
+		payload_1: { ...(payload || {}) },
+		filters: { ...props.rootFilters },
+	});
+
+	overlayChartsListWrapperLoading.value = true;
+	overlayChartsListInstance.value.chartsInstancesList?.forEach((Chart) => {
+		Chart.injectProps('events', overlayChartInstanceEventsList.value);
+		Chart.fetchChartData();
+	});
+
+	if (window.location.origin === 'http://localhost:5173') {
+		window.OverlayChartsListInstance = overlayChartsListInstance.value;
+	}
+};
+
 const buildCharts = ({ settings, payload } = {}) => {
 	chartsListInstance.value.buildCharts({
 		settings,
@@ -245,7 +353,7 @@ const buildCharts = ({ settings, payload } = {}) => {
 		setupOverlayPlotlines(props.rpmOverlayData.rpm_value);
 	}
 
-	if (window.location.origin === 'http://localhost:8080') {
+	if (window.location.origin === 'http://localhost:5173') {
 		window[`ChartsListInstance_${props.chartsContainerIdx}`] = chartsListInstance.value;
 	}
 };
@@ -303,23 +411,154 @@ const handleRedirectTo = (to) => {
 	}
 };
 
+const setupSocket = () => {
+	const shouldConnect = (
+		!props.additionalProps.isCompare &&
+		!props.oneChartOnly &&
+		props.rootFilters.daterange &&
+		isTodayRange(props.rootFilters.daterange) &&
+		props.rootFilters.isLiveEnabled &&
+		socketChannel.value
+	);
+
+	if (shouldConnect) {
+		if (statisticsSocket.value) return;
+		statisticsSocket.value = setupWebSocket({
+			socketName: 'statistics_socket',
+			socketReadyRef: statisticsSocketReady,
+			socketChannel: socketChannel.value,
+			onMessage: statisticsSocketCallback,
+		});
+		return;
+	}
+
+	if (statisticsSocket.value) {
+		closeWebSocket({ socketName: 'statistics_socket' });
+		statisticsSocket.value = null;
+	}
+};
+
+const statisticsSocketCallback = (response = {}) => {
+	const { data, type } = response;
+	try {
+		if (type === 'job') {
+			chartsListInstance.value.callMethod('handlePointsLiveUpdate', data);
+		} else if (type === 'sensor') {
+			if (data) {
+				emit('event', {
+					eventName: 'update_sensor',
+					data: {
+						id: props.sensorData.id,
+						sensor: {
+							...props.sensorData,
+							lube_cycle_high_speed: data.lube_cycle_high_speed,
+						},
+					},
+					onward: true,
+				});
+			}
+		} else if (type === 'GainAdjustment') {
+			chartsListInstance.value.callMethod('handleAdjustmentsLiveUpdate', {
+				data,
+				settings: {
+					set_sensor_state: sensorsStore.set_sensor_state,
+				},
+			});
+		}
+	} catch (error) {
+		console.error('statistics_socketCallback', error);
+	}
+};
+
+const handleUltrasoundWebSocketSuccess = (lubeShotData) => {
+	if (
+		!props.additionalProps.isCompare &&
+		!props.oneChartOnly &&
+		props.rootFilters.daterange &&
+		isTodayRange(props.rootFilters.daterange) &&
+		props.rootFilters.isLiveEnabled
+	) {
+		chartsListInstance.value.callMethod('handleLubePointsLiveUpdate', lubeShotData);
+	}
+};
+
 const { handleEvent } = useEventHandler({
 	handleRedirectTo,
+	handleUltrasoundWebSocketSuccess,
+	callMethodInAllCharts,
 }, emit);
+
+watch(() => props.rpmOverlayData, (data = {}) => {
+	callMethodInAllCharts({
+		ids: getValues('chart_id', chartsListInstance.value.getCharts()),
+		methodName: 'cleanOverlayChartData',
+		fromInstance: true,
+	});
+
+	if (data.is_rpm_visible && data.rpm_value) {
+		setupOverlayPlotlines(data.rpm_value);
+	}
+}, { deep: true });
+
+watch(overlayChartsListInstance, (instance) => {
+	if (instance) {
+		buildOverlayCharts();
+	}
+});
 
 watch(buildChartsSettings, (settings) => {
 	buildCharts({ settings });
 });
 
-watch(() => props.rootFilters, () => {
-	chartsListInstance.value.setFiltersToCharts?.({ ...props.rootFilters });
+watch(chartsConfigsFullList, (list) => {
+	if (!props.oneChartOnly) {
+		emit('event', {
+			eventName: 'handleChartsConfigsListReady',
+			data: list || [],
+			onward: true,
+		});
+	}
 });
 
+watch(() => props.rootFilters, (filters) => {
+	if (overlayChartsListInstance.value) {
+		overlayChartsListInstance.value.setFiltersToCharts?.({ ...filters }, { refetchData: true });
+	}
+	chartsListInstance.value.setFiltersToCharts?.({ ...filters }, { refetchData: true });
+	setupSocket();
+}, { deep: true });
+
+watch(yFilters, (filters) => {
+	chartsListInstance.value.setYFiltersToCharts?.(filters);
+}, { deep: true });
+
 onMounted(() => {
+	if (overlayChartsListInstance.value) {
+		buildOverlayCharts();
+	}
 	buildCharts({ settings: buildChartsSettings.value });
+	setupSocket();
+
+	if (!props.oneChartOnly && editThresholdsByStagesEnabled.value) {
+		globalStore.set_global_state({
+			stateProp: 'beforeEachHook',
+			value: (payload) => checkUnsavedThresholds(payload),
+		});
+	}
 });
 
 onBeforeUnmount(() => {
+	if (statisticsSocket.value) {
+		closeWebSocket({ socketName: 'statistics_socket' });
+		statisticsSocket.value = null;
+	}
+
+	if (editThresholdsByStagesEnabled.value) {
+		globalStore.set_global_state({ stateProp: 'beforeEachHook', value: null });
+		globalStore.set_value?.('redirectTo', null);
+	}
+
+	overlayChartsListInstance.value?.destroyCharts?.();
 	chartsListInstance.value?.destroyCharts?.();
 });
 
@@ -331,6 +570,7 @@ defineExpose({
 	reloadChart,
 	callMethodInAllCharts,
 	checkUnsavedThresholds,
+	handleUltrasoundWebSocketSuccess,
 	getType,
 	getChartSettingsKey,
 });

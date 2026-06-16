@@ -47,6 +47,11 @@
 
 						<div class="images-part mcol-xs-5">
 							<div v-if="mainImage" class="imgWrapper">
+								<div class="images-part-overlay dark-overlay" @click="togglePreviewModal">
+									<div class="caption">
+										<i class="icomoon icon-zoom-in"></i>
+									</div>
+								</div>
 								<img :src="mainImage.full_thumb_file_name" alt="img error" />
 							</div>
 						</div>
@@ -104,6 +109,7 @@ import { computed } from 'vue';
 
 import { getCellValue } from '@/helpers';
 import { not_wifi_icon } from '@/constants/global';
+import { buildProps, useItemCard } from '@/composables/mixins/useItemCard';
 
 import ButtonWithPopover from '@/components/common/ButtonWithPopover.vue';
 
@@ -111,13 +117,15 @@ defineOptions({
 	name: 'ProcessItemCard',
 });
 
-const props = defineProps({
+const props = defineProps(buildProps({
 	cardData: { type: Object, required: true },
-	selectedIds: { type: Array, default: () => [] },
-	operationsSettings: { type: Object, default: () => ({}) },
-});
+}));
 
 const emit = defineEmits(['event']);
+const { togglePreviewModal } = useItemCard({
+	cardData: computed(() => props.cardData),
+	emit,
+});
 
 const sortByDisplayOrder = (items = []) =>
 	[...items].sort((a, b) => Number(a?.display_order || 0) - Number(b?.display_order || 0));

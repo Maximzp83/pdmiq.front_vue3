@@ -40,9 +40,12 @@ export function useItemCard({ cardData, changeRoute, titleLinkRoute, resetPageFi
 	const handleTitleClick = () => {
 		const navigate = changeRoute || defaultChangeRoute;
 		if (navigate) navigate({ path: resolve(titleLinkRoute) });
-		if (resetPageFiltersList) {
+		const resetConfig = resolve(resetPageFiltersList);
+		if (typeof resetConfig === 'function') {
+			resetConfig();
+		} else if (resetConfig) {
 			try {
-				setFiltersViaList(resolve(resetPageFiltersList));
+				setFiltersViaList(resetConfig);
 			} catch (error) {
 				console.warn('[useItemCard] resetPageFiltersList is not available in the current store setup', error);
 			}

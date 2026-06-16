@@ -37,7 +37,8 @@ export const MENU_TYPES = {
 	STOREROOMS: 30,
 	USER_ROLES: 31,
 	CLIENT_API: 32,
-	SENSORS: 33,
+	CORPORATE_ANALYTICS: 33,
+	SENSORS: 34,
 };
 
 const menuItems1 = [
@@ -72,6 +73,15 @@ const menuItems1 = [
 		icon: 'icon-dashboard2',
 		path: '/success-dashboard',
 		meta: { permissions: ['view_customer_success'] },
+		enableInCompanyMenuForm: true
+	},
+	{
+		name: 'sidebar_menu.CORPORATE_VIEW',
+		belongs_to_label: 'predictive_maintenance',
+		id: MENU_TYPES.CORPORATE_ANALYTICS,
+		icon: 'icon-corporate',
+		path: '/corporate',
+		meta: { permissions: ['view_corporate'] },
 		enableInCompanyMenuForm: true
 	},
 	{
@@ -497,6 +507,7 @@ const menuItems1 = [
 const menuSectionsList1 = [
 	{ id: MENU_TYPES.DASHBOARD, name: 'sidebar_menu.Dashboard' },
 	{ id: MENU_TYPES.CUSTOMER_SUCCESS, name: 'sidebar_menu.customer_success' },
+	{ id: MENU_TYPES.CORPORATE_ANALYTICS, name: 'sidebar_menu.corporate_view' },
 	{ id: MENU_TYPES.CONTROLLERS, name: 'controllers' },
 	{ id: MENU_TYPES.OEE, name: 'sidebar_menu.oee' },
 	{ id: MENU_TYPES.COMPANIES, name: 'companies' },

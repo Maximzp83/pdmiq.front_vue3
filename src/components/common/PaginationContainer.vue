@@ -88,6 +88,7 @@ const currentPage = computed({
 
 		&:not(.disabled).is-active {
 			background-color: $primary-color !important;
+			color: #fff;
 		}
 	}
 

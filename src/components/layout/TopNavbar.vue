@@ -88,6 +88,7 @@
 							clearingTo="last_7_days"
 							type="daterange"
 							size="large"
+							clearable
 						/>
 					</div>
 				</Transition>

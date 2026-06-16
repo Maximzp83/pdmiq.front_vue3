@@ -58,7 +58,7 @@ const isSuccessStatus = (response, statusCheckSettings) => {
  */
 const getResponseValue = (response, payload) => {
 	const { prepareData, prepareDataSettings, dataPath } = payload;
-
+	// console.log('payload', payload);
 	if (dataPath) {
 		// Extract data from specific path
 		const paths = dataPath.split('.');

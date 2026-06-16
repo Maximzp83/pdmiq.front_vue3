@@ -22,6 +22,7 @@
 									class="mcol-xs-12 mcol-sm-auto"
 									:ChartInstance="ChartInstance"
 									:chartOptionsUpdate="chartOptionsUpdate"
+									:chartOptionsUpdateSettings="chartOptionsUpdateSettings"
 									:chartIsInit="chartRendering"
 									:showHistory="additionalProps.showHistory"
 									@event="handleEvent"
@@ -174,6 +175,7 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
+import { initHighchartsModule } from '@/helpers/charts';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import {
@@ -218,6 +220,7 @@ const chartToggled = ref(1);
 const refetchChartData = ref(false);
 const chartIsInit = ref(false);
 const chartOptionsUpdate = ref(0);
+const chartOptionsUpdateSettings = ref({});
 const showNavigator = ref(false);
 const chartLoading = ref(false);
 const chartRendering = ref(false);
@@ -237,12 +240,12 @@ const hcInstance = computed(() => {
 	if (!instances) return undefined;
 	const { hcInstanceNew, hcInstance: legacyInstance, stockInit, boost, stockInitNew, boostNew } = instances;
 	if (props.ChartInstance.generateSeriesByStatistics) {
-		stockInitNew?.(hcInstanceNew);
-		boostNew?.(hcInstanceNew);
+		initHighchartsModule(stockInitNew, hcInstanceNew);
+		initHighchartsModule(boostNew, hcInstanceNew);
 		return hcInstanceNew;
 	}
-	stockInit?.(legacyInstance);
-	boost?.(legacyInstance);
+	initHighchartsModule(stockInit, legacyInstance);
+	initHighchartsModule(boost, legacyInstance);
 	return legacyInstance;
 });
 const chartOptions = computed(() => chartOptionsUpdate.value ? Object.freeze(props.ChartInstance.getChartOptions()) : null);
@@ -312,7 +315,9 @@ const enableColorPickerBlock = computed(() => props.currentSensorType.isBannerV2
 const updateThresholdsData = computed(() =>
 	chartThresholdsUpdate.value ? Object.freeze(props.ChartInstance.updateThresholdsData) : {},
 );
-const isWarningThresholdChanged = computed(() => !!updateThresholdsData.value.warning_zone);
+const isWarningThresholdChanged = computed(() =>
+	Object.prototype.hasOwnProperty.call(updateThresholdsData.value, 'warning_zone'),
+);
 const isWarningThresholdLessThanAlarm = computed(() =>
 	chartThresholdsUpdate.value ? props.ChartInstance.isWarningThresholdLessThanAlarm : true,
 );
@@ -440,6 +445,10 @@ const handleUnlockFFT = () => {
 };
 
 const chartInstanceEventsList = computed(() => {
+	const handleChartOptionsUpdate = (options, settings = {}) => {
+		chartOptionsUpdateSettings.value = settings || {};
+		chartOptionsUpdate.value += 1;
+	};
 	const list = {
 		chartIsHidden: () => { chartToggled.value += 1; },
 		isLoading: (value) => { chartLoading.value = value; },
@@ -448,8 +457,8 @@ const chartInstanceEventsList = computed(() => {
 		statisticsResponsesReady: handleStatisticsResponsesReady,
 		hasStatistics: handleHasStatisticsChange,
 		chartDataReady: (value) => { chartDataReady.value = value; },
-		chartOptionsReady: () => { chartOptionsUpdate.value += 1; },
-		chartOptionsUpdate: () => { chartOptionsUpdate.value += 1; },
+		chartOptionsReady: handleChartOptionsUpdate,
+		chartOptionsUpdate: handleChartOptionsUpdate,
 		chartThresholdsUpdate: handleChartThresholdsUpdate,
 	};
 	if (props.additionalProps.setIsGraphMountedToWindow) {

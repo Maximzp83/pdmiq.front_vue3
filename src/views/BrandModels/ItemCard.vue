@@ -56,6 +56,7 @@ import { findItemBy } from '@/helpers';
 import { setupTypeOptionsValuesList } from '@/helpers/specialHelpers';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemCard, buildProps } from '@/composables/mixins/useItemCard';
+import { useBrandModelsStore } from '@/stores/BrandModelsStore';
 
 import GridItemCardHeader from '@/components/gridTable/GridItemCardHeader.vue';
 import InfoItem from '@/components/itemDetails/InfoItem.vue';
@@ -67,6 +68,7 @@ defineOptions({
 const props = defineProps(buildProps());
 
 const emit = defineEmits(['event']);
+const brandModelsStore = useBrandModelsStore();
 
 const detailsRoute = computed(
 	() => `/brand-models/${props.cardData.id}/details?plantId=${props.additionalProps?.plantId}`,
@@ -92,19 +94,12 @@ const currentDataList = computed(() =>
 	Object.freeze(props.cardData?.type_option_values || []),
 );
 
-const resetPageFiltersList = computed(() =>
-	Object.freeze({
-		filters: [
-			{
-				storeName: 'BrandModelsStore',
-				stateKey: 'filters',
-				storageKey: 'brand_models_filters',
-				params: ['page'],
-			},
-		],
-		value: 1,
-	}),
-);
+const resetPageFiltersList = () => {
+	brandModelsStore.set_filters('brand_models', {
+		...(brandModelsStore.filters || {}),
+		page: 1,
+	});
+};
 
 const typeOptionsValuesList = computed(() =>
 	Object.freeze(

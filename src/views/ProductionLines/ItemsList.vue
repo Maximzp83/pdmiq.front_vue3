@@ -171,6 +171,7 @@ const props = defineProps({
 	productionLineType: { type: Number, default: PRODUCTION_LINES_TYPES.PRODUCTION_LINE },
 	showToggleListButton: Boolean,
 	fromDetailsPage: Boolean,
+	fromDashboard: Boolean
 });
 const emit = defineEmits(['event']);
 
@@ -228,6 +229,8 @@ const {
 	itemsName: itemsNameLocal,
 	options: {
 		tableRef: itemsTableRef,
+		fromDashboard: props.fromDashboard,
+		preventSetNavbar: props.fromDashboard,
 		editInModal: true,
 		filtersStateProp: filtersStateProp.value,
 		predefinedFilters: { type: props.productionLineType || PRODUCTION_LINES_TYPES.PRODUCTION_LINE },

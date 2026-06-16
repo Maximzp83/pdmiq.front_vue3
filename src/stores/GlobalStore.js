@@ -130,6 +130,7 @@ export const useGlobalStore = defineStore('globalStore', {
 		},
 
 		setup_navbar(data = {}) {
+			// console.log('setup_navbar', data);
 			this.set_value('navbarSettings', data);
 		},
 

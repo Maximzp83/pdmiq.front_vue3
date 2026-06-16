@@ -141,15 +141,15 @@ export function useMainInstanceDetailsPage({
 		e.preventDefault();
 		const { key } = e.legendItem;
 
-		const alertType = findItemBy('key', key, alertTypesList());
+		const alertType = findItemBy('key', key.toLowerCase(), alertTypesList());
 		const layout = equipmentsLayoutRef?.value;
-
 		if (layout && layout.handleAlertTypesFilter) {
 			const newFilters = {
 				...equipmentsFilters.value,
 				page: 1,
 				isShowList: true,
 			};
+			// console.log('alertType', alertType, key);
 			set_equipments_filters(newFilters);
 			if (alertType) {
 				layout.handleAlertTypesFilter([alertType.id]);

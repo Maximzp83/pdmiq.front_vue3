@@ -3761,12 +3761,22 @@
 	&.filled-header {
 		.el-dialog__header {
 			background-color: #F0F2F5;
-
 		}
 	}
 
 	.el-dialog__header {
 		padding: 0;
+		position: relative;
+
+		.el-dialog__headerbtn{
+			top: 50%;
+			right: 10px;
+			transform: translateY(-50%);
+
+			.el-icon {
+				font-size: 24px;
+			}
+		}
 	}
 
 	&.title-center {
@@ -3775,7 +3785,7 @@
 		}
 	}
 
-	.el-icon-close:not(.el-tag__close) {
+	.el-dialog__close:not(.el-tag__close) {
 		font-size: 22px;
 		font-weight: 600;
 		color: #000 !important;

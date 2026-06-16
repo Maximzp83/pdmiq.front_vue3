@@ -22,10 +22,11 @@
 import { computed } from 'vue';
 import Highcharts from 'highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
+import { initHighchartsModule } from '@/helpers/charts';
 import { Lang } from '@/localization';
 import CommonChartItemWrapper from '@/components/charts/CommonChartItemWrapper.vue';
 
-highchartsMore(Highcharts);
+initHighchartsModule(highchartsMore, Highcharts);
 
 const { tt } = Lang;
 

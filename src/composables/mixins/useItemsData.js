@@ -129,6 +129,7 @@ export function useItemsData({
 		}
 		return filters;
 	};
+	const getPropsFiltersValue = () => resolve(propsFilters) || {};
 
 	const navbarSettings = shallowReactive({
 		showFilter: true,
@@ -172,7 +173,7 @@ export function useItemsData({
 		}
 
 		// Add props filters
-		const propsFiltersValue = propsFilters?.value || propsFilters;
+		const propsFiltersValue = getPropsFiltersValue();
 		if (propsFiltersValue && Object.keys(propsFiltersValue).length > 0) {
 			newFilters = { ...newFilters, ...propsFiltersValue };
 		}
@@ -521,7 +522,11 @@ export function useItemsData({
 	// Watch filters
 	if (filtersRef && !watchPropsFiltersOnly) {
 		watch(filtersRef, () => {
-			scheduleFetchItems();
+			if (preventFetch.value) {
+				preventFetch.value = false;
+			} else {
+				scheduleFetchItems();
+			}
 		}, {
 			deep: true,
 			flush: 'post'
@@ -553,7 +558,7 @@ export function useItemsData({
 
 	// Watch propsFilters if provided
 	if (propsFilters) {
-		watch(propsFilters, () => {
+		watch(() => getPropsFiltersValue(), () => {
 			scheduleFetchItems();
 		}, {
 			deep: true,
@@ -579,11 +584,11 @@ export function useItemsData({
 		}
 
 		// Initial fetch
-		if (!stopFetch && !manual) {
-			if (watchPropsFiltersOnly) {
-				const propsFiltersValue = propsFilters?.value || propsFilters || {};
-				fetchItems({ ...propsFiltersValue });
-			} else {
+			if (!stopFetch && !manual) {
+				if (watchPropsFiltersOnly) {
+					const propsFiltersValue = getPropsFiltersValue();
+					fetchItems({ ...propsFiltersValue });
+				} else {
 				const filters = filtersRef?.value || {};
 				fetchItems({
 					...filters,
@@ -594,7 +599,10 @@ export function useItemsData({
 		}
 
 		if (navbarSettings) {
-			set_global_store('navbarSettings', navbarSettings);
+			if (!options.preventSetNavbar) {
+				// console.log('useItemsData beforeMount', options)
+				set_global_store('navbarSettings', navbarSettings);
+			}
 		}
 		// console.log('useItemsData beforeMount', itemsName.value)
 	});

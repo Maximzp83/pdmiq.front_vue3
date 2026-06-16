@@ -17,6 +17,7 @@ export function useSwitchGridView({
 		Object.freeze({
 			hideTitle: true,
 			buttonType: 'primary',
+			className: 'full-height',
 			group: true,
 		}),
 	);

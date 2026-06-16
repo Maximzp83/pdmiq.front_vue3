@@ -19,7 +19,6 @@
 				:showCreateActions="hasAccessToCreate || hasAccessToDelete"
 				:hideCreate="!hasAccessToCreate"
 				:hideDelete="!hasAccessToDelete"
-				:itemsName="itemsName"
 				filterbarDropdownId="equipmentsDropdownFilterbar"
 				@event="handleEvent"
 			>
@@ -59,7 +58,7 @@
 							</div>
 
 							<div v-if="showClearFilters" class="filter-item ml-auto">
-								<el-button class="small" type="primary" native-type="button" @click="handleClearFilters">
+								<el-button type="primary" class="el-button--mini" native-type="button" @click="handleClearFilters">
 									{{ tt('phrases.Clear_filters') }}
 								</el-button>
 							</div>
@@ -75,6 +74,7 @@
 									:optionsList="equipmentTypesList"
 									:placeholder="tt('Item_type')"
 									@update:model-value="(id) => setFilters({ typeId: id })"
+									prefixIcon="icomoon icon-item-types2"
 								/>
 							</div>
 
@@ -188,7 +188,7 @@
 						<el-checkbox
 							:model-value="filters.favorites"
 							:false-label="null"
-							@change="(favorites) => setFilters({ favorites })"
+							@change="(favorites) => setFilters({ favorites: favorites ? true : null })"
 						>
 							{{ tt('Favorites') }}
 						</el-checkbox>
@@ -215,7 +215,18 @@
 					</div>
 
 					<div class="filter-item mcol-xs-auto mcol-sm-5 mcol-lg-auto">
-						<el-select
+						<CustomSelectV2
+							class="form-item-standard-width"
+							:disabled="isStoreRoomTab"
+							collapse-tags
+							multiple
+							:placeholder="tt('phrases.Select_alert_types')"
+							:model-value="alertTypesFilters"
+							@change="handleAlertTypesFilter"
+							:optionsList="alertTypesList"
+						/>
+
+						<!-- <el-select
 							:disabled="isStoreRoomTab"
 							collapse-tags
 							multiple
@@ -229,7 +240,7 @@
 								:label="item.name"
 								:value="item.id"
 							/>
-						</el-select>
+						</el-select> -->
 					</div>
 
 					<div v-if="!hideDatepicker" class="filter-item text-right mcol-xs-auto">
@@ -264,6 +275,28 @@
 								<i :class="['icomoon', draggingLocked ? 'icon-lock2' : 'icon-unlock']"></i>
 							</el-button>
 						</span>
+
+						<span>
+							<el-popover
+								v-if="fromDashboard"
+								placement="bottom"
+								popper-class="link-popover"
+								:title="tt('phrases.export_charts_to_pdf')"
+								trigger="hover"
+								width="120"
+							>
+								<template #reference>
+									<el-button
+										native-type="button"
+										class="drag_n_drop-locker"
+										@click="exportChartsToPdfDialogOpen = true"
+									>
+										<i class="icomoon icon-pdf"></i>
+									</el-button>
+								</template>
+							</el-popover>
+							
+						</span>
 					</div>
 
 					<div v-show="filters.hasSensors && !isStoreRoomTab" class="filter-item mcol-xs-12">
@@ -279,6 +312,7 @@
 			</Filterbar>
 
 			<EquipmentsList
+				v-if="activeRadioFilter === 'isAsset'"
 				ref="itemsListContainerRef"
 				:hideDatepicker="hideDatepicker"
 				:fromDashboard="fromDashboard"
@@ -295,19 +329,49 @@
 				:equipmentTypesList="equipmentTypesList"
 				@event="handleEvent"
 			/>
+
+			<BrandModelsList
+				v-if="activeRadioFilter === 'isStoreRoom'"
+				ref="itemsListContainerRef"
+				:fromDashboard="fromDashboard"
+				:preventSetNavbar="preventSetNavbar"
+				:fromDetailsPage="fromDetailsPage"
+				:plantId="plantId"
+				fromEquipmentsLayout
+				isStoreRoomItems
+				:perPageItems="perPageItems"
+				:propsFilters="finalBrandModelsFilters"
+				watchPropsFiltersOnly
+				@event="handleEvent"
+			/>
 		</div>
+
+		<el-dialog
+			v-model="exportChartsToPdfDialogOpen"
+			append-to-body
+			center
+			class="small dialog-decorate-header"
+			:title="tt('phrases.export_charts_to_pdf')"
+		>
+			<ExportChartsToPdfContent
+				v-if="exportChartsToPdfDialogOpen"
+				:plantId="globalFilters.plantId"
+				@close="exportChartsToPdfDialogOpen = false"
+			/>
+		</el-dialog>
 	</div>
 </template>
 
 <script setup>
-import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue';
+import { computed, defineAsyncComponent, onBeforeMount, ref, shallowRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
 import { ALERT_TYPES, alertTypesList as getAlertTypesList, sensorClassesList } from '@/constants/global';
-import { getDateRange, getYmdDateString } from '@/helpers';
+import { getDateRange, getYmdDateString, removeObjProps } from '@/helpers';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useBrandModelsStore } from '@/stores/BrandModelsStore';
 import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useSensorsStore } from '@/stores/SensorsStore';
@@ -321,6 +385,9 @@ import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
 import Filterbar from '@/components/common/Filterbar.vue';
 import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
 import EquipmentsList from './ItemsList.vue';
+import BrandModelsList from '@/views/BrandModels/ItemsList.vue';
+
+const ExportChartsToPdfContent = defineAsyncComponent(() => import('./ExportChartsToPdfContent.vue'));
 
 const { tt } = Lang;
 
@@ -342,9 +409,11 @@ const emit = defineEmits(['event']);
 
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
+const brandModelsStore = useBrandModelsStore();
 const equipmentsStore = useEquipmentsStore();
 const sensorsStore = useSensorsStore();
 const { globalFilters } = storeToRefs(globalStore);
+const { storeroom_brand_models_filters: storeroomBrandModelsFilters } = storeToRefs(brandModelsStore);
 const { filters } = storeToRefs(equipmentsStore);
 const { statistics_filters: sensorsStatisticsFilters } = storeToRefs(sensorsStore);
 
@@ -352,6 +421,7 @@ const dropdownFilterbarRef = ref(null);
 const itemsListContainerRef = ref(null);
 const showFilterbar = ref(false);
 const draggingLocked = ref(true);
+const exportChartsToPdfDialogOpen = ref(false);
 const activeRadioFilter = ref('isAsset');
 const alertTypesFilters = ref([]);
 const showStoreRoomFilter = ref(false);
@@ -387,6 +457,22 @@ const isStoreRoomTab = computed(() => activeRadioFilter.value === 'isStoreRoom')
 const itemsName = computed(() => Object.freeze({ one: tt('Item'), mult: tt('Items'), instanceName: 'Equipments' }));
 const finalFilters = computed(() => ({ ...filters.value }));
 const finalEquipmentsFilters = computed(() => ({ ...finalFilters.value, ...props.propsFilters }));
+const finalBrandModelsFilters = computed(() => {
+	const mergedFilters = {
+		...filters.value,
+		...props.propsFilters,
+		...storeroomBrandModelsFilters.value,
+	};
+	const removePropsForModels = [
+		'hasSensors',
+		'acknowledgeOnly',
+		'alert_types',
+		'isShowList',
+		'predefinedOptionsValuesIDs',
+		'rawOptionsValuesIDs',
+	];
+	return removeObjProps(mergedFilters, removePropsForModels);
+});
 const clearableFiltersList = Object.freeze([
 	'locationId',
 	'productionLineId',
@@ -418,8 +504,8 @@ const alertTypesList = computed(() => {
 	return list;
 });
 const sensorTypesButtonsList = computed(() => Object.freeze(sensorClassesList()));
-const radioSensorTypeSettings = Object.freeze({ hideTitle: true, inline: true, clearable: true, buttonType: 'primary' });
-const radioBlockOptions = Object.freeze({ hideTitle: true, buttonType: 'primary' });
+const radioSensorTypeSettings = Object.freeze({ hideTitle: true, inline: true, clearable: true, className: 'el-button--secondary el-button--small' });
+const radioBlockOptions = Object.freeze({ hideTitle: true, className: 'el-button--secondary el-button--small' });
 const filterButtonsList = computed(() =>
 	Object.freeze([
 		{ id: 'isAsset', title: tt('Asset') },
@@ -502,16 +588,52 @@ initiateRequestsToDoList.value = false;
 
 const setFilters = (value, bindedFilters = [], settings = {}) => {
 	const nextValues = { ...value };
+	Object.keys(nextValues).forEach((key) => {
+		const item = nextValues[key];
+		if (Array.isArray(item) || typeof item === 'boolean') return;
+
+		const numericValue = item ? +item : item;
+		nextValues[key] = numericValue && !Number.isNaN(numericValue) ? numericValue : item;
+	});
 	bindedFilters.forEach((prop) => {
 		if (!Object.prototype.hasOwnProperty.call(nextValues, prop) && finalFilters.value[prop]) {
 			nextValues[prop] = null;
 		}
 	});
-	equipmentsStore.set_equipments_filters({
+	const newFilters = {
 		...finalFilters.value,
 		...nextValues,
 		...(settings.preventResetPage ? {} : { page: 1 }),
-	});
+	};
+	// console.log(newFilters);
+	equipmentsStore.set_equipments_filters(newFilters);
+
+	const removePropsForModels = [
+		'hasSensors',
+		'archivedNodes',
+		'daterange_setted_at',
+		'isHideList',
+		'isShowListRefreshed2',
+		'offlineNodes',
+		'acknowledgeOnly',
+		'alert_types',
+		'assetId',
+		'brandModelId',
+		'daterange',
+		'isShowList',
+		'isStoreroom',
+		'locationId',
+		'machineId',
+		'isAsset',
+		'plantId',
+		'predefinedOptionsValuesIDs',
+		'productionLineId',
+		'rawOptionsValuesIDs',
+		'max',
+		'sensor_class',
+		'flat_metric_data_anomaly',
+	];
+	brandModelsStore.set_storerooms_filters(removeObjProps(newFilters, removePropsForModels));
 };
 const {
 	perPageItems,
@@ -555,6 +677,7 @@ const handleClearFilters = () => {
 	setFilters({}, clearableFiltersList);
 };
 const handleAlertTypesFilter = (ids = []) => {
+	// console.log('handleAlertTypesFilter', ids);
 	alertTypesFilters.value = ids;
 	const hasOffline = ids.some((id) => id === 'offline');
 	const hasAnomaly = ids.some((id) => id === 'anomaly');

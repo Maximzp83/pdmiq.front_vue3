@@ -1,6 +1,7 @@
-import { request } from '../../../api/request_provider.js';
+import { api_request, getResponseValue } from '@/api/request_provider';
 import { mergeArrays } from '@/helpers';
-import { getResponseValue } from '@/api/request_provider';
+
+const request = (url, payload = {}) => api_request(url, payload);
 
 const fetchStatisticsRequestUtil = payload => {
 	return new Promise((resolve, reject) => {
@@ -52,7 +53,6 @@ const fetch_sensor_statistics1 = payload => {
 		...payload,
 		method: 'GET',
 		notNotify: true,
-		alternateResponseProp: 'data',
 		returnResponseOnly: 1
 	};
 
@@ -65,10 +65,13 @@ const fetch_sensor_statistics1 = payload => {
 		request(`/sensors/jobs/${extendedPayload.sensorId}/mixins`, payload_1)
 			.then(response => {
 				sensorOtherData = response.value.data;
-					// 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws'; -old
-				let baseURL = 'https://graph.industrialmatrix.com';
+				// 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws'; -old
+				// let baseURL = 'https://graph.industrialmatrix.com';
 				// let baseURL = 'https://e4qsnej4po7dizmnk4p2vfrv3m0ggvpj.lambda-url.ca-central-1.on.aws';
 				// let baseURL = 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws' // old;
+
+				// let baseURL = 'https://graph-points.industrialmatrix-stage.tools';
+				let baseURL = 'https://graph-points.industrialmatrix.tools';
 
 				if (import.meta.env.VITE_SENSOR_STATISTICS_API_URL) {
 					baseURL = import.meta.env.VITE_SENSOR_STATISTICS_API_URL;
@@ -77,7 +80,7 @@ const fetch_sensor_statistics1 = payload => {
 						window.location.origin === 'https://app.industrialmatrix.com'
 						|| window.location.origin === 'https://newcharts.industrialmatrix.com'
 					) {
-						baseURL = 'https://graph.industrialmatrix.com';
+						baseURL = 'https://graph-points.industrialmatrix.tools';
 					} else if (
 						window.location.origin === 'https://testmatrix.assetmatrix.com'
 						//|| window.location.origin === 'https://newcharts.industrialmatrix.com'
@@ -123,9 +126,8 @@ const fetch_sensor_statistics1 = payload => {
 };
 
 const fetch_ncd_sensor_fft_statistics1 = payload => {
-	let baseURL =
-		'https://7i4l4qqai25gqquke4teubtkt40hjcaw.lambda-url.ca-central-1.on.aws';
-	//let baseURL = 'https://graph.industrialmatrix.com/fft';
+	// let baseURL = 'https://7i4l4qqai25gqquke4teubtkt40hjcaw.lambda-url.ca-central-1.on.aws';
+	let baseURL = 'https://graph.industrialmatrix.com/fft';
 	
 	if (import.meta.env.VITE_FFT_STATISTICS_API_URL) {
 		baseURL = import.meta.env.VITE_FFT_STATISTICS_API_URL;
@@ -147,7 +149,6 @@ const fetch_ncd_sensor_fft_statistics1 = payload => {
 		...payload,
 		method: 'GET',
 		notNotify: true,
-		alternateResponseProp: 'data',
 		baseURL: baseURL
 	};
 
@@ -158,7 +159,6 @@ const calculate_thresholds_our1 = payload => {
 	const extendedPayload = {
 		...payload,
 		method: 'GET',
-		alternateResponseProp: 'data',
 		notNotify: true
 	};
 
@@ -237,7 +237,6 @@ const fetch_multi_views_alerts1 = payload => {
 	const extendedPayload = {
 		...payload,
 		method: 'GET',
-		alternateResponseProp: 'data',
 		notNotify: true
 	};
 	const { multiViewId, graphId } = payload;

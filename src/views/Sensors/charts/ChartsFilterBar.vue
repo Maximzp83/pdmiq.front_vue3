@@ -24,11 +24,11 @@
 			<form class="popover-content" @submit.prevent="applyChartsFilters">
 				<div class="filter-options-list">
 					<FilterOption
-						v-for="(item, idx) in sensorParametersList"
+						v-for="(item, idx) in sensorParameters"
 						:key="`sensorParam_id-${item.id}`"
 						:ref="(el) => setSubItemRef('FilterOption', el, idx)"
 						:optionData="item"
-						:filterData="filters[`chart-${item.id}`]"
+						:filterData="filters?.[`chart-${item.id}`]"
 					/>
 				</div>
 
@@ -75,7 +75,7 @@ defineOptions({
 });
 
 const props = defineProps({
-	sensorParametersList: { type: Array, required: true },
+	sensorParametersList: { type: Array, default: () => [] },
 	isLoading: Boolean,
 });
 
@@ -87,13 +87,16 @@ const chartFiltersPopoverShow = ref(false);
 const subItemsSettings = computed(() =>
 	Object.freeze([{ ref: 'FilterOption', returnArray: true }]),
 );
+const sensorParameters = computed(() =>
+	Array.isArray(props.sensorParametersList) ? props.sensorParametersList : [],
+);
 
 const activeFilters = computed(() => {
 	let text = '';
 	let count = 0;
 
-	props.sensorParametersList.forEach((param) => {
-		const filter = filters.value[`chart-${param.id}`];
+	sensorParameters.value.forEach((param) => {
+		const filter = filters.value?.[`chart-${param.id}`];
 		if (filter?.y_min) {
 			text += `${param.name}, `;
 			count += 1;

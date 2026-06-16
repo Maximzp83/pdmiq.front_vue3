@@ -1488,7 +1488,7 @@ class SensorChart extends SensorChartBase {
 		}
 	}
 
-	updatePlotLines({ zone_key, new_val, alarm_value, warning_value, lube_value }) {
+	updatePlotLines({ zone_key, new_val, alarm_value, warning_value, lube_value, optionsUpdateSettings }) {
 		this.options.yAxis[0].plotLines.forEach(pli => {
 			if (zone_key == 'alarm_zone') {
 				switch (pli.id) {
@@ -1533,7 +1533,7 @@ class SensorChart extends SensorChartBase {
 			this.options.yAxis[0].max = max + max / 9;
 		}
 		// console.log('updatePlotLines', this[`current_position_${zone_key}`], this.options.yAxis[0].plotLines);
-		this.emitChartOptionsUpdate();
+		this.emitChartOptionsUpdate(optionsUpdateSettings);
 	}
 
 	setupDraggablePlotLine(plotLine, axis) {
@@ -1603,7 +1603,7 @@ class SensorChart extends SensorChartBase {
 			};
 
 			// console.log(this.updateThresholdsData, plotLine, zone_key, new_val);
-			this.updatePlotLines({ zone_key, new_val });
+			this.updatePlotLines({ zone_key, new_val, optionsUpdateSettings: { skipZoomReset: true }  });
 			if (this.events.chartThresholdsUpdate) {
 				this.events.chartThresholdsUpdate({ open_dialog: true });
 			}
@@ -1688,7 +1688,12 @@ class SensorChart extends SensorChartBase {
 			};
 
 			['alarm_zone', 'warning_zone'].forEach(zone_key => {
-				this.updatePlotLines({ zone_key, alarm_value, warning_value: warning_zone });
+				this.updatePlotLines({
+					zone_key,
+					alarm_value,
+					warning_value: warning_zone,
+					optionsUpdateSettings: { skipZoomReset: true }
+				});
 			});
 
 			if (this.events.chartThresholdsUpdate) {

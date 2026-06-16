@@ -46,6 +46,7 @@ import Highcharts from 'highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 
+import { initHighchartsModule } from '@/helpers/charts';
 import { Lang } from '@/localization';
 import { useSensors } from '@/composables/useSensors';
 import { useSensorsStore } from '@/stores/SensorsStore';
@@ -55,8 +56,8 @@ import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapp
 import Datepicker from '@/components/common/Datepicker.vue';
 import ChartsListWrapper from './charts/ChartsListWrapper.vue';
 
-stockInit(Highcharts);
-boost(Highcharts);
+initHighchartsModule(stockInit, Highcharts);
+initHighchartsModule(boost, Highcharts);
 
 const { tt } = Lang;
 const route = useRoute();

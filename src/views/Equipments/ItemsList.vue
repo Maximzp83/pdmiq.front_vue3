@@ -140,7 +140,7 @@ const {
 			loadingProp: 'isLoading',
 		},
 		additionalModalSettings: {
-			editModalProp: 'editModalClassic',
+			// editModalProp: 'editModalClassic',
 			instanceName: 'Equipments',
 			multiform: true,
 			componentPath: 'Dashboard/MultiFormWrapper',

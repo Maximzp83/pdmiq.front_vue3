@@ -70,6 +70,8 @@ import { findItemBy } from '@/helpers';
 import { getBrandModelImgByType } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { buildProps, useItemCard } from '@/composables/mixins/useItemCard';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 
 import GridItemCardHeader from '@/components/gridTable/GridItemCardHeader.vue';
 import InfoItem from '@/components/itemDetails/InfoItem.vue';
@@ -78,12 +80,9 @@ const { tt } = Lang;
 
 defineOptions({ name: 'AssetItemCard' });
 
-const props = defineProps({
-	cardData: { type: Object, default: () => ({}) },
-	selectedIds: { type: Array, default: () => [] },
-	operationsSettings: { type: Object, default: () => ({}) },
-});
+const props = defineProps(buildProps());
 const emit = defineEmits(['event']);
+const equipmentsStore = useEquipmentsStore();
 
 const mainInfoSettingsList = computed(() =>
 	Object.freeze([
@@ -96,6 +95,9 @@ const mainInfoSettingsList = computed(() =>
 const equipmentTypesList = computed(() => props.cardData.equipmentTypes || []);
 const brandModelsList = computed(() => props.cardData.brandModels || []);
 const titleLinkRoute = computed(() => `/assets/${props.cardData.id}/details`);
+const resetChildPages = () => {
+	equipmentsStore.set_equipments_filters({ ...(equipmentsStore.filters || {}), page: 1 });
+};
 
 const getTypeName = (brandModel) => {
 	if (brandModel.type) {
@@ -105,5 +107,11 @@ const getTypeName = (brandModel) => {
 	return item?.name || '';
 };
 
-const { handleEvent } = useEventHandler({}, emit);
+const { handleTitleClick } = useItemCard({
+	cardData: computed(() => props.cardData),
+	titleLinkRoute,
+	resetPageFiltersList: resetChildPages,
+	emit,
+});
+const { handleEvent } = useEventHandler({ handleTitleClick }, emit);
 </script>

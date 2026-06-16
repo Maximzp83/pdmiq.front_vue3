@@ -42,13 +42,15 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
 import { required } from '@/constants/validation';
 import { useSensors } from '@/composables/useSensors';
 import { useSensorsStore } from '@/stores/SensorsStore';
+import { useItemForm } from '@/composables/mixins/useItemForm';
+import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
@@ -74,14 +76,15 @@ const { sensorJobSaving } = storeToRefs(sensorsStore);
 const itemFormRef = ref(null);
 const fileUploadBlockRef = ref(null);
 const isSaving = ref(false);
-const formData = reactive({
+const initialFormData = {
 	message: '',
 	file: null,
 	image_angle: 0,
 	graph_timestamp: '',
 	metric_type: null,
 	metric_issue_alert_id: null,
-});
+};
+const formData = ref({ ...initialFormData });
 const rules = {
 	message: required,
 };
@@ -100,14 +103,52 @@ const closeDialog = () => {
 	emit('closeDialog', props.itemData?.chartId);
 };
 
-const submitForm = () => {
+const refsMap = computed(() => ({
+	FileUploadBlock: fileUploadBlockRef.value,
+}));
+
+const {
+	validateSubItemsForm,
+	resetFormDataBySubItems,
+	collectDataFromSubItems,
+} = useSubItemsList({
+	formData,
+	refsMap,
+});
+
+const subItemsSettings = computed(() =>
+	Object.freeze([
+		{
+			ref: 'FileUploadBlock',
+			setIfEmpty: { prop: 'is_file_deleted', val: 1 },
+			cleanIfEmpty: { prop: 'file', val: null },
+		},
+	])
+);
+
+/*const localSetupPage = (item = {}) => {
+	formData.value.metric_type = item.metric_type || props.parameter_type || null;
+};*/
+
+const localSubmit = (submitData) => {
 	const noteId = props.itemData?.id || null;
-	const data = { ...formData };
+	const data = { ...submitData };
 	delete data.id;
 
 	if (data.metric_issue_alert_id) {
 		delete data.graph_timestamp;
 	}
+
+	/*if (data) {
+		console.log('ChartMessageForm', {
+			sensorId: props.sensorId,
+			noteId,
+			method: noteId ? 'PUT' : 'POST',
+			data,
+			withFile: !!data.file,
+		});
+		return;
+	}*/
 
 	isSaving.value = true;
 	saveChartNote({
@@ -126,24 +167,18 @@ const submitForm = () => {
 		});
 };
 
-const validateForm = () => {
-	itemFormRef.value?.validate((valid) => {
-		if (valid) submitForm();
-	});
-};
-
-watch(
-	() => props.itemData,
-	(item = {}) => {
-		Object.assign(formData, {
-			message: item.message || '',
-			file: null,
-			image_angle: item.image_angle || 0,
-			graph_timestamp: item.graph_timestamp || '',
-			metric_type: item.metric_type || props.parameter_type || null,
-			metric_issue_alert_id: item.metric_issue_alert_id || null,
-		});
-	},
-	{ immediate: true },
-);
+const { validateForm } = useItemForm({
+	itemData: computed(() => props.itemData),
+	formData,
+	initialFormData,
+	formRef: itemFormRef,
+	cleanFormDataAfterClose: true,
+	// localSetupPage,
+	subItemsSettings,
+	validateSubItemsForm,
+	collectDataFromSubItems,
+	resetFormDataBySubItems,
+	localSubmit,
+	emit,
+});
 </script>

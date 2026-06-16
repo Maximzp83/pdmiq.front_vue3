@@ -49,6 +49,7 @@ import Highcharts from 'highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 
+import { initHighchartsModule } from '@/helpers/charts';
 import { Lang } from '@/localization';
 import { useSensors } from '@/composables/useSensors';
 import { useSensorsStore } from '@/stores/SensorsStore';
@@ -58,8 +59,8 @@ import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapp
 import Datepicker from '@/components/common/Datepicker.vue';
 import ChartsListWrapper from './charts/ChartsListWrapper.vue';
 
-stockInit(Highcharts);
-boost(Highcharts);
+initHighchartsModule(stockInit, Highcharts);
+initHighchartsModule(boost, Highcharts);
 
 const { tt } = Lang;
 const route = useRoute();
@@ -71,11 +72,21 @@ defineOptions({
 	name: 'MultiViewStatisticsPage',
 });
 
+const props = defineProps({
+	multiViewsList: { type: Array, default: () => [] },
+});
+
 const sensorsList = ref([]);
 const itemLoading = ref(false);
 
 const sensorIds = computed(() => {
-	const ids = route.query.ids || route.params.id || '';
+	if (route.params.multiViewId && props.multiViewsList.length) {
+		const multiView = props.multiViewsList.find((item) => item.id == route.params.multiViewId);
+		const graphItems = (multiView?.multi_view_graphs || []).flatMap((graph) => graph.graph_items || []);
+		return [...new Set(graphItems.map((item) => item.sensor_id).filter(Boolean))];
+	}
+
+	const ids = route.query.ids || route.params.sensorIds || route.params.id || '';
 	if (Array.isArray(ids)) return ids;
 	return String(ids).split(',').filter(Boolean);
 });

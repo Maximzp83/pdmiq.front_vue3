@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, onBeforeMount, shallowReactive, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 
@@ -125,6 +125,8 @@ import { api_request } from '@/api/request_provider';
 import { PRODUCTION_LINES_TYPES } from '@/constants/global';
 import { scrollToElement, waitForElement } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
+
+import { useGlobalStore } from '@/stores/GlobalStore';
 import { useAssetsStore } from '@/stores/AssetsStore';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useEquipmentsStore } from '@/stores/EquipmentsStore';
@@ -155,6 +157,8 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const route = useRoute();
+const globalStore = useGlobalStore();
+const { set_value: set_global_store } = globalStore;
 const assetsStore = useAssetsStore();
 const authStore = useAuthStore();
 const equipmentsStore = useEquipmentsStore();
@@ -167,6 +171,20 @@ const fallbackPlant = ref(null);
 const plantLoading = ref(false);
 const maintenanceListWrapperRef = ref(null);
 const equipmentsLayoutRef = ref(null);
+
+const navbarSettings = computed(() =>
+	Object.freeze({
+		showFilter: true,
+		showCompareButton: true,
+		datepickerSettings: {
+			label: `${tt('phrases.statistics_for_period')}:`,
+			storeSettings: {
+				storeName: 'PlantsStore',
+				stateKey: 'statistics_filters'
+			},
+		}
+	}),
+);
 
 const currentPlant = computed(() => props.plantItem || fallbackPlant.value);
 const itemsName = computed(() => ({
@@ -281,6 +299,12 @@ watch(
 	() => fetchFallbackPlant(),
 	{ immediate: true },
 );
+
+onBeforeMount(() => {
+	if (navbarSettings) {
+		set_global_store('navbarSettings', navbarSettings);
+	}
+});
 
 onMounted(handleScrollTo);
 </script>

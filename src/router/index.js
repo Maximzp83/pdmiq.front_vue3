@@ -302,6 +302,21 @@ const routes = [
 				],
 			},
 			{
+				path: 'corporate',
+				name: 'CorporateDashboard',
+				redirect: '/corporate/main',
+				component: () => import('@/views/CorporateDashboard/CorporateDashboard.vue'),
+				meta: { auth: true, permissions: ['view_corporate'] },
+				children: [
+					{
+						path: 'main',
+						name: 'CorporateMain',
+						component: () => import('@/views/CorporateDashboard/Details/CorporateMain.vue'),
+						meta: { auth: true },
+					},
+				],
+			},
+			{
 				path: 'brands',
 				name: 'Brands',
 				component: () => import('@/views/Brands/ItemsList.vue'),
@@ -547,24 +562,45 @@ const routes = [
 			// 	component: () => import('@/views/BrandModels/ItemPage.vue'),
 			// 	meta: { auth: true, permissions: ['edit_part_numbers'] },
 			// },
-			// {
-			// 	path: 'equipments/:id/details',
-			// 	name: 'EquipmentsDetails',
-			// 	component: () => import('@/views/Equipments/Details/DetailsPage.vue'),
-			// 	meta: { auth: true, permissions: ['view_items'] },
-			// },
-			// {
-			// 	path: 'equipments/:id/details/info',
-			// 	name: 'EquipmentsInfoBlock',
-			// 	component: () => import('@/views/Equipments/Details/EquipmentInfoBlock.vue'),
-			// 	meta: { auth: true, permissions: ['view_items'] },
-			// },
-			// {
-			// 	path: 'equipments/:id/details/quote',
-			// 	name: 'EquipmentsQuoteTab',
-			// 	component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
-			// 	meta: { auth: true, permissions: ['view_items'] },
-			// },
+			{
+				path: 'equipments/:id/details',
+				name: 'EquipmentsDetails',
+				component: () => import('@/views/Equipments/Details/DetailsPage.vue'),
+				redirect: (to) => `/equipments/${to.params.id}/details/main`,
+				meta: { auth: true, permissions: ['view_items'] },
+				children: [
+					{
+						path: 'main',
+						name: 'EquipmentInfoBlock',
+						component: () => import('@/views/Equipments/Details/EquipmentInfoBlock.vue'),
+						meta: { auth: true, permissions: ['view_items'] },
+					},
+					{
+						path: 'pdm/:sensorId',
+						name: 'DetailsStatPage',
+						component: () => import('@/views/Sensors/StatisticsPage.vue'),
+						meta: { auth: true, permissions: ['view_items'] },
+					},
+					{
+						path: 'multi-view/:multiViewId',
+						name: 'DetailsMultiViewPage',
+						component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),
+						meta: { auth: true, permissions: ['view_items'] },
+					},
+					{
+						path: 'quote',
+						name: 'EquipmentsQuoteTab',
+						component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
+						meta: { auth: true, permissions: ['view_items'], request_type: 1 },
+					},
+					{
+						path: 'service',
+						name: 'EquipmentsServiceTab',
+						component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
+						meta: { auth: true, permissions: ['view_items'], request_type: 2 },
+					},
+				],
+			},
 			{
 				path: 'machines/new',
 				name: 'MachineCreate',

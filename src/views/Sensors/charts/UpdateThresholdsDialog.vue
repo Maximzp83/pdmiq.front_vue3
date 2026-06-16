@@ -1,23 +1,54 @@
 <template>
-	<div class="update-thresholds-dialog">
-		<div class="card-content text-center">
-			<div v-if="redirectTo" class="article-title">
-				{{ tt('phrases.Unsaved_Thresholds') }}
-			</div>
-			<div v-else-if="isWarningThresholdChanged" class="article-title">
-				{{ tt('Warning') }}
-			</div>
-			<div v-else class="article-title">
-				{{ tt('phrases.Continue') }}
+	<div class="thresholds-update-dialog">
+		<div class="content-container">
+			<div class="article-title">
+				{{
+					`${tt('phrases.Do_you_really_want_to')} ${tt('change')} ${tt(
+						'thresholds',
+					)}? ${tt('phrases.Continue_or_save_changes')}?`
+				}}
 			</div>
 		</div>
 
 		<div class="dialog-footer section-row text-center">
-			<el-button type="primary" class="uppercase semi-bold" :disabled="!enableContinueButton && !redirectTo" @click="confirm">
-				{{ tt('Continue') }}
-			</el-button>
-			<el-button class="uppercase semi-bold" @click="$emit('onClose')">
+			<el-button @click="emitCancelUpdateThresholds">
 				{{ tt('Cancel') }}
+			</el-button>
+
+			<el-button
+				v-if="enableContinueButton"
+				type="primary"
+				class="capitalize"
+				@click="closeDialog"
+			>
+				{{ tt('continue') }}
+			</el-button>
+
+			<el-button
+				v-if="isWarningThresholdChanged"
+				type="primary"
+				class="capitalize"
+				@click="ChartInstance?.handleUpdateAlarmThresholdByWarningValue()"
+			>
+				{{ tt('phrases.Continue_and_Update_Alarm_Threshold') }}
+			</el-button>
+
+			<el-button
+				v-if="isWarningThresholdLessThanAlarm"
+				type="primary"
+				class="capitalize"
+				@click="emitCompleteUpdateThresholds"
+			>
+				{{ `${tt('Complete')}/${tt('save')}` }}
+			</el-button>
+
+			<el-button
+				v-if="isWarningThresholdChanged"
+				type="primary"
+				class="capitalize"
+				@click="emitCompleteUpdateThresholds({ updateAlarm: true })"
+			>
+				{{ tt('phrases.Complete_Save_and_Update_Alarm_Threshold') }}
 			</el-button>
 		</div>
 	</div>
@@ -42,17 +73,35 @@ const props = defineProps({
 
 const emit = defineEmits(['event', 'onClose']);
 
-const confirm = () => {
-	if (props.ChartInstance?.continueThresholdsUpdate) {
-		props.ChartInstance.continueThresholdsUpdate();
+const emitCancelUpdateThresholds = () => {
+	emit('event', {
+		eventName: 'callMethodInAllCharts',
+		data: {
+			methodName: 'discardThresholdsChanges',
+			fromInstance: true,
+			payload: { redirectTo: props.redirectTo },
+		},
+		onward: true,
+	});
+	closeDialog();
+};
+
+const emitCompleteUpdateThresholds = (settings = {}) => {
+	if (settings.updateAlarm) {
+		props.ChartInstance?.handleUpdateAlarmThresholdByWarningValue(false);
 	}
-	if (props.redirectTo) {
-		emit('event', {
-			eventName: 'handleRedirectTo',
-			data: props.redirectTo,
-			onward: true,
-		});
-	}
+	emit('event', {
+		eventName: 'callMethodInAllCharts',
+		data: {
+			methodName: 'submitNewThresholds',
+			fromInstance: true,
+			payload: { redirectTo: props.redirectTo },
+		},
+		onward: true,
+	});
+};
+
+const closeDialog = () => {
 	emit('onClose');
 };
 </script>

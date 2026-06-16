@@ -107,6 +107,15 @@ const editModal = computed(() => {
 	return globalStore[modalProp];
 });
 
+/*const componentFile = computed(() => {
+	const { formComponentFileLoader, multiform } = editModal.value;
+
+	if (props.componentFileLoader) {
+		return defineAsyncComponent(props.componentFileLoader);
+	}
+	return null;
+});*/
+
 const componentFile = computed(() => {
 	const { componentPath, formComponentFileLoader, multiform } = editModal.value;
 

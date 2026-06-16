@@ -367,6 +367,7 @@ const {
 		tableRef: itemsTableRef,
 		propsFilters: propsFiltersRef,
 		fromDashboard: props.fromDashboard || props.insideOtherPage,
+		preventSetNavbar: props.preventSetNavbar,
 		formComponentFileLoader: () => import('../MaintenanceFormWrapper.vue'),
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',

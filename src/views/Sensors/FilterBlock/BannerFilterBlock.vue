@@ -35,6 +35,7 @@
 		</div>
 
 		<PDFandFFTrequestsBlock
+			ref="pdfAndFftRequestsBlockRef"
 			:enableFFT="enableFFT"
 			:isCompare="isCompare"
 			:sensorData="sensorData"
@@ -142,11 +143,12 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
 import {
+	SENSOR_PARAMETERS_TYPES,
 	sensorParametersList as getSensorParametersList,
 	metricSystemsList as getMetricSystemsList,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
@@ -184,9 +186,17 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 const sensorsStore = useSensorsStore();
 const { statistics_filters: filters } = storeToRefs(sensorsStore);
+const pdfAndFftRequestsBlockRef = ref(null);
 
 const metricSystemsList = computed(() => Object.freeze(getMetricSystemsList()));
-const sensorParametersList = computed(() => Object.freeze(getSensorParametersList()));
+const sensorParametersList = computed(() =>
+	Object.freeze({
+		banner_CM1L: getSensorParametersList(),
+		banner: getSensorParametersList().filter(
+			(parameter) => parameter.id !== SENSOR_PARAMETERS_TYPES.AMPS,
+		),
+	}),
+);
 const isBannerTempVibe2 = computed(() => props.currentSensorType.isBannerTempVibe2);
 const isHumiditySensor = computed(() => props.currentSensorType.isHumiditySensor);
 const isBannerV2_1 = computed(() => props.currentSensorType.isBannerV2_1);
@@ -209,6 +219,13 @@ const event = (name, data) => {
 const switchMetricSystem = ({ id }) => {
 	sensorsStore.set_statistics_filters({ ...filters.value, measurement: id });
 };
+const handleUnlockFFT = (payload) => {
+	pdfAndFftRequestsBlockRef.value?.handleUnlockFFT?.(payload);
+};
 
 const { handleEvent } = useEventHandler({}, emit);
+
+defineExpose({
+	handleUnlockFFT,
+});
 </script>

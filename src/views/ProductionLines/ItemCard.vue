@@ -58,7 +58,6 @@ import { computed } from 'vue';
 import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemCard, buildProps } from '@/composables/mixins/useItemCard';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useMachinesStore } from '@/stores/MachinesStore';
 import { useAssetsStore } from '@/stores/AssetsStore';
 import { useEquipmentsStore } from '@/stores/EquipmentsStore';
@@ -72,7 +71,6 @@ defineOptions({ name: 'ProductionLinesItemCard' });
 
 const props = defineProps(buildProps());
 const emit = defineEmits(['event']);
-const { changeRoute } = useNavigation();
 const machinesStore = useMachinesStore();
 const assetsStore = useAssetsStore();
 const equipmentsStore = useEquipmentsStore();
@@ -102,13 +100,11 @@ const resetChildPages = () => {
 	assetsStore.set_assets_filters({ ...(assetsStore.filters || {}), page: 1 });
 	equipmentsStore.set_equipments_filters({ ...(equipmentsStore.filters || {}), page: 1 });
 };
-const { togglePreviewModal } = useItemCard({
+const { togglePreviewModal, handleTitleClick } = useItemCard({
 	cardData: computed(() => props.cardData),
+	titleLinkRoute,
+	resetPageFiltersList: resetChildPages,
 	emit,
 });
-const handleTitleClick = () => {
-	changeRoute({ path: titleLinkRoute.value });
-	resetChildPages();
-};
 const { handleEvent } = useEventHandler({ handleTitleClick }, emit);
 </script>

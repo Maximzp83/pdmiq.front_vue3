@@ -66,6 +66,9 @@
 <script setup>
 import { computed } from 'vue';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { buildProps, useItemCard } from '@/composables/mixins/useItemCard';
+import { useAssetsStore } from '@/stores/AssetsStore';
+import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 
 import GridItemCardHeader from '@/components/gridTable/GridItemCardHeader.vue';
 import InfoItem from '@/components/itemDetails/InfoItem.vue';
@@ -74,13 +77,11 @@ defineOptions({
 	name: 'MachineItemCard',
 });
 
-const props = defineProps({
-	cardData: { type: Object, default: () => ({}) },
-	selectedIds: { type: Array, default: () => [] },
-	operationsSettings: { type: Object, default: () => ({}) },
-});
+const props = defineProps(buildProps());
 
 const emit = defineEmits(['event']);
+const assetsStore = useAssetsStore();
+const equipmentsStore = useEquipmentsStore();
 
 const mainInfoSettingsList = Object.freeze([
 	{ prop: 'plant.name', label: 'Plant' },
@@ -102,13 +103,16 @@ const itemsCountersList = Object.freeze([
 
 const titleLinkRoute = computed(() => `/machines/${props.cardData.id}/details`);
 
-const togglePreviewModal = () => {
-	emit('event', {
-		eventName: 'togglePreviewModal',
-		data: props.cardData,
-		onward: true,
-	});
+const resetChildPages = () => {
+	assetsStore.set_assets_filters({ ...(assetsStore.filters || {}), page: 1 });
+	equipmentsStore.set_equipments_filters({ ...(equipmentsStore.filters || {}), page: 1 });
 };
 
-const { handleEvent } = useEventHandler({}, emit);
+const { togglePreviewModal, handleTitleClick } = useItemCard({
+	cardData: computed(() => props.cardData),
+	titleLinkRoute,
+	resetPageFiltersList: resetChildPages,
+	emit,
+});
+const { handleEvent } = useEventHandler({ handleTitleClick }, emit);
 </script>

@@ -7,6 +7,7 @@
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Assets` has been completed for the current compile/build scope.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Settings` has been completed for the current compile/build scope, excluding `vue2_project/src/views/Settings/Import` by user request.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/SuccessDashboard` has been completed for the current compile/build scope.
+- Vue2 -> Vue3 migration for `vue2_project/src/views/CorporateDashboard` has been completed for the current compile/build scope.
 - `src/views/Dashboard/Dashboard.vue` and `src/views/Plants/Details` have been re-migrated because the previous Vue3 version did not follow the legacy parent/child dashboard architecture.
 - Ask only when there are disputable points without a suitable migrated pattern/example.
 
@@ -69,13 +70,20 @@ Primary rules source:
 - `src/config/entities.js` now includes `Assets`, `StoreRooms`, and `Equipments` to support the migrated details flow and remove local endpoint hardcodes.
 - Runtime fix applied: `src/components/itemDetails/ItemImagesBlock.vue` now imports `Lang.tt`, which resolved the `_ctx.tt is not a function` crash on `BrandModelDetailsPage`.
 - Supporting request/item-card infrastructure from the earlier `BrandModels` migration remains active and was reused by the details stack.
+- Migrated ItemCard files were re-aligned with Vue2 `itemCardMixin` behavior:
+  - `src/composables/mixins/useItemCard.js` supports Vue3 reset callbacks.
+  - `src/views/Assets/ItemCard.vue`, `src/views/Machines/ItemCard.vue`, `src/views/ProductionLines/ItemCard.vue`, and `src/views/BrandModels/ItemCard.vue` use shared title-click handling with Pinia page resets where applicable.
+  - `src/views/Processes/ItemCard.vue` uses shared preview modal handling and restores the image overlay.
+  - `npm run build` and targeted `git diff --check` pass after this follow-up.
+- `src/components/common/Datepicker.vue` now lazy-mounts Element Plus `el-date-picker` after first interaction, using a lightweight div placeholder styled like the datepicker input with icons from `@element-plus/icons-vue` before activation to reduce initial DOM from eager calendar panels.
 - `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:
   - `src/views/Dashboard/Dashboard.vue` again acts as the plant dashboard container: it resolves the active plant from auth/global filters, fetches `plantItem`, resets child list filters on plant changes, and passes `plantItem`, `plantId`, and `additionalModalSettings` into the nested route.
   - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.
   - Plant details now uses `src/views/Equipments/EquipmentsLayout.vue` for equipments, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed; Equipments list ownership stays under `src/views/Equipments`.
   - `src/views/Equipments/EquipmentsLayout.vue` and `src/views/Equipments/ItemsList.vue` were added as the first Vue3 Equipments migration step. Layout owns the original-style dropdown/filter toolbar with `useRequestsList` + `initiateRequestsToDoList`; nested list uses `/equipments/dashboard` with `prepareEquipmentsList`.
-  - `src/views/Equipments/Card` now has the first grid-card scope, and `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue` cover the first create/edit compile scope. Advanced RPM/vibration/subtype/sensor/multiview form behavior and Details pages remain pending.
-  - `src/router/index.js` enables `/dashboard/equipments` for the migrated list. Vue2 equipment create/edit routes were commented and details components are still pending, so those routes remain inactive.
+  - `src/views/Equipments/Card` now has the first grid-card scope, and `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue` cover the first create/edit compile scope. Advanced RPM/vibration/subtype/sensor/multiview form behavior remains pending.
+  - `vue2_project/src/views/Equipments/Details` has been migrated into `src/views/Equipments/Details` for the current Vue3 compile scope, including DetailsPage, EquipmentInfoBlock, Quote/Service tab, crossover/analogues tables, move history, PDM buttons, `/equipments/:id/details/*` nested routes, `equipment_mock.jpg`, and Sensors statistics route-param compatibility for nested PDM/multiview links.
+  - `src/router/index.js` enables `/dashboard/equipments` for the migrated list and `/equipments/:id/details` nested details routes.
   - `src/views/Dashboard/MultiFormWrapper.vue` and `MultiFormItemWrapper.vue` were migrated from Vue2 for dashboard create/edit flows. `ProductionLines`, `Machines`, `Assets`, and `Equipments` lists now open the multiform modal; child forms receive parent instance data for chained ids.
   - Equipment edit inside the multiform now force-fetches `/equipments/:id` before rendering `Equipments/ItemFormWrapper`, because list rows are not full form payloads.
   - `src/composables/mixins/useMainInstanceDetailsPage.js` now opens Maintenance Work Order modals with `formComponentFileLoader` instead of legacy `componentPath`.
@@ -90,6 +98,7 @@ Primary rules source:
   - Enabled CMMS/Maintenance sidebar menu entries in `src/constants/menuItems.js`.
   - Wired `src/components/itemDetails/MaintenanceListWrapper.vue` to migrated lists.
   - Hardened `src/views/Maintenance/WorkOrders/ItemForm.vue` with attachments/images, parts, snooze, recurring periods/dates, task procedure selection, `users_ids`, main-instance validation, and multipart payload handling.
+  - Re-checked `src/views/Maintenance/WorkOrders/ItemForm.vue` against Vue2 and restored missing behavior: `showJustInfo`, filtered statuses, task procedure info/dialog, technician users/teams tabs, create Part/WO Type modal callbacks, legacy snooze-change UI, equipment card grouping, and recurring period-date submit normalization.
   - Hardened `src/views/Maintenance/Logs/ItemForm.vue` with total/start-finish time handling, attachments/images, supervisor/sanitization/acknowledge/shift flags, breakdown type, main-instance validation, and multipart payload handling.
   - Hardened `src/views/Maintenance/WorkOrders/ItemsList.vue` with production line/machine/asset/equipment filters, category "Without Category" option, filtered status options, plant guard for create/export, closer legacy table columns, details/preview actions, and Vue3 async-select settings for asset/equipment lookup.
   - Hardened `src/views/Maintenance/Logs/ItemsList.vue` with production line/machine/asset/equipment filters, plant/date guard for export, closer legacy table columns, file and parent work-order actions, log/parent preview modals, and Vue3 async-select settings for asset/equipment lookup.
@@ -110,8 +119,23 @@ Primary rules source:
   - `src/components/gridTable/ItemsGridContainer.vue` now supports explicit `componentFileLoader: () => import(...)` for item cards, with `import.meta.glob` only as a fallback; `ProductionLines/ItemsList.vue` passes `() => import('@/views/ProductionLines/ItemCard.vue')`.
   - Dropdown location loading is deferred after opening starts so clicking the additional filters button opens the dropdown first.
   - `npm run build` and targeted `git diff --check` pass after this update.
+- `CorporateDashboard` section is migrated for the current Vue3 compile scope:
+  - Added `src/views/CorporateDashboard/CorporateDashboard.vue`.
+  - Added `src/views/CorporateDashboard/Details/CorporateMain.vue`.
+  - Added `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`.
+  - Enabled `/corporate/main` route in `src/router/index.js`.
+  - Enabled Corporate View sidebar/menu entry in `src/constants/menuItems.js`.
+  - Added `view_corporate` mapping in `src/utils/hasAccessTo.js`.
+  - The migration uses Pinia `AuthStore`, `GlobalStore`, `PlantsStore`, existing `api_request`, existing `useEventHandler`, and already migrated `ItemPDMsStatisticBlock`, `Counters`, and `ROIStatisticsContainer`.
+  - `npm run build` and targeted `git diff --check` pass.
 
 ## Latest Completed Files
+- `src/views/CorporateDashboard/CorporateDashboard.vue`
+- `src/views/CorporateDashboard/Details/CorporateMain.vue`
+- `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
+- `src/router/index.js`
+- `src/constants/menuItems.js`
+- `src/utils/hasAccessTo.js`
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/views/Controllers/ItemFormUltraSoundWhiteRiver.vue`
@@ -160,13 +184,19 @@ Primary rules source:
 - `src/views/Plants/Details/DetailsPage.vue`
 - `src/views/Dashboard/Dashboard.vue`
 - `src/composables/mixins/useMainInstanceDetailsPage.js`
+- `src/views/Equipments/Details/**`
+- `src/assets/img/equipment_mock.jpg`
+- `src/views/Sensors/StatisticsPage.vue`
+- `src/views/Sensors/MultiViewStatisticsPage.vue`
 
 ## Recommended Next Focus
 - Runtime smoke-test Settings with authenticated real data, especially Back-End Register Writing, Custom Formulas save, Industrial Services image upload/delete, Banner V2 Subtypes IO parameters, and Faults/NCD Faults save flows.
 - Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
 - Smoke-test Assets list/create/edit/details with authenticated real data, especially machine/location binding, library uploads, create Work Order action, and reorder.
 - Smoke-test Machines list/create/edit/details with authenticated real data, especially uploads, create Application modal callback, create Work Order action, and reorder.
+- Smoke-test Equipments details with authenticated real data, especially main/quote/service tabs, Move modal, PDM links, multiview links, crossover lists, RFQ submission, and maintenance/history sections.
 - Smoke-test Sensors list/create/edit/statistics/FFT/chart routes in browser.
+- Smoke-test Corporate Dashboard `/corporate/main` with authenticated data, especially company filter selection, date range, all-plants summary, print view, and per-plant ROI/PDM/counters rendering.
 - Review runtime completeness of the simplified chart/statistics controls against production data.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.
 

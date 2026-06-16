@@ -73,8 +73,13 @@ const { validateItemForm, getFormData, removeItem, isInitialSetup } = useSubItem
 
 watch(
 	() => props.parametersList,
-	() => {
+	(parametersList) => {
 		if (!isInitialSetup.value) {
+			const hasCurrentParameter = parametersList?.some(
+				(item) => item.id === formData.value.node_parameter,
+			);
+			if (hasCurrentParameter) return;
+
 			formData.value.node_parameter = null;
 		}
 	},

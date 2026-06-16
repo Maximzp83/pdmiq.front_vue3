@@ -28,6 +28,7 @@ const props = defineProps({
 	ChartInstance: { type: Object, required: true },
 	chartIsInit: Boolean,
 	chartOptionsUpdate: Number,
+	chartOptionsUpdateSettings: { type: Object, default: () => ({}) },
 	showHistory: Boolean,
 	buttonType: String,
 	buttonClass: String,
@@ -121,6 +122,7 @@ watch(
 	() => props.chartOptionsUpdate,
 	() => {
 		resetInitialValues();
+		if (props.chartOptionsUpdateSettings?.skipZoomReset) return;
 		zoomYAxis(0);
 	},
 );

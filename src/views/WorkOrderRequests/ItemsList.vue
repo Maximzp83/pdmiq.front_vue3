@@ -65,6 +65,7 @@ defineOptions({
 
 const props = defineProps({
 	perPageItems: { type: Array, default: () => [] },
+	preventSetNavbar: Boolean
 });
 
 const authStore = useAuthStore();
@@ -100,6 +101,7 @@ const {
 	entityKey: 'WorkOrders',
 	itemStore: maintenanceStore,
 	options: {
+		preventSetNavbar: props.preventSetNavbar,
 		filtersStateProp: 'filters_requests',
 		tableRef: itemsTableRef,
 		propsFilters: propsFiltersRef,

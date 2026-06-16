@@ -189,11 +189,16 @@ export function useItemForm({
 				if (localValidationResult === false) {
 					return false;
 				}
+				if (options.skipSubmit) {
+					return true;
+				}
 				if (localValidationResult === true) {
 					submitForm(options);
 				}
 			} else if (handleValidateRefsItems) {
 				handleValidateRefsItems(options);
+			} else if (options.skipSubmit) {
+				return true;
 			} else {
 				submitForm(options);
 			}

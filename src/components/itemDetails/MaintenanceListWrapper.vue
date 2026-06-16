@@ -18,6 +18,7 @@
 				insideOtherPage
 				:propsFilters="woFilters"
 				:hideDatepicker="hideDatepicker"
+				preventSetNavbar
 			/>
 		</div>
 
@@ -27,6 +28,7 @@
 				insideOtherPage
 				:propsFilters="logFilters"
 				:hideDatepicker="hideDatepicker"
+				preventSetNavbar
 			/>
 		</div>
 	</div>

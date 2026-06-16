@@ -119,6 +119,11 @@ const props = defineProps({
 	plantId: Number,
 	isStoreRoomItems: Boolean,
 	storeroomItem: { type: Object, default: null },
+	fromDashboard: Boolean,
+	preventSetNavbar: Boolean,
+	perPageItems: Array,
+	propsFilters: { type: Object, default: () => ({}) },
+	watchPropsFiltersOnly: Boolean,
 });
 
 const itemsTableRef = ref(null);
@@ -161,6 +166,9 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 	itemStore: brandModelsStore,
 	options: {
 		tableRef: itemsTableRef,
+		propsFilters: computed(() => props.propsFilters),
+		watchPropsFiltersOnly: props.watchPropsFiltersOnly,
+		fromDashboard: props.fromDashboard,
 	},
 });
 
