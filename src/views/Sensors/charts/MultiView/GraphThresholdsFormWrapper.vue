@@ -109,8 +109,8 @@ const closeDialog = () => {
 	emit('closeDialog');
 };
 
-const validateForm = () => {
-	if (validateSubItemsForm(subItemsSettings.value)) {
+const validateForm = async () => {
+	if (await validateSubItemsForm(subItemsSettings.value)) {
 		resetFormDataBySubItems(subItemsSettings.value);
 		const { thresholdsItems } = collectDataFromSubItems(subItemsSettings.value);
 		submitGraphThresholds(thresholdsItems);

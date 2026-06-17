@@ -11,12 +11,16 @@
 .edit-form-container {
 
 	.labels-on-top {
+		.el-form-item {
+			display: block;
+		}
 		.el-form-item__label,
 		.label {
-			width: 100% !important;
+			// width: 100% !important;
 			line-height: 19px;
 			padding-top: 12px;
-			padding-bottom: 10px;
+			margin-bottom: 10px;
+			// padding-bottom: 10px;
 		}
 		
 		.el-form-item__content {

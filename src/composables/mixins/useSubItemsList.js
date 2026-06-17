@@ -271,7 +271,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 				},
 			});
 		});
-		return validationResults.every((item) => item);
+		return Promise.all(validationResults).then((results) => results.every((item) => item));
 	};
 
 	const resetFormDataBySubItems = (subItemsSettings) => {

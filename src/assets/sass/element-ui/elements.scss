@@ -4,7 +4,9 @@ body {
 	.el-select-dropdown__wrap.el-scrollbar__wrap {
 		transform: translateZ(0);
 	}
-	--el-component-size: 0 !important;
+
+	--el-component-size: 100%;
+	--el-input-height: 100%;
 
 	.el-input  {
 		height: $formElementsHeight;

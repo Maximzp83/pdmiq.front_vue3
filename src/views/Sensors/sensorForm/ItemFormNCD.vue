@@ -831,8 +831,8 @@ const {
 	emit,
 });
 
-const validateForm = () => {
-	if (!validateItemForm()) return false;
+const validateForm = async () => {
+	if (!(await validateItemForm())) return false;
 	submitItemForm();
 	return true;
 };

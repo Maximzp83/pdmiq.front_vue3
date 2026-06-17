@@ -81,8 +81,8 @@ const saveFormulas = (payload) => {
 		});
 };
 
-const handleSubmit = () => {
-	if (validateSubItemsForm(subItemsSettings.value)) {
+const handleSubmit = async () => {
+	if (await validateSubItemsForm(subItemsSettings.value)) {
 		saveFormulas({
 			data: {
 				formulas: collectDataFromSubItems(subItemsSettings.value).result,

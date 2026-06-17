@@ -3,7 +3,7 @@
 		<el-form
 			ref="itemFormRef"
 			class="item-edit-form relative section-row sensor-form"
-			label-width="160px"
+			label-width="150px"
 			:model="formData"
 			:rules="rules"
 			:validate-on-rule-change="false"
@@ -381,7 +381,7 @@
 				</el-form-item>
 
 				<el-form-item
-					class="content-row"
+					class="content-row switcher"
 					v-if="showLubeMatrixButton"
 					:label="`${tt('Enable')} LubeMatrix`"
 					prop="is_lube_mode"
@@ -1078,6 +1078,11 @@ const localSubmit = (payloadData, options = {}) => {
 		return;
 	}
 
+	if (process.env.NODE_ENV === 'development') {
+		console.log('sensorSave banner', formDataForSave);
+		return;
+	}
+
 	toggleSubmitRequestResult({ fromSensorsList, isLoading: 1 });
 
 	saveSensor(formDataForSave)
@@ -1145,8 +1150,8 @@ const {
 	emit,
 });
 
-const handleValidateSensorForm = () => {
-	if (validateItemForm()) {
+const handleValidateSensorForm = async () => {
+	if (await validateItemForm()) {
 		submitItemForm({fromSensorsList:true});
 	}
 };

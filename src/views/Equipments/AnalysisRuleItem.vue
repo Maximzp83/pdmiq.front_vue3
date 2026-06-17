@@ -304,8 +304,8 @@ const handleShowAnalysisRuleFormDialog = () => {
 	setupPage(props.itemData);
 };
 
-const handleSave = () => {
-	if (showFFTAnalysisHarmonicsSettings.value && !validateItemForm()) {
+const handleSave = async () => {
+	if (showFFTAnalysisHarmonicsSettings.value && !(await validateItemForm())) {
 		return;
 	}
 

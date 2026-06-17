@@ -109,7 +109,7 @@ const validateItemForm = () => validateSubItemsForm(subItemsSettings.value);
 
 const submitItemForm = async () => {
 	if (!props.equipmentTypeId) return;
-	if (!validateItemForm()) return;
+	if (!(await validateItemForm())) return;
 
 	const data = collectDataFromSubItems(subItemsSettings.value);
 	if (!data?.data) return;

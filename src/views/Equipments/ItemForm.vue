@@ -749,20 +749,20 @@ const localPrepareSubmitData = (data) => {
 	);
 	return nextData;
 };
-const validateItemForm = () => {
+const validateItemForm = async () => {
 	const validationResults = [];
 	const form = itemFormRef.value;
 
-	if (form?.validateField && form?.fields) {
-		form.fields.forEach((field) => {
-			const prop = field?._props?.prop;
-			form.validateField(prop, (error) => {
-				if (error) validationResults.push(false);
-			});
-		});
+	if (form?.validate) {
+		try {
+			await form.validate();
+			validationResults.push(true);
+		} catch {
+			validationResults.push(false);
+		}
 	}
 
-	validationResults.push(validateSubItemsForm(subItemsSettings.value));
+	validationResults.push(await validateSubItemsForm(subItemsSettings.value));
 	return validationResults.every((item) => item);
 };
 

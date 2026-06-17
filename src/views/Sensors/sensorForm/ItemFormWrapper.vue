@@ -229,7 +229,7 @@ const setupSensorLabelMethod = (sensor) => {
 };
 
 
-const validateItemForm = () => {
+const validateItemForm = async () => {
 	if (!props.hasAccessToCreate) {
 		Notify({
 			type: 'warning',

@@ -61,26 +61,48 @@ export function useSubItem({
 	};
 
 	const validateItemForm = (options = {}) => {
-		const validationResults = [];
 		const form = itemFormRef?.value;
-
-		if (form?.validateField && form?.fields) {
-			form.fields.forEach((field) => {
-				const prop = field?._props?.prop;
-				form.validateField(prop, (error) => {
-					if (error) validationResults.push(false);
+		const formValidation = form?.validate
+			? new Promise((resolve) => {
+				form.validate((mainFormIsValid) => {
+					resolve(mainFormIsValid);
 				});
+			})
+			: Promise.resolve(true);
+
+		return formValidation.then((mainFormIsValid) => {
+			const validationResults = [];
+			if (!mainFormIsValid) {
+				validationResults.push(false);
+			}
+			console.log('validationResults1', validationResults);
+
+			const validations = [];
+			if (subItemsSettings && validateSubItemsForm) {
+				validations.push(validateSubItemsForm(subItemsSettings));
+			}
+			if (localValidationHook) {
+				validations.push(localValidationHook(options));
+			}
+
+			return Promise.all(validations).then((results) => {
+				validationResults.push(...results);
+				console.log('validationResults2', validationResults, localValidationHook);
+				return validationResults.every((item) => item);
 			});
-		}
-
-		if (subItemsSettings && validateSubItemsForm) {
-			validationResults.push(validateSubItemsForm(subItemsSettings));
-		}
-
-		if (localValidationHook) {
-			validationResults.push(localValidationHook(options));
-		}
-		return validationResults.every((item) => item);
+		}).catch(() => {
+			const validationResults = [false];
+			console.log('validationResults1', validationResults);
+			if (localValidationHook) {
+				return Promise.resolve(localValidationHook(options)).then((localResult) => {
+					validationResults.push(localResult);
+					console.log('validationResults2', validationResults, localValidationHook);
+					return false;
+				});
+			}
+			console.log('validationResults2', validationResults, localValidationHook);
+			return false;
+		});
 	};
 
 	const getFormData = (options) => {

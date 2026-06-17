@@ -1,5 +1,5 @@
 <template>
-	<el-form ref="itemFormRef" class="flex mrow bottom align-center" :model="formData">
+	<el-form ref="itemFormRef" class="flex mrow bottom align-center" :model="formData" :rules="rules">
 		<el-form-item prop="node_parameter" class="mcol-xs-6" required>
 			<label v-if="itemIndex === 0">{{ tt('Parameter') }}</label>
 			<CustomSelectV2
@@ -36,6 +36,7 @@ import { computed, ref, watch } from 'vue';
 
 import { Lang } from '@/localization';
 import { useSubItem } from '@/composables/mixins/useSubItem';
+import { required } from '@/constants/validation';
 
 const { tt } = Lang;
 
@@ -58,6 +59,10 @@ const formData = ref({
 	node_parameter: null,
 	baseline_value: null,
 });
+const rules = {
+	node_parameter: required,
+	baseline_value: required,
+};
 
 const { validateItemForm, getFormData, removeItem, isInitialSetup } = useSubItem({
 	itemData: computed(() => props.itemData),

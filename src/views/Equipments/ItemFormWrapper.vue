@@ -162,7 +162,7 @@ const bannerSubtypesLoading = ref(false);
 
 const subItemsSettings = Object.freeze([
 	{ ref: 'ItemFormComponent', targetProp: 'equipmentSubmitPayload' },
-	// { ref: 'SensorFormComponent', submitInSubItem: true },
+	{ ref: 'SensorFormComponent', submitInSubItem: true },
 	{ ref: 'MultiViewItemForm', targetProp: 'multiViewsItems', returnArray: true },
 ]);
 const tabsList = computed(() => {
@@ -437,13 +437,13 @@ const submitMultiViews = (multiViewsItems) => {
 		});
 };
 
-const validateForm = (options = {}) => {
+const validateForm = async (options = {}) => {
 	formSubmitFinishCount.value = 0;
 	formSubmitSuccessCount.value = 0;
 	formsCount.value = 0;
 
 	return handleValidationResult([
-		validateSubItemsForm(subItemsSettings),
+		await validateSubItemsForm(subItemsSettings),
 	], options);
 };
 
