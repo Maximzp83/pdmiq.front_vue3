@@ -1,15 +1,15 @@
 <template>
-	<div class="edit-form-container">
+	<div :class="['edit-form-container', { 'half-width': !fromModal }]">
 		<el-form
 			ref="itemFormRef"
 			class="item-edit-form relative section-row sensor-form"
 			label-width="160px"
 			:model="formData"
 			:rules="rules"
+			:validate-on-rule-change="false"
 			:label-position="isMobile ? 'top' : 'left'"
 		>
-			<div class="tab-container" :class="{ 'half-width': !fromAnotherInstance && !isMobile }">
-				<div v-if="showDeviceDataRegisters" class="el-form-item info-list">
+				<div v-if="showDeviceDataRegisters" class="content-row info-list">
 					<div class="info-item">
 						<div class="div-block"><b>{{ tt('Model') }}</b>:</div>
 						<div class="div-block info">{{ itemData.device_data.Model }}</div>
@@ -32,7 +32,7 @@
 					</div>
 				</div>
 
-				<div v-if="showLastLubricationExternalStats" class="el-form-item info-list">
+				<div v-if="showLastLubricationExternalStats" class="content-row info-list">
 					<div class="info-item">
 						<div class="div-block"><b>{{ tt('phrases.shots_count_per_today') }}</b>:</div>
 						<div class="div-block info">{{ itemData.last_lubrication_external_stats.shots_count_per_today }}</div>
@@ -51,7 +51,7 @@
 					</div>
 				</div>
 
-				<el-form-item :label="tt('Type')" prop="data_set">
+				<el-form-item :label="tt('Type')" prop="data_set" class="content-row">
 					<CustomSelectV2
 						v-model="formData.data_set"
 						:optionsList="dataSets"
@@ -153,9 +153,11 @@
 						<span class="mcol-xs-4">
 							<el-switch v-model="formData.is_creating_recommended_maintenance" />
 						</span>
-						<span v-show="formData.is_creating_recommended_maintenance" class="mcol-xs-8 flex">
-							<el-checkbox v-model="maintenanceWarning">Warning</el-checkbox>
-							<el-checkbox v-model="maintenanceAlarm">Alarm</el-checkbox>
+						<span v-show="formData.is_creating_recommended_maintenance" class="mcol-xs-8">
+							<span class="flex">
+								<el-checkbox v-model="maintenanceWarning">Warning</el-checkbox>
+								<el-checkbox v-model="maintenanceAlarm">Alarm</el-checkbox>								
+							</span>
 						</span>
 					</div>
 				</el-form-item>
@@ -259,11 +261,12 @@
 				</el-form-item>
 
 				<el-form-item
+					class="switcher"
 					v-if="showRebaselineSwitch"
 					:label="`${tt('Start')} ${tt('rebaseline')}`"
 					prop="is_re_baseline"
 				>
-					<el-switch v-model="formData.is_re_baseline" :active-value="1" :inactive-value="0" />
+					<el-switch  v-model="formData.is_re_baseline" :active-value="1" :inactive-value="0" />
 				</el-form-item>
 
 				<div v-if="currentSensorType.isExtravibration" class="el-form-item">
@@ -378,6 +381,7 @@
 				</el-form-item>
 
 				<el-form-item
+					class="content-row"
 					v-if="showLubeMatrixButton"
 					:label="`${tt('Enable')} LubeMatrix`"
 					prop="is_lube_mode"
@@ -385,7 +389,7 @@
 					<el-switch v-model="formData.is_lube_mode" :active-value="1" :inactive-value="0" />
 				</el-form-item>
 
-				<div v-if="isLubeMatrixV4" class="el-form-item">
+				<div v-if="isLubeMatrixV4" class="content-row">
 					<div class="content-row">
 						<b>{{ `LubeMatrix ${tt('Setup')}` }}</b>
 					</div>
@@ -421,7 +425,7 @@
 				<ItemFormUltraSound
 					v-if="isLubeMatrixV4 || isLubeMatrixV3"
 					:ref="(el) => setSubItemRef('ItemFormUltraSound', el, 0)"
-					class="el-form-item"
+					class="content-row"
 					fromBannerSensorForm
 					:isLubeMatrixV3="isLubeMatrixV3"
 					:isLubeMatrixV4="isLubeMatrixV4"
@@ -440,6 +444,7 @@
 				/>
 
 				<el-form-item
+					class="content-row"
 					v-if="formData.is_runtime_tracking"
 					:label="tt('phrases.runtime_tracking_threshold_data_value')"
 					prop="runtime_tracking_threshold_data_value"
@@ -488,8 +493,6 @@
 						:placeholder="`${tt('select')} ${tt('range')}`"
 					/>
 				</el-form-item>
-			</div>
-
 			<FormOperationsButtons
 				v-if="!fromModal && !editInModal"
 				@onCancel="handleCancel"

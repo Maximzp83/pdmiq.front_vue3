@@ -5,78 +5,46 @@
 - Vue2 migration source: `vue2_project/`; Vue3 target: `src/`.
 
 ## Key Architecture Rules
-- Compare against Vue2 originals before changing migrated code.
+- Compare migrated files against Vue2 originals before changing behavior.
 - Preserve Vue2 behavior while adapting to Vue3 architecture: `src/api`, Pinia stores, existing composables, Element Plus, Vue Router 4.
 - Do not copy Vue2 API/store/mixins/helpers as-is; adapt behavior to existing Vue3 modules.
-- For Sensors forms, concrete forms own `localSubmit`; wrapper forms are orchestration/subitem wrappers.
-- For Equipments wrapper flow, mirror Vue2 orchestration: `validateForm -> handleValidationResult -> parallel submits -> handleFormSubmitFinish`.
-- Session collaboration: no code/diff output in replies; work one step at a time; after each step report result and changed path(s). No real API/websocket runtime testing unless explicitly requested.
+- Use existing local composables and globally registered form controls where applicable.
+- Session collaboration: no code/diff output in replies; work one step at a time; after each step report result and changed path(s). Ask before risky or ambiguous changes.
 
 ## Current Task Status
-- `src/views/CorporateDashboard` was migrated from Vue2:
-  - `src/views/CorporateDashboard/CorporateDashboard.vue`
-  - `src/views/CorporateDashboard/Details/CorporateMain.vue`
-  - `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
-  - `/corporate/main` route, Corporate View menu entry, and `view_corporate` permission mapping are enabled.
-- Sensors `PDFandFFTrequestsBlock` was re-aligned with the Vue2 original:
-  - Restored grouped RPM / FFT / PDF controls.
-  - Restored PDF request/download state, websocket completion handling, and compare PDF export.
-  - Restored FFT request dialog, Last FFT, Unlock FFT, socket response handling, and parent event propagation.
-  - Added missing `plantGraphsPdfReport` and `unlockFft` helpers in `useSensors`.
-  - Exposed `handleUnlockFFT` from `BannerFilterBlock` so `StatisticsPage` can forward chart unlock actions.
-- `src/views/Equipments/ItemFormWrapper.vue` was statically checked against Vue2:
-  - Current Vue3 wrapper appears aligned for compile/static scope.
-  - Reorder is handled in the equipment submit promise chain, which is safer than the legacy counter-only behavior.
-- Item card mixin behavior from `vue2_project/src/mixins/itemCardMixin.js` was re-applied across migrated ItemCard files:
-  - `useItemCard` now supports Vue3 reset callbacks.
-  - Assets/Machines/ProductionLines/BrandModels cards use `useItemCard` title-click flow with Pinia page reset where applicable.
-  - Processes card uses `useItemCard` preview modal behavior and restored image overlay.
-- `src/views/Maintenance/WorkOrders/ItemForm.vue` was re-checked against the Vue2 original and expanded:
-  - Restored `showJustInfo` behavior, filtered statuses, task procedure preview/info, technician users/teams tabs, create Part/WO Type modal callbacks, legacy snooze-change UI, equipment card grouping, and recurring period-date submit normalization.
-- `src/components/common/Datepicker.vue` now lazy-mounts Element Plus `el-date-picker` after first interaction:
-  - Initial render uses a lightweight div placeholder styled like the datepicker input, with icons imported from `@element-plus/icons-vue`, reducing eager calendar table DOM on pages with many datepickers.
-- Latest verification: `npm run build` passed; targeted `git diff --check` passed.
+- Sensors form HTML was partially re-aligned with Vue2 originals:
+  - `src/views/Sensors/sensorForm/ItemForm.vue`: removed extra inner `tab-container`; moved `half-width` behavior to root container.
+  - `src/views/Sensors/sensorForm/ItemFormNCD.vue`: removed extra `equipment_id` select that does not exist in Vue2 original.
+  - `src/views/Sensors/sensorForm/ItemFormNCD.vue`: added `:validate-on-rule-change="false"` to avoid `data_set` watcher triggering form validation through dynamic rules.
+- `src/components/layout/TopNavbar.vue`: `baseCreationMenuList` now uses `componentFileLoader` instead of `componentPath` for Utility and Item creation modals.
+- `src/views/Equipments/ItemForm.vue`:
+  - Restored active Vue2 `selectedEquipmentType` watcher logic: `without_brand` removes `brand_id` validation; new items receive default brand/model and local select options without duplicates.
+  - Converted conditional local components to `defineAsyncComponent`: `AnalysisRuleItem`, `ChildComponentItem`, `AttachmentItem`.
+- `src/views/Equipments/Card/ItemCard.vue`: restored drag-and-drop reorder for sensor/multiview card items using existing `useDragNdropSortable`; reorder calls PUT `/equipments/{id}/card-items-order` and reinitializes on failure.
+- `src/composables/mixins/useDragNdropSortable.js` already exists and is also used by file upload reorder; no new composable was created.
+- Latest verification after each step: `npm run build` passed; targeted `git diff --check` passed.
 
 ## Files Already Modified
 - `SESSION_CONTEXT.md`
-- `docs/migration-progress.md`
-- `docs/migration-todos.md`
-- `docs/new-session-handoff.md`
-- `src/views/CorporateDashboard/CorporateDashboard.vue`
-- `src/views/CorporateDashboard/Details/CorporateMain.vue`
-- `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
-- `src/router/index.js`
-- `src/constants/menuItems.js`
-- `src/utils/hasAccessTo.js`
-- `src/views/Sensors/FilterBlock/PDFandFFTrequestsBlock.vue`
-- `src/views/Sensors/FilterBlock/FFTRequestBlock.vue`
-- `src/views/Sensors/FilterBlock/BannerFilterBlock.vue`
-- `src/composables/useSensors.js`
-- `src/composables/mixins/useItemCard.js`
-- `src/views/Assets/ItemCard.vue`
-- `src/views/Machines/ItemCard.vue`
-- `src/views/ProductionLines/ItemCard.vue`
-- `src/views/Processes/ItemCard.vue`
-- `src/views/BrandModels/ItemCard.vue`
-- `src/views/Maintenance/WorkOrders/ItemForm.vue`
-- `src/components/common/Datepicker.vue`
-- Earlier Equipment/Sensor form orchestration files remain modified in the worktree from prior migration work:
-  - `src/views/Equipments/ItemForm.vue`
-  - `src/views/Equipments/ItemFormWrapper.vue`
-  - `src/views/Sensors/sensorForm/ItemForm.vue`
+- `src/views/Sensors/sensorForm/ItemForm.vue`
+- `src/views/Sensors/sensorForm/ItemFormNCD.vue`
+- `src/components/layout/TopNavbar.vue`
+- `src/views/Equipments/ItemForm.vue`
+- `src/views/Equipments/Card/ItemCard.vue`
+- Prior worktree modifications also exist in related migration files, including:
+  - `src/components/common/Datepicker.vue`
+  - `src/assets/sass/element-ui/elements.scss`
+  - `src/views/Equipments/EquipmentsLayout.vue`
+  - `src/views/Equipments/ExportChartsToPdfContent.vue`
   - `src/views/Sensors/sensorForm/ItemFormUltraSound.vue`
-  - `src/views/Sensors/sensorForm/ItemFormNCD.vue`
-  - `src/views/Sensors/sensorForm/ItemFormWrapper.vue`
-  - `src/views/Sensors/sensorForm/RunningThresholdItem.vue`
+  - `src/composables/useSensors.js`
 
 ## Unresolved Issues
-- No real API/websocket runtime testing was performed.
-- Sensors PDF/FFT/RPM flows need authenticated runtime smoke testing, especially websocket PDF completion, compare export, Banner FFT request dialog, Last FFT, Unlock FFT, and RPM settings/overlay.
-- Corporate Dashboard needs authenticated runtime smoke testing: company filter, date range, all-plants summary, print view, per-plant ROI/PDM/counters.
-- Equipment wrapper still needs runtime validation with real edit data: multiple sensors, Multi View, failure accounting, and create/edit behavior.
-- Watch for Element Plus validation warnings caused by late async list updates in nested forms.
+- No authenticated runtime/API/websocket testing was performed.
+- Sensors PDF/FFT/RPM flows still need authenticated smoke testing.
+- Equipment forms need runtime validation with real edit data, especially sensors, Multi View, wrapper submit orchestration, and card reorder persistence.
+- `src/views/Sensors/sensorForm/ItemFormUltraSound.vue` still needs careful HTML comparison against Vue2 original if continuing the earlier form-alignment task.
+- After removing NCD `equipment_id` HTML, related script-only helpers such as `equipmentsSelectSettings` may now be unused; they were intentionally not removed because the user requested HTML-only at that step.
 
 ## Next Actionable Step
-- Runtime smoke-test Sensors statistics page PDF/FFT/RPM actions with authenticated data.
-- Then smoke-test `/corporate/main`.
-- Then runtime-check `src/views/Equipments/ItemFormWrapper.vue` edit flow with sensors and Multi View.
+- Runtime-test equipment card drag-and-drop reorder on Plant Details dashboard with authenticated data; confirm the PUT request payload and UI ordering after refresh.

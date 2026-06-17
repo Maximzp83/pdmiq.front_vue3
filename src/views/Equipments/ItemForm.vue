@@ -124,6 +124,8 @@
 				/>
 			</div>
 
+			<!-- --------------- -->
+
 			<div v-if="preparedChildComponentsItems.length" class="content-row">
 				<b>{{ `${tt('Child')} ${tt('Components')}` }}:</b>
 			</div>
@@ -140,6 +142,8 @@
 					:rpm_source_value="rpmSourceValue"
 				/>
 			</div>
+
+			<!-- --------------- -->
 
 			<div class="content-row">
 				<b>RPM</b>
@@ -222,49 +226,46 @@
 				</el-form-item>
 			</div>
 
-			<el-form-item :label="tt('url')" prop="url">
-				<el-input v-model="formData.url" />
+			<el-form-item :label="tt('phrases.loc_on_machine')" prop="loc_on_machine" class="content-row">
+				<CustomInput v-model="formData.loc_on_machine" :placeholder="`${tt('input')} ${tt('location')}`"/>
 			</el-form-item>
 
-			<el-form-item :label="`${tt('Location')} ${tt('on')} ${tt('Machine')}`" prop="loc_on_machine">
-				<CustomInput v-model="formData.loc_on_machine" />
-			</el-form-item>
+			<div class="content-row equipment-uploads-container relative">
+				<el-form-item :label="`${tt('Item')} ${tt('images')}`"
+					prop="pictures"
+					class="upload-form-item"
+				>
+					<FileUploadBlock
+						:ref="(el) => setSubItemRef('PicturesUploadBlock', el, 0)"
+						:pictures="itemImagesList"
+						multiple
+						rotate
+						showDeleteButton
+						:enableReorderFiles="{ appendTo: 'body', formKey: 'display_order' }"
+						:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.EQUIPMENT }"
+						:blockId="EQUIPMENT_IMG_TYPES.EQUIPMENT"
+					/>
+				</el-form-item>
 
-			<el-form-item :label="tt('phrases.is_limbo')" prop="is_limbo">
-				<el-switch v-model="formData.is_limbo" />
-			</el-form-item>
+				<el-form-item
+					:label="`${tt('constants.Nameplate')} ${tt('images')}`"
+					prop="pictures"
+					class="upload-form-item"
+				>
+					<FileUploadBlock
+						:ref="(el) => setSubItemRef('NameplateUploadBlock', el, 0)"
+						:pictures="nameplateImagesList"
+						multiple
+						rotate
+						showDeleteButton
+						:enableReorderFiles="{ appendTo: 'body', formKey: 'display_order' }"
+						:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.NAMEPLATE }"
+						:blockId="EQUIPMENT_IMG_TYPES.NAMEPLATE"
+					/>
+				</el-form-item>
+			</div>
 
-			<el-form-item :label="tt('StoreRoom')" prop="is_store_room">
-				<el-switch v-model="formData.is_store_room" />
-			</el-form-item>
-
-			<el-form-item :label="tt('Pictures')" prop="pictures">
-				<FileUploadBlock
-					:ref="(el) => setSubItemRef('PicturesUploadBlock', el, 0)"
-					:pictures="itemImagesList"
-					multiple
-					rotate
-					showDeleteButton
-					:enableReorderFiles="{ appendTo: 'body', formKey: 'display_order' }"
-					:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.EQUIPMENT }"
-					:blockId="EQUIPMENT_IMG_TYPES.EQUIPMENT"
-				/>
-			</el-form-item>
-
-			<el-form-item :label="tt('Nameplate')" prop="pictures">
-				<FileUploadBlock
-					:ref="(el) => setSubItemRef('NameplateUploadBlock', el, 0)"
-					:pictures="nameplateImagesList"
-					multiple
-					rotate
-					showDeleteButton
-					:enableReorderFiles="{ appendTo: 'body', formKey: 'display_order' }"
-					:additionalFormData="{ type: EQUIPMENT_IMG_TYPES.NAMEPLATE }"
-					:blockId="EQUIPMENT_IMG_TYPES.NAMEPLATE"
-				/>
-			</el-form-item>
-
-			<el-form-item :label="tt('Attachments')" prop="libraries">
+			<el-form-item :label="tt('Attachments')" prop="libraries" class="content-row">
 				<div class="options-container">
 					<div v-if="librariesItemsList.length" class="content-row">
 						<AttachmentItem
@@ -303,13 +304,13 @@
 				/>
 			</el-form-item>
 
-			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
+			<!-- <FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" /> -->
 		</el-form>
 	</div>
 </template>
 
 <script setup>
-import { computed, ref, shallowRef, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, shallowRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
@@ -322,7 +323,7 @@ import {
 	itemSpeedOptionsList,
 } from '@/constants/global';
 import { required } from '@/constants/validation';
-import { findItemBy, prepareSubmitData, sortArrayByKeyNumber } from '@/helpers';
+import { findItemBy, prepareSubmitData, removeDuplicatesObjectsArray, sortArrayByKeyNumber } from '@/helpers';
 import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -335,10 +336,11 @@ import { useProductionLines } from '@/composables/useProductionLines';
 
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
-import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
-import AnalysisRuleItem from './AnalysisRuleItem.vue';
-import ChildComponentItem from './ChildComponentItem.vue';
-import AttachmentItem from '@/views/ProductionLines/AttachmentItem.vue';
+// import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
+
+const AnalysisRuleItem = defineAsyncComponent(() => import('./AnalysisRuleItem.vue'));
+const ChildComponentItem = defineAsyncComponent(() => import('./ChildComponentItem.vue'));
+const AttachmentItem = defineAsyncComponent(() => import('@/views/ProductionLines/AttachmentItem.vue'));
 
 const { tt } = Lang;
 
@@ -928,6 +930,29 @@ watch(
 	},
 	{ immediate: true },
 );
+
+watch(selectedEquipmentType, (type) => {
+	rules.brand_id = type?.without_brand ? null : required;
+
+	if (itemData.value?.id) return;
+
+	if (type?.default_brand_id && !formData.value.brand_id) {
+		if (type.default_brand) {
+			brandsList.value = removeDuplicatesObjectsArray([type.default_brand, ...brandsList.value], 'id');
+		}
+		formData.value.brand_id = type.default_brand_id;
+	}
+
+	if (type?.default_brand_model_id && !formData.value.brand_model_id) {
+		if (type.default_brand_model) {
+			brandModelsList.value = removeDuplicatesObjectsArray(
+				[type.default_brand_model, ...brandModelsList.value],
+				'id',
+			);
+		}
+		formData.value.brand_model_id = type.default_brand_model_id;
+	}
+});
 
 defineExpose({
 	validateForm,

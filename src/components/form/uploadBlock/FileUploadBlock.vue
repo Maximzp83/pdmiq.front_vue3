@@ -156,6 +156,7 @@ const reorderHandler = () => {
 const { setupDraggable } = useDragNdropSortable({
 	wrapperSelector: drag_n_drop_wrapper_selector,
 	draggingLockedProp: draggingLocked,
+	sortableSettings: computed(() => props.enableReorderFiles || {}),
 	reorderHandler,
 	dragStartHandler,
 });
@@ -227,6 +228,7 @@ watch(
 onMounted(() => {
 	if (enableReorder.value && uploadList.value) {
 		nextTick(() => {
+			// console.log('setupDraggable', props.enableReorderFiles);
 			draggingLocked.value = false;
 			setupDraggable(props.enableReorderFiles || {});
 		});

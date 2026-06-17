@@ -6,12 +6,13 @@
 			label-width="170px"
 			:model="formData"
 			:rules="rules"
+			:validate-on-rule-change="false"
 			:label-position="isMobile ? 'top' : 'left'"
 		>
-			<div v-if="itemId" class="custom-form-item el-form-item">
+			<!-- <div v-if="itemId" class="custom-form-item el-form-item">
 				<div class="el-form-item__label">{{ tt('Sensor') }} id</div>
 				<div class="value-instead-input el-form-item__content bold">{{ itemId }}</div>
-			</div>
+			</div> -->
 
 			<el-form-item :label="`${tt('Sensor')} ${tt('Type')}`" prop="data_set">
 				<CustomSelectV2
@@ -38,16 +39,6 @@
 					:disabled="!isNew && !itemData?.is_archived"
 					:settings="controllersSelectSettings"
 					:placeholder="`${tt('select')} ${tt('controller')}`"
-				/>
-			</el-form-item>
-
-			<el-form-item :label="tt('Item')" prop="equipment_id">
-				<FetchByQuerySelect
-					v-model="formData.equipment_id"
-					clearable
-					enableLoadmore
-					:settings="equipmentsSelectSettings"
-					:placeholder="`${tt('select')} ${tt('item')}`"
 				/>
 			</el-form-item>
 

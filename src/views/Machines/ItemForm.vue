@@ -255,7 +255,7 @@ const {
 const methodsMap = {
 	fetch_applications: createGetRequest(ENTITIES.Applications.apiBase),
 	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
-	fetch_locations: createGetRequest(ENTITIES.Plants.apiBase + '/locations'),
+	fetch_locations: createGetRequest(ENTITIES.Locations.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 };
 const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || formData.value.plant_id;

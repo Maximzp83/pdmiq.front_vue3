@@ -70,7 +70,11 @@
 		</div>
 
 		<div :class="['sensors-block', `equipment_${cardData.id}-sensors-drag-n-drop-wrapper`]">
-			<div v-if="sensorsAndMultiviewsList.length" class="sensors-list drag-n-drop-list">
+			<div
+				v-if="sensorsAndMultiviewsList.length"
+				:key="resetReorder"
+				class="sensors-list drag-n-drop-list relative"
+			>
 				<div
 					v-for="(item, idx) in sensorsAndMultiviewsList"
 					:key="`sensor-${item.id}_idx-${idx}`"
@@ -99,9 +103,10 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { api_request } from '@/api/request_provider';
 import { findItemBy, sortArrayByKeyNumber } from '@/helpers';
 import { SENSOR_ALARM_TYPES } from '@/constants/global';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -109,6 +114,7 @@ import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { Lang } from '@/localization';
 import { buildProps, useItemCard } from '@/composables/mixins/useItemCard';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
 
 import GridItemCardHeader from '@/components/gridTable/GridItemCardHeader.vue';
 import InfoItem from '@/components/itemDetails/InfoItem.vue';
@@ -128,6 +134,7 @@ const authStore = useAuthStore();
 const equipmentsStore = useEquipmentsStore();
 const { filters } = storeToRefs(equipmentsStore);
 const activeEquipmentTypeTab = ref(null);
+const resetReorder = ref(1);
 
 const equipmentTypesList = computed(() => Object.freeze(props.additionalProps?.equipmentTypesList || []));
 const dashboardSensors = computed(() => props.cardData.dashboardSensors || []);
@@ -137,6 +144,8 @@ const sensorsAndMultiviewsList = computed(() =>
 );
 const isIndustrialMatrix = computed(() => authStore.isIndustrialMatrix || authStore.isDeveloper);
 const enableReorder = computed(() => dashboardSensors.value.length > 1 && isIndustrialMatrix.value);
+const draggingLocked = computed(() => !enableReorder.value);
+const dragNdropWrapperSelector = computed(() => `.equipment_${props.cardData.id}-sensors-drag-n-drop-wrapper`);
 const titleLinkRoute = computed(() => `/equipments/${props.cardData.id}/details`);
 const radioBlockOptions = Object.freeze({ hideTitle: true, buttonType: 'primary' });
 const mainInfoSettingsList = computed(() => {
@@ -207,12 +216,58 @@ const equipmentStatusClass = computed(() => {
 const switchEquipmentTypeTab = (id) => {
 	activeEquipmentTypeTab.value = id;
 };
+const dragStartHandler = (event) => {
+	const target = event?.sensorEvent?.data?.target;
+	return !!target?.classList?.contains('can-dragging');
+};
+const reorderHandler = (event) => {
+	const { oldIndex, newIndex } = event || {};
+	const { card_item_order: cardItemOrder } = event?.data?.dragEvent?.data?.originalSource?.dataset || {};
+
+	if (oldIndex === newIndex || cardItemOrder == null) return;
+
+	const payload = {
+		notNotify: true,
+		data: {
+			current_display_order: +cardItemOrder,
+			desired_display_order: newIndex
+		}
+	}
+
+	/*if (process.env.NODE_ENV === 'development') {
+		if (payload) {
+			console.log('reorderHandler', payload.data);
+			resetReorder.value++;
+			destroySortable();
+
+			setTimeout(() => {
+				nextTick(setupDraggable);
+			}, 0)
+
+			return;
+		}
+	}*/
+
+	api_request.put(`/equipments/${props.cardData.id}/card-items-order`, payload)
+		.catch((error) => {
+			console.log(error);
+			resetReorder.value++;
+			destroySortable();
+			nextTick(setupDraggable);
+		});
+};
 const { togglePreviewModal, handleTitleClick } = useItemCard({
 	cardData: computed(() => props.cardData),
 	titleLinkRoute,
 	emit,
 });
 const { handleEvent } = useEventHandler({ handleTitleClick }, emit, 'itemCard');
+const { setupDraggable, destroySortable } = useDragNdropSortable({
+	wrapperSelector: dragNdropWrapperSelector,
+	draggingLockedProp: draggingLocked,
+	reorderHandler,
+	dragStartHandler,
+});
 
 watch(
 	currentEquipmentTypesList,
@@ -220,6 +275,14 @@ watch(
 		if (!activeEquipmentTypeTab.value && list.length) {
 			activeEquipmentTypeTab.value = list[0].id;
 		}
+	},
+	{ immediate: true },
+);
+
+watch(
+	[enableReorder, sensorsAndMultiviewsList],
+	() => {
+		nextTick(setupDraggable);
 	},
 	{ immediate: true },
 );

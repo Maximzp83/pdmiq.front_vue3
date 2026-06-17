@@ -245,12 +245,13 @@
 	.showJustInfo {
 		height: auto;
 		.el-input, .el-select, .el-textarea {pointer-events: none;}
-		.el-input__inner, .el-textarea__inner {
+		.el-input__inner, .el-textarea__inner,
+		.el-select__wrapper {
 			background-color: transparent !important	;
 			border: none;
 			// color: #fff;
 		}
-		.el-input__suffix {display: none;}
+		.el-input__suffix, .el-select__suffix {display: none;}
 
 		.el-select__tags {
 			.el-tag__close {display: none;}
@@ -428,6 +429,10 @@
 	.el-textarea__inner.elastic {
 		resize: none;
 		overflow: hidden;
+	}
+
+	.el-select__wrapper, .el-input {
+		background-color: #fff;
 	}
 }
 

@@ -1674,6 +1674,8 @@ body {
 		flex-wrap: wrap;
 
 		.el-upload-list {
+			margin-top: 0;
+			
 			.el-upload-list__item {
 				padding: 5px;
 				box-sizing: border-box;

@@ -159,9 +159,10 @@ const lubeTypesList = ref([]);
 const lubeTypesLoading = ref(false);
 const bannerSubtypesList = ref([]);
 const bannerSubtypesLoading = ref(false);
+
 const subItemsSettings = Object.freeze([
 	{ ref: 'ItemFormComponent', targetProp: 'equipmentSubmitPayload' },
-	{ ref: 'SensorFormComponent', submitInSubItem: true },
+	// { ref: 'SensorFormComponent', submitInSubItem: true },
 	{ ref: 'MultiViewItemForm', targetProp: 'multiViewsItems', returnArray: true },
 ]);
 const tabsList = computed(() => {
@@ -192,6 +193,7 @@ const tabsList = computed(() => {
 	}
 	return Object.freeze(list);
 });
+
 const { activeTab, switchTab } = useTabs({ tabsList, hideTabsBar: true });
 const { handleEvent } = useEventHandler({
 	handleFormSubmitFinish: ({ success } = {}) => {
@@ -331,13 +333,11 @@ const handleValidationResult = (validationResults, options = {}) => {
 	} = collectDataFromSubItems(subItemsSettings, options);
 
 	formsCount.value = 1 + sensorFormsList.value.length;
-	if (props.itemData?.id) {
-		formsCount.value += 1;
-	}
 
 	submitEquipment(equipmentSubmitPayload);
-
+	
 	if (props.itemData?.id) {
+		formsCount.value += 1; // multiViews
 		submitMultiViews(multiViewsItems);
 	}
 
@@ -367,6 +367,7 @@ const handleFormSubmitFinish = (success) => {
 	formsCount.value = 0;
 };
 
+// -----------------------
 const submitEquipment = (equipmentSubmitPayload = {}) => {
 	const {
 		equipmentForm,
@@ -378,13 +379,20 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 	const method = itemId ? 'put' : 'post';
 	const url = itemId ? `${ENTITIES.Equipments.apiBase}/${itemId}` : ENTITIES.Equipments.apiBase;
 
-	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-
-	api_request[method](url, {
+	const payload = {
 		data: equipmentForm,
 		withFile,
 		itemName: 'Item',
-	})
+	};
+
+	if (payload) {
+		console.log('payload equipment', payload.data)
+		return
+	}
+
+	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
+
+	api_request[method](url, payload)
 		.then((answer) => {
 			if (desiredId) {
 				return api_request.post(`${ENTITIES.Equipments.apiBase}/reorder`, {
@@ -396,10 +404,8 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 					},
 				}).then(() => answer);
 			}
-			return answer;
-		})
-		.then(() => {
 			handleFormSubmitFinish(true);
+			return answer;
 		})
 		.catch(() => {
 			handleFormSubmitFinish(false);
@@ -409,13 +415,20 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 const submitMultiViews = (multiViewsItems) => {
 	if (!props.itemData?.id) return;
 
-	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-
-	api_request.post(`/equipments/${props.itemData.id}/metric-multi-views`, {
+	const payload = {
 		data: { data: multiViewsItems || [] },
 		equipmentId: props.itemData.id,
 		itemName: 'Multi Views',
-	})
+	};
+
+	if (process.env.NODE_ENV === 'development') {
+		console.log('multiviews', multiViewsItems);
+		return;
+	}
+
+	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
+
+	api_request.post(`/equipments/${props.itemData.id}/metric-multi-views`, payload)
 		.then(() => {
 			handleFormSubmitFinish(true);
 		})

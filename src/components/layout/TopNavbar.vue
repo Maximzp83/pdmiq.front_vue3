@@ -642,6 +642,7 @@ const baseCreationMenuList = computed(() => {
 		{
 			label: tt('common.Production_line'),
 			instance: 'ProductionLines',
+			formComponentFileLoader: () => import('@/views/ProductionLines/ItemForm.vue'),
 			checkPlant: true,
 			icon: 'icomoon icon-production_lines',
 			permissions: ['create_dashboard'],
@@ -649,14 +650,15 @@ const baseCreationMenuList = computed(() => {
 		{
 			label: tt('common.Utility'),
 			instance: 'Utilities',
+			formComponentFileLoader: () => import('@/views/ProductionLines/ItemForm.vue'),
 			checkPlant: true,
-			componentPath: 'ProductionLines/ItemForm',
 			icon: 'icomoon icon-production_lines',
 			permissions: ['create_dashboard'],
 		},
 		{
 			label: tt('common.Machine'),
 			instance: 'Machines',
+			formComponentFileLoader: () => import('@/views/Machines/ItemForm.vue'),
 			checkPlant: true,
 			icon: 'icomoon icon-machines',
 			permissions: ['create_dashboard'],
@@ -664,13 +666,14 @@ const baseCreationMenuList = computed(() => {
 		{
 			label: tt('common.Asset'),
 			instance: 'Assets',
+			formComponentFileLoader: () => import('@/views/Assets/ItemForm.vue'),
 			checkPlant: true,
 			icon: 'icomoon icon-assets',
 			permissions: ['create_dashboard'],
 		},
 		{
 			label: tt('common.Item'),
-			componentPath: 'Equipments/ItemFormWrapper',
+			formComponentFileLoader: () => import('@/views/Equipments/ItemFormWrapper.vue'),
 			checkPlant: true,
 			icon: 'icomoon icon-equipments',
 			permissions: ['create_dashboard'],
@@ -691,7 +694,7 @@ const createItemByMenu = (item) => {
 		...creationMenuModalSettings.value,
 		show: true,
 		itemName: item.label,
-		componentPath: item.componentPath,
+		formComponentFileLoader: item.formComponentFileLoader,
 		instanceName: item.instance,
 		additionalModalSettings: item.additionalModalSettings,
 	};

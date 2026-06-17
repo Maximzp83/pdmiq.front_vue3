@@ -183,7 +183,7 @@
 						:key="`va-${rule.original_rule_id}`"
 						:ref="(el) => setSubItemRef('AnalysisRuleItem', el, idx)"
 						:crossoverRulesList="crossoverRulesStore[rule.original_rule_id]"
-						class="el-form-item content-row"
+						class="content-row"
 						:item-data="rule"
 						:item-index="idx"
 						:equipmentTypeId="formData.child_equipment_type_id"

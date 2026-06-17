@@ -6,15 +6,13 @@
 			label-width="160px"
 			:model="formData"
 			:rules="rules"
+			:validate-on-rule-change="false"
 			:label-position="isMobile ? 'top' : 'left'"
 		>
 			<div class="tab-container" :class="{ 'half-width': !fromAnotherInstance && !isMobile }">
-				<div v-if="itemId" class="custom-form-item el-form-item">
-					<div class="el-form-item__label">{{ tt('Sensor') }} id</div>
-					<div class="value-instead-input el-form-item__content bold">{{ itemId }}</div>
-				</div>
-
-				<el-form-item :label="tt('Lube_Type')" prop="functionality_type">
+				<el-form-item :label="tt('Lube_Type')" prop="functionality_type" 
+					class="content-row"
+				>
 					<CustomSelectV2
 						v-model="formData.functionality_type"
 						:optionsList="ultrasoundSensorTypes"
@@ -91,6 +89,7 @@
 				</el-form-item>
 
 				<el-form-item
+					class="content-row"
 					v-if="!fromBannerSensorForm"
 					:label="tt('phrases.lube_version')"
 					prop="lube_version"
@@ -103,6 +102,7 @@
 				</el-form-item>
 
 				<el-form-item
+					class="content-row"
 					v-if="!fromBannerSensorForm && formData.lube_version === LUBE_VERSIONS.V3"
 					:label="`${tt('Device')} ${tt('address')} id`"
 					prop="device_address_id"
@@ -112,15 +112,16 @@
 				</el-form-item>
 
 				<el-form-item
+					class="content-row"
 					v-if="!fromBannerSensorForm && formData.lube_version === LUBE_VERSIONS.V3"
-					:label="`${tt('Sensor')} Id`"
+					:label="`${tt('Sensor')} Id 2`"
 					prop="fft_sensor_id"
 					required
 				>
 					<CustomInput v-model="formData.fft_sensor_id" />
 				</el-form-item>
 
-				<div v-if="!isSensorOnly" class="el-form-item">
+				<div v-if="!isSensorOnly" class="content-row">
 					<el-form-item :label="`${tt('constants.Lube')} ${tt('Method')}`" prop="lube_method">
 						<CustomSelectV2
 							v-model="formData.lube_method"
