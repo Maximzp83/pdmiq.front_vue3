@@ -115,7 +115,7 @@
 					v-for="(rule, idx) in preparedVibrationAnalysisItems"
 					:key="`va-${rule.original_rule_id}`"
 					:ref="(el) => setSubItemRef('AnalysisRuleItem', el, idx)"
-					class="el-form-item"
+					class="content-row"
 					:item-data="rule"
 					:item-index="idx"
 					:equipmentTypeId="selectedEquipmentType.id"

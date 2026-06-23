@@ -323,7 +323,7 @@ const itemFormMixin = {
 									) {
 										this.set_global_state({
 											stateProp: 'updateItemsList',
-											value: true
+											value: { key: 'equipmentsList', val: true }
 										});
 
 										// console.log(this, this.filters)

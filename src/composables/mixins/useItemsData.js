@@ -103,6 +103,7 @@ export function useItemsData({
 		enableDeepUpdateForList,
 		filtersStateProp = 'filters',
 		relatedFiltersStoresMap = {},
+		listUpdateKey,
 	} = options;
 
 	// ========== State ==========
@@ -113,6 +114,7 @@ export function useItemsData({
 	const preventFetch = ref(false);
 	const doNotFetchItems = ref(false);
 	const filtersRef = itemStore ? storeToRefs(itemStore)[filtersStateProp] : filters;
+	const { updateItemsList } = storeToRefs(globalStore);
 
 	// ========== Computed-like ==========
 	const getRouteMeta = () => route.meta;
@@ -564,6 +566,19 @@ export function useItemsData({
 			deep: true,
 			flush: 'post'
 		});
+	}
+
+	if (listUpdateKey) {
+		watch(updateItemsList, (updateRequest) => {
+			if (updateRequest?.key !== listUpdateKey || !updateRequest?.val) return;
+
+			refetchItemsList().finally(() => {
+				globalStore.set_global_state({
+					stateProp: 'updateItemsList',
+					value: { key: listUpdateKey, val: false },
+				});
+			});
+		}, { deep: true });
 	}
 
 	// ========== Lifecycle ==========

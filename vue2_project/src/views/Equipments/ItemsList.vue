@@ -123,6 +123,7 @@ export default {
 		dashboardListsReorderMixin(),
 		dragNdropSortableMixin()
 	],
+	name: 'equipmentsList',
 	components: {
 		ItemsGridContainer: () =>
 			import('@/components/gridTable/ItemsGridContainer.vue'),
@@ -765,10 +766,11 @@ export default {
 
 		// -----------------
 		state_socketCallback(response = {}) {
-			const { data, type } = response;
+			const { type, data } = response;
+			const safeData = data.data || {};
 
-			if (type == 'counters') {
-				this.itemsList = this.updateSensorsCounters(this.itemsList, data);
+			if (type.toLowerCase() == 'counters') {
+				this.itemsList = this.updateSensorsCounters(this.itemsList, safeData);
 			}			
 		},
 
@@ -851,7 +853,7 @@ export default {
 							socketName: 'state_socket',
 							socketNameReadyProp: 'state_socket_ready',
 							socketChannel: this.socketChannel,
-							socketCallbackName: 'state_socketCallback',
+							socketCallback: (type, data) => this.state_socketCallback({type, data}),
 							// resources: sensorIds
 						});
 					}
@@ -870,7 +872,7 @@ export default {
 		'filters.hasSensors'(hasSensors) {
 			if (!hasSensors) {
 				this.preventFetch = true;
-				console.log('filters.hasSensors')
+				// console.log('filters.hasSensors')
 				this.setFilters({ sensorType: null, dataSet: null, page: 1 });
 			}
 		}

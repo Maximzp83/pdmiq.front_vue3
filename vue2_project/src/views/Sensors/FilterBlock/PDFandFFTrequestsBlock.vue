@@ -451,7 +451,7 @@ export default {
 						socketName: 'pdf_socket',
 						socketNameReadyProp: 'pdf_socket_ready',
 						socketChannel: this.socketChannel,
-						socketCallbackName: 'pdf_socketCallback',
+						socketCallback: (type, data) => this.pdf_socketCallback({ type, data }),
 						resources: this.sensorData.id
 					});
 
@@ -463,8 +463,11 @@ export default {
 		},
 
 		pdf_socketCallback(response = {}) {
-			if (response.type == "REPORT.GRAPHICAL" && response.data) {
-				const { report_filename, report_by_sensor_ids } = response.data;
+			const { type, data } = response;
+			const safeData = data.data || {};
+			// console.log(response, data)
+			if (type == "REPORT.GRAPHICAL" && safeData) {
+				const { report_filename, report_by_sensor_ids } = safeData;
 				// console.log(status, message, report_filename)
 				if (
 					report_by_sensor_ids &&

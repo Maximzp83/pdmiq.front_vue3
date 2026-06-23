@@ -637,7 +637,8 @@ export default {
 					socketName: 'statistics_socket',
 					socketNameReadyProp: 'statistics_socket_ready',
 					socketChannel: this.socketChannel,
-					socketCallbackName: 'statistics_socketCallback'
+					socketCallback: (type, data) => this.statistics_socketCallback({type, data}),
+
 					// resources: this.getSensorsIds(this.itemsList)
 				});
 
@@ -680,20 +681,21 @@ export default {
 		},*/
 
 		statistics_socketCallback(response = {}) {
-			const { data, type, /*event*/ } = response;
+			const { type, data } = response;
+			const safeData = data.data || {};
 			// console.log('statistics_socketCallback', response.data.parameter_type, this.socketChannel)
 			try {
-				if (type === 'job') {
-					this.ChartsListInstance.callMethod('handlePointsLiveUpdate', data);
+				if (type.toLowerCase() === 'job') {
+					this.ChartsListInstance.callMethod('handlePointsLiveUpdate', safeData);
 				} else if (type === 'sensor') {
-					if (data) {
+					if (safeData) {
 						const payload = {
 							eventName: 'update_sensor',
 							data: {
 								id: this.sensorData.id,
 								sensor: {
 									...this.sensorData,
-									lube_cycle_high_speed: data.lube_cycle_high_speed
+									lube_cycle_high_speed: safeData.lube_cycle_high_speed
 								}
 							}
 						};
@@ -701,7 +703,7 @@ export default {
 					}
 				} else if (type == 'GainAdjustment') {
 					this.ChartsListInstance.callMethod('handleAdjustmentsLiveUpdate', {
-						data,
+						safeData,
 						settings: {
 							set_sensor_state: this.set_sensor_state,
 							$notify: this.$notify

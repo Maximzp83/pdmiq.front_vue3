@@ -520,11 +520,12 @@ const itemsDataMixin = {
 				...preventedFilters
 			});
 		},
-		updateItemsList(isUpdate) {
-			if (isUpdate) {
+		updateItemsList({key, val}) {
+			// console.log('updateItemsList', key, val, this.$options.name)
+			if (key == this.$options.name && val) {
 				// console.log('updateItemsList')
 				this.refetchItemsList();
-				this.set_global_state({ stateProp: 'updateItemsList', value: false });
+				this.set_global_state({ stateProp: 'updateItemsList', value: {key, val:false } });
 			}
 		},
 

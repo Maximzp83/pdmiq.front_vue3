@@ -282,9 +282,10 @@ watch(
 watch(
 	[enableReorder, sensorsAndMultiviewsList],
 	() => {
+		destroySortable();
 		nextTick(setupDraggable);
 	},
-	{ immediate: true },
+	{ immediate: true, flush: 'post' },
 );
 
 </script>

@@ -344,7 +344,7 @@ export default {
 					socketName: 'state_socket',
 					socketNameReadyProp: 'state_socket_ready',
 					socketChannel: this.socketChannel,
-					socketCallbackName: 'state_socketCallback'
+					socketCallback: (type, data) => this.state_socketCallback({type, data}),
 					// resources: this.getSensorsIds(this.itemsList)
 				});
 			} else if (this.state_socket) {

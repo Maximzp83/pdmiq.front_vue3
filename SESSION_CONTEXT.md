@@ -12,6 +12,20 @@
 - Session collaboration: no code/diff output in replies; work one step at a time; after each step report result and changed path(s). Ask before risky or ambiguous changes.
 
 ## Current Task Status
+- Equipment dashboard drag-and-drop initialization was fixed:
+  - `src/views/Equipments/ItemsList.vue` now initializes `useDragNdropSortable` for equipment cards using the `draggingLockedProp` passed by `EquipmentsLayout`.
+  - The sortable instance is rebuilt after list/grid switches and list rerenders, and destroyed on unmount.
+  - `src/views/Equipments/Card/ItemCard.vue` now destroys and recreates its internal sensor/Multi View sortable instance after its draggable list changes.
+  - `npm run build` and targeted `git diff --check` pass.
+- Latest `vue2_project` change sync was applied to already migrated Vue3 equivalents:
+  - Added English/Spanish `aliases.del_sensor` localization and updated the Equipment sensor-removal confirmation.
+  - Replaced the global boolean list refresh flag with keyed `{ key: 'equipmentsList', val }` handling in `useItemForm`, `useItemsData`, Equipment forms, and Equipment list.
+  - Restored Equipment list live sensor-counter updates and adapted websocket consumers to the new nested `data.data` payload while retaining flat-payload compatibility.
+  - Updated OEE/Processes live updates, Sensors PDF exports, sensor charts, NCD item/config flows, and the folded compare-export logic.
+  - `src/views/Sensors/StatisticsPage.vue` already contained the new equipment null guard, so no additional change was required.
+  - `vue2_project/src/views/Processes/Details/ChartItemContainer.vue` was skipped because that Vue3 view is not migrated.
+  - `vue2_project/src/services/WebSocketService.js` was not copied because Vue3 currently uses `useWebSocket` with a different transport; changing only its endpoint would be protocol-incompatible.
+  - `npm run build` and targeted `git diff --check` pass.
 - Sensors form HTML was partially re-aligned with Vue2 originals:
   - `src/views/Sensors/sensorForm/ItemForm.vue`: removed extra inner `tab-container`; moved `half-width` behavior to root container.
   - `src/views/Sensors/sensorForm/ItemFormNCD.vue`: removed extra `equipment_id` select that does not exist in Vue2 original.

@@ -281,12 +281,19 @@ class OEEChart extends ChartBase {
 
 	// -------------Live Update-------
 	handleCountersLiveUpdate(answer) {
-		const { actual_capacity, counter, type, downtime, totalDowntime } = answer;
+		const { type, data } = answer;
+		const {
+			actual_capacity,
+			counter,
+			downtime,
+			totalDowntime
+		} = data?.data || data || {};
+		const normalizedType = `${type || ''}`.toLowerCase();
 		let values,
 			specification = {};
 		// let updateSeries;
 		// console.log('handleCountersLiveUpdate', answer)
-		if (type == 'job') {
+		if (normalizedType == 'job') {
 			values = [
 				{ accessor: `counters`, value: counter },
 				{ accessor: `actual_capacity`, value: actual_capacity }
@@ -296,7 +303,7 @@ class OEEChart extends ChartBase {
 			specification = {
 				setupPointsData: this.transformator_settings.specification.setupPointsData
 			};
-		} else if (type == 'downtime') {
+		} else if (normalizedType == 'downtime') {
 			values = [
 				{ accessor: `downtimes`, value: downtime },
 				{ accessor: `totalDowntimes`, value: totalDowntime || {} }

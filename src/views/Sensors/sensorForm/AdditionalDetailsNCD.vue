@@ -339,9 +339,10 @@ const handleConfigRequest = () => {
 };
 
 const configRequestSocketCallback = ({ type, data }) => {
-	if (type !== 'ncd.command' || data.sensor_id !== props.itemData.id) return;
+	const safeData = data?.data || data || {};
+	if (`${type || ''}`.toLowerCase() !== 'ncd.command' || safeData.sensor_id !== props.itemData.id) return;
 
-	if (data.status === NCD_REQUEST_STATUSES.SUCCESS) {
+	if (safeData.status === NCD_REQUEST_STATUSES.SUCCESS) {
 		Notify({
 			type: 'success',
 			title: tt('Success'),
@@ -349,11 +350,11 @@ const configRequestSocketCallback = ({ type, data }) => {
 		});
 		closeWebSocket({ socketName: 'ncd_socket' });
 		toggleMainPreloader(false);
-		emit('event', { eventName: 'successModalSubmit', data });
+		emit('event', { eventName: 'successModalSubmit', data: safeData });
 		emit('event', { eventName: 'handleCloseEditModal' });
 	}
 
-	if (data.status === NCD_REQUEST_STATUSES.FAIL) {
+	if (safeData.status === NCD_REQUEST_STATUSES.FAIL) {
 		Notify({
 			type: 'warning',
 			title: tt('Fail'),

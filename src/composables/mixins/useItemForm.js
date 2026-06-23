@@ -257,7 +257,7 @@ export function useItemForm({
 				const itemName = resolve(editModal)?.itemName || resolvedItemsName.value.one || 'Item';
 
 				if (editInModal || fromModal || showSubmitButtons) {
-					executeFormSubmit({
+					return executeFormSubmit({
 						formData: preparedData,
 						itemName,
 						uploadSettings,
@@ -270,14 +270,26 @@ export function useItemForm({
 						successSubmitCallback,
 						propsSuccessSubmitCallback,
 						options
-					})/*.then((answer) => { // for ai - leave this
+					}).then((answer) => {
+						const activeTable = `${activeItemsTable.value || ''}`.toLowerCase();
+						const instanceName = `${resolvedItemsName.value.instanceName || ''}`.toLowerCase();
+
+						if (activeTable === instanceName || instanceName === 'sensors') {
+							globalStore.set_global_state({
+								stateProp: 'updateItemsList',
+								value: { key: 'equipmentsList', val: true },
+							});
+						}
+
 						if (activeItemsTable.value || fromModal) {
 							globalStore.set_global_state({
 								stateProp: 'updateCounters',
 								value: true,
 							});
 						}
-					});*/
+
+						return answer;
+					});
 				} else {
 					if (localPreSubmitHook) {
 						const { next } = localPreSubmitHook({data: preparedData, itemName});

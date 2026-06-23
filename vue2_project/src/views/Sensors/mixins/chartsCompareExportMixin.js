@@ -48,7 +48,7 @@ const chartsCompareExportMixin = {
 				socketName: 'compare_pdf_socket',
 				socketNameReadyProp: 'compare_pdf_socket_ready',
 				socketChannel: this.socketChannelCompareRequest,
-				socketCallbackName: 'compare_pdf_socketCallback'
+				socketCallback: (type, data) => this.compare_pdf_socketCallback({ type, data }),
 				// resources: this.sensorData.id
 			});
 		},
@@ -119,6 +119,7 @@ const chartsCompareExportMixin = {
 		},
 
 		compare_pdf_socketCallback({ type, data }) {
+			const safeData = data.data || {};
 			// console.log('compare_pdf_socketCallback', type, data)
 			if (type == 'REPORT.GRAPHICAL') {
 				this.$notify({
@@ -127,7 +128,7 @@ const chartsCompareExportMixin = {
 				});
 
 				this.pdfReportURL = generateUrl({
-					path: `plants/${data.plant_id}/graphical-comparison-reports/${data.id}/pdf`
+					path: `plants/${safeData.plant_id}/graphical-comparison-reports/${safeData.id}/pdf`
 				});
 				// console.log(this.pdfReportURL)
 

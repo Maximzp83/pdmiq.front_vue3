@@ -49,13 +49,14 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
 import { SUBJECT_TYPES } from '@/constants/global';
 import { ITEMS_GRID_TYPES, standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
+import { getValues } from '@/helpers';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -63,6 +64,8 @@ import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useDashboardListsReorder } from '@/composables/mixins/useDashboardListsReorder';
+import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
+import { useWebSocket } from '@/composables/mixins/useWebSocket';
 
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import ItemsGridContainer from '@/components/gridTable/ItemsGridContainer.vue';
@@ -100,12 +103,17 @@ const { globalFilters } = storeToRefs(globalStore);
 const { changeRoute } = useNavigation();
 const itemsTableRef = ref(null);
 const isLoadingCards = ref(false);
+const stateSocketReady = ref(false);
 const equipmentItemCardLoader = () => import('./Card/ItemCard.vue');
 const additionalDataForCards = computed(() =>
 	Object.freeze({
 		equipmentTypesList: props.equipmentTypesList,
 	}),
 );
+const socketChannel = computed(() =>
+	authStore.authUser ? `user.${authStore.authUser.uuid}` : null,
+);
+const { setupWebSocket, closeWebSocket, webSocketSend } = useWebSocket();
 
 const {
 	itemsList,
@@ -147,11 +155,70 @@ const {
 			callback: () => refetchItemsList(),
 			...(props.additionalModalSettings || {}),
 		},
+		listUpdateKey: 'equipmentsList',
 	},
 });
 
+const getSensorsIds = (equipments = []) => {
+	const ids = [];
+	equipments.forEach((equipment) => {
+		if (equipment.dashboardSensors?.length) {
+			ids.push(...getValues('id', equipment.dashboardSensors));
+		}
+	});
+	return ids.join(',');
+};
+
+const updateSensorsCounters = (list, counterData = {}) => {
+	const { equipment_id: equipmentId, sensor_id: sensorId, ...increments } = counterData;
+
+	return list.map((equipment) => {
+		if (
+			(equipmentId && equipmentId === equipment.id) ||
+			equipment.dashboardSensors?.some((sensor) => sensor.id === sensorId)
+		) {
+			equipment.dashboardSensors?.forEach((sensor) => {
+				if (sensor.id !== sensorId) return;
+
+				Object.entries(increments).forEach(([prop, value]) => {
+					if (sensor[prop] !== undefined) {
+						sensor[prop] += value;
+					} else if (sensor.lubes?.[prop] !== undefined) {
+						if (
+							value > 0 ||
+							(prop !== 'successCyclesCount' && prop !== 'failuresCyclesCount')
+						) {
+							sensor.lubes[prop] += value;
+						}
+					}
+				});
+			});
+		}
+		return equipment;
+	});
+};
+
+const stateSocketCallback = ({ type, data } = {}) => {
+	const safeData = data?.data || data || {};
+	if (`${type || ''}`.toLowerCase() === 'counters') {
+		itemsList.value = updateSensorsCounters(itemsList.value, safeData);
+	}
+};
+
+const setupEquipmentSocket = (resources) => {
+	if (!socketChannel.value || !resources) return;
+
+	setupWebSocket({
+		socketName: 'state_socket',
+		socketReadyRef: stateSocketReady,
+		socketChannel: socketChannel.value,
+		resources,
+		onMessage: stateSocketCallback,
+	});
+};
+
 const reorderEquipment = (payload) => api_request.post('/equipments/reorder', { ...payload, notNotify: true });
-const { handleCreateWorkOrderButton } = useDashboardListsReorder({
+const { reorderHandler, handleCreateWorkOrderButton } = useDashboardListsReorder({
 	tt,
 	emit,
 	itemsList,
@@ -161,6 +228,11 @@ const { handleCreateWorkOrderButton } = useDashboardListsReorder({
 	globalFilters,
 	fromDetailsPage: computed(() => props.fromDetailsPage),
 	showEditModal: globalStore.show_edit_modal,
+});
+const { setupDraggable, destroySortable } = useDragNdropSortable({
+	wrapperSelector: '.equipments-list .drag-n-drop-wrapper',
+	draggingLockedProp: computed(() => props.draggingLockedProp),
+	reorderHandler: (event) => reorderHandler(event),
 });
 
 const tableSettings = computed(() => {
@@ -322,6 +394,44 @@ const { handleEvent } = useEventHandler({
 	handleShowDetails,
 	handleAddToFavorites,
 }, emit, 'itemsList');
+
+watch(
+	() => itemsList.value,
+	(list) => {
+		if (!list?.length || !socketChannel.value) return;
+
+		const sensorIds = getSensorsIds(list);
+		if (!sensorIds) return;
+
+		if (!stateSocketReady.value) {
+			setupEquipmentSocket(sensorIds);
+		} else {
+			webSocketSend({
+				socketName: 'state_socket',
+				resources: sensorIds,
+			});
+		}
+	},
+	{ deep: true },
+);
+
+watch(
+	[
+		() => props.activeGrid,
+		() => itemsLoading.value,
+		() => itemsList.value.length,
+	],
+	() => {
+		destroySortable();
+		setupDraggable();
+	},
+	{ flush: 'post' },
+);
+
+onBeforeUnmount(() => {
+	destroySortable();
+	closeWebSocket({ socketName: 'state_socket' });
+});
 
 defineExpose({
 	createItem,

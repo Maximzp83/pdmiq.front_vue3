@@ -281,12 +281,15 @@ class OEEChart extends ChartBase {
 
 	// -------------Live Update-------
 	handleCountersLiveUpdate(answer) {
-		const { actual_capacity, counter, type, downtime, totalDowntime } = answer;
+		const { type, data } = answer;
+		const { actual_capacity, counter, downtime, totalDowntime } = data;
+		// const safeData = data.data || {};
+
 		let values,
 			specification = {};
 		// let updateSeries;
 		// console.log('handleCountersLiveUpdate', answer)
-		if (type == 'job') {
+		if (type.toLowerCase() == 'job') {
 			values = [
 				{ accessor: `counters`, value: counter },
 				{ accessor: `actual_capacity`, value: actual_capacity }

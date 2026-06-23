@@ -703,7 +703,7 @@ export default {
 		linespeedOverlaySensorData() {
 			const { equipmentData, rpmOverlayData } = this;
 
-			if (equipmentData.linespeedSensor && equipmentData.linespeedSensor.is_deleted) {
+			if (equipmentData && equipmentData.linespeedSensor && equipmentData.linespeedSensor.is_deleted) {
 				return null
 			};
 			// console.log('linespeedOverlaySensorData')

@@ -308,8 +308,8 @@ export default {
 		state_socketCallback(response = {}) {
 			const { type } = response;
 
-			if (type == 'job' || type == 'downtime') {
-				this.itemsList = this.update_process_data(response);
+			if (type.toLowerCase() == 'job' || type.toLowerCase() == 'downtime') {
+				this.itemsList = this.update_process_data(response.data);
 			}			
 		},
 	},
@@ -333,7 +333,7 @@ export default {
 							socketName: 'state_socket',
 							socketNameReadyProp: 'state_socket_ready',
 							socketChannel: this.socketChannel,
-							socketCallbackName: 'state_socketCallback',
+							socketCallback: (type, data) => this.state_socketCallback({type, data}),
 							// resources: sensorIds
 						});
 					}

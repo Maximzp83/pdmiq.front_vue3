@@ -239,10 +239,11 @@ const startPDFreportRequest = () => {
 };
 const comparePdfSocketCallback = ({ type, data } = {}) => {
 	if (type !== 'REPORT.GRAPHICAL') return;
+	const safeData = data?.data || data || {};
 
 	Notify({ type: 'success', title: tt('Success') });
 	pdfReportURL.value = generateUrl({
-		path: `plants/${data.plant_id}/graphical-comparison-reports/${data.id}/pdf`,
+		path: `plants/${safeData.plant_id}/graphical-comparison-reports/${safeData.id}/pdf`,
 	});
 	pdfReportProcessing.value = false;
 	closeComparePdfSocket();

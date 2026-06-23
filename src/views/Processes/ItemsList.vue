@@ -158,9 +158,10 @@ const updateProcessData = ({ process_id, actualCapacity, totalDowntime, downtime
 	});
 
 const stateSocketCallback = (answer) => {
-	const { type } = answer || {};
-	if (type === 'job' || type === 'downtime') {
-		itemsList.value = updateProcessData(answer);
+	const { type, data } = answer || {};
+	const normalizedType = `${type || ''}`.toLowerCase();
+	if (normalizedType === 'job' || normalizedType === 'downtime') {
+		itemsList.value = updateProcessData(data);
 	}
 };
 

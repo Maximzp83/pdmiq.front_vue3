@@ -1064,13 +1064,14 @@ export default {
 
 		ncd_socketCallback(response = {}, settings = {}) {
 			const { data, type } = response;
+			const safeData = data.data || {};
 
 			return new Promise((resolve, reject) => {
 				const { successMessage, failMessage, sensor_id } = settings;
 				// console.log(type, data)
 
-				if (type == 'ncd.command' && sensor_id == data.sensor_id) {
-					if (data.status == NCD_REQUEST_STATUSES.SUCCESS) {
+				if (type.toLowerCase() == 'ncd.command' && sensor_id == safeData.sensor_id) {
+					if (safeData.status == NCD_REQUEST_STATUSES.SUCCESS) {
 						this.$notify({
 							type: 'success',
 							title: this.tt('Success'),
@@ -1081,7 +1082,7 @@ export default {
 						resolve();
 					}
 
-					if (data.status == NCD_REQUEST_STATUSES.FAIL) {
+					if (safeData.status == NCD_REQUEST_STATUSES.FAIL) {
 						this.$notify({
 							type: 'warning',
 							title: this.tt('Fail'),

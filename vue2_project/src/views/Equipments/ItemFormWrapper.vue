@@ -425,14 +425,19 @@ export default {
 			}
 		},
 
+		test() {
+			this.set_global_state({
+				stateProp: 'updateItemsList',
+				value: { key:'equipmentsList', val: true }
+			});
+		},
+
 		handleDeleteSensor(sensorId) {
 			const { tt } = this;
 			this.$confirm({
 				title: tt('Warning'),
-				message: `${tt('phrases.this_will_permanently_delete_current')} ${tt(
-					'Sensor'
-				)}. ${tt('Continue')}?`,
-				confirmButtonText: tt('Delete'),
+				message: `${tt('aliases.del_sensor')}. ${tt('Continue')}?`,
+				confirmButtonText: tt('Remove'),
 				showCancelButton: true,
 				cancelButtonText: tt('Cancel'),
 				iconClass: 'icomoon icon-warning',
@@ -443,7 +448,7 @@ export default {
 						this.removeFormItem(sensorId, 'sensorFormsList');
 						this.set_global_state({
 							stateProp: 'updateItemsList',
-							value: true
+							value: { key:'equipmentsList', val: true }
 						});
 					});
 				})

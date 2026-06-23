@@ -350,10 +350,11 @@ const startPDFCompareReport = () => {
 };
 const comparePdfSocketCallback = ({ type, data } = {}) => {
 	if (type !== 'REPORT.GRAPHICAL') return;
+	const safeData = data?.data || data || {};
 
 	Notify({ type: 'success', title: tt('Success') });
 	pdfReportURL.value = generateUrl({
-		path: `plants/${data.plant_id}/graphical-comparison-reports/${data.id}/pdf`,
+		path: `plants/${safeData.plant_id}/graphical-comparison-reports/${safeData.id}/pdf`,
 	});
 	pdfReportProcessing.value = false;
 	closeComparePdfSocket();
@@ -391,9 +392,11 @@ const sendPDFreportRequest = () => {
 		});
 };
 const pdfSocketCallback = (response = {}) => {
-	if (response.type !== 'REPORT.GRAPHICAL' || !response.data) return;
+	const { type, data } = response;
+	const safeData = data?.data || data || {};
+	if (type !== 'REPORT.GRAPHICAL') return;
 
-	const { report_filename, report_by_sensor_ids = [] } = response.data;
+	const { report_filename, report_by_sensor_ids = [] } = safeData;
 	const compareSensorIds = sensorsList.value.map((item) => item.id);
 	const hasCurrentSensor = report_by_sensor_ids.includes(props.sensorData.id);
 	const hasCompareSensor = report_by_sensor_ids.some((id) => compareSensorIds.includes(id));

@@ -289,9 +289,9 @@ const removeSensorItem = ({ sensorId, isNew }) => {
 	}
 
 	ElMessageBox.confirm(
-		`${tt('phrases.this_will_permanently_delete_current')} ${tt('Sensor')}. ${tt('Continue')}?`,
+		`${tt('aliases.del_sensor')}. ${tt('Continue')}?`,
 		{
-			confirmButtonText: tt('Delete'),
+			confirmButtonText: tt('Remove'),
 			cancelButtonText: tt('Cancel'),
 			type: 'warning',
 		},
@@ -310,7 +310,7 @@ const removeSensorItem = ({ sensorId, isNew }) => {
 			removeFormItem(sensorId, sensorFormsList);
 			globalStore.set_global_state({
 				stateProp: 'updateItemsList',
-				value: true,
+				value: { key: 'equipmentsList', val: true },
 			});
 		})
 		.catch(() => {});
@@ -357,6 +357,10 @@ const handleFormSubmitFinish = (success) => {
 	emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 
 	if (formSubmitSuccessCount.value >= formsCount.value) {
+		globalStore.set_global_state({
+			stateProp: 'updateItemsList',
+			value: { key: 'equipmentsList', val: true },
+		});
 		emit('event', {
 			eventName: 'successModalSubmit',
 			data: true,

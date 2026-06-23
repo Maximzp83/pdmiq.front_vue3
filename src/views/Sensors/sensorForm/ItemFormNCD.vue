@@ -749,9 +749,10 @@ const waitForNcdStatus = ({ sensorId, answer, ncdWebSocketData }) => {
 				reject(err);
 			},
 			onMessage: ({ data, type }) => {
-				if (type !== 'ncd.command' || data?.sensor_id !== sensorId) return;
+				const safeData = data?.data || data || {};
+				if (`${type || ''}`.toLowerCase() !== 'ncd.command' || safeData.sensor_id !== sensorId) return;
 
-				if (data.status === NCD_REQUEST_STATUSES.SUCCESS) {
+				if (safeData.status === NCD_REQUEST_STATUSES.SUCCESS) {
 					Notify({
 						type: 'success',
 						title: tt('Success'),
@@ -761,7 +762,7 @@ const waitForNcdStatus = ({ sensorId, answer, ncdWebSocketData }) => {
 					resolve(answer);
 				}
 
-				if (data.status === NCD_REQUEST_STATUSES.FAIL) {
+				if (safeData.status === NCD_REQUEST_STATUSES.FAIL) {
 					Notify({
 						type: 'warning',
 						title: tt('Fail'),

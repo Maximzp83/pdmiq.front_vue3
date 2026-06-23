@@ -459,7 +459,8 @@ export default {
 					socketNameReadyProp: 'ncd_socket_ready',
 					socketChannel: this.socketChannelFFT,
 					localHandleError: this.configRequestWebsocketErrorHandler,
-					socketCallbackName: 'configRequest_socketCallback',
+					socketCallback: (type, data) => this.configRequest_socketCallback({ type, data }),
+
 				});
 
 				this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
@@ -469,9 +470,12 @@ export default {
 		},
 
 		configRequest_socketCallback({ type, data }) {
+			const safeData = data.data || {};
+			
+
 			// console.log(type, data)
-			if (type == 'ncd.command' && data.sensor_id === this.itemData.id) {
-				if (data.status == NCD_REQUEST_STATUSES.SUCCESS) {
+			if (type.toLowerCase() == 'ncd.command' && safeData.sensor_id === this.itemData.id) {
+				if (safeData.status == NCD_REQUEST_STATUSES.SUCCESS) {
 					this.$notify({
 						type: 'success',
 						title: this.tt('Success'),
@@ -479,11 +483,11 @@ export default {
 					});
 					this.closeWebSocket({ socketName: 'ncd_socket' });
 					this.toggleMainPreloader(false);
-					this.$emit('event', { eventName: 'successModalSubmit', data: data });
+					this.$emit('event', { eventName: 'successModalSubmit', data: safeData });
 					this.$emit('event', { eventName: 'handleCloseEditModal' });
 				}
 
-				if (data.status == NCD_REQUEST_STATUSES.FAIL) {
+				if (safeData.status == NCD_REQUEST_STATUSES.FAIL) {
 					this.$notify({
 						type: 'warning',
 						title: this.tt('Fail'),

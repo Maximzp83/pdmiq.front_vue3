@@ -8,7 +8,8 @@ const webSocketMixin = {
 			if (process.env.VUE_APP_WEB_SOCKET_ENDPOINT) {
 				return `${process.env.VUE_APP_WEB_SOCKET_ENDPOINT}`;
 			}
-			return 'wss://ws.industrialmatrix-stage.tools/';
+			// return 'wss://ws.industrialmatrix-stage.tools/';
+			return 'wss://ws.industrialmatrix.tools/';
 		},
 		// topic: () => 'live.statistic.9ae4ad0b-ab79-4924-9f2d-89bcde2f66f4',
 		accessToken() {
@@ -52,6 +53,7 @@ const webSocketMixin = {
 					localHandleConnected();
 				}
 				// console.log('connected in mixin', this[socketName], socketChannel)
+					// console.log('socketCallbackName', socketCallbackName, this[socketCallbackName], socketCallback)
 				if (socketCallbackName) {
 					this[socketName].private(socketChannel).listenToAll(this[socketCallbackName]);
 				} else if (socketCallback) {

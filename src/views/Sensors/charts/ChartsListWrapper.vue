@@ -440,18 +440,20 @@ const setupSocket = () => {
 
 const statisticsSocketCallback = (response = {}) => {
 	const { data, type } = response;
+	const safeData = data?.data || data || {};
+	const normalizedType = `${type || ''}`.toLowerCase();
 	try {
-		if (type === 'job') {
-			chartsListInstance.value.callMethod('handlePointsLiveUpdate', data);
-		} else if (type === 'sensor') {
-			if (data) {
+		if (normalizedType === 'job') {
+			chartsListInstance.value.callMethod('handlePointsLiveUpdate', safeData);
+		} else if (normalizedType === 'sensor') {
+			if (safeData) {
 				emit('event', {
 					eventName: 'update_sensor',
 					data: {
 						id: props.sensorData.id,
 						sensor: {
 							...props.sensorData,
-							lube_cycle_high_speed: data.lube_cycle_high_speed,
+							lube_cycle_high_speed: safeData.lube_cycle_high_speed,
 						},
 					},
 					onward: true,
@@ -459,7 +461,7 @@ const statisticsSocketCallback = (response = {}) => {
 			}
 		} else if (type === 'GainAdjustment') {
 			chartsListInstance.value.callMethod('handleAdjustmentsLiveUpdate', {
-				data,
+				data: safeData,
 				settings: {
 					set_sensor_state: sensorsStore.set_sensor_state,
 				},

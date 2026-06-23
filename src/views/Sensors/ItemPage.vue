@@ -136,11 +136,12 @@ const toggleMainPreloader = (open, text = '') => {
 const handleNcdSocketResponse = (response = {}, settings = {}) =>
 	new Promise((resolve, reject) => {
 		const { data, type } = response;
+		const safeData = data?.data || data || {};
 		const { successMessage, failMessage, sensorId } = settings;
 
-		if (type !== 'ncd.command' || sensorId !== data?.sensor_id) return;
+		if (`${type || ''}`.toLowerCase() !== 'ncd.command' || sensorId !== safeData.sensor_id) return;
 
-		if (data.status === NCD_REQUEST_STATUSES.SUCCESS) {
+		if (safeData.status === NCD_REQUEST_STATUSES.SUCCESS) {
 			Notify({
 				type: 'success',
 				title: tt('Success'),
@@ -149,7 +150,7 @@ const handleNcdSocketResponse = (response = {}, settings = {}) =>
 			resolve();
 		}
 
-		if (data.status === NCD_REQUEST_STATUSES.FAIL) {
+		if (safeData.status === NCD_REQUEST_STATUSES.FAIL) {
 			Notify({
 				type: 'warning',
 				title: tt('Fail'),
