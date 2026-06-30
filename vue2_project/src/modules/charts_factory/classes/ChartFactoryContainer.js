@@ -101,7 +101,6 @@ export default class ChartFactoryContainerBase {
 
 	buildChart(resource) {
 		try {
-			// console.log(this.resources, resource)
 			this.resources = mergeObjects(this.resources, resource);
 			if (resource.settings.events) {
 				this.events = { ...this.events, ...resource.settings.events };
@@ -111,6 +110,7 @@ export default class ChartFactoryContainerBase {
 				chartFactoryName,
 				setupChartsConfigsListSettings /*chart_instance_name*/
 			} = this.resources.settings;
+			// console.log(this.resources.settings, setupChartsConfigsListSettings)
 
 			const chart_config = this.setupChartConfig(setupChartsConfigsListSettings);
 			// console.log('chart_config', chart_config, chartFactoryName)

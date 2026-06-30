@@ -27,13 +27,18 @@ class MultiViewChartFactoryContainer extends ChartFactoryContainerBase {
 			let chart_config = {
 				chart_id: `multi_view_chart-${graphItemData.id}`,
 				requestsList: graph_items.map(gi => {
-				// console.log('gi', gi)
+					// console.log('gi', gi)
+					// debugger
+					if (!gi.sensor) {
+						console.warn(`Sensor ${gi.sensor_id} not found`);
+						return null;
+					}
 					const parameterItem = get_sensor_parameter_item({
-						sensor: gi.sensor,
+						sensor: gi.sensor || {},
 						parameter_id: gi.metric_type,
 						graph_item: gi
-					})
-
+					});
+					// console.log('parameterItem', parameterItem)
 					let sensor_name = '';
 					const {data_set, device_address_id, controller, fft_sensor_id} = gi.sensor;
 					// console.log(gi.sensor)
@@ -58,6 +63,8 @@ class MultiViewChartFactoryContainer extends ChartFactoryContainerBase {
 					}
 				})
 			};
+
+			chart_config.requestsList = chart_config.requestsList.filter(r => r);
 
 			// console.log('setupChartConfig', graph_items, chart_config)
 			return chart_config;

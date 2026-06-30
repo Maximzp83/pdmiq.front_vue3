@@ -162,12 +162,14 @@ const alertTypesList1 = [
 	{
 		id: ALERT_TYPES.LOW_ALARM,
 		name: 'phrases.low_alarm',
+		short_name: 'low',
 		icon: 'icon-alarm',
 		key: 'low_alarm'
 	},
 	{
 		id: ALERT_TYPES.HIGH_ALARM,
 		name: 'phrases.high_alarm',
+		short_name: 'high',
 		icon: 'icon-alarm',
 		key: 'high_alarm'
 	},

@@ -160,7 +160,7 @@ body {
 					display: flex;
 					justify-content: center;
 					align-items: center;
-					height: 100%;
+					height: 100% !important;
 					width: 100%;
 					padding: 10px;
 					transition: transform 0.15s ease, background 0.2s ease;
@@ -188,6 +188,10 @@ body {
 						width: 13px;
 						padding-left: 1px;
 					// color: $danger-color;
+				}
+
+				.icon-pdf {
+					font-size: 20px;
 				}
 
 				.clean-button {

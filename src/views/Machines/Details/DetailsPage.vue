@@ -93,6 +93,7 @@ import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
+import { getObjectVal } from '@/helpers';
 import { MAINTENANCE_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -182,6 +183,17 @@ const createWOButtonFormSetup = Object.freeze([
 	{ formKey: 'machine_id', valKey: 'id' },
 ]);
 const chartLegendEvents = Object.freeze({});
+const creationWOModalSettings = computed(() => Object.freeze({
+	itemName: tt('Work_Order'),
+	editModalProp: 'editModalClassic',
+	modalClassName: 'fixed-header-footer small-header small-footer',
+	className: 'maintenance-modal',
+	formComponentFileLoader: () => import('@/views/Maintenance/MaintenanceFormWrapper.vue'),
+	additionalModalSettings: {
+		switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
+		...woFilters.value,
+	},
+}));
 const setFilters = (range) => {
 	machinesStore.set_value('statistics_filters', {
 		...filters.value,
@@ -195,6 +207,20 @@ const editItem = () => {
 	if (itemData.value.id) {
 		changeRoute({ path: `/machines/${itemData.value.id}` });
 	}
+};
+const setupFormSettings = ({ row, formSetup }) => {
+	const settings = {};
+	formSetup.forEach((fi) => {
+		settings[fi.formKey] = getObjectVal(row, fi.valKey);
+	});
+	return settings;
+};
+const handleCreateWorkOrderButton = (payload) => {
+	globalStore.show_edit_modal({
+		...creationWOModalSettings.value,
+		show: true,
+		formSettings: setupFormSettings(payload),
+	});
 };
 const setupNavbar = () => {
 	globalStore.setup_navbar({
@@ -217,7 +243,7 @@ const fetchItem = () => {
 		});
 };
 
-const { handleEvent } = useEventHandler({}, null);
+const { handleEvent } = useEventHandler({ handleCreateWorkOrderButton }, null);
 
 onMounted(fetchItem);
 onBeforeUnmount(() => globalStore.setup_navbar({}));

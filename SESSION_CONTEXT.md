@@ -1,64 +1,78 @@
 # Continuation Briefing
 
 ## Project Stack
-- Vue 3 + Vite, Vue Router 4, Pinia, Element Plus, `<script setup>`.
-- Vue2 migration source: `vue2_project/`; Vue3 target: `src/`.
+- Vue 3 + Vite application using Vue Router 4, Pinia, Element Plus, and `<script setup>`.
+- Migration source is `vue2_project/`; migrated target is `src/`.
+- Charts use Highcharts through local chart factory modules under `src/modules/charts_factory`.
+- API access is through local request helpers/composables such as `api_request`, `createGetRequest`, `useRequestsList`, and domain composables.
 
 ## Key Architecture Rules
-- Compare migrated files against Vue2 originals before changing behavior.
-- Preserve Vue2 behavior while adapting to Vue3 architecture: `src/api`, Pinia stores, existing composables, Element Plus, Vue Router 4.
-- Do not copy Vue2 API/store/mixins/helpers as-is; adapt behavior to existing Vue3 modules.
-- Use existing local composables and globally registered form controls where applicable.
-- Session collaboration: no code/diff output in replies; work one step at a time; after each step report result and changed path(s). Ask before risky or ambiguous changes.
+- Before changing migrated behavior, compare the Vue3 file with the Vue2 original in `vue2_project/`.
+- Preserve Vue2 behavioral parity: template structure, slots, wrappers, conditionals, permissions, events, request timing, route/query behavior, and store-filter ownership.
+- Adapt Vue2 mixins to existing Vue3 composables/Pinia patterns; do not blindly copy mixin code.
+- Keep changes scoped to the requested component/flow and avoid unrelated refactors.
+- Use `apply_patch` for manual file edits.
+- Do not revert user/unrelated work in the dirty worktree.
+- After implementation, run `npm run build` when behavior/compile surface changes and run targeted `git diff --check`.
+- Keep responses concise and do not output code/diffs unless explicitly requested.
 
 ## Current Task Status
-- Equipment dashboard drag-and-drop initialization was fixed:
-  - `src/views/Equipments/ItemsList.vue` now initializes `useDragNdropSortable` for equipment cards using the `draggingLockedProp` passed by `EquipmentsLayout`.
-  - The sortable instance is rebuilt after list/grid switches and list rerenders, and destroyed on unmount.
-  - `src/views/Equipments/Card/ItemCard.vue` now destroys and recreates its internal sensor/Multi View sortable instance after its draggable list changes.
-  - `npm run build` and targeted `git diff --check` pass.
-- Latest `vue2_project` change sync was applied to already migrated Vue3 equivalents:
-  - Added English/Spanish `aliases.del_sensor` localization and updated the Equipment sensor-removal confirmation.
-  - Replaced the global boolean list refresh flag with keyed `{ key: 'equipmentsList', val }` handling in `useItemForm`, `useItemsData`, Equipment forms, and Equipment list.
-  - Restored Equipment list live sensor-counter updates and adapted websocket consumers to the new nested `data.data` payload while retaining flat-payload compatibility.
-  - Updated OEE/Processes live updates, Sensors PDF exports, sensor charts, NCD item/config flows, and the folded compare-export logic.
-  - `src/views/Sensors/StatisticsPage.vue` already contained the new equipment null guard, so no additional change was required.
-  - `vue2_project/src/views/Processes/Details/ChartItemContainer.vue` was skipped because that Vue3 view is not migrated.
-  - `vue2_project/src/services/WebSocketService.js` was not copied because Vue3 currently uses `useWebSocket` with a different transport; changing only its endpoint would be protocol-incompatible.
-  - `npm run build` and targeted `git diff --check` pass.
-- Sensors form HTML was partially re-aligned with Vue2 originals:
-  - `src/views/Sensors/sensorForm/ItemForm.vue`: removed extra inner `tab-container`; moved `half-width` behavior to root container.
-  - `src/views/Sensors/sensorForm/ItemFormNCD.vue`: removed extra `equipment_id` select that does not exist in Vue2 original.
-  - `src/views/Sensors/sensorForm/ItemFormNCD.vue`: added `:validate-on-rule-change="false"` to avoid `data_set` watcher triggering form validation through dynamic rules.
-- `src/components/layout/TopNavbar.vue`: `baseCreationMenuList` now uses `componentFileLoader` instead of `componentPath` for Utility and Item creation modals.
-- `src/views/Equipments/ItemForm.vue`:
-  - Restored active Vue2 `selectedEquipmentType` watcher logic: `without_brand` removes `brand_id` validation; new items receive default brand/model and local select options without duplicates.
-  - Converted conditional local components to `defineAsyncComponent`: `AnalysisRuleItem`, `ChildComponentItem`, `AttachmentItem`.
-- `src/views/Equipments/Card/ItemCard.vue`: restored drag-and-drop reorder for sensor/multiview card items using existing `useDragNdropSortable`; reorder calls PUT `/equipments/{id}/card-items-order` and reinitializes on failure.
-- `src/composables/mixins/useDragNdropSortable.js` already exists and is also used by file upload reorder; no new composable was created.
-- Latest verification after each step: `npm run build` passed; targeted `git diff --check` passed.
+- Recent focus was Sensors and BrandModels parity against `vue2_project`.
+- `src/views/Sensors/charts/ChartItemContainer.vue` was rechecked against Vue2 and restored for:
+  - one-chart legend rendering;
+  - compare-mode header classes;
+  - hidden-chart lazy fetch behavior;
+  - disable-chart button initialization;
+  - `additionalProps.showHistory` handling via `ChartZoom` ref.
+- `src/views/Sensors/charts/ChartZoom.vue` now exposes `resetInitialValues` and `zoomYAxis` for the restored parent ref flow.
+- `src/views/Sensors/charts/HeaderRightPart.vue` chart export payload now again includes `metricSystemType` and `X-Timezone-Offset`.
+- `src/views/Sensors/PossibleProblemsBlock.vue` watcher behavior was restored to Vue2-style separate non-immediate watchers for `sensorParamsForSetupProblems` and `daterange`.
+- Highcharts flag SVG assets were restored under `public/static/img/icons`, but the manual flag tooltip `pointFormatter` and hover `tooltip.refresh/hide` handlers were rolled back at user request.
+- `src/views/BrandModels/ItemsList.vue` was restored closer to Vue2 for storeroom grid/list behavior, original `activeGrid` store-based calculation, QTY/details navigation, and `preventSetNavbar` forwarding to `useItemsData`.
+- `src/views/Plants/Details/DetailsPage.vue` now stores `navbarSettings.value` instead of the computed ref to avoid readonly navbar warnings.
+- SuccessDashboard and CorporateDashboard had prior parity/runtime fixes and currently build, but still need authenticated runtime smoke testing.
 
 ## Files Already Modified
 - `SESSION_CONTEXT.md`
-- `src/views/Sensors/sensorForm/ItemForm.vue`
-- `src/views/Sensors/sensorForm/ItemFormNCD.vue`
-- `src/components/layout/TopNavbar.vue`
-- `src/views/Equipments/ItemForm.vue`
-- `src/views/Equipments/Card/ItemCard.vue`
-- Prior worktree modifications also exist in related migration files, including:
-  - `src/components/common/Datepicker.vue`
-  - `src/assets/sass/element-ui/elements.scss`
-  - `src/views/Equipments/EquipmentsLayout.vue`
-  - `src/views/Equipments/ExportChartsToPdfContent.vue`
-  - `src/views/Sensors/sensorForm/ItemFormUltraSound.vue`
-  - `src/composables/useSensors.js`
+- `docs/migration-progress.md`
+- `docs/migration-todos.md`
+- `src/views/Sensors/charts/ChartItemContainer.vue`
+- `src/views/Sensors/charts/ChartZoom.vue`
+- `src/views/Sensors/charts/HeaderRightPart.vue`
+- `src/views/Sensors/PossibleProblemsBlock.vue`
+- `src/views/Sensors/SensorFFTRequestButton.vue`
+- `src/modules/charts_factory/enums/index.js`
+- `public/static/img/icons/*.svg`
+- `src/views/BrandModels/ItemsList.vue`
+- `src/views/Plants/Details/DetailsPage.vue`
+- `src/views/SuccessDashboard/DetailsPage.vue`
+- `src/views/SuccessDashboard/MeetingTracker/ItemForm.vue`
+- `src/views/SuccessDashboard/MeetingTracker/DynamicFormItem.vue`
+- `src/views/SuccessDashboard/MeetingTracker/ItemPage.vue`
+- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
+- `src/views/SuccessDashboard/ROIOnePager/DynamicFormItem.vue`
+- `src/views/SuccessDashboard/ROIOnePager/ItemsList.vue`
+- `src/views/SuccessDashboard/ROIOnePager/ItemPage.vue`
+- `src/views/SuccessDashboard/common/SensorsAlarmsContainer.vue`
+- `src/views/SuccessDashboard/common/SensorAlarmsChartsListWrapper.vue`
+- `src/views/SuccessDashboard/common/SensorAlarmsChartItemContainer.vue`
+- `src/views/SuccessDashboard/common/NotesItem.vue`
+- `src/views/SuccessDashboard/common/ChartCommentForm.vue`
+- `src/views/SuccessDashboard/MainDashboard/HealthStatisticsCard.vue`
+- `src/views/SuccessDashboard/MainDashboard/ROIStatisticsContainer.vue`
+- `src/views/SuccessDashboard/MainDashboard/GaugeStatisticsContainer.vue`
+- `src/views/CorporateDashboard/CorporateDashboard.vue`
+- `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
 
 ## Unresolved Issues
-- No authenticated runtime/API/websocket testing was performed.
-- Sensors PDF/FFT/RPM flows still need authenticated smoke testing.
-- Equipment forms need runtime validation with real edit data, especially sensors, Multi View, wrapper submit orchestration, and card reorder persistence.
-- `src/views/Sensors/sensorForm/ItemFormUltraSound.vue` still needs careful HTML comparison against Vue2 original if continuing the earlier form-alignment task.
-- After removing NCD `equipment_id` HTML, related script-only helpers such as `equipmentsSelectSettings` may now be unused; they were intentionally not removed because the user requested HTML-only at that step.
+- No authenticated browser/API smoke test has been performed for the latest Sensors, SuccessDashboard, BrandModels, or CorporateDashboard fixes.
+- Sensors charts need runtime verification with real chart data, especially one-chart legend, show-history zoom reset, hidden-chart fetch behavior, export payload, and flags after tooltip rollback.
+- SuccessDashboard Meeting Tracker remains high-risk and needs deeper parity review against Vue2, especially submit payloads, dynamic rows, readonly mode, async initial values, and alarms dialog behavior.
+- `src/views/SuccessDashboard/MeetingTracker/NextActivityFormItem.vue` remains simplified compared with Vue2.
+- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` was heavily restored but still needs runtime validation with real item data and API responses.
+- `src/views/SuccessDashboard/ROIAnalysis/DynamicFormItemRoi.vue` is a stub; Vue2 source is empty, so no current action unless requirements change.
+- Further files in `src/views/Sensors/charts` may still have Vue2 parity gaps beyond the targeted fixes already applied.
 
 ## Next Actionable Step
-- Runtime-test equipment card drag-and-drop reorder on Plant Details dashboard with authenticated data; confirm the PUT request payload and UI ordering after refresh.
+- Continue checking `src/views/Sensors/charts` against `vue2_project/src/views/Sensors/charts` one file at a time, starting with `ChartsListWrapper.vue` and then `ChartThresholdsOperations.vue`.
+- For each file: compare with Vue2, apply only behaviorally relevant parity fixes, run `npm run build`, run targeted `git diff --check`, and update handoff docs if the change is significant.

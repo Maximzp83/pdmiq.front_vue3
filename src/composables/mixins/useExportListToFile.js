@@ -32,6 +32,7 @@ export function useExportListToFile({ prepareFilters } = {}) {
 		}
 
 		const finalUrl = generateUrl({ path: url, filters: newFilters });
+		// console.log(finalUrl);
 		generateDownloadLink(finalUrl);
 	};
 

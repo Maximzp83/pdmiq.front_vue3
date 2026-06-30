@@ -433,7 +433,9 @@ body {
 				// & + .el-button {margin-left: 15px;}
 			}
 
-			& > span {display: inline-block;}
+			& > span {
+				display: inline-block; height: 100%;
+			}
 
 			.fluid {
 				& > span, & > span > span {
@@ -442,7 +444,7 @@ body {
 				}
 
 				.el-button {
-					width: inherit;
+					width: 100%;
 					display: flex;
 					justify-content: center;
 					align-items: center;
@@ -517,7 +519,7 @@ body {
 
 					border-bottom-left-radius: 0;
 					border-bottom-right-radius: 0;
-					height: 40px;
+					height: 40px !important;
 
 					&.active, &:hover {
 						img {	filter: grayscale(0);	}
@@ -543,6 +545,7 @@ body {
 				position: absolute;
 				transition: transform 0.3s ease-out;
 				z-index: 2;
+				height: 100%;
 			}
 
 			.scroll-buttons {
@@ -2155,7 +2158,7 @@ body {
 			padding: 20px 25px 15px !important;
 		}
 
-		& > .el-dialog {
+		&.el-dialog {
 			width: 95%;
 			margin-bottom: 15px;
 		}
@@ -3598,7 +3601,7 @@ body {
 		}
 	}
 
-	.el-tooltip__popper.is-dark  .primary-color {
+	.el-tooltip.is-dark {
 		color: #fff !important;
 	}
 
@@ -4000,6 +4003,7 @@ body {
 			}
 		}
 	}
+
 
 	@keyframes horizontal-move {
 		0% { transform: translateX(0px); }

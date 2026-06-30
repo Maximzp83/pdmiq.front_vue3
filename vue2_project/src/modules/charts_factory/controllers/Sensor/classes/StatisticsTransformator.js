@@ -5,6 +5,8 @@ import {
 	setupPlotlinesData,
 	setupZonesList,
 	setupCrashesStatistics,
+	setupMultiviewCrashesStatistics,
+	setupMultiviewPlotlinesData,
 	setupGainAdjustmentsStatistics,
 	setupLubeStatistics,
 	setupLubeLockLogStatistics,
@@ -105,6 +107,12 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 	setupCrashesStatistics(arg1, arg2) {
 		return setupCrashesStatistics(arg1, arg2);
 	}
+	setupMultiviewCrashesStatistics(arg1, arg2) {
+		return setupMultiviewCrashesStatistics(arg1, arg2);
+	}
+	setupMultiviewPlotlinesData(arg1, arg2) {
+		return setupMultiviewPlotlinesData(arg1, arg2);
+	}
 	setupGainAdjustmentsStatistics(payload) {
 		return setupGainAdjustmentsStatistics(payload);
 	}
@@ -147,6 +155,8 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				gainAdjustments,
 				runtimeTrackers,
 				issue_alerts,
+				includePlotlinesSeriesData,
+				thresholds, // for multiviews
 				flat_metric_data_anomalies,
 				parameter_item
 			} = statistics_data[statisticsKey];
@@ -237,6 +247,32 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.historyMaxValues = historyMaxValues;
 						statistics_result.plotlinesMaxValues = plotlinesMaxValues;
 						statistics_result.statsData = {...statistics_result.statsData, ...statsData};
+					}
+				}
+				// ---------------------
+				if (actualSpecification.setupMultiviewThresholdsData) { //multiview
+					const {
+						enableSetupThresholds,
+						plotLinesSettings
+					} = actualSpecification.setupMultiviewThresholdsData;
+					// console.log('setupMultiviewThresholdsData', actualSpecification.setupMultiviewThresholdsData, thresholds)
+
+					if (enableSetupThresholds && thresholds && thresholds.length) {
+						const {
+							first_statistics_item,
+							last_statistics_item
+						} = statistics_result.edgeStatisticsItems;
+
+						const { plotlinesSeriesData, plotlinesMaxValues, plotlinesMinValues } = this.setupMultiviewPlotlinesData({
+							thresholds,
+							first_statistics_item: first_statistics_item || [],
+							last_statistics_item: last_statistics_item || [],
+							plotLinesSettings
+						})
+
+						statistics_result.plotlinesSeriesData = includePlotlinesSeriesData ? plotlinesSeriesData : [];
+						statistics_result.plotlinesMaxValues = plotlinesMaxValues;
+						statistics_result.plotlinesMinValues = plotlinesMinValues;
 					}
 				}
 				// --------------------
@@ -364,7 +400,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 
 					if (enable_issue_alerts && (issue_alerts && issue_alerts.length)) {
 						statistics_result.flagsData = {
-							...this.setupCrashesStatistics(
+							...this.setupMultiviewCrashesStatistics(
 								issue_alerts,
 								this.resources.sensorType == 'banner_humidity' ? 'Alarm' : undefined
 							)
@@ -392,7 +428,6 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.additionalSeriesData[data_path] = 
 					})*/
 				}
-				// ---------------------
 
 				// -------------Max Values--------
 				resultData = this.updateDataMaxValues(resultData, statistics_result);

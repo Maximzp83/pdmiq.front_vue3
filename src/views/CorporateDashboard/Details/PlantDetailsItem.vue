@@ -33,6 +33,7 @@
 					<div :class="[selectedColumnsNumber.id > 1 ? 'mcol-xs-12' : 'mcol-lg-6', 'roi-charts-wrapper']">
 						<ROIStatisticsContainer
 							:plantItem="plantItem"
+							:plantsList="plantsList"
 							:predefinedFilters="predefinedFilters"
 							:switchTabTo="{ key: 'prop', value: 'plTab' }"
 							disableTabs

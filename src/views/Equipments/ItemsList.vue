@@ -1,7 +1,7 @@
 <template>
 	<div class="view-wrapper view-list-wrapper equipments-list pt-0">
 		<div :class="[{ card: !fromLayout }, 'content-row', { 'view-content-card': !fromDetailsPage }]">
-			<div :class="[{ 'card-content': !fromLayout }, { 'dragndrop-active': !draggingLockedProp }]">
+			<div :class="['relative', { 'card-content': !fromLayout }, { 'dragndrop-active': !draggingLockedProp }]">
 				<VueElementLoadingWrapper
 					class="section-block items-preloader"
 					spinner="line-scale"

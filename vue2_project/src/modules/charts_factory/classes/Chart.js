@@ -170,17 +170,18 @@ export default class ChartBase {
 		});
 		
 		// seriesConfig - step 3
-		this.seriesConfig = this.modifySeriesConfig({
-			seriesConfig: this.seriesConfig,
-			requestsList: this.requestsList,
-			resources: this.resources
-		});
+		if (!settings.modifySeriesConfigOnResponse) {
+			this.seriesConfig = this.modifySeriesConfig({
+				seriesConfig: this.seriesConfig,
+				requestsList: this.requestsList,
+				resources: this.resources
+			});			
+		}
 		// seriesConfig - finish (should be)
 
 		/*if (this.chart_id === 'chart-25') {
 			console.log('seriesConfig final', this.chart_id, this.seriesConfig)
 		}*/
-
 		if (!settings.generateSeriesByStatistics) {
 			this.options.series = this.generateSeries({
 				seriesConfig: this.seriesConfig,
@@ -327,6 +328,7 @@ export default class ChartBase {
 
 	// ----------Series---------
 	generateSeries(payload) {
+		// console.log('generateSeries', payload)
 		return generateSeries(payload);
 	}
 
@@ -391,7 +393,7 @@ export default class ChartBase {
 			if (!resultData.statistics_result[responseDataKey]) {
 				responseDataKey = 'main';
 			}
-			// console.log(/*resultData.statistics_result,*/ this.chart_id, serie.id, responseDataKey, /*resultData.statistics_result[responseDataKey]*/)
+			// console.log(resultData.statistics_result, /*this.chart_id,*/ serie.id, responseDataKey, resultData.statistics_result[responseDataKey])
 
 			if (resultData.statistics_result[responseDataKey]) {
 				serie.data = getObjectVal(

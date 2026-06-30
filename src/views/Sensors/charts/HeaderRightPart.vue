@@ -127,7 +127,12 @@ const handleExportChart = () => {
 	const parameterType = props.parameterTypeItems.length ? props.parameterTypeItems[0].id : null;
 	handleExportItem({
 		url: `sensors/jobs/${props.sensorId}/export`,
-		filters: { parameterType, ...props.rootFilters },
+		filters: {
+			parameterType,
+			...props.rootFilters,
+			metricSystemType: props.rootFilters.measurement,
+			'X-Timezone-Offset': -new Date().getTimezoneOffset(),
+		},
 	});
 };
 </script>

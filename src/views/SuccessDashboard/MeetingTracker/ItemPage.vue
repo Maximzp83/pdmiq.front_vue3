@@ -28,10 +28,11 @@ import ItemForm from './ItemForm.vue';
 
 defineOptions({ name: 'SuccessMeetingTrackerPage' });
 
-defineProps({
+const props = defineProps({
 	plantItem: { type: Object, default: () => ({}) },
 	sensorsLoading: Boolean,
 	sensorsList: { type: Array, default: () => [] },
+	preventSetNavbar: Boolean,
 });
 
 const itemFormRef = ref(null);
@@ -46,6 +47,7 @@ const {
 } = useItemPage({
 	entityKey: 'MeetingTrackers',
 	itemFormRef,
+	preventSetNavbar: props.preventSetNavbar,
 	goToListAfterSave: true,
 	additionalNavbarSettings: {
 		showSaveButton: true,

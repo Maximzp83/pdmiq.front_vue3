@@ -1,9 +1,8 @@
 <template>
 	<div>
 		<el-button
-			size="small"
 			:type="buttonType || 'primary'"
-			:class="['block-item', buttonClass]"
+			:class="['block-item mini inverted', buttonClass]"
 			@click="zoomYAxis(0)"
 		>
 			{{ tt('reset') }}
@@ -132,5 +131,10 @@ onMounted(() => {
 		resetInitialValues();
 		zoomYAxis(0);
 	}
+});
+
+defineExpose({
+	resetInitialValues,
+	zoomYAxis,
 });
 </script>

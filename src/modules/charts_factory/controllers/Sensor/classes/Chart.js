@@ -22,7 +22,7 @@ import {
 	hexToRgba
 } from '@/helpers';
 
-import { sensorThresholdsTypesList } from '@/constants/global';
+import { sensorThresholdsTypesList, MULTIVIEW_ALARM_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
 
 import {
@@ -38,10 +38,11 @@ import {
 	setupParameterName,
 	setupAnnotations,
 	setupAnnotationSelectionData,
-	collect_specific_points
+	collect_specific_points,
+	buildPlotlinesSeriesDataByThresholds
 } from '../methods';
 import { METRIC_SYSTEM_TYPES } from '../enums';
-import { colorsList } from '../../../enums';
+import { colorsList2 } from '../../../enums';
 
 import { setupYAxisPlotlines } from '../../../helpers/series_generator';
 // import { setupStatisticsTransformator } from '../StatisticsTransformatorDispatcher';
@@ -2508,12 +2509,13 @@ class MultiViewChart extends ChartBase {
 						{
 							id: 'crashes-flag-serie',
 							data_path: 'crashes_statistics',
-							template: 'sensor.crashes_flag'
+							template: 'sensor.lube_lock_log_flag'
 						},
 					]
 				}
-			}
-		}
+			},
+			plotlinesSeriesData: {},
+		};
 
 		this.transformator_settings = {
 			...this.transformator_settings,
@@ -2528,12 +2530,19 @@ class MultiViewChart extends ChartBase {
 				setupFlagsData: {
 					enable_issue_alerts: true,
 				},
+				setupMultiviewThresholdsData: {
+					enableSetupThresholds: true,
+					plotLinesSettings: []
+				}
 			}
 		};
 
 		this.injectProps('options', options);
 
-		this.finalSetup(resources);
+		this.finalSetup(resources, {
+			modifySeriesConfigOnResponse: true,
+			generateSeriesByStatistics: true,
+		});
 	}
 
 	setupChartTitle() {
@@ -2678,46 +2687,103 @@ class MultiViewChart extends ChartBase {
 		return this.measurement !== resources.filters.measurement;
 	}
 
-	modifySeriesConfig({ requestsList, seriesConfig }) {
-		// const { ncd_active_axial_axis } = this.sensorItem;
-		// console.log('modifySeriesConfig', this.measurement, this.options.yAxis)
+	modifySeriesConfig({ requestsList, seriesConfig, plotlinesSeriesData, thresholds }) {
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = this.setupUnitTypeName({
-				parameterItem,
-				measurement: this.measurement
-			});
-			const { sensor_id } = parameterItem;
-			let actualAxisIdx = 0;
+			try {
+				const unit_type_name = this.setupUnitTypeName({
+					parameterItem,
+					measurement: this.measurement
+				});
+				const { sensor_id } = parameterItem;
+				let actualAxisIdx = 0;
 
-			this.options.yAxis.forEach((axis, idx) => {
-				if (
-					axis.customSettings.parameterItem.sensor_id === sensor_id
-					&& axis.customSettings.parameterItem.id === parameterItem.id
-				) {
-					actualAxisIdx = idx;
-				}
-			});
-
-			seriesConfig.pointsData.seriesConfigsList[idx] = [
-				{
-					id: `serie-${idx}`,
-					data_path: '',
-					template: 'fft.base',
-					responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
-					// event_keys: ['pointClickEvent'],
-					inject: {
-						showInNavigator: true,
-						name: `${parameterItem.sensor_name}, ${parameterItem.sensor_location} - ${parameterItem.short_name || parameterItem.name}`,
-						tooltip: { valueSuffix: ` ${unit_type_name}` },
-						color: colorsList[idx],
-						yAxis: actualAxisIdx,
+				this.options.yAxis.forEach((axis, axisIdx) => {
+					if (
+						axis.customSettings.parameterItem.sensor_id === sensor_id
+						&& axis.customSettings.parameterItem.id === parameterItem.id
+					) {
+						actualAxisIdx = axisIdx;
 					}
+				});
+
+				const foundItem = thresholds.find(item =>
+					item.monitor_metrics?.some(metric =>
+						metric.sensor_id === sensor_id && metric.metric_type === parameterItem.id
+					)
+				);
+				const alarm_type = foundItem?.type;
+
+				seriesConfig.pointsData.seriesConfigsList[idx] = [
+					{
+						id: `serie-${idx}`,
+						data_path: '',
+						template: 'fft.base',
+						responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+						inject: {
+							showInNavigator: true,
+							name: `${parameterItem.sensor_name}, ${parameterItem.sensor_location} - ${parameterItem.short_name || parameterItem.name}`,
+							tooltip: { valueSuffix: ` ${unit_type_name}` },
+							color: colorsList2[idx],
+							yAxis: actualAxisIdx,
+						},
+						customSettings: {
+							setupSeriePropValue: [
+								{
+									key: 'zones',
+									methodName: 'setupMultiviewLineSerieZones',
+									payload: { alarm_type, normalColor: colorsList2[idx] }
+								}
+							]
+						}
+					}
+				];
+
+				if (seriesConfig.flagsData.seriesConfigsList[idx]) {
+					seriesConfig.flagsData.seriesConfigsList[idx] =
+						seriesConfig.flagsData.seriesConfigsList[idx].map(seriesConfigItem => ({
+							...seriesConfigItem,
+							responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+						}));
 				}
-			];
+
+				if (plotlinesSeriesData) {
+					seriesConfig.plotlinesSeriesData = plotlinesSeriesData;
+				}
+			} catch (error) {
+				console.warn(error);
+			}
 		});
 
 		// console.log('seriesConfig', seriesConfig)
 		return seriesConfig;
+	}
+
+	setupSeriesByThresholds({ thresholds, parameterItem }) {
+		const plotlinesSeriesData = thresholds.length
+			? buildPlotlinesSeriesDataByThresholds({
+				thresholds,
+				responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+			})
+			: null;
+
+		this.seriesConfig = this.modifySeriesConfig({
+			requestsList: this.requestsList,
+			seriesConfig: this.seriesConfig,
+			plotlinesSeriesData,
+			thresholds
+		});
+
+		const setupPlotlinesData =
+			plotlinesSeriesData && plotlinesSeriesData.seriesConfigsList[0];
+
+		this.transformator_settings.specification.setupMultiviewThresholdsData.plotLinesSettings =
+			setupPlotlinesData;
+
+		this.options.series = this.generateSeries({
+			seriesConfig: this.seriesConfig,
+			seriesEvents: this.seriesEvents,
+			chart_id: this.chart_id
+		});
 	}
 	// ----------------
 	checkIsHasStatistics() {
@@ -2747,14 +2813,25 @@ class MultiViewChart extends ChartBase {
 						})
 					}
 				}).then(({value}) => {
-					// console.log('multi_views_alerts', value)
-					const ri = this.requestsList[0];
-					const sensorId = ri.sensor_id;
+					const thresholds = value.thresholds.filter(
+						item => item.type != MULTIVIEW_ALARM_TYPES.COMPARE
+					);
 
-					this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = {
-						...this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`],
-						issue_alerts: value.issue_alerts
-					};
+					this.requestsList.forEach((ri, idx) => {
+						const sensorId = ri.sensor_id;
+						const statisticsKey = `sensor_${sensorId}-parameter_${ri.id}`;
+						this.fetched_statistics_data[statisticsKey] =
+							this.fetched_statistics_data[statisticsKey] || {};
+						this.fetched_statistics_data[statisticsKey].issue_alerts =
+							!idx ? value.issue_alerts : null;
+						this.fetched_statistics_data[statisticsKey].includePlotlinesSeriesData = !idx;
+						this.fetched_statistics_data[statisticsKey].thresholds = thresholds;
+					});
+
+					this.setupSeriesByThresholds({
+						parameterItem: this.requestsList[0],
+						thresholds
+					});
 
 					this.checkStatisticsResponses({requestsQuantity});
 				}).catch(() => {
@@ -2772,13 +2849,12 @@ class MultiViewChart extends ChartBase {
 
 					fetch_sensor_statistics({sensorId, params })
 						.then(({statistics}) => {
-							// console.log('2 response', response)
 							try {
-								this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = {
-									...this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`],
-									parameter_item: ri,
-									statistics
-								};
+								const statisticsKey = `sensor_${sensorId}-parameter_${ri.id}`;
+								this.fetched_statistics_data[statisticsKey] =
+									this.fetched_statistics_data[statisticsKey] || {};
+								this.fetched_statistics_data[statisticsKey].parameter_item = ri;
+								this.fetched_statistics_data[statisticsKey].statistics = statistics;
 								this.checkStatisticsResponses({requestsQuantity});
 							} catch (e) {
 								console.warn(e);

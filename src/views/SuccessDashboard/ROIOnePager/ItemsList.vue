@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeMount, ref, shallowRef, watch } from 'vue';
+import { computed, onBeforeMount, ref, shallowRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import { cleanDateString, getDateRange } from '@/helpers';
 import { standardTableOperations } from '@/constants/table';
@@ -125,6 +125,7 @@ import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useExportListToFile } from '@/composables/mixins/useExportListToFile';
 import { useNavigation } from '@/composables/mixins/useNavigation';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import Datepicker from '@/components/common/Datepicker.vue';
@@ -172,6 +173,36 @@ const itemsName = computed(() =>
 	}),
 );
 const predefinedFilters = computed(() => Object.freeze({ plantId: props.plantItem?.id }));
+const requestsToDoList = computed(() =>
+	Object.freeze([
+		{
+			actionName: 'fetch_production_lines',
+			bindTo: [
+				{
+					getValue: () => props.plantItem?.id,
+					param: 'plantId',
+				},
+			],
+			localProp: productionLinesList,
+			localLoadProp: productionLinesLoading,
+		},
+		{
+			actionName: 'fetch_machines',
+			bindTo: [
+				{
+					getValue: () => props.plantItem?.id,
+					param: 'plantId',
+				},
+				{
+					getValue: () => filters.value.productionLineId,
+					param: 'productionLineId',
+				},
+			],
+			localProp: machinesList,
+			localLoadProp: machinesLoading,
+		},
+	]),
+);
 const assetQueryOptions = computed(() =>
 	Object.freeze({
 		fetchAction: (payload) => api_request.get('/assets', payload),
@@ -252,34 +283,17 @@ const {
 	options: {
 		predefinedFilters: predefinedFilters.value,
 		tableRef: itemsTableRef,
+		preventSetNavbar: true,
 	},
 });
 const { handleExportItem, generateDownloadLink } = useExportListToFile();
-
-const fetchProductionLineOptions = async () => {
-	if (!props.plantItem?.id) return;
-	productionLinesLoading.value = true;
-	try {
-		const { value } = await fetchProductionLines({ max: -1, plantId: props.plantItem.id });
-		productionLinesList.value = value || [];
-	} finally {
-		productionLinesLoading.value = false;
-	}
-};
-const fetchMachineOptions = async () => {
-	if (!props.plantItem?.id) return;
-	machinesLoading.value = true;
-	try {
-		const { value } = await fetchMachines({
-			max: -1,
-			plantId: props.plantItem.id,
-			productionLineId: filters.value.productionLineId,
-		});
-		machinesList.value = value || [];
-	} finally {
-		machinesLoading.value = false;
-	}
-};
+useRequestsList({
+	methodsMap: {
+		fetch_production_lines: ({ params } = {}) => fetchProductionLines(params),
+		fetch_machines: ({ params } = {}) => fetchMachines(params),
+	},
+	requestsToDoList,
+});
 const handleShowDetails = ({ row }) => {
 	changeRoute({ path: `/success-dashboard/roi-one-pager/${row.id}` });
 };
@@ -300,8 +314,6 @@ const { handleEvent } = useEventHandler({
 	openPDF,
 });
 
-watch(() => filters.value.productionLineId, fetchMachineOptions);
-
 onBeforeMount(() => {
 	if (!filters.value.daterange) {
 		setFilters(
@@ -309,7 +321,5 @@ onBeforeMount(() => {
 			{ preventResetPage: true },
 		);
 	}
-	fetchProductionLineOptions();
-	fetchMachineOptions();
 });
 </script>

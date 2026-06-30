@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/AuthStore';
 import api from '@/api/index.js';
+import {getBaseURL} from '@/api/index.js';
 
 /**
  * Parse URL parameters from a URL string
@@ -98,7 +99,8 @@ export const generateUrl = ({ path, filters }) => {
 	params.token = authStore.access_token;
 
 	// Get base URL from environment or axios defaults
-	const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.testmatrix.assetmatrix.com/api';
+	// console.log(api)
+	const baseURL = getBaseURL();
 	const finalUrl = `${baseURL}/${path}`;
 
 	return setupGetParamsStr(finalUrl, params);

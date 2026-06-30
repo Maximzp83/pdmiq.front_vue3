@@ -26,6 +26,19 @@
 - `Plants/Dashboard` + `Plants/Details` have been re-migrated for the current Vue3 compile scope to match the legacy parent/child architecture: `Dashboard.vue` owns plant selection/loading and passes `plantItem`; `DetailsPage.vue` renders the nested dashboard content with PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, Maintenance tabs, and Work Order modal wiring through `componentFileLoader`.
 - `Settings` section is migrated for the current Vue3 compile scope except `Settings/Import`, including Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and sidebar menu entry.
 - `SuccessDashboard` section is migrated for the current Vue3 compile scope with Success Dashboard container, main dashboard, Meeting Tracker, ROI One Pager, common chart/support components, `useSuccessDashboard`, entity configs, routes, and sidebar menu entry.
+- `src/views/SuccessDashboard/DetailsPage.vue` was re-aligned with the Vue2 `doFetchAction` request pattern by using `useRequestsList().doFetchAction` for plant and sensors loading, and route-child prop forwarding was centralized through `childRouteProps`.
+- `src/components/common/ButtonsNavbar.vue` now explicitly marks active items by current route path and nested route prefix, fixing Success Dashboard `DetailsPage.vue` navbar highlighting on child routes.
+- `src/views/SuccessDashboard/MeetingTracker/ItemPage.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemPage.vue` now forward `preventSetNavbar` into `useItemPage`, preventing local Success Dashboard `ButtonsNavbar` route switches from replacing the parent navbar settings.
+- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` was restored closer to the Vue2 ROI One Pager form with Form/File tabs, readonly/details mode, issue and cost-avoidance subitems, image/file upload behavior, PDM screenshot graphs, history dialog, file-required validation, and graph save-before-submit.
+- `src/views/SuccessDashboard/ROIOnePager/DynamicFormItem.vue` now follows the Vue2 subitem contract for ROI issues/cost-avoidance rows, and `SensorsAlarmsContainer.vue` exposes `saveSensorsAlarmsChartsForms` for parent form submit collection.
+- `src/views/SuccessDashboard/ROIOnePager/ItemsList.vue` now loads production-line and machine filter options through `useRequestsList` / `requestsToDoList` with bound plant and production-line params, replacing local manual async loader functions.
+- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` now loads the asset dropdown list through `useRequestsList` / `requestsToDoList` via `methodsMap.fetch_assets`, while `fetchAsset` and `fetchAssetSensors` use `doFetchAction` via `methodsMap.fetch_asset` / `methodsMap.fetch_sensors`.
+- `src/views/SuccessDashboard/ROIOnePager/DynamicFormItem.vue` add/remove buttons now render Icomoon icons as child `<i>` elements instead of Element Plus `icon` props, fixing the runtime invalid tag-name error.
+- `SuccessDashboard` form parity follow-up is active: `src/views/SuccessDashboard/MeetingTracker/ItemForm.vue` data loading was re-aligned with Vue2 `requestsToDoList` through Vue3 `useRequestsList`; continue checking remaining Success Dashboard forms one file at a time.
+- `SuccessDashboard` Sensors alarms modal runtime fix was applied: `MeetingTracker/ItemForm.vue` now passes legacy-compatible alarm props, and the common Sensors alarms components use the Vue2-style sensor alarm chart factory flow instead of the simplified maintenance chart wrapper that caused empty modal content and missing event handler warnings.
+- `SuccessDashboard` Meeting Tracker alarms fetch now uses `useRequestsList().doFetchAction` via `methodsMap.fetch_alarms`, matching the Vue2-style request helper pattern.
+- `SuccessDashboard` Meeting Tracker alarms fetch trigger was fixed after the `useRequestsList` migration: when `graphsPeriod` is established during initial setup, `fetchAlarms` is now called from `initialRequestsListResponsesReadyCallback` after `isInitialSetup` is cleared.
+- `SuccessDashboard` Sensors alarms modal render error was fixed by removing `Object.freeze` around reactive `sensorData` / `equipmentData` in `SensorAlarmsChartsListWrapper.vue`.
 - `CorporateDashboard` section is migrated for the current Vue3 compile scope with container, main corporate view, plant details item, `/corporate/main` route, Corporate View sidebar/menu entry, and `view_corporate` permission mapping.
 - `Equipments` migration has started for the current Vue3 compile scope:
   - Added `src/views/Equipments/EquipmentsLayout.vue`.
@@ -697,3 +710,88 @@ await fetchUsers({ page: 1 });
   - Replaced direct history mutation with router navigation and delayed lazy location loading until after dropdown open starts
   - Fixed grid item-card runtime loading by adding explicit `componentFileLoader: () => import(...)` support to `src/components/gridTable/ItemsGridContainer.vue`; ProductionLines now passes `() => import('@/views/ProductionLines/ItemCard.vue')`, with `import.meta.glob` retained as a fallback
   - `npm run build` and targeted `git diff --check` passed
+- [x] SuccessDashboard Sensors alarms Highcharts flags runtime fix
+  - Updated `src/views/SuccessDashboard/common/SensorAlarmsChartItemContainer.vue`
+  - Alarm charts now use `constructorType="stockChart"` and initialize Highcharts `highcharts-more`, `stock`, `boost`, and `annotations` modules before rendering chart options with `flags` / `gauge` series
+  - `npm run build` passed
+- [x] SuccessDashboard Main Dashboard gauge Highcharts runtime fix
+  - Updated `src/views/SuccessDashboard/MainDashboard/GaugeStatisticsContainer.vue`
+  - `SuccessGaugeChart` now passes an initialized Highcharts instance with `highcharts-more`, `boost`, and `annotations` through `additionalProps.hcInstance`
+  - `npm run build` passed
+- [x] SuccessDashboard Meeting Tracker static asset runtime fix
+  - Updated `src/views/SuccessDashboard/MeetingTracker/ItemForm.vue`
+  - Added `src/assets/img/no_logo.jpg` from the Vue2 public static assets
+  - Replaced `/static/img/no_logo.jpg` with a Vite-resolved asset import
+  - `npm run build` passed
+- [x] SuccessDashboard Sensors alarms chart item parity fix
+  - Updated `src/views/SuccessDashboard/common/SensorAlarmsChartItemContainer.vue`
+  - Updated `src/views/SuccessDashboard/common/NotesItem.vue`
+  - Updated `src/views/SuccessDashboard/common/ChartCommentForm.vue`
+  - Restored Vue2 alarm chart behavior for disable/toggle, selection mode, annotation comment dialog, notes list, notes add/remove controls, and chart form data collection
+  - `npm run build` passed
+- [x] SuccessDashboard Sensors alarms drag/drop parity fix
+  - Updated `src/views/SuccessDashboard/common/SensorsAlarmsContainer.vue`
+  - Restored the Vue2 `enableDragNDrop` UI with lock/unlock button and active list state
+  - Wired `useDragNdropSortable` reorder handling and applied reorder history before saving graph data
+  - Restored `newNotesSettings` generation from chart notes for recommended actions and activity lists
+  - `npm run build` passed
+- [x] SuccessDashboard Sensors alarms notes checkbox warning fix
+  - Updated `src/views/SuccessDashboard/common/NotesItem.vue`
+  - Replaced deprecated Element Plus `true-label` / `false-label` with `true-value` / `false-value`
+  - `npm run build` passed
+- [x] SuccessDashboard Sensors alarms drag overlay and selector fix
+  - Updated `src/views/SuccessDashboard/common/SensorAlarmsChartsListWrapper.vue`
+  - Updated `src/views/SuccessDashboard/common/SensorsAlarmsContainer.vue`
+  - Restored the Vue2 `dark-overlay` / move icon markup inside draggable sensor alarm wrappers
+  - Scoped sortable initialization to `.sensors-alarms-drag-n-drop-wrapper` so the alarm modal does not bind the generic `.drag-n-drop-wrapper`
+  - `npm run build` passed
+- [x] SuccessDashboard Sensors alarms invalid chart config guard
+  - Updated `src/views/SuccessDashboard/common/SensorAlarmsChartsListWrapper.vue`
+  - Skips chart factory build when the current alarm group has no chart settings key or valid parameters, preventing `charts_configs for "undefined" not found`
+  - `npm run build` passed
+- [x] Corporate Dashboard Highcharts/navbar runtime fix
+  - Updated `src/views/CorporateDashboard/CorporateDashboard.vue`
+  - Replaced direct Highcharts module calls with shared `initHighchartsModule`
+  - Stopped freezing computed navbar settings before storing them in Pinia
+  - `npm run build` passed
+- [x] Corporate Dashboard all-plants ROI gauge request fix
+  - Updated `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
+  - Updated `src/views/SuccessDashboard/MainDashboard/ROIStatisticsContainer.vue`
+  - Restored Vue2 `plantsList` propagation into the shared gauge container so the corporate all-plants ROI chart uses root statistics data instead of making an empty `/api` request
+  - `npm run build` passed
+- [x] Corporate Dashboard ROI container display parity fix
+  - Updated `src/views/SuccessDashboard/MainDashboard/ROIStatisticsContainer.vue`
+  - Restored `disableTabs` handling so Corporate Dashboard hides production-line/machine/asset tab charts and shows gauge `statistics-outside`
+  - Forwarded gauge events through the ROI container for corporate totals
+  - `npm run build` passed
+- [x] Sensors statistics FFT button runtime fix
+  - Updated `src/views/Sensors/SensorFFTRequestButton.vue`
+  - Removed invalid `.value` access from `is_fft_processing` and accepted both `propsData` / `itemData` callers
+  - `npm run build` passed
+- [x] Sensors Highcharts flag icons fix
+  - Updated `src/modules/charts_factory/enums/index.js`
+  - Restored Vue2 public SVG icons under `public/static/img/icons`
+  - Follow-up rollback: removed the manual flag-series tooltip formatting and hover refresh handlers from `flags_template`
+  - `npm run build` passed
+- [x] Sensors PossibleProblemsBlock watcher parity fix
+  - Updated `src/views/Sensors/PossibleProblemsBlock.vue`
+  - Replaced the migrated combined `immediate` / `deep` watcher with the Vue2-style separate watchers for `sensorParamsForSetupProblems` and `daterange`
+  - `npm run build` passed
+- [x] Sensors charts Vue2 parity follow-up
+  - Updated `src/views/Sensors/charts/ChartItemContainer.vue`
+  - Updated `src/views/Sensors/charts/ChartZoom.vue`
+  - Updated `src/views/Sensors/charts/HeaderRightPart.vue`
+  - Restored one-chart legend, compare header classes, hidden-chart lazy fetch behavior, disable-chart button initialization, show-history zoom reset handling, and Vue2 chart export payload fields
+  - `npm run build` passed
+- [x] BrandModels list storeroom grid/list parity fix
+  - Updated `src/views/BrandModels/ItemsList.vue`
+  - Restored Vue2 storeroom grid switcher, grid card rendering through `ItemsGridContainer`, equipment type data for cards, and QTY/details actions for storeroom/equipment contexts
+  - Kept embedded equipment layout in table mode while storeroom views default to grid mode
+  - Follow-up: corrected `activeGrid` calculation to use `storeroom_brand_models_filters` for `fromEquipmentsLayout` and normal `filters` otherwise, matching the Vue2 computed property
+  - Follow-up: passed `preventSetNavbar` through to `useItemsData` so embedded BrandModels lists respect parent navbar ownership
+  - `npm run build` passed
+- [x] Plant details navbar readonly warning fix
+  - Updated `src/views/Plants/Details/DetailsPage.vue`
+  - Stored `navbarSettings.value` instead of the computed ref in the global navbar store
+  - Fixes readonly `navbarSettings` warnings while switching embedded Asset/Storeroom lists
+  - `npm run build` passed

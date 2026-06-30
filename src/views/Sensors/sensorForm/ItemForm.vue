@@ -57,6 +57,7 @@
 						:optionsList="dataSets"
 						:placeholder="`${tt('select')} ${tt('dataset')}`"
 						:setupLabelMethod="setupDataSetLabel"
+						@change="handleChangeDataSet"
 					/>
 				</el-form-item>
 
@@ -434,6 +435,7 @@
 					:itemData="itemData"
 					:itemsName="itemsName"
 					:isNew="isNew"
+					:dataSetChanged="dataSetChanged"
 					:formulasList="formulasList"
 					:bearingsList="bearingsList"
 					:lubeTypesList="lubeTypesList"
@@ -581,6 +583,7 @@ const maintenanceAlarm = ref(false);
 const maintenanceWarning = ref(false);
 const runningThresholdItemsList = ref([]);
 const isInitialSetup = ref(true);
+const dataSetChanged = ref(false);
 
 const initialFormData = {
 	id: null,
@@ -668,6 +671,9 @@ const dataSets = computed(() =>
 	)),
 );
 const setupDataSetLabel = (item) => `${item.label} ${item.alt_label ? `(${item.alt_label})` : ''}`;
+const handleChangeDataSet = () => {
+	dataSetChanged.value = true;
+};
 const dataSetConverters = computed(() =>
 	Object.freeze(dataSetConvertersList.filter((item) => {
 		if (props.isNew) return item.id !== DATASET_CONVERTERS.AMPS_CUSTOM_150;

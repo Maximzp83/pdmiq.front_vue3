@@ -720,6 +720,7 @@ const props = defineProps({
 	isLubeMatrixV3: Boolean,
 	isLubeMatrixV4: Boolean,
 	parentDataSet: null,
+	dataSetChanged: Boolean,
 	controllersList: { type: Array, default: () => [] },
 	formulasList: { type: Array, default: () => [] },
 	bearingsList: { type: Array, default: () => [] },
@@ -1310,6 +1311,7 @@ const localPrepareSubmitData = (data) => {
 	if (props.fromBannerSensorForm) {
 		delete preparedData.location_in_equipment;
 		delete preparedData.controller_id;
+		preparedData.type = SENSOR_TYPES.ULTRA_SOUND;
 		if (isLubeMatrixV4.value) {
 			preparedData.data_set = props.parentDataSet;
 		}
@@ -1592,6 +1594,11 @@ watch(
 watch(selectedLubeDate, () => {
 	selectedLubeTime.value = '';
 });
+
+if (props.fromBannerSensorForm && props.dataSetChanged) {
+	formData.value.data_set = null;
+	datasetChanged.value = true;
+}
 
 watch(
 	() => props.parentDataSet,

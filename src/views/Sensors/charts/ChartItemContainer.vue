@@ -1,5 +1,16 @@
 <template>
 	<div class="card">
+		<div v-if="oneChartPageLegend" class="one-chart-page-legend">
+			<div
+				v-for="(item, index) in oneChartPageLegend"
+				:key="index"
+				class="item flex align-center"
+			>
+				<div class="color-block" :style="`backgroundColor: ${item.color}`"></div>
+				<div class="label">{{ item.name }}</div>
+			</div>
+		</div>
+
 		<VueElementLoadingWrapper
 			v-if="!disableAnimationAndSpinner"
 			:isLoading="chartLoading || forceLoading"
@@ -9,16 +20,26 @@
 		<div
 			v-if="!hideChartHeader"
 			v-show="hasStatistics"
-			class="card-header chart-card-header capitalize flex mrow wrap"
+			:class="['card-header chart-card-header capitalize flex mrow', { wrap: !additionalProps.isCompare }]"
 		>
-			<div class="mcol-xs-10 mcol-sm-9 left-part fluid">
+			<div
+				:class="[
+					'mcol-xs-10 mcol-sm-9 left-part',
+					{ 'mcol-lg-7': !additionalProps.isCompare },
+					{ fluid: additionalProps.isCompare },
+				]"
+			>
 				<div class="flex mrow wrap align-center">
-					<div class="title-block ellipsis" v-text="chartTitle"></div>
+					<div
+						:class="['title-block ellipsis', { 'mcol-xs-12': additionalProps.isCompare }]"
+						v-text="chartTitle"
+					></div>
 
 					<div v-if="enableZoomBlock && ChartAPI" class="zoom-block-container mcol-xs-9 mcol-sm-auto">
 						<div class="chart-actions-block">
 							<div class="flex wrap mrow">
 								<ChartZoom
+									ref="chartZoomRef"
 									class="mcol-xs-12 mcol-sm-auto"
 									:ChartInstance="ChartInstance"
 									:chartOptionsUpdate="chartOptionsUpdate"
@@ -216,6 +237,7 @@ const globalStore = useGlobalStore();
 const { isSidebarCollapse } = storeToRefs(globalStore);
 
 const chartWrapperRef = ref(null);
+const chartZoomRef = ref(null);
 const chartToggled = ref(1);
 const refetchChartData = ref(false);
 const chartIsInit = ref(false);
@@ -235,6 +257,20 @@ const updateThresholdsDialogOpen = ref(false);
 const chartIsRendered = ref(false);
 
 const chartIsHidden = computed(() => chartToggled.value && props.ChartInstance.chartIsHidden && !oneChartOnly.value);
+const oneChartPageLegend = computed(() => {
+	if (!oneChartOnly.value || !props.ChartInstance) return null;
+
+	const { requestsList = [], options = {} } = props.ChartInstance;
+	const chartType = options.chart?.type;
+	if (
+		requestsList.length > 1 &&
+		(chartType === 'spline' || chartType === 'line')
+	) {
+		return (options.series || []).filter((seriesItem) => seriesItem.custom_id === 'base_series');
+	}
+
+	return null;
+});
 const hcInstance = computed(() => {
 	const instances = props.additionalProps.higchartInstances;
 	if (!instances) return undefined;
@@ -493,10 +529,28 @@ watch(isSidebarCollapse, () => {
 	}, 350);
 });
 
+watch(() => props.additionalProps.showHistory, () => {
+	props.ChartInstance.setShowHistory?.(props.additionalProps.showHistory);
+
+	if (chartZoomRef.value) {
+		setTimeout(() => {
+			chartZoomRef.value.resetInitialValues?.();
+			chartZoomRef.value.zoomYAxis?.(0);
+		}, 50);
+	}
+});
+
 onMounted(() => {
 	props.ChartInstance.injectProps('events', chartInstanceEventsList.value);
 	props.ChartInstance.setValue?.('seriesEvents', chartPointsEventsList.value);
-	props.ChartInstance.fetchChartData({ rootStatisticsData: props.additionalProps.rootStatisticsData });
+
+	if (props.ChartInstance.chartIsHidden !== undefined) {
+		showDisableChartButton.value = true;
+	}
+
+	if (!chartIsHidden.value) {
+		fetchChartData({ rootStatisticsData: props.additionalProps.rootStatisticsData });
+	}
 });
 
 onBeforeUnmount(() => {

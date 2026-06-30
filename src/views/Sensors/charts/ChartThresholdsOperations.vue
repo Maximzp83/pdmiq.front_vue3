@@ -3,9 +3,8 @@
 		<span class="small-desc">{{ tt('Thresholds') }}</span>
 		<el-button
 			:disabled="disabledThresholdsEdit"
-			size="small"
 			type="primary"
-			:class="{ active: editPlotlines }"
+			:class="[{ active: editPlotlines }, 'mini']"
 			@click="emitEvent('toggleEditPlotlinesManual')"
 		>
 			<i class="icomoon icon-graph"></i>
@@ -13,9 +12,8 @@
 
 		<el-button
 			:disabled="disabledThresholdsEdit"
-			size="small"
 			type="primary"
-			:class="['with-img', { active: showZoneSetup }]"
+			:class="['with-img mini', { active: showZoneSetup }]"
 			@click="emitEvent('handleSetupThresholds')"
 		>
 			<img :src="one_layout_icon" alt="" />

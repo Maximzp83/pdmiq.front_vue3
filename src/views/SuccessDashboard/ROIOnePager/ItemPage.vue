@@ -28,10 +28,11 @@ import ItemForm from './ItemForm.vue';
 
 defineOptions({ name: 'ROIOnePagerPage' });
 
-defineProps({
+const props = defineProps({
 	sensorsLoading: Boolean,
 	sensorsList: { type: Array, default: () => [] },
 	plantItem: { type: Object, default: () => ({}) },
+	preventSetNavbar: Boolean,
 });
 
 const itemFormRef = ref(null);
@@ -46,6 +47,7 @@ const {
 } = useItemPage({
 	entityKey: 'RoiOnePagers',
 	itemFormRef,
+	preventSetNavbar: props.preventSetNavbar,
 	uploadSettings: Object.freeze([{ fileProp: 'pictures', multiple: true }, { fileProp: 'file' }]),
 	goToListAfterSave: true,
 	additionalNavbarSettings: {

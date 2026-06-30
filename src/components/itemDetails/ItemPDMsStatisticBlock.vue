@@ -35,6 +35,13 @@
 			/>
 
 			<div
+				v-if="showNoDataMock"
+				class="page-title bold gray-color outside-bg-addition"
+			>
+				{{ tt('phrases.no_data') }}
+			</div>
+
+			<div
 				v-if="resultStatistics"
 				v-show="legendEnabled"
 				class="chart-statistic-legend-part relative"
@@ -72,6 +79,7 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const chartContainerReady = ref(0);
+const hasStatistics = ref(false);
 const commonChartItemWrapper = ref(null);
 
 const globalStore = useGlobalStore();
@@ -80,6 +88,7 @@ const { printHTMLWindowIsOpen } = storeToRefs(globalStore);
 const chartProps = computed(() =>
 	Object.freeze({
 		useSimpleSpinnerAsPreloader: true,
+		nodataMock: true,
 		chartSpecificEvents: props.chartLegendEvents,
 	})
 );
@@ -98,13 +107,16 @@ const resultStatistics = computed(() => {
 const legendEnabled = computed(
 	() => props.selectedColumnsNumber.id == null || props.selectedColumnsNumber.id < 2
 );
+const showNoDataMock = computed(() => chartContainerReady.value && !hasStatistics.value);
 
 const handleShowAll = () => {
 	emit('event', { eventName: 'showItemsWithSensors' });
 };
-const handleChartContainerReady = ({ chartContainerReady: ready }) => {
+const handleChartContainerReady = ({ chartContainerReady: ready, hasStatistics: hasStats }) => {
 	chartContainerReady.value = ready;
+	hasStatistics.value = !!hasStats;
 };
+const chartLoadEvent = () => {};
 
 const callChartMethod = (method, data) => {
 	if (commonChartItemWrapper.value?.callChartMethod) {
@@ -112,7 +124,7 @@ const callChartMethod = (method, data) => {
 	}
 };
 
-const { handleEvent } = useEventHandler({ handleChartContainerReady }, emit);
+const { handleEvent } = useEventHandler({ handleChartContainerReady, chartLoadEvent }, emit);
 
 watch(
 	() => props.selectedColumnsNumber,

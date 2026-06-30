@@ -10,7 +10,11 @@
 		>
 			<div :class="['el-form-item flex mrow wrap', { showJustInfo }]">
 				<div class="mcol-xs-12 mcol-sm-6">
-					<el-form-item v-if="itemData?.serial_number" :label="`# ${tt('Work_Order')}`">
+					<el-form-item
+						v-if="itemData && !showJustInfo"
+						:label="`# ${tt('Work_Order')}`"
+						class="showJustInfo"
+					>
 						<b>{{ itemData.serial_number }}</b>
 					</el-form-item>
 
@@ -24,153 +28,6 @@
 							:optionsList="filteredWorkOrdersStatusesList"
 							:placeholder="`${tt('select')} ${tt('status')}`"
 						/>
-					</el-form-item>
-
-					<el-form-item :label="tt('Work_Order_Type')" prop="category_id">
-						<div class="flex">
-							<div class="relative mcol-xs-10 fluid span-block">
-								<CustomSelectV2
-									v-model="formData.category_id"
-									filterable
-									clearable
-									:optionsLoading="woTypesLoading"
-									:optionsList="woTypesList"
-									:placeholder="tt('type')"
-								/>
-							</div>
-
-							<el-button
-								v-if="!fromAnotherInstance"
-								class="create-button span-block inverted"
-								size="small"
-								type="primary"
-								@click="createWOType"
-							>
-								<i class="icomoon icon-plus"></i>
-							</el-button>
-						</div>
-					</el-form-item>
-
-					<el-form-item v-if="!isRecurring" :label="tt('Due_Date')" prop="finish_date" required>
-						<Datepicker v-model="formData.finish_date" :placeholder="`${tt('Select')} ${tt('date')}`" />
-					</el-form-item>
-
-					<template v-if="isRecurring">
-						<el-form-item v-if="!showJustInfo" label="">
-							<RadioButtonsBlock
-								v-model="periodMethod"
-								:settings="periodMethodRadioOptions"
-								:optionsList="translatedPeriodMethodsList"
-							/>
-						</el-form-item>
-
-						<div v-if="periodMethod === PERIOD_METHODS.PERIOD_TYPE">
-							<el-form-item :label="tt('Period')" prop="period_type" required>
-								<CustomSelectV2
-									v-model="formData.period_type"
-									:optionsList="translatedPeriodsTypesList"
-									:placeholder="`${tt('select')} ${tt('period')}`"
-								/>
-							</el-form-item>
-
-							<el-form-item :label="tt('Frequency')" prop="period_frequency" required>
-								<CustomSelectV2
-									v-model="formData.period_frequency"
-									:optionsList="frequenciesList"
-									:placeholder="`${tt('select')} ${tt('frequency')}`"
-									:labelKey="`${formData.period_type}`"
-								/>
-							</el-form-item>
-
-							<el-form-item :label="tt('Period_Range')" required>
-								<Datepicker v-model="periodDateRange" type="daterange" :pickerOptions="periodsPickerOptions" />
-							</el-form-item>
-						</div>
-
-						<div v-else class="el-form-item">
-							<el-form-item :label="tt('Period_Dates')" prop="period_dates">
-								<div class="options-container relative">
-									<div v-if="datesItemsList.length" class="content-row">
-										<DateItem
-											v-for="(item, idx) in datesItemsList"
-											:key="`date_item-${item.id}`"
-											:ref="(el) => setSubItemRef('DateItem', el, idx)"
-											:item-data="item"
-											:item-index="idx"
-											:pickerOptions="periodsPickerOptions"
-											@onRemove="(id) => removeFormItem(id, datesItemsList)"
-										/>
-									</div>
-
-									<b v-else-if="showJustInfo">-</b>
-
-									<div class="create-button-container content-row">
-										<el-button
-											class="action-button create-button"
-											type="success"
-											@click="addFormItem(datesItemsList, 'd_i-')"
-										>
-											<i class="icomoon icon-cross"></i>
-										</el-button>
-									</div>
-								</div>
-							</el-form-item>
-						</div>
-					</template>
-
-					<div v-if="!isRecurring" class="el-form-item">
-						<div class="mrow flex bottom">
-							<el-form-item :label="tt('Due_Date')" prop="finish_date" class="mcol-xs-6" required>
-								<Datepicker v-model="formData.finish_date" :placeholder="`${tt('Select')} ${tt('date')}`" />
-							</el-form-item>
-							<el-form-item v-if="!showJustInfo" label="" prop="snooze" class="mcol-xs-6">
-								<el-checkbox v-model="snooze">
-									<b>{{ tt('phrases.Snooze_Alerts') }}</b>
-								</el-checkbox>
-							</el-form-item>
-						</div>
-					</div>
-
-					<div v-if="!isRecurring" class="el-form-item" v-show="snooze">
-						<el-form-item class="period-block" :label="tt('Snooze')" prop="time_period">
-							<div class="flex mrow align-center">
-								<div v-show="!changeSnoozeRange" class="daterange">
-									<i class="el-icon-date span-block"></i>
-									<b class="span-block">{{ prepareRangeStr(formData.snooze_alert) }}</b>
-								</div>
-								<div v-if="!hasSnoozeAlert || (changeSnoozeRange && formData.snooze_alert)">
-									<CustomSelectV2
-										v-model="formData.snooze_alert.time_period"
-										:optionsList="snoozeRangeTypesList"
-										:placeholder="`${tt('Select')} ${tt('range')}`"
-									/>
-								</div>
-
-								<div v-if="hasSnoozeAlert && !showJustInfo" class="mcol-xs-3">
-									<span class="link underline" @click="changeSnoozeRange = !changeSnoozeRange">
-										{{ changeSnoozeRange ? tt('Cancel') : tt('Change') }}
-									</span>
-								</div>
-							</div>
-						</el-form-item>
-
-						<el-form-item
-							v-if="snooze && (!hasSnoozeAlert || (changeSnoozeRange && formData.snooze_alert))"
-							label=""
-							prop="daterange"
-						>
-							<div v-show="formData.snooze_alert?.time_period === SNOOZE_RANGE_TYPES.CUSTOM_RANGE">
-								<Datepicker v-model="snoozeDateRange" type="daterange" />
-							</div>
-						</el-form-item>
-					</div>
-
-					<el-form-item :label="tt('Description')" prop="description" required>
-						<div v-if="showJustInfo" class="el-form-item el-textarea">
-							<div class="flex align-center el-input__inner el-textarea__inner" v-html="formData.description || '-'"></div>
-						</div>
-
-						<el-input v-else v-model="formData.description" type="textarea" :rows="5" />
 					</el-form-item>
 
 					<div class="el-form-item">
@@ -203,12 +60,162 @@
 						</div>
 					</div>
 
+					<el-form-item :label="tt('Work_Order_Type')" prop="category_id">
+						<div class="flex align-center">
+							<div class="relative mcol-xs-11 fluid span-block">
+								<CustomSelectV2
+									v-model="formData.category_id"
+									filterable
+									clearable
+									:optionsLoading="woTypesLoading"
+									:optionsList="woTypesList"
+									:placeholder="tt('type')"
+								/>
+							</div>
+
+							<el-button
+								v-if="!fromAnotherInstance"
+								class="create-button span-block inverted mini"
+								type="primary"
+								@click="createWOType"
+							>
+								<i class="icomoon icon-plus"></i>
+							</el-button>
+						</div>
+					</el-form-item>
+
+					<template v-if="isRecurring && formData.is_periodic">
+						<el-form-item v-if="!showJustInfo" label="" class="content-row">
+							<RadioButtonsBlock
+								v-model="periodMethod"
+								:settings="periodMethodRadioOptions"
+								:optionsList="translatedPeriodMethodsList"
+							/>
+						</el-form-item>
+
+						<div v-if="periodMethod === PERIOD_METHODS.PERIOD_TYPE" class="content-row">
+							<el-form-item :label="tt('Period')" prop="period_type" required>
+								<CustomSelectV2
+									v-model="formData.period_type"
+									:optionsList="translatedPeriodsTypesList"
+									:placeholder="`${tt('select')} ${tt('period')}`"
+								/>
+							</el-form-item>
+
+							<el-form-item
+								v-show="formData.period_type"
+								:label="tt('Frequency')"
+								prop="period_frequency"
+								required
+							>
+								<CustomSelectV2
+									v-model="formData.period_frequency"
+									:optionsList="frequenciesList"
+									:placeholder="`${tt('select')} ${tt('frequency')}`"
+									:labelKey="`${formData.period_type}`"
+								/>
+							</el-form-item>
+
+							<el-form-item :label="tt('Period_Range')" required>
+								<Datepicker v-model="periodDateRange" type="daterange" :pickerOptions="periodsPickerOptions" />
+							</el-form-item>
+						</div>
+
+						<div v-if="periodMethod === PERIOD_METHODS.PERIOD_DATES" class="content-row">
+							<el-form-item :label="tt('Period_Dates')" prop="period_dates">
+								<div class="options-container relative">
+									<div v-if="datesItemsList.length" class="content-row">
+										<DateItem
+											v-for="(item, idx) in datesItemsList"
+											:key="`date_item-${item.id}`"
+											:ref="(el) => setSubItemRef('DateItem', el, idx)"
+											:item-data="item"
+											:item-index="idx"
+											:pickerOptions="periodsPickerOptions"
+											@onRemove="(id) => removeFormItem(id, datesItemsList)"
+										/>
+									</div>
+
+									<b v-else-if="showJustInfo">-</b>
+
+									<div class="create-button-container content-row">
+										<el-button
+											class="action-button create-button mini"
+											type="success"
+											@click="addFormItem(datesItemsList, 'd_i-')"
+										>
+											<i class="icomoon icon-cross"></i>
+										</el-button>
+									</div>
+								</div>
+							</el-form-item>
+						</div>
+					</template>
+
+					<div v-else class="mt-20">
+						<div class="mrow flex bottom">
+							<el-form-item :label="tt('Due_Date')" prop="finish_date" class="mcol-xs-6" required>
+								<Datepicker
+									class="no-min-width"
+									v-model="formData.finish_date" :placeholder="`${tt('Select')} ${tt('date')}`"
+								/>
+							</el-form-item>
+							<el-form-item v-if="!showJustInfo" label="" prop="snooze" class="mcol-xs-6">
+								<el-checkbox v-model="snooze">
+									<b>{{ tt('phrases.Snooze_Alerts') }}</b>
+								</el-checkbox>
+							</el-form-item>
+						</div>
+					</div>
+
+					<div v-if="!formData.is_periodic" class="mt-20" v-show="snooze">
+						<el-form-item class="period-block" :label="tt('Snooze')" prop="time_period">
+							<div class="flex mrow align-center">
+								<div v-show="!changeSnoozeRange" class="daterange mcol-xs-1">
+									<CalendarIcon />
+									<b class="span-block">{{ prepareRangeStr(formData.snooze_alert) }}</b>
+								</div>
+								
+								<div class="mcol-xs-7" v-if="!hasSnoozeAlert || (changeSnoozeRange && formData.snooze_alert)">
+									<CustomSelectV2
+										v-model="formData.snooze_alert.time_period"
+										:optionsList="snoozeRangeTypesList"
+										:placeholder="`${tt('Select')} ${tt('range')}`"
+									/>
+								</div>
+
+								<div v-if="hasSnoozeAlert && !showJustInfo" class="mcol-xs-3">
+									<span class="link underline" @click="changeSnoozeRange = !changeSnoozeRange">
+										{{ changeSnoozeRange ? tt('Cancel') : tt('Change') }}
+									</span>
+								</div>
+							</div>
+						</el-form-item>
+
+						<el-form-item
+							v-if="snooze && (!hasSnoozeAlert || (changeSnoozeRange && formData.snooze_alert))"
+							label=""
+							prop="daterange"
+						>
+							<div v-show="formData.snooze_alert?.time_period === SNOOZE_RANGE_TYPES.CUSTOM_RANGE">
+								<Datepicker v-model="snoozeDateRange" type="daterange" />
+							</div>
+						</el-form-item>
+					</div>
+
+					<el-form-item class="mt-20" :label="tt('Description')" prop="description" required>
+						<div v-if="showJustInfo" class="el-form-item el-textarea">
+							<div class="flex align-center el-input__inner el-textarea__inner" v-html="formData.description || '-'"></div>
+						</div>
+
+						<el-input v-else v-model="formData.description" type="textarea" :rows="5" />
+					</el-form-item>
+
 					<el-form-item :label="tt('Parts')" prop="parts" class="parts">
 						<div class="flex part-create-button">
 							<el-button
 								v-if="!fromAnotherInstance"
-								class="create-button span-block inverted"
-								size="small"
+								class="create-button span-block inverted mini"
 								type="primary"
 								@click="createPart"
 							>
@@ -234,7 +241,7 @@
 
 							<div class="create-button-container content-row">
 								<el-button
-									class="action-button create-button"
+									class="action-button create-button mini mt-10"
 									type="success"
 									@click="addFormItem(partsItemsList, 'p_i-')"
 								>
@@ -415,7 +422,7 @@
 				</div>
 			</div>
 
-			<FormOperationsButtons v-if="!fromModal && !showJustInfo" @onCancel="handleCancel" @onSave="validateForm" />
+			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
 		</el-form>
 
 		<div v-if="showJustInfo && selectedTaskProcedure" class="section-row">
@@ -444,6 +451,7 @@
 
 <script setup>
 import { computed, reactive, ref, shallowRef } from 'vue';
+import { Calendar as CalendarIcon } from '@element-plus/icons-vue';
 
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
@@ -459,10 +467,12 @@ import {
 	workOrdersStatusesList as getWorkOrdersStatusesList,
 } from '@/constants/global';
 import { required } from '@/constants/validation';
-import { findItemBy, getDateRange, getLocaleStringDateRange } from '@/helpers';
+import { findItemBy, getDateRange, getLocaleStringDateRange, getYmdDateString } from '@/helpers';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
+import { useNotify } from '@/composables/useNotify';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
@@ -495,6 +505,8 @@ const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
+const { Notify } = useNotify();
+const { confirmHelper } = useActionButtons({ emit });
 const itemFormRef = ref(null);
 const refsMap = reactive({});
 const productionLinesList = shallowRef([]);
@@ -948,6 +960,13 @@ const localValidationHook = () => {
 	].some((prop) => !!formData.value[prop]);
 
 	mainInstancesError.value = !hasMainInstance;
+	if (!hasMainInstance) {
+		Notify({
+			type: 'warning',
+			title: tt('phrases.form_isnt_ready'),
+			message: tt('phrases.Please_check_fields_errors_first'),
+		});
+	}
 	return hasMainInstance;
 };
 
@@ -959,10 +978,14 @@ const localPrepareSubmitData = (data) => {
 	};
 
 	if (snooze.value) {
-		if (
-			(!hasSnoozeAlert.value || changeSnoozeRange.value) &&
-			preparedData.snooze_alert?.time_period === SNOOZE_RANGE_TYPES.CUSTOM_RANGE
-		) {
+		if (hasSnoozeAlert.value && !changeSnoozeRange.value) {
+			preparedData.snooze_alert.date_start = getYmdDateString({
+				ms: preparedData.snooze_alert.date_start,
+			});
+			preparedData.snooze_alert.date_finish = getYmdDateString({
+				ms: preparedData.snooze_alert.date_finish,
+			});
+		} else if (preparedData.snooze_alert?.time_period === SNOOZE_RANGE_TYPES.CUSTOM_RANGE) {
 			preparedData.snooze_alert.date_start = snoozeDateRange.value[0];
 			preparedData.snooze_alert.date_finish = snoozeDateRange.value[1];
 		}
@@ -1026,6 +1049,53 @@ const preparePayload = (payload) => {
 	return nextPayload;
 };
 
+const localSubmit = (data) => {
+	const payload = preparePayload({ data });
+
+	if (!payload.data.plant_id) {
+		Notify({
+			type: 'warning',
+			title: tt('phrases.form_isnt_ready'),
+			message: tt('phrases.Select_plant_first'),
+		});
+		return false;
+	}
+
+	if (props.isRecurring && payload.data.id) {
+		confirmHelper({
+			message: `${tt('phrases.Apply_this_action_to_all_reccurring_orders_or_only_this_one')}?`,
+			confirmButtonText: tt('phrases.To_all'),
+			cancelButtonText: tt('phrases.only_this_one'),
+			cancelButtonClass: 'el-button--primary',
+			distinguishCancelAndClose: true,
+		})
+			.then(() => {
+				emit('event', {
+					eventName: 'handleSubmitForm',
+					data: {
+						withFile: payload.withFile,
+						data: { ...payload.data, with_siblings: true },
+					},
+				});
+			})
+			.catch((action) => {
+				if (action === 'cancel') {
+					emit('event', {
+						eventName: 'handleSubmitForm',
+						data: payload,
+					});
+				}
+			});
+		return true;
+	}
+
+	emit('event', {
+		eventName: 'handleSubmitForm',
+		data: payload,
+	});
+	return true;
+};
+
 const {
 	setupFormSubItemsList,
 	addFormItem,
@@ -1055,6 +1125,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	localSetupPage,
 	localValidationHook,
 	localPrepareSubmitData,
+	localSubmit,
 	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,

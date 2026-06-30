@@ -70,6 +70,8 @@ const currentPage = computed({
 :deep(.el-pagination) {
 	padding: 0;
 	margin: 0 -5px;
+	display: flex;
+	justify-content: flex-end;
 
 	button,
 	.el-pager > li {

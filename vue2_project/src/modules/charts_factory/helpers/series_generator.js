@@ -1,9 +1,10 @@
 import { mergeObjects, hasOwnProperty1 } from '@/helpers';
 import { chartSeriesTemplates, blueColor, baseColor, alarmColor, warningColor } from '../enums';
-import { NCD_ALARM_TYPES, SENSOR_THRESHOLD_TYPES } from '@/constants/global';
+import { NCD_ALARM_TYPES, SENSOR_THRESHOLD_TYPES, MULTIVIEW_ALARM_TYPES } from '@/constants/global';
 
 const methodsList = {
 	setupLineSerieZones: arg => {
+		// console.log('setupLineSerieZones', arg);
 		let levelZoneData;
 		if (arg.payload && arg.payload.levelZoneData) {
 			levelZoneData = arg.payload.levelZoneData;
@@ -37,6 +38,35 @@ const methodsList = {
 			if (zones.length) zones.push({ color: alarmColor, threshold_level: ALARM });
 		}
 
+		return zones;
+	},
+
+	setupMultiviewLineSerieZones: arg => {
+		let zones = [];
+		try {
+			const { plotlinesMaxValues, plotlinesMinValues } = arg.statistics;
+			const { alarm_type, normalColor } = arg.payload;
+				// console.log('setupMultiviewLineSerieZones', plotlinesMaxValues, alarm_type);
+
+			if (plotlinesMaxValues && plotlinesMaxValues.length) {
+				let	alarm_zone = Math.min(...plotlinesMaxValues);
+				let	warning_zone = Math.max(...plotlinesMinValues);
+
+
+				if (alarm_type === MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH) {
+					if (warning_zone) zones.push({ value: warning_zone, color: blueColor });
+					if (alarm_zone) zones.push({ value: alarm_zone, color: normalColor });
+					if (zones.length) zones.push({ color: alarmColor });
+				} else if (alarm_type === MULTIVIEW_ALARM_TYPES.STANDARD_WARNING_ALARM) {
+					if (warning_zone) zones.push({ value: warning_zone, color: normalColor });
+					if (alarm_zone) zones.push({ value: alarm_zone, color: warningColor });
+					if (zones.length) zones.push({ color: alarmColor });
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
+		// console.log(zones);
 		return zones;
 	}
 };

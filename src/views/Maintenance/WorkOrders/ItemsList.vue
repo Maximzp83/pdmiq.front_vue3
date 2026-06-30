@@ -6,6 +6,7 @@
 					:itemsLoading="itemsLoading"
 					:filters="filters"
 					:itemsName="itemsName"
+					:perPageItems="perPageItems"
 					:actionButtons="filterbarActionButtons"
 					hideSearchbar
 					@event="handleEvent"
@@ -23,18 +24,18 @@
 						/>
 					</div>
 
-					<div class="filter-item ml-auto">
+					<div v-if="!hideDatepicker" class="filter-item ml-auto">
 						<Datepicker
 							setupDaterangeFilter
 							enableShortcuts
-							:value="filters.daterange"
+							:model-value="filters.daterange"
 							type="daterange"
 							clearable
-							@input="(range) => setFilters({ daterange: range, daterange_setted_at: Date.now() })"
+							@update:model-value="(range) => setFilters({ daterange: range, daterange_setted_at: Date.now() })"
 						/>
 					</div>
 
-					<div class="filter-item">
+					<div class="filter-item ml-auto">
 						<el-button
 							type="success"
 							class="action-button inverted"
@@ -45,12 +46,50 @@
 						</el-button>
 					</div>
 
-					<div class="filter-item">
-						<SearchBar :query="filters.q" clearable @submit="setFilters" />
+					<div class="filter-item ml-auto">
+						<el-popover placement="bottom" trigger="click" width="200" :close-delay="0">
+							<template #reference>
+								<el-button
+									type=""
+									class="action-button inverted"
+									native-type="button"
+								>
+									<i class="icomoon icon-search"></i>
+								</el-button>
+							</template>
+
+							<div class="search-block-wrapper relative">
+								<SimpleSpinner :active="itemsLoading" />
+								<SearchBar
+									class="search-block"
+									:query="filters.q"
+									clearable
+									@submit="(data) => setFilters(data)"
+								/>
+							</div>
+						</el-popover>
 					</div>
+
+					<template #last>
+						<div class="filter-item toggle-additional-filters relative">
+							<el-button
+								type="primary"
+								native-type="button"
+								:class="['action-button inverted', { active: showFilterbar }]"
+								@click="toggleFilterbar"
+							>
+								<i :class="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"></i>
+							</el-button>
+
+							<span v-show="activeFiltersCount" class="round-counter wo-filters-count">
+								{{ activeFiltersCount }}
+							</span>
+						</div>
+					</template>
 				</Filterbar>
 
 				<DropdownFilterbar
+					ref="dropdownFilterbarRef"
 					hideToggleButton
 					:itemsName="itemsName"
 					filterbarDropdownId="woDropdownFilterbar"
@@ -88,8 +127,8 @@
 										clearable
 										:optionsList="woStageTypesList"
 										:placeholder="tt('stage')"
-										:value="filters.stage"
-										@change="(id) => setFilters({ stage: id })"
+										:model-value="filters.stage"
+										@update:model-value="(id) => setFilters({ stage: id })"
 									/>
 								</div>
 
@@ -98,8 +137,8 @@
 										clearable
 										:optionsList="woFrequencyTypesList"
 										:placeholder="tt('Frequency')"
-										:value="filters.frequency"
-										@change="(id) => setFilters({ frequency: id })"
+										:model-value="filters.frequency"
+										@update:model-value="(id) => setFilters({ frequency: id })"
 									/>
 								</div>
 
@@ -110,8 +149,8 @@
 										clearable
 										:optionsList="workOrdersStatusesList"
 										:placeholder="tt('Status')"
-										:value="filters.status"
-										@change="(ids) => setFilters({ status: ids })"
+										:model-value="filters.status"
+										@update:model-value="(ids) => setFilters({ status: ids })"
 									/>
 								</div>
 
@@ -122,8 +161,8 @@
 										:optionsLoading="maintenanceCategoriesLoading"
 										:optionsList="maintenanceCategoriesFiltersList"
 										:placeholder="tt('Work_Order_Type')"
-										:value="filters.categoryId"
-										@change="(id) => setFilters({ categoryId: id, withoutCategory: id === 0 ? true : null })"
+										:model-value="filters.categoryId"
+										@update:model-value="(id) => setFilters({ categoryId: id, withoutCategory: id === 0 ? true : null })"
 									/>
 								</div>
 
@@ -134,8 +173,8 @@
 										:optionsLoading="productionLinesLoading"
 										:optionsList="productionLinesList"
 										:placeholder="tt('production_line')"
-										:value="filters.productionLineId"
-										@change="(id) => setFilters({ productionLineId: id, machineId: null, assetId: null, equipmentId: null })"
+										:model-value="filters.productionLineId"
+										@update:model-value="(id) => setFilters({ productionLineId: id, machineId: null, assetId: null, equipmentId: null })"
 									/>
 								</div>
 
@@ -146,8 +185,8 @@
 										:optionsLoading="machinesLoading"
 										:optionsList="machinesList"
 										:placeholder="tt('Machine')"
-										:value="filters.machineId"
-										@change="(id) => setFilters({ machineId: id, assetId: null, equipmentId: null })"
+										:model-value="filters.machineId"
+										@update:model-value="(id) => setFilters({ machineId: id, assetId: null, equipmentId: null })"
 									/>
 								</div>
 
@@ -156,10 +195,10 @@
 										clearable
 										enableLoadmore
 										:loadmoreIsActive="assetsLoadmoreIsActive"
-										:value="filters.assetId"
+										:model-value="filters.assetId"
 										:settings="assetQueryOptions"
 										:placeholder="tt('Asset')"
-										@input="(id) => setFilters({ assetId: id, equipmentId: null })"
+										@update:model-value="(id) => setFilters({ assetId: id, equipmentId: null })"
 									/>
 								</div>
 
@@ -168,11 +207,11 @@
 										clearable
 										enableLoadmore
 										:loadmoreIsActive="equipmentsLoadmoreIsActive"
-										:value="filters.equipmentId"
+										:model-value="filters.equipmentId"
 										:settings="equipmentsQueryOptions"
 										:placeholder="tt('item')"
 										:setupLabelSettings="equipmentLabelOptions"
-										@input="(id) => setFilters({ equipmentId: id })"
+										@update:model-value="(id) => setFilters({ equipmentId: id })"
 									/>
 								</div>
 							</div>
@@ -184,7 +223,7 @@
 					ref="itemsTableRef"
 					alwaysShowOperations
 					:disableSelection="!hasBulkAccess"
-					:itemsLoading="itemsLoading"
+					:itemsLoading="itemsLoading || usersLoading"
 					:tableData="itemsList"
 					:tableSettings="tableSettings"
 					:itemsName="itemsName"
@@ -206,7 +245,7 @@
 <script setup>
 import { computed, ref, shallowRef } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ElNotification } from 'element-plus';
+import { ElMessageBox, ElNotification } from 'element-plus';
 
 import {
 	MAINTENANCE_TYPES,
@@ -221,6 +260,7 @@ import { standardTableOperations } from '@/constants/table';
 import { cleanDateString, findItemBy, getTimeDifference, getWOStatus, setupAssignedUsers, cloneDeep } from '@/helpers';
 import { Lang } from '@/localization';
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
+import { api_request } from '@/api/request_provider';
 import { ENTITIES } from '@/config/entities';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -233,6 +273,7 @@ import { useMaintenance } from '@/composables/useMaintenance';
 import Filterbar from '@/components/common/Filterbar.vue';
 import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
 import SearchBar from '@/components/common/SearchBar.vue';
+import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 import Datepicker from '@/components/common/Datepicker.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
@@ -270,6 +311,8 @@ const {
 } = useMaintenance();
 
 const itemsTableRef = ref(null);
+const dropdownFilterbarRef = ref(null);
+const showFilterbar = ref(false);
 const productionLinesList = shallowRef([]);
 const productionLinesLoading = ref(false);
 const machinesList = shallowRef([]);
@@ -293,6 +336,23 @@ const workOrdersStatusesList = computed(() =>
 const maintenanceCategoriesFiltersList = computed(() =>
 	Object.freeze([{ id: 0, name: 'Without Category' }, ...maintenanceCategoriesList.value]),
 );
+const activeFiltersCount = computed(() => {
+	const exceptions = new Set([
+		'page',
+		'max',
+		'daterange',
+		'q',
+		'orderByColumn',
+		'orderByMethod',
+		'daterange_setted_at',
+	]);
+
+	return Object.entries(filters.value || {}).filter(([key, value]) => {
+		if (exceptions.has(key)) return false;
+		if (Array.isArray(value)) return value.length > 0;
+		return value !== null && value !== undefined && value !== false && value !== '';
+	}).length;
+});
 const propsFiltersRef = computed(() => ({
 	type: MAINTENANCE_TYPES.WORK_ORDER,
 	...props.propsFilters,
@@ -300,8 +360,8 @@ const propsFiltersRef = computed(() => ({
 const itemsNameRef = computed(() => {
 	const item = findItemBy('id', propsFiltersRef.value.type, maintenanceTypesList());
 	return Object.freeze({
-		one: tt(item?.label || 'Work_Order'),
-		mult: tt(item?.label || 'Work_Orders'),
+		one: item?.label || 'Work_Order',
+		mult: item?.label || 'Work_Orders',
 		instanceName: 'maintenance',
 	});
 });
@@ -397,6 +457,7 @@ const {
 			}*/
 			return newModalSettings;			
 		},
+		localDeleteItems: (payload) => deleteWorkOrders(payload),
 		/*predefinedFilters: {
 			orderByColumn: 'created_at',
 			orderByMethod: 'desc',
@@ -415,15 +476,17 @@ const filterbarActionButtons = computed(() => {
 	return Object.freeze(translate(buttons, { key: 'text' }));
 });
 
-const changeStatusOperationsList = computed(() =>
-	Object.freeze(
-		translate([
-			{ label: 'phrases.Set_In_Work', actionName: 'setInWorkSelected' },
-			{ label: 'Complete', actionName: 'completeSelected' },
-			{ label: 'Close', actionName: 'closeSelected' },
-		], { key: 'label' }),
-	)
-);
+const changeStatusOperationsList = computed(() => {
+	const list = [{ label: 'phrases.In_Work', actionName: 'handleInWorkItems' }];
+
+	if (hasAccessToEdit.value) {
+		list.push({ label: 'Complete', actionName: 'handleCompleteItems' });
+	}
+	if (hasAccessToDelete.value) {
+		list.push({ label: 'Close', actionName: 'handleCloseItems' });
+	}
+	return Object.freeze(translate(list, { key: 'label' }));
+});
 
 const tableSettings = computed(() => {
 	const settings = {
@@ -547,23 +610,44 @@ const setupRequiredItems = ({ taskProcedure, parts = [] } = {}) => {
 const getSelectedIds = () => itemsTableRef.value?.selectedIds || [];
 const changeStatusOperation = (actionName) => {
 	const handlers = {
-		setInWorkSelected,
-		completeSelected,
-		closeSelected,
+		handleInWorkItems,
+		handleCompleteItems,
+		handleCloseItems,
 	};
 	handlers[actionName]?.();
 };
-const setInWorkSelected = () => {
+
+const confirmSelectedStatusAction = ({ confirmButtonText, confirmMessage, action }) => {
 	const ids = getSelectedIds();
-	if (ids.length) setInWorkWorkOrders({ data: { ids } }).then(refetchItemsList);
+	if (!ids.length) return;
+
+	ElMessageBox.confirm(confirmMessage, {
+		confirmButtonText,
+		cancelButtonText: tt('CANCEL'),
+		type: 'warning',
+	}).then(() => action({ data: { ids } }).then(refetchItemsList));
 };
-const completeSelected = () => {
-	const ids = getSelectedIds();
-	if (ids.length) completeWorkOrders({ data: { ids } }).then(refetchItemsList);
+
+const handleInWorkItems = () => {
+	confirmSelectedStatusAction({
+		confirmButtonText: tt('phrases.In_Work'),
+		confirmMessage: `${tt('phrases.this_will_set_in_work_status_to_selected_workorders')}. ${tt('Continue')}?`,
+		action: setInWorkWorkOrders,
+	});
 };
-const closeSelected = () => {
-	const ids = getSelectedIds();
-	if (ids.length) closeWorkOrders({ data: { ids } }).then(refetchItemsList);
+const handleCompleteItems = () => {
+	confirmSelectedStatusAction({
+		confirmButtonText: tt('Complete'),
+		confirmMessage: `${tt('phrases.this_will_complete_selected_workorders')}. ${tt('Continue')}?`,
+		action: completeWorkOrders,
+	});
+};
+const handleCloseItems = () => {
+	confirmSelectedStatusAction({
+		confirmButtonText: tt('Close'),
+		confirmMessage: `${tt('phrases.this_will_close_selected_workorders')}. ${tt('Continue')}?`,
+		action: closeWorkOrders,
+	});
 };
 const handleExportToExcel = () => {
 	if (!globalFilters.value?.plantId) {
@@ -721,9 +805,50 @@ const handleShowLog = ({ order, log }) => {
 	});
 };
 
-const handleDeleteWorkOrders = (payload) => handleDeleteItems(payload);
+const deleteWorkOrders = ({ row, ids, with_siblings: withSiblings } = {}) => {
+	const deleteIds = row?.id ? [row.id] : (ids?.length ? ids : getSelectedIds());
+	if (!deleteIds.length) return Promise.resolve();
 
-useRequestsList({
+	return ElMessageBox.confirm(
+		`${tt('phrases.this_will_permanently_delete_selected')} ${itemsName.value.mult}. ${tt('Continue')}?`,
+		{
+			confirmButtonText: tt('Delete'),
+			cancelButtonText: tt('CANCEL'),
+			type: 'warning',
+		},
+	).then(() =>
+		api_request.delete('/maintenance', {
+			data: {
+				ids: deleteIds,
+				...(withSiblings ? { with_siblings: true } : {}),
+			},
+			itemName: itemsName.value.one,
+		}).then(refetchItemsList)
+	);
+};
+
+const handleDeleteWorkOrders = (payload = {}) => {
+	if (payload?.row?.is_periodic) {
+		ElMessageBox.confirm(
+			`${tt('phrases.apply_this_action_to_all_reccurring_orders_or_only_this_one')}?`,
+			{
+				confirmButtonText: tt('phrases.To_all'),
+				cancelButtonText: tt('phrases.only_this_one'),
+				type: 'warning',
+				distinguishCancelAndClose: true,
+			},
+		)
+			.then(() => deleteWorkOrders({ ...payload, with_siblings: true }))
+			.catch((action) => {
+				if (action === 'cancel') deleteWorkOrders(payload);
+			});
+		return;
+	}
+
+	deleteWorkOrders(payload);
+};
+
+const { initiateRequestsToDoList } = useRequestsList({
 	methodsMap,
 	requestsToDoList: computed(() =>
 		Object.freeze([
@@ -752,6 +877,13 @@ useRequestsList({
 		])
 	),
 });
+initiateRequestsToDoList.value = false;
+
+const toggleFilterbar = (event) => {
+	dropdownFilterbarRef.value?.toggleFilterbar?.(event);
+	initiateRequestsToDoList.value = true;
+	showFilterbar.value = !showFilterbar.value;
+};
 
 const { handleEvent } = useEventHandler({
 	setFilters,
@@ -761,9 +893,13 @@ const { handleEvent } = useEventHandler({
 	handleDeleteItems,
 	handleDeleteWorkOrders,
 	changeStatusOperation,
+	handleInWorkItems,
+	handleCompleteItems,
+	handleCloseItems,
 	handleShowDetails,
 	handleShowDetailsPreview,
 	handleCreateLog,
 	handleShowLog,
+	toggleFilterbar,
 });
 </script>

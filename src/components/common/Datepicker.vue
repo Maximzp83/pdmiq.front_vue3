@@ -227,7 +227,7 @@ const finalPlaceholder = computed(() => {
 		return props.placeholder || `${tt('phrases.start_date')} - ${tt('phrases.end_date')}`;
 	}
 
-	return props.placeholder || tt('phrases.Date_range');
+	return props.placeholder || tt('Date');
 });
 
 // ========== Methods ===========

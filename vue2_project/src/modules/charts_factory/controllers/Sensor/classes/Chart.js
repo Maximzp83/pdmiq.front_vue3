@@ -23,7 +23,7 @@ import {
 	hexToRgba
 } from '@/helpers';
 
-import { sensorThresholdsTypesList } from '@/constants/global';
+import { sensorThresholdsTypesList, MULTIVIEW_ALARM_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
 
 import {
@@ -39,10 +39,12 @@ import {
 	setupParameterName,
 	setupAnnotations,
 	setupAnnotationSelectionData,
-	collect_specific_points
+	collect_specific_points,
+	buildPlotlinesSeriesDataByThresholds
 } from '../methods';
 import { METRIC_SYSTEM_TYPES } from '../enums';
-import { colorsList } from '../../../enums';
+import { colorsList2 } from '../../../enums';
+// import { SENSOR_THRESHOLD_TYPES } from '@/constants/global';
 
 import { setupYAxisPlotlines } from '../../../helpers/series_generator';
 // import { setupStatisticsTransformator } from '../StatisticsTransformatorDispatcher';
@@ -2440,6 +2442,8 @@ class MultiViewChart extends ChartBase {
 		super();
 		// console.log('resources', resources)
 		// this.chartTitle = Lang.tt('phrases.connection_strength_trend');
+		// this.generateSeriesByStatistics = true;
+
 		this.chartTitle = 'MultiView Chart';
 		this.measurement = resources.filters.measurement;
 
@@ -2499,11 +2503,12 @@ class MultiViewChart extends ChartBase {
 						{
 							id: 'crashes-flag-serie',
 							data_path: 'crashes_statistics',
-							template: 'sensor.crashes_flag'
+							template: 'sensor.lube_lock_log_flag'
 						},
 					]
 				}
-			}
+			},
+			plotlinesSeriesData: {},
 		}
 
 		this.transformator_settings = {
@@ -2519,12 +2524,19 @@ class MultiViewChart extends ChartBase {
 				setupFlagsData: {
 					enable_issue_alerts: true,
 				},
+				setupMultiviewThresholdsData: {
+					enableSetupThresholds: true,
+					plotLinesSettings: []
+				}
 			}
 		};
 
 		this.injectProps('options', options);
 
-		this.finalSetup(resources);
+		this.finalSetup(resources, {
+			modifySeriesConfigOnResponse: true,
+			generateSeriesByStatistics: true,
+		});
 	}
 
 	setupChartTitle() {
@@ -2668,50 +2680,79 @@ class MultiViewChart extends ChartBase {
 		return this.measurement !== resources.filters.measurement;
 	}
 
-	modifySeriesConfig({ requestsList, seriesConfig }) {
+	modifySeriesConfig({ requestsList, seriesConfig, plotlinesSeriesData, thresholds }) {
 		// const { ncd_active_axial_axis } = this.sensorItem;
-		// console.log('modifySeriesConfig', this.measurement, this.options.yAxis)
+		// console.log('modifySeriesConfig', requestsList, seriesConfig)
+
 		requestsList.forEach((parameterItem, idx) => {
-			const unit_type_name = this.setupUnitTypeName({
-				parameterItem,
-				measurement: this.measurement
-			});
-			const { sensor_id } = parameterItem;
-			let actualAxisIdx = 0;
-
-			this.options.yAxis.forEach((axis, idx) => {
-				if (
-					axis.customSettings.parameterItem.sensor_id === sensor_id
-					&& axis.customSettings.parameterItem.id === parameterItem.id
-				) {
-					actualAxisIdx = idx;
-				}
-			});
-
-			seriesConfig.pointsData.seriesConfigsList[idx] = [
-				{
-					id: `serie-${idx}`,
-					data_path: '',
-					template: 'fft.base',
-					responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
-					// event_keys: ['pointClickEvent'],
-					inject: {
-						showInNavigator: true,
-						name: `${parameterItem.sensor_name}, ${parameterItem.sensor_location} - ${parameterItem.short_name || parameterItem.name}`,
-						tooltip: { valueSuffix: ` ${unit_type_name}` },
-						color: colorsList[idx],
-						yAxis: actualAxisIdx,
-					}
-				}
-			];
-
-			if (seriesConfig.flagsData.seriesConfigsList[idx]) {
-				seriesConfig.flagsData.seriesConfigsList[idx] = seriesConfig.flagsData.seriesConfigsList[idx].map(sci => {
-					return {
-						...sci,
-						responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
-					}				
+			try {
+				const unit_type_name = this.setupUnitTypeName({
+					parameterItem,
+					measurement: this.measurement
 				});
+				const { sensor_id } = parameterItem;
+				let actualAxisIdx = 0;
+
+				this.options.yAxis.forEach((axis, idx) => {
+					if (
+						axis.customSettings.parameterItem.sensor_id === sensor_id
+						&& axis.customSettings.parameterItem.id === parameterItem.id
+					) {
+						actualAxisIdx = idx;
+					}
+				});
+
+				// --- Multiview---
+				let alarm_type = null;
+				const foundItem = thresholds.find(item => {
+					return item.monitor_metrics?.some(metric => {
+						return metric.sensor_id === sensor_id &&
+							metric.metric_type === parameterItem.id;
+					});
+				});
+
+				alarm_type = foundItem?.type;
+				
+				// console.log('modifySeriesConfig', idx, alarm_type)
+				seriesConfig.pointsData.seriesConfigsList[idx] = [
+					{
+						id: `serie-${idx}`,
+						data_path: '',
+						template: 'fft.base',
+						responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+						// event_keys: ['pointClickEvent'],
+						inject: {
+							showInNavigator: true,
+							name: `${parameterItem.sensor_name}, ${parameterItem.sensor_location} - ${parameterItem.short_name || parameterItem.name}`,
+							tooltip: { valueSuffix: ` ${unit_type_name}` },
+							color: colorsList2[idx],
+							yAxis: actualAxisIdx,
+						},
+						customSettings: {
+							setupSeriePropValue: [
+								{ 
+									key: 'zones', methodName: 'setupMultiviewLineSerieZones', 
+									payload: {alarm_type, normalColor: colorsList2[idx]}
+								}
+							]
+						}
+					}
+				];
+
+				if (seriesConfig.flagsData.seriesConfigsList[idx]) {
+					seriesConfig.flagsData.seriesConfigsList[idx] = seriesConfig.flagsData.seriesConfigsList[idx].map(sci => {
+						return {
+							...sci,
+							responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,
+						}				
+					});
+				}
+
+				if (plotlinesSeriesData) {
+					seriesConfig.plotlinesSeriesData = plotlinesSeriesData;
+				}
+			} catch (e) {
+				console.warn(e);
 			}
 
 			// console.log('modifySeriesConfig', parameterItem, idx, seriesConfig.flagsData.seriesConfigsList[idx])
@@ -2720,6 +2761,35 @@ class MultiViewChart extends ChartBase {
 		// console.log('seriesConfig', seriesConfig)
 		return seriesConfig;
 	}
+
+	setupSeriesByThresholds({thresholds, parameterItem}) {
+		// console.log('value.thresholds', thresholds)
+		let plotlinesSeriesData = thresholds.length ? buildPlotlinesSeriesDataByThresholds({
+			thresholds: thresholds,
+			responseDataKey: `sensor_${parameterItem.sensor_id}-parameter_${parameterItem.id}`,							
+		}) : null;
+
+		this.seriesConfig = this.modifySeriesConfig({
+			requestsList: this.requestsList,
+			seriesConfig: this.seriesConfig,
+			plotlinesSeriesData,
+			thresholds
+		})
+
+		const setupPlotlinesData =
+			plotlinesSeriesData &&
+			plotlinesSeriesData.seriesConfigsList[0];
+
+		// console.log('plotlinesSeriesData', this.seriesConfig.plotlinesSeriesData)
+		this.transformator_settings.specification.setupMultiviewThresholdsData.plotLinesSettings = setupPlotlinesData;
+
+		this.options.series = this.generateSeries({
+			seriesConfig: this.seriesConfig,
+			seriesEvents: this.seriesEvents,
+			chart_id: this.chart_id
+		});
+	}
+
 	// ----------------
 	checkIsHasStatistics() {
 		return Object.keys(this.fetched_statistics_data).some(key => {
@@ -2749,13 +2819,29 @@ class MultiViewChart extends ChartBase {
 					}
 				}).then(({value}) => {
 					// console.log('multi_views_alerts', value)
-					const ri = this.requestsList[0];
-					const sensorId = ri.sensor_id;
+					// const ri = this.requestsList[0];
+					const thresholds = value.thresholds.filter(
+						item => item.type != MULTIVIEW_ALARM_TYPES.COMPARE
+					);
 
-					this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = {
-						...this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`],
-						issue_alerts: value.issue_alerts
-					};
+					this.requestsList.forEach((ri, idx) => {
+						const sensorId = ri.sensor_id;
+						// console.log('statistics', this.fetched_statistics_data)
+						this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] || {};
+						this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`].issue_alerts = !idx ? value.issue_alerts : null;
+						this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`].includePlotlinesSeriesData = !idx;
+						this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`].thresholds = thresholds;
+					});
+					// ------------------------
+					// if (thresholds.length) {
+						const parameterItem = this.requestsList[0];
+						this.setupSeriesByThresholds({
+							parameterItem,
+							thresholds
+						})
+					// }
+					// console.log('fetched_statistics_data', this.fetched_statistics_data)
+					// ------------------------
 
 					this.checkStatisticsResponses({requestsQuantity});
 				}).catch(() => {
@@ -2775,11 +2861,10 @@ class MultiViewChart extends ChartBase {
 						.then(({statistics}) => {
 							// console.log('2 response', response)
 							try {
-								this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = {
-									...this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`],
-									parameter_item: ri,
-									statistics
-								};
+								this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] = this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`] || {};
+								this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`].parameter_item = ri;
+								this.fetched_statistics_data[`sensor_${sensorId}-parameter_${ri.id}`].statistics = statistics;
+								
 								this.checkStatisticsResponses({requestsQuantity});
 							} catch (e) {
 								console.warn(e);

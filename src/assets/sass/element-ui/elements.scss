@@ -5,8 +5,11 @@ body {
 		transform: translateZ(0);
 	}
 
-	--el-component-size: 100%;
-	--el-input-height: 100%;
+	--el-component-size: unset;
+	--el-input-height: unset;
+	--el-date-editor-width: 100%;
+	--el-dialog-margin-top: 0;
+
 
 	.el-input  {
 		height: $formElementsHeight;
@@ -84,6 +87,18 @@ body {
 		}
 	}
 
+	.el-date-editor.el-input {
+		width: 100%;
+
+		.el-input__prefix-inner,
+		.el-input__suffix-inner {
+			width: auto;
+			padding: 0 3px !important;
+
+			.el-icon {margin: 0;}
+		}
+	}
+
 	.datepicker-container {
 		&:not(.no-max-width) {max-width: 237px;}
 
@@ -108,6 +123,12 @@ body {
 			border: 1px solid #DEE2E6;
 			border-radius: 4px;
 			box-sizing: border-box;
+
+			&.el-input {
+				padding-top: 0;
+				padding-bottom: 0;
+				padding-right: 3px;
+			}
 
 			&.el-input > .el-input__wrapper	{
 				height: 40px;
@@ -148,12 +169,21 @@ body {
 			max-width: 130px;
 			min-width: 130px;
 
+			.el-date-editor {
+				height: 30px !important;
+				line-height: 29px;
+				
+				.el-input__wrapper {
+					height: 28px !important;
+				}
+			}
+
 			.el-input {
 				.el-input__prefix {left: 5px;}
 
 				.el-input__inner {
-					padding-left: 30px;
-					padding-right: 15px;
+					// padding-left: 30px;
+					padding-right: 10px;
 				}
 
 				.el-input__icon {line-height: 30px;}
@@ -254,9 +284,8 @@ body {
 	.el-select {
 		width: 100%;
 
-		.el-select__wrapper {
-			padding-top: 0;
-			padding-bottom: 0;
+		.el-select__selection {
+			// min-width: 100px;
 		}
 
 		&.el-button > .el-select__wrapper {border: 0;}
@@ -309,21 +338,25 @@ body {
 			border: none;
 		}
 
-			.el-input__suffix {
-				// right: 0;
-				.el-select__caret {
-					line-height: $formElementsHeight;
-					&:before {
-						position: relative;
-						top: -2px;
-					}
+		.el-input__suffix {
+			// right: 0;
+			.el-select__caret {
+				line-height: $formElementsHeight;
+				&:before {
+					position: relative;
+					top: -2px;
 				}
 			}
+		}
 
 		.el-select__wrapper {
 			height: auto;
 			border: 1px solid $formElementsBorderColor;
 			box-shadow: none !important;
+			padding-top: 0;
+			padding-bottom: 0;
+			min-width: 130px;
+
 			// background-color: transparent;
 
 			&:focus, &.is-focused {
@@ -422,6 +455,10 @@ body {
 
 	.el-button, .el-button:focus  {
 		.icomoon {min-width: 16px;}
+		& > .el-select__wrapper {
+			background-color: transparent;
+		}
+
 
 		&.link {
 			border: none;
@@ -711,6 +748,8 @@ body {
 
 	.el-dialog {
 		padding: 0;
+		margin-top: 0;
+		margin-bottom: 0;
 
 		.el-dialog__body {
 			padding: 25px 25px 30px;
@@ -840,6 +879,7 @@ body {
 	.el-select-dropdown {max-width: 99%;}
 
 	.el-popover {
+		box-sizing: content-box !important;
 		// border-radius: 0 !important;
 		.el-popover__title {
 			text-align: center;
@@ -855,6 +895,12 @@ body {
 			text-transform: capitalize;
 		}
 	}
+
+	.el-popper.el-tooltip {
+		&.is-dark > * > *{
+			color: #fff !important;
+		}
+	} 
 
 	/*.el-picker-panel {
 		.el-date-range-picker__time-header {

@@ -49,10 +49,10 @@
 				<ElButton
 					v-else
 					:disabled="action.isDisabled"
-					:class="['action-button', action.className || '']"
+					:class="['action-button', legacyTypeClass, action.className || '']"
 					:loading="isProccessing"
 					:size="buttonSize || 'small'"
-					:type="action.type"
+					:type="buttonType"
 					:icon="elButtonIcon"
 					@click="executeAction"
 				>
@@ -90,6 +90,7 @@ import { computed, defineAsyncComponent } from 'vue';
 import { ElButton, ElPopover } from 'element-plus';
 import { getObjectVal, validateBySettings } from '@/helpers';
 import { useNavigation } from '@/composables/mixins/useNavigation';
+import { useGlobalStore } from '@/stores/GlobalStore';
 
 const DynamicComponentWrapper = defineAsyncComponent(
 	() => import('../common/DynamicComponentWrapper.vue')
@@ -121,6 +122,18 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const { changeRoute } = useNavigation();
+const globalStore = useGlobalStore();
+const validButtonTypes = new Set(['default', 'primary', 'success', 'warning', 'info', 'danger', 'text', '']);
+
+const buttonType = computed(() => {
+	const type = props.action.type || '';
+	return validButtonTypes.has(type) ? type : '';
+});
+
+const legacyTypeClass = computed(() => {
+	const type = props.action.type || '';
+	return type && !validButtonTypes.has(type) ? type : '';
+});
 
 const preparedLink = computed(() => {
 	const { action, rowData } = props;
@@ -212,8 +225,7 @@ const executeLink = () => {
 	}
 
 	if (action.forceRerender) {
-		// TODO: Implement forceRerender in store
-		console.warn('[TableAction] forceRerender not implemented');
+		globalStore.forceRerender(action.forceRerender);
 	}
 };
 

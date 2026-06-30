@@ -48,7 +48,7 @@ const tableSettings = computed(() =>
 			{ prop: 'model.name', label: 'Part_number' },
 		]),
 		expandedRowSettings: {
-			componentPath: 'views/Equipments/Details/AnaloguesSubTypesList',
+			componentFileLoader: () => import('@/views/Equipments/Details/AnaloguesSubTypesList.vue')
 		},
 		operations: {
 			actions: [

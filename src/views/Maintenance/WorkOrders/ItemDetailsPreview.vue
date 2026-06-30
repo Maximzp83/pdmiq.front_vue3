@@ -397,6 +397,8 @@ const editItem = () => {
 	});
 };
 
+const editWOFromLogsList = editItem;
+
 const handleUnlockWorkOrder = () => {
 	if (!itemData.value?.id) return;
 	unlockWorkOrder({ itemId: itemData.value.id }).then(() => {
@@ -407,6 +409,7 @@ const handleUnlockWorkOrder = () => {
 
 defineExpose({
 	editItem,
+	editWOFromLogsList,
 	handlePrintWO,
 	handleUnlockWorkOrder,
 });

@@ -18,12 +18,15 @@ import { Lang } from '@/localization';
 
 import {
 	ALERT_RULES,
+	ALERT_TYPES,
 	alertTypesList,
 	fftTypesList,
 	FFT_TYPES,
 	sensorTypesList,
 	fftLockStatusesList,
-	FFT_LOCK_STATUSES
+	FFT_LOCK_STATUSES,
+	MULTIVIEW_ALARM_TYPES,
+	SENSOR_THRESHOLD_TYPES
 } from '@/constants/global';
 import {
 	lubeTypesObj,
@@ -43,6 +46,8 @@ import {
 	ncdAxisList,
 	thresholdUpdateSourceTypesList,
 } from './enums';
+import { warningColor, alarmColor, blueColor } from '../../enums';
+
 
 const getThresholdUpdateSource = source => {
 	const sourceItem = findItemBy('id', +source, thresholdUpdateSourceTypesList());
@@ -400,6 +405,97 @@ const setupPlotlinesData1 = historyPayload => {
 	};
 };
 
+const buildPlotlinesSeriesDataByThresholds1 = ({thresholds, responseDataKey}) => {
+	const seriesConfigsList = {
+		0: []
+	}
+
+	try {
+		const thresholdsFinal = thresholds.filter(
+			item => item.type != MULTIVIEW_ALARM_TYPES.COMPARE
+		);
+		
+		thresholdsFinal.forEach(ti => {
+			const {	type, id } = ti;
+			const warning_template = type === MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH ? 
+				'sensor.humidity_warning_threshold' : 'sensor.warning_threshold';
+
+			seriesConfigsList[0].push(
+				{
+					threshold_id: id,
+					value_key: 'alarm_level',
+					id: `alarm_threshold-serie-${id}`,
+					data_path: `alarm_zone_threshold-${id}`,
+					responseDataKey,
+					template: 'sensor.alarm_threshold',
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.ALARM } }
+				},
+				{
+					threshold_id: id,
+					value_key: 'warning_level',
+					id: `warning_threshold-serie-${id}`,
+					data_path: `warning_zone_threshold-${id}`,
+					responseDataKey,
+					template: warning_template,
+					inject: { customSettings: { threshold_level: SENSOR_THRESHOLD_TYPES.WARNING } }
+				}
+			)
+		})
+	} catch (e) {
+		console.warn(e);
+	}
+
+	return {seriesConfigsList};
+};
+
+const setupMultiviewPlotlinesData1 = payload => {
+	const {
+		plotLinesSettings,
+		first_statistics_item,
+		last_statistics_item,
+		thresholds
+	} = payload;
+
+	let max = 0;
+	let min = 99999999;
+
+	let	plotlinesSeriesData = {};
+	let plotlinesMaxValues = [];
+	let plotlinesMinValues = [];
+
+	if (last_statistics_item && last_statistics_item.length) {
+		plotLinesSettings.forEach(setting => {
+			// console.log(setting)
+			const { data_path, threshold_id, value_key } = setting;
+			const thresholdItem = findItemBy('id', threshold_id, thresholds);
+
+			if (thresholdItem) {
+				plotlinesSeriesData[data_path] = [
+					{ x: first_statistics_item[0], y: thresholdItem[value_key] },
+					{ x: last_statistics_item[0], y: thresholdItem[value_key] }
+				];
+
+				if (thresholdItem[value_key] > max) {
+					max = thresholdItem[value_key];
+				}
+
+				if (thresholdItem[value_key] < min) {
+					min = thresholdItem[value_key];	
+				}
+			}
+		});
+	}
+
+	plotlinesMinValues.push(min);
+	plotlinesMaxValues.push(max);
+
+	return {
+		plotlinesSeriesData,
+		plotlinesMaxValues,
+		plotlinesMinValues
+	};
+};
+
 const setupLubeStatistics1 = ({ lubeData, pumpData }) => {
 	const { history } = lubeData;
 
@@ -549,6 +645,66 @@ const setupCrashesStatistics1 = (crashesData, crashText) => {
 		} else {
 			crashes_statistics.push(stat_item);
 		}
+	}
+
+	return {
+		crashes_statistics: crashes_statistics,
+		acute_statistics: acute_statistics,
+		chronic_statistics: chronic_statistics
+	};
+};
+
+const setupMultiviewCrashesStatistics1 = (crashesData, crashText) => {
+	let crashes_statistics = [];
+	let acute_statistics = [];
+	let chronic_statistics = [];
+	const alertTypesListArray = alertTypesList();
+	// console.log(warningColor, alarmColor, blueColor);
+
+	for (let i = 0; i < crashesData.length; i++) {
+		const { created_at, alert_type, id, threshold_type } = crashesData[i];
+		const alert_type_item = findItemBy('id', alert_type, alertTypesListArray) || {};
+		// const alert_rule_item = findItemBy('id', alert_rule, alertRulesList) || {};
+		let title = alert_type_item.name[0].toUpperCase();
+		let tooltip_text = '';
+		let shape = '';
+		let color;
+
+		if (threshold_type === MULTIVIEW_ALARM_TYPES.COMPARE) {
+			title = 'D';
+			tooltip_text = Lang.tt('Difference') + ' ';
+		}
+		
+		tooltip_text += crashText || alert_type_item.short_name || alert_type_item.name;
+
+		if (alert_type === ALERT_TYPES.WARNING) {
+			shape = 'url(/static/img/icons/warning_flag.svg)';
+			color = warningColor;
+		} else if (alert_type === ALERT_TYPES.ALARM || alert_type === ALERT_TYPES.HIGH_ALARM) {
+			shape = 'url(/static/img/icons/alarm_flag.svg)';
+			color = alarmColor;
+		} else if (alert_type === ALERT_TYPES.LOW_ALARM) {
+			shape = 'url(/static/img/icons/low_alarm_flag.svg)';
+			color = blueColor;
+		}
+
+		let stat_item = {
+			x: Date.parse(created_at),
+			title,
+			text: tooltip_text,
+			pointId: id,
+			shape,
+			style: { color }
+			// icon: alert_rule_item.icon
+		};
+
+		/*if (alert_rule === ALERT_RULES.ACUTE) {
+			acute_statistics.push(stat_item);
+		} else if (alert_rule === ALERT_RULES.CHRONIC) {
+			chronic_statistics.push(stat_item);
+		} else {
+		}*/
+		crashes_statistics.push(stat_item);
 	}
 
 	return {
@@ -1740,6 +1896,12 @@ export const setupLubeLockLogStatistics = payload => setupLubeLockLogStatistics1
 
 export const setupCrashesStatistics = (crashesData, crashText) =>
 	setupCrashesStatistics1(crashesData, crashText);
+export const setupMultiviewCrashesStatistics = (crashesData, crashText) =>
+	setupMultiviewCrashesStatistics1(crashesData, crashText);
+export const setupMultiviewPlotlinesData = payload => setupMultiviewPlotlinesData1(payload);
+export const buildPlotlinesSeriesDataByThresholds = thresholds =>
+	buildPlotlinesSeriesDataByThresholds1(thresholds);
+
 export const setupGainAdjustmentsStatistics = adjustmentsData =>
 	setupGainAdjustmentsStatistics1(adjustmentsData);
 export const setupNotesStatistics = notesData => setupNotesStatistics1(notesData);

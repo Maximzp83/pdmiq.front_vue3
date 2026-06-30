@@ -250,6 +250,9 @@ export default {
 
 		multiViewChartsList: that => that.multiViewData ? Object.freeze(that.multiViewData.multi_view_graphs) : [],
 
+		// multiViewChartsList: that => that.multiViewData ? [Object.freeze(that.multiViewData.multi_view_graphs)[0]] : [],
+
+
 		additionalProps: () => ({
 			customMock: true,
 			chartWrapperClass: 'content-row',

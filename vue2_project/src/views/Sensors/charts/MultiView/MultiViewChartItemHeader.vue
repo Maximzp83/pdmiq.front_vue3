@@ -1,6 +1,12 @@
 <template>
 	<div class="card-header chart-card-header capitalize">
 		<!-- <button @click="zoomYAxis">+</button> -->
+		<!-- <ul class="flex">
+			<li
+				v-for="(color, index) in colorsList2"
+				:style="`backgroundColor: ${ color }; height: 10px; width: 10px;`"
+			></li>
+		</ul> -->
 		<div class="flex mrow wrap align-center left-part">
 			<div class="title-block mcol-xs-12 mcol-sm-auto" v-html="chartTitle"></div>
 			<div class="zoom-block-container mcol-xs-9 mcol-sm-auto">
@@ -55,6 +61,7 @@
 
 <script>
 import { eventHandler } from '@/mixins';
+// import { colorsList2 } from '@/modules/charts_factory/enums';
 
 export default {
 	mixins: [eventHandler()],
@@ -70,6 +77,7 @@ export default {
 	},
 
 	computed: {
+		// colorsList2: () => colorsList2,
 		// multiViewData: that => that.propsData.multiViewData,
 		showThresoldsDialog: that => that.dynamicProps.showThresoldsDialog,
 

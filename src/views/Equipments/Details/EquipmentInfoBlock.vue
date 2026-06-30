@@ -251,7 +251,7 @@
 import { computed, nextTick, onMounted, reactive, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { mergeArrays } from '@/helpers';
+import { getObjectVal, mergeArrays } from '@/helpers';
 import { getImgTypeName } from '@/helpers/specialHelpers';
 import { MAINTENANCE_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
@@ -373,6 +373,19 @@ const createWOButtonFormSetup = Object.freeze([
 	{ formKey: 'asset_id', valKey: 'asset_id' },
 	{ formKey: 'equipment_id', valKey: 'id' },
 ]);
+const creationWOModalSettings = computed(() =>
+	Object.freeze({
+		itemName: tt('Work_Order'),
+		editModalProp: 'editModalClassic',
+		modalClassName: 'fixed-header-footer small-header small-footer',
+		className: 'maintenance-modal',
+		formComponentFileLoader: () => import('@/views/Maintenance/MaintenanceFormWrapper.vue'),
+		additionalModalSettings: {
+			switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
+			...woFilters.value,
+		},
+	}),
+);
 
 const getOptionValue = (option) => (option.raw_values || []).join(' ');
 const setFilters = (range) => {
@@ -388,6 +401,26 @@ const togglePreviewModal = (id) => {
 		data: {
 			picturesList: imagesList.value,
 			pictureId: id,
+		},
+		onward: true,
+	});
+};
+const setupFormSettings = ({ row, formSetup }) => {
+	const settings = {};
+	formSetup.forEach((fi) => {
+		settings[fi.formKey] = getObjectVal(row, fi.valKey);
+	});
+	return settings;
+};
+const handleCreateWorkOrderButton = (payload) => {
+	emit('event', {
+		eventName: 'handleCreateWorkOrderButton',
+		data: {
+			settings: {
+				...creationWOModalSettings.value,
+				show: true,
+				formSettings: setupFormSettings(payload),
+			},
 		},
 		onward: true,
 	});
@@ -412,7 +445,7 @@ const setupInfoBlocksHeights = () => {
 	}, 200);
 };
 
-const { handleEvent } = useEventHandler({}, emit);
+const { handleEvent } = useEventHandler({ handleCreateWorkOrderButton }, emit);
 
 watch(
 	() => props.equipmentData,

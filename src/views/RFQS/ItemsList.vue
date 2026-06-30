@@ -12,17 +12,15 @@
 						searchbarClass="ml-auto"
 						@event="handleEvent"
 					>
-						<template #middle>
-							<div class="mcol-xs-12 mcol-sm-4 radio-buttons-wrapper">
-								<RadioButtonsBlock
-									:model-value="filters.type"
-									:settings="radioBlockOptions"
-									:optionsList="filterButtonsList"
-									@update:model-value="handleRadioFilters"
-									@onChange="handleRadioFilters"
-								/>
-							</div>
-						</template>
+						<div class="mcol-xs-12 mcol-sm-4 radio-buttons-wrapper">
+							<RadioButtonsBlock
+								:model-value="filters.type"
+								:settings="radioBlockOptions"
+								:optionsList="filterButtonsList"
+								@update:model-value="handleRadioFilters"
+								@onChange="handleRadioFilters"
+							/>
+						</div>
 					</Filterbar>
 
 					<CustomDataListTable
@@ -71,6 +69,8 @@ const props = defineProps({
 	equipmentData: { type: Object, default: null },
 	editInModal: Boolean,
 	fromCard: Boolean,
+	preventSetNavbar: Boolean,
+	additionalModalSettings: { type: Object, default: null },
 });
 
 const authStore = useAuthStore();
@@ -95,6 +95,8 @@ const {
 			userId: authStore.authUser?.id,
 			equipmentId: props.equipmentData?.id || null,
 		},
+		preventSetNavbar: props.preventSetNavbar,
+		additionalModalSettings: props.additionalModalSettings,
 	},
 });
 
@@ -125,7 +127,7 @@ const tableSettings = computed(() =>
 const radioBlockOptions = Object.freeze({
 	hideTitle: true,
 	buttonType: 'info',
-	className: 'filled inverted',
+	className: 'filled inverted small',
 	clearable: true,
 });
 const filterButtonsList = Object.freeze([

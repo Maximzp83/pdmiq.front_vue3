@@ -142,6 +142,7 @@ import PdmButton from './PdmButton.vue';
 const { tt, translate } = Lang;
 
 defineOptions({ name: 'EquipmentDetailsPage' });
+const emit = defineEmits(['event']);
 
 const route = useRoute();
 const router = useRouter();
@@ -195,6 +196,7 @@ const tabsList = computed(() =>
 const navbarSettings = computed(() => {
 	const settings = {
 		showStandardNavItem: true,
+		showFilter: false,
 		pageTitle: `${tt('Item')} ${tt('Details')}`,
 	};
 
@@ -390,6 +392,19 @@ const updateEquipment = (equipment) => {
 		equipmentsList.value[found.index].is_rpm_visible = equipment.is_rpm_visible;
 	}
 };
+const togglePreviewModal = (data) => {
+	emit('event', {
+		eventName: 'togglePreviewModal',
+		data,
+		onward: true,
+	});
+};
+const handleCreateWorkOrderButton = ({ settings }) => {
+	if (settings) {
+		// console.log(settings);
+		globalStore.show_edit_modal(settings);
+	}
+};
 const initialPageSetup = () => {
 	fetchItem(routeParamsId.value);
 };
@@ -398,7 +413,9 @@ const { handleEvent } = useEventHandler({
 	rfqSuccess,
 	forceRerender,
 	reloadPage,
+	togglePreviewModal,
 	updateEquipment,
+	handleCreateWorkOrderButton,
 }, null);
 
 watch(navbarSettings, (settings) => globalStore.setup_navbar(settings), { immediate: true });

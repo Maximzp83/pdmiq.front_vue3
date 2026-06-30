@@ -18,7 +18,7 @@
 							:optionsList="productionLinesList"
 							:placeholder="tt('Production_Line')"
 							:value="filters.productionLineId"
-							@change="(id) => setFilters({ productionLineId: id, machineId: null, assetId: null, equipmentId: null })"
+							@change="(id) => setFilters({ productionLineId: id, machineId: null })"
 						/>
 					</div>
 
@@ -30,38 +30,12 @@
 							:optionsList="machinesList"
 							:placeholder="tt('Machine')"
 							:value="filters.machineId"
-							@change="(id) => setFilters({ machineId: id, assetId: null, equipmentId: null })"
+							@change="(id) => setFilters({ machineId: id })"
 						/>
 					</div>
 
-					<div class="filter-item">
-						<FetchByQuerySelect
-							clearable
-							enableLoadmore
-							:loadmoreIsActive="assetsLoadmoreIsActive"
-							:value="filters.assetId"
-							:settings="assetQueryOptions"
-							:placeholder="tt('Asset')"
-							@input="(id) => setFilters({ assetId: id, equipmentId: null })"
-						/>
-					</div>
-
-					<div class="filter-item">
-						<FetchByQuerySelect
-							clearable
-							enableLoadmore
-							:loadmoreIsActive="equipmentsLoadmoreIsActive"
-							:value="filters.equipmentId"
-							:settings="equipmentsQueryOptions"
-							:placeholder="tt('item')"
-							:setupLabelSettings="equipmentLabelOptions"
-							@input="(id) => setFilters({ equipmentId: id })"
-						/>
-					</div>
-
-					<div class="filter-item ml-auto">
+					<div v-if="!hideDatepicker" class="filter-item">
 						<Datepicker
-							v-if="!hideDatepicker"
 							setupDaterangeFilter
 							enableShortcuts
 							:value="filters.daterange"
@@ -82,12 +56,28 @@
 						</el-button>
 					</div>
 
-					<div class="filter-item">
-						<SearchBar
-							:query="filters.q"
-							clearable
-							@submit="setFilters"
-						/>
+					<div class="filter-item ml-auto">
+						<el-popover placement="bottom" trigger="click" width="200" :close-delay="0">
+							<template #reference>
+								<el-button
+									type=""
+									class="action-button inverted"
+									native-type="button"
+								>
+									<i class="icomoon icon-search"></i>
+								</el-button>
+							</template>
+
+							<div class="search-block-wrapper relative">
+								<SimpleSpinner :active="itemsLoading" />
+								<SearchBar
+									class="search-block"
+									:query="filters.q"
+									clearable
+									@submit="(data) => setFilters(data)"
+								/>
+							</div>
+						</el-popover>
 					</div>
 				</Filterbar>
 
@@ -131,7 +121,7 @@ import { cleanDateString, convertMsToHours, findItemBy, prepareRangeParams } fro
 import { setupTrueFalseCellIcon } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
 import { api_request } from '@/api/request_provider';
-import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
+import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -143,10 +133,10 @@ import { useMaintenance } from '@/composables/useMaintenance';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import SearchBar from '@/components/common/SearchBar.vue';
+import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 import Datepicker from '@/components/common/Datepicker.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
-import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
 
 const { tt, translate } = Lang;
 
@@ -187,8 +177,8 @@ const propsFiltersRef = computed(() => ({
 const itemsNameRef = computed(() => {
 	const item = findItemBy('id', propsFiltersRef.value.type, maintenanceTypesList());
 	return Object.freeze({
-		one: tt(item?.label || 'Maintenance_Log'),
-		mult: tt(item?.label || 'Maintenance_Logs'),
+		one: item?.label || 'Maintenance Log',
+		mult: item?.label || 'Maintenance Logs',
 		instanceName: 'maintenance',
 	});
 });
@@ -196,43 +186,7 @@ const itemsNameRef = computed(() => {
 const methodsMap = {
 	fetch_production_lines: createGetRequest(ENTITIES.ProductionLines.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
-	fetch_assets: createGetRequest(ENTITIES.Assets.apiBase),
-	fetch_asset: createGetByIdRequest(ENTITIES.Assets.apiBase),
-	fetch_equipments: createGetRequest(ENTITIES.Equipments.apiBase),
-	fetch_equipment: createGetByIdRequest(ENTITIES.Equipments.apiBase),
 };
-
-const assetQueryOptions = computed(() =>
-	Object.freeze({
-		fetchAction: methodsMap.fetch_assets,
-		fetchByIdAction: methodsMap.fetch_asset,
-		payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
-		bindTo: [
-			{ getValue: () => globalFilters.value?.plantId, param: 'plantId', withoutClean: true },
-			{ getValue: () => filters.value.productionLineId, param: 'productionLineId' },
-			{ getValue: () => filters.value.machineId, param: 'machineId' },
-		],
-	}),
-);
-const equipmentsQueryOptions = computed(() =>
-	Object.freeze({
-		fetchAction: methodsMap.fetch_equipments,
-		fetchByIdAction: methodsMap.fetch_equipment,
-		payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
-		bindTo: [
-			{ getValue: () => globalFilters.value?.plantId, param: 'plantId', withoutClean: true },
-			{ getValue: () => filters.value.productionLineId, param: 'productionLineId' },
-			{ getValue: () => filters.value.machineId, param: 'machineId' },
-			{ getValue: () => filters.value.assetId, param: 'assetId' },
-		],
-	}),
-);
-const assetsLoadmoreIsActive = computed(() => !filters.value.machineId);
-const equipmentsLoadmoreIsActive = computed(() => !filters.value.machineId && !filters.value.assetId);
-const equipmentLabelOptions = Object.freeze({
-	accessors: ['brand_name', 'machine_name', 'production_line_name', 'location_name'],
-	delimeter: ',',
-});
 
 const {
 	itemsList,
@@ -510,7 +464,7 @@ const handleShowParentWO = ({ row }) => {
 	if (hasAccessToEdit.value) {
 		headerActions.push(...translate([
 			{
-				name: 'editItem',
+				name: 'editWOFromLogsList',
 				icon: 'icomoon icon-pencil',
 				tooltip_text: 'Edit',
 				type: 'transparent',

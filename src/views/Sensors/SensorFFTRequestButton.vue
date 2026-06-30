@@ -1,6 +1,6 @@
 <template>
-	<div :class="['fft-animation-container', {'disable-pointer': propsData.is_fft_processing.value}]">
-		<div :class="['fft-animation-wrapper', {'animate-fft': propsData.is_fft_processing.value}]">
+	<div :class="['fft-animation-container', { 'disable-pointer': isFftProcessing }]">
+		<div :class="['fft-animation-wrapper', { 'animate-fft': isFftProcessing }]">
 			<i class="icomoon icon-fft-wave"></i>
 		</div>
 	</div>
@@ -15,7 +15,9 @@ defineOptions({
 
 const props = defineProps({
 	propsData: { type: Object, default: () => ({}) },
+	itemData: { type: Object, default: () => ({}) },
 });
 
-// const isProcessing = computed(() => !!props.itemData?.is_fft_processing);
+const sensorData = computed(() => props.propsData?.id ? props.propsData : props.itemData);
+const isFftProcessing = computed(() => !!sensorData.value?.is_fft_processing);
 </script>

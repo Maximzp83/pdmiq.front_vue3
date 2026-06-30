@@ -182,6 +182,7 @@ const {
 	options: {
 		predefinedFilters: predefinedFilters.value,
 		tableRef: itemsTableRef,
+		preventSetNavbar: true
 	},
 });
 const { handleExportItem } = useExportListToFile();

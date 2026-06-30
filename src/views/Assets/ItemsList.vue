@@ -13,7 +13,7 @@
 				</div>
 			</div>
 
-			<div v-if="showToggleListButton ? filters.isShowList : true" :class="['card-content', { 'dragndrop-active': !draggingLocked }]">
+			<div v-if="showToggleListButton ? filters.isShowList : true" :class="['relative card-content', { 'dragndrop-active': !draggingLocked }]">
 				<Filterbar
 					:hideCreate="!hasAccessToCreate"
 					:hideDelete="!hasAccessToDelete"

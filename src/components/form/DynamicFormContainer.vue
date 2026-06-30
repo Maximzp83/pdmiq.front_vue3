@@ -29,7 +29,7 @@
 				:fromModal="true"
 				:settings="editModal.settings"
 				:formSettings="editModal.formSettings"
-				:additionalSettings="editModal.additionalSettings"
+				:additionalSettings="additionalSettings"
 				@event="handleEvent"
 			/>
 
@@ -139,6 +139,10 @@ const componentFile = computed(() => {
 	}
 	return null;
 });
+
+const additionalSettings = computed(() =>
+	editModal.value.additionalSettings || editModal.value.additionalModalSettings || {}
+);
 
 const modalTitle = computed(() => {
 	const modal = editModal.value;

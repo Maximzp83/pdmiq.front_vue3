@@ -170,11 +170,13 @@ export default class ChartBase {
 		});
 		
 		// seriesConfig - step 3
-		this.seriesConfig = this.modifySeriesConfig({
-			seriesConfig: this.seriesConfig,
-			requestsList: this.requestsList,
-			resources: this.resources
-		});
+		if (!settings.modifySeriesConfigOnResponse) {
+			this.seriesConfig = this.modifySeriesConfig({
+				seriesConfig: this.seriesConfig,
+				requestsList: this.requestsList,
+				resources: this.resources
+			});
+		}
 		// seriesConfig - finish (should be)
 
 		/*if (this.chart_id === 'chart-25') {

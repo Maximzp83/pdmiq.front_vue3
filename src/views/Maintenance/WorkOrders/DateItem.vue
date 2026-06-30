@@ -1,9 +1,9 @@
 <template>
 	<div class="flex align-center content-row">
-		<Datepicker v-model="localDate" :pickerOptions="pickerOptions" />
+		<Datepicker v-model="localDate" :pickerOptions="pickerOptions" class="mini span-block"/>
 		<el-button
 			type="danger"
-			class="action-button mini"
+			class="action-button mini span-block"
 			@click="$emit('onRemove', itemData.id)"
 		>
 			<i class="icomoon icon-cross"></i>

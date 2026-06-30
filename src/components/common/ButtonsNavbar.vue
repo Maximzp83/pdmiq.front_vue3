@@ -9,6 +9,7 @@
 							:class="[
 								'el-button ',
 								{ 'semi-bold': bold },
+								{ active: isActive(item) },
 								item.className || buttonType || ' el-button--primary inverted'
 							]"
 						>
@@ -24,6 +25,8 @@
 </template>
 
 <script setup>
+import { useRoute } from 'vue-router';
+
 defineProps({
 	itemsList: {
 		type: Array,
@@ -38,4 +41,13 @@ defineProps({
 	},
 	small: Boolean,
 });
+
+const route = useRoute();
+
+const normalizePath = (path = '') => path.replace(/\/+$/, '');
+const isActive = (item) => {
+	const itemPath = normalizePath(item.path);
+	const currentPath = normalizePath(route.path);
+	return Boolean(itemPath && (currentPath === itemPath || currentPath.startsWith(`${itemPath}/`)));
+};
 </script>

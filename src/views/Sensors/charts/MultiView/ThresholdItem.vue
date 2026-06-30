@@ -1,7 +1,7 @@
 <template>
 	<el-form
 		ref="itemFormRef"
-		label-width="150px"
+		label-width="122px"
 		class="item-edit-form"
 		:model="formData"
 		label-position="left"
@@ -9,7 +9,7 @@
 		<div class="text-center bold title article-title">{{ title }}</div>
 		<div class="flex mrow">
 			<div class="mcol-xs-11">
-				<div class="el-form-item">
+				<div class="el-form-item content-row">
 					<div class="flex mrow wrap align-center">
 						<el-form-item
 							:label="tt('constants.metric')"
@@ -47,7 +47,7 @@
 					</div>
 				</div>
 
-				<div v-if="enableTimeDelta" class="el-form-item">
+				<div v-if="isCompareType" class="el-form-item content-row">
 					<div class="flex mrow wrap align-center">
 						<el-form-item
 							required
@@ -68,21 +68,43 @@
 					</div>
 				</div>
 
-				<el-form-item
-					:label="isLowHighType ? tt('constants.high_zone') : tt('constants.Alarm_Zone')"
-					required
-					prop="alarm_level"
-				>
-					<el-input-number v-model="formData.alarm_level" :precision="3" />
-				</el-form-item>
+				<div class="flex mrow wrap content-row">
+					<div class="mcol-xs-12 mcol-sm-6">
+						<el-form-item
+							:label="isLowHighType ? tt('constants.high_zone') : tt('constants.Alarm_Zone')"
+							required
+							prop="alarm_level"
+						>
+							<el-input-number v-model="formData.alarm_level" :precision="3" />
+						</el-form-item>
 
-				<el-form-item
-					:label="isLowHighType ? tt('constants.low_zone') : tt('constants.Warning_Zone')"
-					required
-					prop="warning_level"
-				>
-					<el-input-number v-model="formData.warning_level" :precision="3" />
-				</el-form-item>
+						<el-form-item
+							:label="isLowHighType ? tt('constants.low_zone') : tt('constants.Warning_Zone')"
+							required
+							prop="warning_level"
+						>
+							<el-input-number v-model="formData.warning_level" :precision="3" />
+						</el-form-item>
+					</div>
+
+					<div v-if="!isCompareType" class="mcol-xs-12 mcol-sm-6">
+						<el-form-item :label="tt('phrases.acute_samples')" prop="acute_samples">
+							<el-input-number v-model="formData.acute_samples" :min="1" />
+						</el-form-item>
+
+						<el-form-item :label="tt('phrases.stable_samples')" prop="stable_samples">
+							<el-input-number v-model="formData.stable_samples" :min="1" />
+						</el-form-item>
+
+						<el-form-item
+							class="label_padding_top-0"
+							:label="tt('phrases.re_trigger_samples')"
+							prop="re_trigger_samples"
+						>
+							<el-input-number v-model="formData.re_trigger_samples" :min="1" />
+						</el-form-item>
+					</div>
+				</div>
 			</div>
 
 			<div>
@@ -136,6 +158,9 @@ const formData = ref({
 	warning_level: null,
 	alarm_level: null,
 	type: null,
+	acute_samples: 1,
+	stable_samples: 5,
+	re_trigger_samples: 30,
 });
 
 const isLowHighType = computed(() => formData.value.type === MULTIVIEW_ALARM_TYPES.STANDARD_LOW_HIGH);
@@ -144,7 +169,7 @@ const title = computed(() => {
 	return alarmType ? alarmType.name : '';
 });
 const metricUnitTypes = computed(() => metricUnitTypesList());
-const enableTimeDelta = computed(() => formData.value.type === MULTIVIEW_ALARM_TYPES.COMPARE);
+const isCompareType = computed(() => formData.value.type === MULTIVIEW_ALARM_TYPES.COMPARE);
 
 const setupMetricLabelMethod = (item) => `${item.sensor_name} - ${item.name}`;
 
@@ -177,6 +202,15 @@ const { validateItemForm, getFormData, removeItem } = useSubItem({
 				return null;
 			})
 			.filter(Boolean);
+		if (!isCompareType.value) {
+			delete nextData.time_delta;
+			delete nextData.time_delta_unit;
+		}
+		if (isCompareType.value) {
+			delete nextData.acute_samples;
+			delete nextData.stable_samples;
+			delete nextData.re_trigger_samples;
+		}
 		return nextData;
 	},
 	emit,

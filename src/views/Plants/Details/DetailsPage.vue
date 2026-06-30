@@ -301,9 +301,7 @@ watch(
 );
 
 onBeforeMount(() => {
-	if (navbarSettings) {
-		set_global_store('navbarSettings', navbarSettings);
-	}
+	set_global_store('navbarSettings', navbarSettings.value);
 });
 
 onMounted(handleScrollTo);

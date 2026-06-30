@@ -76,6 +76,7 @@
 
 			<el-form-item :label="tt('Type')" prop="data_set">
 				<el-select
+					@change="handleChangeDataSet"
 					v-model="formData.data_set"
 					:placeholder="`${tt('Select')} ${tt('dataset')}`"
 				>
@@ -548,6 +549,7 @@
 					:itemData="itemData"
 					:itemsName="itemsName"
 					:isNew="isNew"
+					:dataSetChanged="dataSetChanged"
 					:formulasList="formulasList"
 					:bearingsList="bearingsList"
 					:lubeTypesList="lubeTypesList"
@@ -776,6 +778,8 @@ export default {
 			maintenanceWarning: false,
 
 			runningThresholdItemsList: [],
+
+			dataSetChanged: false,
 
 			formData: {
 				type: SENSOR_TYPES.BANNER,
@@ -1143,9 +1147,6 @@ export default {
 		/*toConsole(val) {
 			console.log(val);
 		},*/
-		toggleLubeMatrix() {
-
-		},
 
 		toggleProp(propName) {
 			this[propName] = !this[propName];
@@ -1480,6 +1481,10 @@ export default {
 		handleCancel() {
 			// console.log(1)
 			this.$emit('onCancel');
+		},
+
+		handleChangeDataSet() {
+			this.dataSetChanged = true;
 		}
 	},
 

@@ -595,6 +595,7 @@ export default {
 		components: 'Componentes',
 		harmonics: 'Harmónicos',
 		editable: 'Editable',
+		difference: 'Diferencia',
 	},
 
 	sidebar_menu: {
@@ -1159,6 +1160,7 @@ export default {
 		lube_based_device_address_id: 'ID de dirección de dispositivo de lubricación',
 		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
 		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
+		re_trigger_samples: 'Muestras de re-disparo',
 		silence_mode: 'Modo Silencio',
 		visible_by_default: 'Visible por defecto',
 		silence_mode_until: 'Modo Silencio hasta',

@@ -305,7 +305,7 @@
 					>
 						<el-button
 							@click="callMethod('printHTML', navbarSettings.printButtonSettings)"
-							class="el-button--secondary"
+							class="el-button--secondary inverted"
 							native-type="button"
 						>
 							<i

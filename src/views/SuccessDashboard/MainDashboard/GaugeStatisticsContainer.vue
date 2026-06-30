@@ -1,61 +1,147 @@
 <template>
-	<div class="card block-item vertical-fluid">
-		<div class="card-header filled_2">
-			<div class="title semi-bold uppercase">{{ title || tt('Statistics') }}</div>
+	<div :class="['block-item gauge-chart statistics-block', `columnsNumber-${selectedColumnsNumber.id}`]">
+		<div v-if="showStatisticsOutsideChart" class="statistics-outside flex space-between">
+			<div class="semi-bold alarm-color">${{ statisticsData.redArea }}</div>
+			<div class="semi-bold green-color">${{ statisticsData.currentValue }}</div>
 		</div>
-		<div class="card-content">
+
+		<div class="relative chart-height-auto">
 			<CommonChartItemWrapper
+				ref="commonChartItemWrapperRef"
 				chartFactoryContainerName="MaintenanceChartFactoryContainer"
 				chartFactoryName="SuccessGaugeChart"
 				configsKey="maintenanceChartListsConfig"
-				:chartKey="chartKey || 'main'"
-				:rootFilters="rootFilters"
-				:predefinedFilters="predefinedFilters"
+				chartKey="main"
 				:additionalProps="chartProps"
+				:rootFilters="rootFilters"
 				:buildChartsPayloadProps="buildChartsPayload"
+				:chartWrapperIdx="9"
+				:rootStatisticsData="alreadyStatisticsData"
+				@event="handleEvent"
 			/>
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import Highcharts from 'highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
+import boost from 'highcharts/modules/boost';
+import annotations from 'highcharts/modules/annotations';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { initHighchartsModule } from '@/helpers/charts';
-import { Lang } from '@/localization';
+
 import CommonChartItemWrapper from '@/components/charts/CommonChartItemWrapper.vue';
-
-initHighchartsModule(highchartsMore, Highcharts);
-
-const { tt } = Lang;
 
 defineOptions({ name: 'SuccessDashboardGaugeStatisticsContainer' });
 
 const props = defineProps({
-	title: String,
-	chartKey: String,
-	plantItem: { type: Object, default: () => ({}) },
-	predefinedFilters: { type: Object, default: () => ({}) },
+	plantItem: { type: Object, default: () => null },
+	plantsList: { type: Array, default: null },
+	selectedColumnsNumber: { type: Object, default: () => ({}) },
+	showStatisticsOutsideChart: Boolean,
 	rootFilters: { type: Object, default: () => ({}) },
-	selectedColumnsNumber: { type: Object, default: () => ({ id: null }) },
+	allPlantsRoiStatistics: null,
 });
 
-const chartProps = computed(() =>
-	Object.freeze({
+const emit = defineEmits(['event']);
+
+const commonChartItemWrapperRef = ref(null);
+const statisticsData = ref({});
+const alreadyStatisticsData = ref(
+	props.plantsList
+		? {
+			billing_plan_cost: 0,
+			roi_cost: 0,
+		}
+		: null,
+);
+const hcInstance = computed(() => {
+	initHighchartsModule(highchartsMore, Highcharts);
+	initHighchartsModule(boost, Highcharts);
+	initHighchartsModule(annotations, Highcharts);
+	return Highcharts;
+});
+
+const chartProps = computed(() => {
+	let chartInstanceContainerPayload = {};
+
+	if (props.plantItem) {
+		chartInstanceContainerPayload = {
+			fetch_action_url: props.plantItem ? `plants/${props.plantItem.id}/roi-cost` : null,
+			billing_plan_cost: props.plantItem.billing_plan_cost,
+		};
+	}
+
+	return Object.freeze({
 		nodataMock: true,
 		showWithoutStatistics: true,
+		hcInstance: hcInstance.value,
+		chartInstanceContainerPayload,
 		useSimpleSpinnerAsPreloader: true,
-		hcInstance: Highcharts,
-		chartInstanceContainerPayload: {
-			fetch_action_url: props.plantItem?.id ? `plants/${props.plantItem.id}/roi-cost` : null,
-			billing_plan_cost: props.plantItem?.billing_plan_cost,
-		},
-	}),
-);
+	});
+});
 const buildChartsPayload = computed(() =>
 	Object.freeze({
 		selectedColumnsNumber: props.selectedColumnsNumber?.id,
 	}),
 );
+
+const callChartMethod = (method, data) => {
+	commonChartItemWrapperRef.value?.callChartMethod(method, data);
+};
+const handleChartContainerReady = (data) => {
+	if (data?.hasStatistics) {
+		const { base, redArea } = data.resultData.statistics_result.main.pointsData;
+		statisticsData.value = {
+			redArea,
+			currentValue: base[0],
+		};
+
+		emit('event', {
+			eventName: 'plantRoiStatisticsReady',
+			data: statisticsData.value,
+			onward: true,
+		});
+	}
+};
+const setupStatisticsData = (plantsList) => {
+	let billing_plan_cost = 0;
+	let roi_cost = 0;
+
+	if (plantsList) {
+		plantsList.forEach((plant) => {
+			billing_plan_cost += plant.billing_plan_cost;
+			roi_cost += plant.roi_cost;
+		});
+	}
+
+	return Object.freeze({
+		billing_plan_cost,
+		roi_cost,
+	});
+};
+
+const { handleEvent } = useEventHandler({
+	handleChartContainerReady,
+});
+
+watch(
+	() => props.allPlantsRoiStatistics,
+	(val) => {
+		if (!val) return;
+		alreadyStatisticsData.value = {
+			billing_plan_cost: val.redArea,
+			roi_cost: val.currentValue,
+		};
+
+		callChartMethod('handleResponse', alreadyStatisticsData.value);
+	},
+);
+
+defineExpose({
+	callChartMethod,
+	setupStatisticsData,
+});
 </script>

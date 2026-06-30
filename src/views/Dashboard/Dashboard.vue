@@ -49,6 +49,8 @@ const { tt } = Lang;
 
 defineOptions({ name: 'PlantDashboard' });
 
+const emit = defineEmits(['event']);
+
 const authStore = useAuthStore();
 const assetsStore = useAssetsStore();
 const equipmentsStore = useEquipmentsStore();
@@ -136,7 +138,7 @@ const resetChildFilters = () => {
 	]);
 };
 
-const { handleEvent } = useEventHandler({}, null);
+const { handleEvent } = useEventHandler({}, emit);
 
 watch(
 	() => globalFilters.value?.plantId,

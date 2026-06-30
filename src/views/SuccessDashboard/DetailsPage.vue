@@ -14,10 +14,7 @@
 							<component
 								:is="Component"
 								:key="route.fullPath"
-								:plantItem="plantItem"
-								:sensorsList="sensorsList"
-								:sensorsLoading="sensorsLoading"
-								preventSetNavbar
+								v-bind="childRouteProps"
 								@event="handleEvent"
 							/>
 						</transition>
@@ -42,6 +39,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useSensors } from '@/composables/useSensors';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ButtonsNavbar from '@/components/common/ButtonsNavbar.vue';
@@ -83,32 +81,34 @@ const navbarSettings = computed(() =>
 		pageTitle: tt('Customer_Success_Dashboard'),
 	}),
 );
+const childRouteProps = computed(() => ({
+	plantItem: plantItem.value,
+	sensorsList: sensorsList.value,
+	sensorsLoading: sensorsLoading.value,
+	preventSetNavbar: true,
+}));
 
-const fetchPlant = async (id) => {
-	plantItem.value = null;
-	if (!id) return;
-	plantsLoading.value = true;
-	try {
-		const { value } = await api_request.get(`/plants/${id}`, { itemId: id, notNotify: true });
-		plantItem.value = value;
-	} finally {
-		plantsLoading.value = false;
-	}
+const methodsMap = {
+	fetch_plant: ({ itemId } = {}) => api_request.get(`/plants/${itemId}`, { itemId, notNotify: true }),
+	fetch_sensors: ({ params } = {}) => fetchSensors(params, { notNotify: true }),
 };
 
-const fetchPlantSensors = async (id) => {
-	sensorsList.value = [];
-	if (!id) return;
-	sensorsLoading.value = true;
-	try {
-		const { value } = await fetchSensors({ max: -1, plantId: id }, { notNotify: true });
-		sensorsList.value = value || [];
-	} finally {
-		sensorsLoading.value = false;
-	}
+const { doFetchAction } = useRequestsList({ methodsMap });
+
+const fetchPlant = (id) => {
+	doFetchAction(methodsMap.fetch_plant, plantItem, plantsLoading, { itemId: id });
+};
+
+const fetchPlantSensors = (id) => {
+	doFetchAction(methodsMap.fetch_sensors, sensorsList, sensorsLoading, {
+		params: { max: -1, plantId: id },
+	});
 };
 
 const setupPageData = (id) => {
+	plantItem.value = null;
+	sensorsList.value = [];
+	if (!id) return;
 	fetchPlant(id);
 	fetchPlantSensors(id);
 };

@@ -18,6 +18,17 @@
 		</div>
 
 		<div class="card-content relative">
+			<CommonChartItemWrapper
+				ref="commonChartItemWrapper"
+				chartFactoryContainerName="MaintenanceChartFactoryContainer"
+				chartFactoryName="WObarChart"
+				configsKey="maintenanceChartListsConfig"
+				chartKey="main"
+				:rootFilters="finalFilters"
+				:additionalProps="chartProps"
+				@event="handleEvent"
+			/>
+
 			<div v-if="hasStatistics && statisticsData.breakdown_total_time" class="additional-group">
 				<ul>
 					<li>
@@ -46,6 +57,7 @@ import { useEventHandler } from '@/composables/mixins/useEmitter';
 const { tt } = Lang;
 
 const TableAction = defineAsyncComponent(() => import('@/components/table/TableAction.vue'));
+const CommonChartItemWrapper = defineAsyncComponent(() => import('@/components/charts/CommonChartItemWrapper.vue'));
 
 defineOptions({
 	name: 'ItemWOStatisticBlock',
@@ -64,6 +76,20 @@ const emit = defineEmits(['event']);
 const hasStatistics = ref(false);
 const chartContainerReady = ref(0);
 const commonChartItemWrapper = ref(null);
+
+const chartProps = computed(() =>
+	Object.freeze({
+		useSimpleSpinnerAsPreloader: true,
+		nodataMock: true,
+	})
+);
+
+const finalFilters = computed(() =>
+	Object.freeze({
+		...props.filters,
+		...(props.predefinedFilters || {}),
+	})
+);
 
 const statisticsData = computed(() => {
 	if (chartContainerReady.value && hasStatistics.value) {
@@ -112,6 +138,7 @@ const handleChartContainerReady = ({ chartContainerReady: ready, hasStatistics: 
 	hasStatistics.value = stats;
 	chartContainerReady.value = ready;
 };
+const chartLoadEvent = () => {};
 
-const { handleEvent } = useEventHandler({ handleChartContainerReady }, emit);
+const { handleEvent } = useEventHandler({ handleChartContainerReady, chartLoadEvent }, emit);
 </script>

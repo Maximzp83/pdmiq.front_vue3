@@ -261,7 +261,7 @@ const { togglePreviewModal, handleTitleClick } = useItemCard({
 	titleLinkRoute,
 	emit,
 });
-const { handleEvent } = useEventHandler({ handleTitleClick }, emit, 'itemCard');
+const { handleEvent } = useEventHandler({ handleTitleClick, togglePreviewModal }, emit, 'itemCard');
 const { setupDraggable, destroySortable } = useDragNdropSortable({
 	wrapperSelector: dragNdropWrapperSelector,
 	draggingLockedProp: draggingLocked,

@@ -10,12 +10,28 @@
 		>
 			<div class="el-form-item flex mrow wrap">
 				<div class="mcol-xs-12 mcol-sm-6">
-					<div class="flex mrow wrap inline-form-items-list inline-labels align-center">
-						<el-form-item prop="" class="relative mcol-xs-4 label-to-center" :label="tt('Time')">
+					<div
+						v-if="formData.parent_id && settings?.parentOrderData"
+						class="el-form-item mcol-xs-12 mcol-lg-6"
+					>
+						<div class="el-form-item__label">{{ tt('Work_Order') }} #</div>
+						<div
+							class="semi-bold link info-color"
+							@click="showParentOrder(settings.parentOrderData)"
+						>
+							{{ settings.parentOrderData.serial_number }} ({{ settings.parentOrderData.title }})
+						</div>
+					</div>
+
+					<div
+						v-if="!showJustInfo"
+						class="flex mrow wrap inline-form-items-list inline-labels align-center"
+					>
+						<el-form-item prop="" class="relative mcol-xs-4 label-to-center label-margin-bottom-0" :label="tt('Time')">
 							<el-switch v-model="isTotalActive" />
 						</el-form-item>
 
-						<div class="mcol-xs-3 semi-bold capitalize el-form-item__label p-0">
+						<div class="mcol-xs-3 semi-bold capitalize el-form-item__label p-0 flex align-center">
 							{{ tt('Total') }}
 						</div>
 					</div>
@@ -47,7 +63,7 @@
 
 					<el-form-item v-else prop="finish_time" :label="tt('time')" required class="mt-10 small-paddings-time">
 						<div class="flex mrow align-center">
-							<div class="mcol-xs-3 mini">
+							<div v-if="!showJustInfo" class="mcol-xs-3 mini">
 								<el-time-picker
 									v-model="formData.start_time"
 									value-format="HH:mm"
@@ -56,13 +72,21 @@
 								/>
 							</div>
 
-							<div class="mcol-xs-3 mini">
+							<div v-if="!showJustInfo" class="mcol-xs-3 mini">
 								<el-time-picker
 									v-model="formData.finish_time"
 									value-format="HH:mm"
 									format="HH:mm"
+									:picker-options="endTimePickerOptions"
 									:placeholder="tt('finish')"
 								/>
+							</div>
+
+							<div v-else class="mcol-xs-6">
+								<i class="el-input__icon el-icon-time section-title muted"></i>
+								<span class="el-range-input">
+									{{ `${formData.start_time} - ${formData.finish_time}` }}
+								</span>
 							</div>
 
 							<div class="mcol-xs-6 form-item">
@@ -72,52 +96,6 @@
 								<div class="semi-bold span-block inherit-color">{{ totalTime }}</div>
 							</div>
 						</div>
-					</el-form-item>
-
-					<el-form-item :label="tt('Reason')" prop="reason_type">
-						<CustomSelectV2
-							v-model="formData.reason_type"
-							clearable
-							:optionsList="maintenanceReasonTypesList"
-							:placeholder="tt('none')"
-						/>
-					</el-form-item>
-
-					<el-form-item v-if="formData.reason_type" :label="reasonTypeName" prop="breakdown_type">
-						<CustomSelectV2
-							v-model="formData.breakdown_type"
-							:optionsList="breakdownTypesList"
-							:placeholder="`${tt('Select')} ${tt('Type')}`"
-						/>
-					</el-form-item>
-
-					<el-form-item :label="tt('phrases.Problem_Solved')" prop="is_problem_solved">
-						<el-switch v-model="formData.is_problem_solved" :active-value="1" :inactive-value="0" />
-					</el-form-item>
-
-					<el-form-item :label="tt('phrases.Sanitization_of_Tools')" prop="is_sanitization_equipment">
-						<el-switch v-model="formData.is_sanitization_equipment" :active-value="1" :inactive-value="0" />
-					</el-form-item>
-
-					<el-form-item :label="tt('phrases.Acknowledge_by_supervisor')" prop="is_acknowledge_by_supervisor">
-						<el-switch v-model="formData.is_acknowledge_by_supervisor" :active-value="1" :inactive-value="0" />
-					</el-form-item>
-
-					<el-form-item :label="`${tt('Supervisor')} ${tt('notes')}`" prop="supervisor_notes">
-						<CustomInput v-model="formData.supervisor_notes" placeholder="-" />
-					</el-form-item>
-
-					<el-form-item :label="tt('Shift')" prop="shift">
-						<CustomSelectV2
-							v-model="formData.shift"
-							:optionsList="shiftValues"
-							:placeholder="`${tt('Select')} ${tt('shift')}`"
-							labelKey="label"
-						/>
-					</el-form-item>
-
-					<el-form-item :label="tt('Description')" prop="description" required>
-						<el-input v-model="formData.description" type="textarea" :rows="5" />
 					</el-form-item>
 
 					<div class="el-form-item">
@@ -130,6 +108,7 @@
 									keepFilePath
 									showDeleteButton
 									accept=" "
+									:disabled="showJustInfo"
 									:buttonText="tt('phrases.upload_files')"
 									:pictures="attachmentsList"
 								/>
@@ -141,87 +120,243 @@
 									multiple
 									keepFilePath
 									showImageClickOverlay
+									:disabled="showJustInfo"
 									:pictures="imagesList"
+									@onImgClick="togglePreviewModal"
 								/>
 							</el-form-item>
 						</div>
 					</div>
+
+					<div :class="['el-form-item', { showJustInfo }]">
+						<div
+							v-if="!showJustInfo"
+							class="flex mrow wrap inline-form-items-list inline-labels"
+						>
+							<el-form-item
+								prop="is_problem_solved"
+								class="relative mcol-xs-6"
+								:label="tt('phrases.Problem_Solved')"
+							>
+								<el-switch class="flex justify-end" v-model="formData.is_problem_solved" :active-value="1" :inactive-value="0" />
+							</el-form-item>
+
+							<el-form-item prop="reason_type" :label="tt('Reason')" class="mcol-xs-6">
+								<CustomSelectV2
+									v-model="formData.reason_type"
+									clearable
+									:optionsList="maintenanceReasonTypesList"
+									:placeholder="tt('none')"
+								/>
+							</el-form-item>
+
+							<el-form-item
+								class="mcol-xs-6"
+								prop="is_sanitization_equipment"
+								:label="tt('phrases.Sanitization_of_Tools')"
+							>
+								<el-switch class="flex justify-end" v-model="formData.is_sanitization_equipment" :active-value="1" :inactive-value="0" />
+							</el-form-item>
+
+							<el-form-item
+								class="mcol-xs-6"
+								prop="is_acknowledge_by_supervisor"
+								:label="tt('phrases.Acknowledge_by_supervisor')"
+							>
+								<el-switch class="flex justify-end" v-model="formData.is_acknowledge_by_supervisor" :active-value="1" :inactive-value="0" />
+							</el-form-item>
+						</div>
+					</div>
+
+					<el-form-item
+						:label="`${tt('Supervisor')} ${tt('notes')}`"
+						prop="supervisor_notes"
+						:class="{ showJustInfo }"
+					>
+						<CustomInput v-model="formData.supervisor_notes" placeholder="-" />
+					</el-form-item>
+
+					<el-form-item :label="tt('Shift')" prop="shift" :class="{ showJustInfo }">
+						<CustomSelectV2
+							v-model="formData.shift"
+							:optionsList="shiftValues"
+							:placeholder="showJustInfo ? '-' : `${tt('Select')} ${tt('shift')}`"
+							labelKey="label"
+						/>
+					</el-form-item>
+
+					<el-form-item
+						class="content-row"
+						prop="description"
+						:label="`${tt('phrases.Equipment_Breakdown')} / ${tt('Maintenance_Log')}`"
+						required
+					>
+						<div v-if="showJustInfo" class="el-form-item el-textarea">
+							<div
+								class="flex align-center el-input__inner el-textarea__inner"
+								v-html="formData.description || '-'"
+							></div>
+						</div>
+
+						<CustomInput
+							v-else
+							v-model="formData.description"
+							:placeholder="tt('text')"
+							type="textarea"
+							rows="5"
+						/>
+					</el-form-item>
 				</div>
 
-				<div class="mcol-xs-12 mcol-sm-6">
+				<div :class="['mcol-xs-12 mcol-lg-6', { showJustInfo }]">
 					<div :class="['card filled no-shadow el-form-item', { 'has-error': mainInstancesError }]">
 						<div class="card-content" @click="mainInstancesError = false">
 							<div class="semi-bold title article-title">{{ tt('Equipment') }}</div>
 
-							<el-form-item :label="tt('Production_Line')" prop="production_line_id">
-								<CustomSelectV2
-									v-model="formData.production_line_id"
-									filterable
-									clearable
-									:optionsLoading="productionLinesLoading"
-									:optionsList="productionLinesList"
-									:placeholder="tt('Production_Line')"
-									@focus="mainInstancesError = false"
-								/>
-							</el-form-item>
+							<div class="el-form-item mrow flex">
+								<div class="mcol-xs-9 fluid">
+									<el-form-item :label="tt('Production_Line')" prop="production_line_id">
+										<CustomSelectV2
+											v-model="formData.production_line_id"
+											filterable
+											clearable
+											:optionsLoading="productionLinesLoading"
+											:optionsList="productionLinesList"
+											:placeholder="showJustInfo ? '-' : `${tt('select')} ${tt('production_line')}`"
+											prefixIcon="icomoon icon-production_lines"
+											@focus="mainInstancesError = false"
+										/>
+									</el-form-item>
 
-							<el-form-item :label="tt('Machine')" prop="machine_id">
-								<CustomSelectV2
-									v-model="formData.machine_id"
-									filterable
-									clearable
-									:optionsLoading="machinesLoading"
-									:optionsList="machinesList"
-									:placeholder="tt('Machine')"
-									@focus="mainInstancesError = false"
-								/>
-							</el-form-item>
+									<el-form-item :label="tt('Machine')" prop="machine_id">
+										<CustomSelectV2
+											v-model="formData.machine_id"
+											filterable
+											clearable
+											:optionsLoading="machinesLoading"
+											:optionsList="machinesList"
+											:placeholder="showJustInfo ? '-' : `${tt('Select')} ${tt('machine')}`"
+											prefixIcon="icomoon icon-machines"
+											@focus="mainInstancesError = false"
+										/>
+									</el-form-item>
 
-							<el-form-item :label="tt('Asset')" prop="asset_id">
-								<CustomSelectV2
-									v-model="formData.asset_id"
-									filterable
-									clearable
-									:optionsLoading="assetsLoading"
-									:optionsList="assetsList"
-									:placeholder="tt('Asset')"
-									@focus="mainInstancesError = false"
-								/>
-							</el-form-item>
+									<el-form-item :label="tt('Asset')" prop="asset_id">
+										<FetchByQuerySelect
+											v-model="formData.asset_id"
+											@focus="mainInstancesError = false"
+											:disabled="!formData.machine_id"
+											clearable
+											filterable
+											enableLoadmore
+											:loadmoreIsActive="!formData.machine_id"
+											:optionsLoading="assetsLoading"
+											:optionsList="assetsList"
+											:settings="assetQueryOptions"
+											:placeholder="showJustInfo ? '-' : tt('Asset')"
+											prefixIcon="icomoon icon-assets"
+											@update:optionsLoading="assetsLoading = $event"
+											@update:optionsList="assetsList = $event"
+										/>
+									</el-form-item>
 
-							<el-form-item :label="tt('item')" prop="equipment_id">
-								<CustomSelectV2
-									v-model="formData.equipment_id"
-									filterable
-									clearable
-									:optionsLoading="equipmentsLoading"
-									:optionsList="equipmentsList"
-									:placeholder="tt('item')"
-									@focus="mainInstancesError = false"
-								/>
-							</el-form-item>
+									<el-form-item :label="tt('Item')" prop="equipment_id">
+										<FetchByQuerySelect
+											v-model="formData.equipment_id"
+											@focus="mainInstancesError = false"
+											:disabled="!formData.asset_id"
+											clearable
+											filterable
+											enableLoadmore
+											:loadmoreIsActive="!formData.asset_id"
+											:optionsLoading="equipmentsLoading"
+											:optionsList="equipmentsList"
+											:placeholder="showJustInfo ? '-' : tt('item')"
+											:settings="equipmentsQueryOptions"
+											:setupLabelSettings="equipmentLabelOptions"
+											prefixIcon="icomoon icon-equipments"
+											@update:optionsLoading="equipmentsLoading = $event"
+											@update:optionsList="equipmentsList = $event"
+										/>
+									</el-form-item>
+								</div>
+
+								<div v-if="formData.reason_type" class="mcol-xs-4 breakdown-radio-block">
+									<el-form-item prop="breakdown_type" :label="reasonTypeName">
+										<RadioButtonsBlock
+											v-if="!showJustInfo"
+											v-model="formData.breakdown_type"
+											:settings="breakdownTypeRadioOptions"
+											:optionsList="breakdownTypesList"
+										/>
+
+										<div v-else class="breakdown-radio-block">
+											<div class="radio-container">
+												<div
+													:class="[
+														'semi-bold radio-item',
+														{ visible: formData.breakdown_type === BREAKDOWN_TYPES.PRODUCTION_LINE },
+													]"
+												>
+													{{ tt('Breakdown') }}
+												</div>
+
+												<div
+													:class="[
+														'semi-bold radio-item',
+														{ visible: formData.breakdown_type === BREAKDOWN_TYPES.MACHINE },
+													]"
+												>
+													{{ tt('Breakdown') }}
+												</div>
+
+												<div
+													:class="[
+														'semi-bold radio-item',
+														{ visible: formData.breakdown_type === BREAKDOWN_TYPES.ASSET },
+													]"
+												>
+													{{ tt('Breakdown') }}
+												</div>
+											</div>
+										</div>
+									</el-form-item>
+								</div>
+							</div>
 						</div>
 					</div>
 
 					<div class="alarm-color content-row" v-show="mainInstancesError">
 						{{ tt('phrases.at_least_one_of_these_fields_is_required') }}
 					</div>
-
-					<el-form-item :label="tt('Task_procedure')" prop="task_procedure_id">
-						<CustomSelectV2
-							v-model="formData.task_procedure_id"
-							filterable
-							clearable
-							:optionsLoading="taskProceduresLoading"
-							:optionsList="taskProceduresList"
-							:placeholder="tt('Task_procedure')"
-						/>
-					</el-form-item>
 				</div>
 			</div>
 
 			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
 		</el-form>
+
+		<div v-if="showJustInfo && selectedTaskProcedure" class="section-row">
+			<div class="card">
+				<div class="card-header filled bold">{{ tt('TASK_PROCEDURES') }}</div>
+				<div class="card-content">
+					<div class="content-row article-title">
+						{{ selectedTaskProcedure.name }}
+					</div>
+
+					<div class="card">
+						<div class="card-content">
+							<CustomDataListTable
+								disableSelection
+								:itemsLoading="taskProceduresLoading"
+								:tableData="selectedTaskProcedure.processes"
+								:tableSettings="taskProcedureTableSettings"
+								:itemsName="taskProceduresName"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -239,12 +374,17 @@ import {
 import { required } from '@/constants/validation';
 import { getTimeDifference, findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
+import { useGlobalStore } from '@/stores/GlobalStore';
+import { useNotify } from '@/composables/useNotify';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
+import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
+import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
+import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 
 const { tt } = Lang;
 
@@ -259,6 +399,8 @@ const props = defineProps(buildProps({
 
 const emit = defineEmits(['submit', 'onCancel', 'event']);
 
+const globalStore = useGlobalStore();
+const { Notify } = useNotify();
 const itemFormRef = ref(null);
 const refsMap = reactive({});
 const productionLinesList = shallowRef([]);
@@ -306,6 +448,7 @@ const rules = {
 	description: required,
 };
 
+const showJustInfo = computed(() => !!props.settings?.showJustInfo);
 const maintenanceReasonTypesList = computed(() => Object.freeze(getMaintenanceReasonTypesList()));
 const breakdownTypesList = computed(() => Object.freeze(getBreakdownTypesList()));
 const reasonTypeName = computed(() => {
@@ -331,12 +474,103 @@ const totalTime = computed(() => {
 	}
 	return 0;
 });
+const endTimePickerOptions = computed(() => {
+	const { start_time: startTime } = formData.value;
+	if (startTime) {
+		const splitTime = startTime.split(':');
+		const newDate = new Date(2000, 0, 1, +splitTime[0], +splitTime[1] + 15);
+		const hours = newDate.getHours();
+		const minutes = newDate.getMinutes();
+
+		return Object.freeze({
+			selectableRange: [
+				`00:00:00 - ${splitTime[0]}:${splitTime[1]}:00`,
+				`${hours}:${minutes}:00 - 23:59:00`,
+			],
+		});
+	}
+
+	return Object.freeze({
+		selectableRange: '00:00:00 - 23:59:00',
+	});
+});
 const plantId = computed(
 	() =>
 		props.itemData?.plant_id ||
 		props.additionalSettings?.plantId ||
 		formData.value.plant_id ||
 		null,
+);
+const assetQueryOptions = computed(() =>
+	Object.freeze({
+		fetchAction: methodsMap.fetch_assets,
+		fetchByIdAction: methodsMap.fetch_asset,
+		params: {
+			plantId: plantId.value,
+			machine_id: formData.value.machine_id,
+			production_line_id: formData.value.production_line_id,
+		},
+	})
+);
+const equipmentsQueryOptions = computed(() =>
+	Object.freeze({
+		fetchAction: methodsMap.fetch_equipments,
+		fetchByIdAction: methodsMap.fetch_equipment,
+		params: {
+			plantId: plantId.value,
+			machineId: formData.value.machine_id,
+			assetId: formData.value.asset_id,
+		},
+	})
+);
+const equipmentLabelOptions = Object.freeze({
+	accessors: ['brand_name', 'machine_name', 'production_line_name', 'location_name'],
+	delimeter: ',',
+});
+const breakdownTypeRadioOptions = Object.freeze({
+	className: 'radio-input',
+	hideLabel: true,
+});
+const selectedTaskProcedure = computed(() => {
+	if (
+		showJustInfo.value &&
+		props.additionalSettings?.taskProcedure &&
+		taskProceduresList.value.length
+	) {
+		return Object.freeze(
+			findItemBy('id', props.additionalSettings.taskProcedure.id, taskProceduresList.value)
+		);
+	}
+	return null;
+});
+const taskProcedureTableSettings = computed(() =>
+	Object.freeze({
+		columns: Lang.translate([
+			{ label: 'Name', prop: 'name' },
+			{ label: 'Notes', prop: 'notes' },
+			{ label: 'phrases.Expected_Time', prop: 'expected_time' },
+			{
+				label: 'Parts',
+				prop: 'parts',
+				meta: {
+					fromArray: { subProp: 'stockPart.part_number', delimeter: ' ' },
+				},
+			},
+			{
+				label: '',
+				prop: 'parts',
+				meta: {
+					fromArray: { subProp: 'quantity', delimeter: ' ' },
+				},
+			},
+		]),
+	})
+);
+const taskProceduresName = computed(() =>
+	Object.freeze({
+		one: tt('Process'),
+		mult: tt('Processes'),
+	})
 );
 
 const methodsMap = {
@@ -432,6 +666,31 @@ const validateTimeInput = (time, prop) => {
 
 const calcTotalSec = (hours, minutes) => Number(hours || 0) * 3600 + Number(minutes || 0) * 60;
 
+const showParentOrder = (row) => {
+	globalStore.show_edit_modal({
+		show: true,
+		title: tt('phrases.See_Parent_Work_Order'),
+		instanceData: row,
+		editModalProp: 'editModalClassicSecond',
+		componentPath: 'Maintenance/WorkOrders/ItemDetailsPreview',
+		className: 'maintenance-modal',
+		modalClassName: 'fixed-header-footer small-header small-footer',
+		additionalModalSettings: {
+			plantId: row.plant_id,
+			productionLinesList: productionLinesList.value,
+		},
+		hideFooter: true,
+	});
+};
+
+const togglePreviewModal = (data) => {
+	emit('event', {
+		eventName: 'togglePreviewModal',
+		data,
+		onward: true,
+	});
+};
+
 const localSetupPage = (item) => {
 	formData.value.plant_id = props.additionalSettings?.plantId || item?.plant_id || formData.value.plant_id;
 
@@ -468,7 +727,14 @@ const localValidationHook = () => {
 	].some((prop) => !!formData.value[prop]);
 
 	mainInstancesError.value = !hasMainInstance;
-	if (!hasMainInstance) return false;
+	if (!hasMainInstance) {
+		Notify({
+			type: 'warning',
+			title: tt('phrases.form_isnt_ready'),
+			message: tt('phrases.Please_check_fields_errors_first'),
+		});
+		return false;
+	}
 
 	if (!isTotalActive.value && formData.value.start_time && formData.value.finish_time) {
 		const { minutes_total } = getTimeDifference({
@@ -477,10 +743,26 @@ const localValidationHook = () => {
 			timeOnly: true,
 			nextDayWhenLessZero: true,
 		});
-		if (minutes_total < 15) return false;
+		if (minutes_total < 15) {
+			Notify({
+				type: 'warning',
+				title: tt('phrases.form_isnt_ready'),
+				message: `${tt('phrases.total_time_should_be_15_minutes')}!`,
+			});
+			return false;
+		}
 	}
 
-	return !(formData.value.reason_type && !formData.value.breakdown_type);
+	if (formData.value.reason_type && !formData.value.breakdown_type) {
+		Notify({
+			type: 'warning',
+			title: tt('phrases.form_isnt_ready'),
+			message: `${reasonTypeName.value} ${tt('Type')} ${tt('phrases.should_be_assigned')}`,
+		});
+		return false;
+	}
+
+	return true;
 };
 
 const localPrepareSubmitData = (data) => {

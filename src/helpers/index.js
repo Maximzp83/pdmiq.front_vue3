@@ -692,8 +692,12 @@ const getPassedTime1 = (from, to) => {
 	if (to < 3600 * 24) {
 		return `${Math.floor(to / 3600)} ${Lang.tt('hours')}`;
 	}
+	if (to < 3600 * 24 * 30) {
+		const t = Math.floor(to / (3600 * 24));
+		return `${t} ${(t == 1 ? Lang.tt('day') : Lang.tt('days') )}`;
+	}
 
-	return `${Math.floor(to / (3600 * 24))} ${Lang.tt('days')}`;
+	return `${Math.floor(to / (3600 * 24 * 30))} ${Lang.tt('months')}`;
 };
 
 const getTimeDifference1 = ({ from, to, timeOnly, nextDayWhenLessZero, to_ms }) => {

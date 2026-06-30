@@ -25,6 +25,10 @@ export const colorsList = [
 	'#706c6c'
 ];
 
+export const colorsList2 = [
+	'#00ff00','#00ffff','#4b0082','#8b00ff','#009900','#990000', '#ffcc99', '#ffff00',
+];
+
 const serie_template = {
 	showInNavigator: true,
 	data: [],

@@ -7,7 +7,7 @@ import { Lang } from '@/localization';
 /**
  * Get base API URL from environment or use default
  */
-const getBaseURL = () => {
+export const getBaseURL = () => {
 	if (import.meta.env.VITE_API_BASE_URL) {
 		return import.meta.env.VITE_API_BASE_URL;
 	}

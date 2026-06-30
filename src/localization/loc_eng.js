@@ -603,6 +603,7 @@ export default {
 		components: 'Components',
 		harmonics: 'Harmonics',
 		editable: 'Editable',
+		difference: 'Difference',
 	},
 
 	sidebar_menu: {
@@ -1141,6 +1142,7 @@ export default {
 		lube_based_device_address_id: 'Lube Based Device Address ID',
 		lube_based_physical_sensor_id: 'Lube Based Physical Sensor ID',
 		lube_trigger_metric_type: 'Lube Trigger Metric Type',
+		re_trigger_samples: 'Re-trigger Samples',
 		silence_mode: 'Silence Mode',
 		visible_by_default: 'Visible by default',
 		silence_mode_until: 'Silence Mode Until',

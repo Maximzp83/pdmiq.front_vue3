@@ -940,7 +940,8 @@ export default {
 		editInModal: Boolean,
 		additionalSettings: { type: Object,	default: () => ({}) },
 		itemsName: { type: Object, default: () => ({}) },
-		parentDataSet: null
+		parentDataSet: null,
+		dataSetChanged: Boolean
 	},
 
 	data() {
@@ -1640,7 +1641,7 @@ export default {
 			if (this.fromBannerSensorForm) {
 				delete data.location_in_equipment;
 				delete data.controller_id;
-				// data.type = SENSOR_TYPES.BANNER;
+				data.type = SENSOR_TYPES.ULTRA_SOUND;
 				// console.log('us loc submit', payload)
 				if (this.isLubeMatrixV4) {
 					// delete data.data_set;
@@ -1933,6 +1934,10 @@ export default {
 	},
 
 	created() {
+		if (this.fromBannerSensorForm && this.dataSetChanged) {
+			this.formData.data_set = null;
+			this.datasetChanged = true;
+		}
 		// console.log('created')
 		this.$emit('event', {
 			eventName: 'handleFetch',

@@ -42,12 +42,13 @@ import { LANGUAGE_TYPES } from '@/localization/utils';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { initHighchartsModule } from '@/helpers/charts';
 import PageMockImg from '@/components/common/PageMockImg.vue';
 
-highchartsMore(Highcharts);
-stockInit(Highcharts);
-boost(Highcharts);
-annotations(Highcharts);
+initHighchartsModule(highchartsMore, Highcharts);
+initHighchartsModule(stockInit, Highcharts);
+initHighchartsModule(boost, Highcharts);
+initHighchartsModule(annotations, Highcharts);
 
 const { tt } = Lang;
 
@@ -66,8 +67,7 @@ const selectedCompany = computed(() => {
 	return findItemBy('id', companyId.value, globalCompaniesList.value);
 });
 
-const navbarSettings = computed(() =>
-	Object.freeze({
+const navbarSettings = computed(() => ({
 		enableCompaniesFilter: true,
 		datepickerSettings: {
 			label: `${tt('phrases.statistics_for_period')}:`,
@@ -80,8 +80,7 @@ const navbarSettings = computed(() =>
 			querySelector: '.corporate-dashboard .corporate-for-print-container',
 			icon: 'icomoon icon-pdf',
 		},
-	}),
-);
+	}));
 
 const setupHighchartsLocale = () => {
 	if (Lang.currentLangId !== LANGUAGE_TYPES.SPANISH) return;

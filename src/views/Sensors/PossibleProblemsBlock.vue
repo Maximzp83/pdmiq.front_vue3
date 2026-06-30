@@ -100,9 +100,9 @@ const hasAxisProblems = computed(() => {
 });
 
 const fetchProblems = ({ params, daterange }) => {
-	if (!props.currentSensor.id) return;
+	if (!props.currentSensor.id) return Promise.resolve();
 	problemsLoading.value = true;
-	fetchSensorProblems({
+	return fetchSensorProblems({
 		sensorId: props.currentSensor.id,
 		params: {
 			parameters: params.map((item) => item.id),
@@ -118,12 +118,20 @@ const fetchProblems = ({ params, daterange }) => {
 };
 
 watch(
-	() => [props.sensorParamsForSetupProblems, props.daterange],
-	([params, daterange]) => {
-		if (daterange.length && params.length) {
-			fetchProblems({ params, daterange });
+	() => props.sensorParamsForSetupProblems,
+	(params) => {
+		if (props.daterange.length && params.length) {
+			fetchProblems({ params, daterange: props.daterange });
 		}
-	},
-	{ immediate: true, deep: true },
+	}
+);
+
+watch(
+	() => props.daterange,
+	(daterange) => {
+		if (daterange.length && props.sensorParamsForSetupProblems.length) {
+			fetchProblems({ params: props.sensorParamsForSetupProblems, daterange });
+		}
+	}
 );
 </script>
