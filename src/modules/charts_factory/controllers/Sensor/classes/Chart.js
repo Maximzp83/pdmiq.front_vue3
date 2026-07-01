@@ -105,6 +105,9 @@ class SensorChartBase extends ChartBase {
 			    maxPointWidth: 10,
 			    // pointPadding: 0.1,
 			    // groupPadding: 0.2,
+			  },
+			  flags: {
+			  	y: -10
 			  }
 			}
 		};
@@ -390,6 +393,7 @@ class SensorChartBase extends ChartBase {
 						// useHTML: true,
 						text: unit_type_name || ''
 					},
+					// maxPadding: 0.3,
 					startOnTick: true,
 					opposite: false,
 					tickPositioner:
@@ -909,6 +913,38 @@ class SensorChartBase extends ChartBase {
 			}
 		}
 	}
+
+	bindFlagsTooltip(chart) {
+	  chart.series.forEach(series => {
+	    if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
+
+	    series.points.forEach(point => {
+	      if (!point.graphic || point._customTooltipBound) return;
+
+	      point._customTooltipBound = true;
+
+	      point.graphic.css({
+	        cursor: 'pointer',
+	        pointerEvents: 'auto'
+	      });
+
+	      point.graphic.on('mouseover', function () {
+	        chart.tooltip.refresh(point);
+
+	        chart.hoverPoint = point;
+	        point.setState('hover');
+	      });
+
+	      point.graphic.on('mouseout', function () {
+	        point.setState('');
+
+	        if (chart.tooltip) {
+	          chart.tooltip.hide(0);
+	        }
+	      });
+	    });
+	  });
+	}
 }
 
 class SensorChart extends SensorChartBase {
@@ -1081,6 +1117,9 @@ class SensorChart extends SensorChartBase {
 				this.isDraggablePlotLinesReady = true;
 			}
 		}
+
+		// this.shiftFlagsBelowAxis(target);
+		this.bindFlagsTooltip(target);
 	}
 
 	localHandleStatisticsTransformUpdated(resultData) {

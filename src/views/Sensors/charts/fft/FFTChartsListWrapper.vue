@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 
 import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -74,7 +74,7 @@ const chartsListInstancesInitialBuild = ref(true);
 const hasStatistics = ref(false);
 const chartsListWrapperReady = ref(false);
 const chartsListWrapperLoading = ref(false);
-const hiddenChartsMap = reactive({});
+const hiddenChartsMap = ref({});
 const chartRefs = ref({});
 
 const { currentSensorType, currentChartSettingsKey } = useSensorType({
@@ -158,7 +158,7 @@ const buildChartsSettings = computed(() => {
 	return Object.freeze(settings);
 });
 const chartsList = computed(() => updateChartsList.value ? chartsListInstance.value.getCharts() : []);
-const someChartsIsHidden = computed(() => chartsList.value.some((chart) => hiddenChartsMap[chart.chart_id]));
+const someChartsIsHidden = computed(() => chartsList.value.some((chart) => hiddenChartsMap.value[chart.chart_id]));
 
 const setChartRef = (chartId, el) => {
 	if (el) chartRefs.value[chartId] = el;
@@ -166,7 +166,10 @@ const setChartRef = (chartId, el) => {
 
 const handleChartVisibilityChange = ({ chartId, isHidden }) => {
 	if (chartId === undefined) return;
-	hiddenChartsMap[chartId] = isHidden;
+	hiddenChartsMap.value = {
+		...hiddenChartsMap.value,
+		[chartId]: isHidden,
+	};
 };
 
 const callChartsMethod = (payload) => {
@@ -189,9 +192,11 @@ const buildCharts = ({ settings, payload } = {}) => {
 	}
 
 	updateChartsList.value += 1;
+	const nextHiddenChartsMap = {};
 	chartsList.value.forEach((chart) => {
-		hiddenChartsMap[chart.chart_id] = hiddenChartsMap[chart.chart_id] || false;
+		nextHiddenChartsMap[chart.chart_id] = hiddenChartsMap.value[chart.chart_id] || false;
 	});
+	hiddenChartsMap.value = nextHiddenChartsMap;
 };
 
 const { handleEvent } = useEventHandler({

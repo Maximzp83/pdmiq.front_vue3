@@ -129,15 +129,18 @@ const generateSerieItem = ({
 		? custom_data_path
 		: `${data_key}.${data_path || 'base'}`;
 
+	const initialSerieItem = chartSeriesTemplates(template);
+
 	let serieItem = {
-		...chartSeriesTemplates(template),
+		...initialSerieItem,
 		id,
 		customSettings: {
 			data_accessor,
+			...initialSerieItem.customSettings,
 			...customSettings
 		}
 	};
-
+	// console.log(serieItem, serie_config)
 	/*if (data_key == 'levelZoneData') {
 		console.log(serieItem)
 	}*/

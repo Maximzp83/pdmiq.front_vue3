@@ -3904,7 +3904,7 @@ body {
 		.periods-list {
 			.el-form-item {margin-top: 0;}
 			.el-input-number {
-				width: 110px;
+				width: 110px !important;
 
 				& > span {
 					width: 30px;

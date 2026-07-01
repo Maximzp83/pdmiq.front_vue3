@@ -692,6 +692,18 @@ const routes = [
 				meta: { auth: true, permissions: ['view_sensors'] },
 			},
 			{
+				path: 'ncd/:id/fft/:fftId',
+				name: 'SensorNcdFFT',
+				component: () => import('@/views/Sensors/FFTStatisticsPage.vue'),
+				meta: { auth: true, permissions: ['view_sensors'] },
+			},
+			{
+				path: 'banner/:id/fft/:fftId',
+				name: 'SensorBannerFFT',
+				component: () => import('@/views/Sensors/FFTStatisticsPage.vue'),
+				meta: { auth: true, permissions: ['view_sensors'] },
+			},
+			{
 				path: 'sensors/:id/stats',
 				name: 'SensorStats',
 				component: () => import('@/views/Sensors/StatisticsPage.vue'),

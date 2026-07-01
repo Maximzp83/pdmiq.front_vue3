@@ -244,7 +244,7 @@
 			center
 			:title="tt('phrases.Setup_thresholds')"
 			append-to-body
-			class="small report-item-dialog"
+			class="small report-item-dialog vertical-margin"
 		>
 			<LevelZoneFormWrapper
 				v-if="showZoneSetup"
@@ -324,6 +324,7 @@ const router = useRouter();
 const sensorsStore = useSensorsStore();
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
+const emit = defineEmits(['event']);
 const { statistics_filters: filters } = storeToRefs(sensorsStore);
 const { compareList } = storeToRefs(globalStore);
 const { fetchSensor, toggleUltrasoundCommand } = useSensors();
@@ -752,6 +753,22 @@ const updateSensor = ({ id, sensor }) => {
 		dropdownFilterbarUpdated.value += 1;
 	}
 };
+const updateEquipment = (equipment) => {
+	if (!equipment?.id) return;
+
+	sensors.value = sensors.value.map((sensor) => {
+		if (sensor.equipment?.id !== equipment.id) return sensor;
+
+		return {
+			...sensor,
+			equipment: {
+				...sensor.equipment,
+				...equipment,
+			},
+		};
+	});
+	dropdownFilterbarUpdated.value += 1;
+};
 
 const initSensors = (items) => {
 	if (items?.length) {
@@ -1039,6 +1056,13 @@ const handleUnlockFFTSuccess = ({ fft_lock_item, sensorId: fftSensorId }) => {
 const handleRedirectTo = (to) => {
 	if (to) router.push(to);
 };
+const togglePreviewModal = (data) => {
+	emit('event', {
+		eventName: 'togglePreviewModal',
+		data,
+		onward: true,
+	});
+};
 
 const { handleEvent } = useEventHandler({
 	toggleV2_1View,
@@ -1046,6 +1070,8 @@ const { handleEvent } = useEventHandler({
 	handleDaterange,
 	toggleFilterbar,
 	updateSensor,
+	updateEquipment,
+	togglePreviewModal,
 	initSensors,
 	toggleHistory,
 	reloadChart,

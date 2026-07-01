@@ -34,7 +34,7 @@
 			:rules="rules"
 			:label-position="isMobile ? 'top' : 'left'"
 		>
-			<div v-if="!isOffAlarm" class="el-form-item">
+			<div v-if="!isOffAlarm" class="content-row">
 				<el-form-item
 					:label="isLowHighZones ? tt('phrases.High_alarm') : tt('constants.Alarm_zone')"
 					prop="alarm_zone"
@@ -56,7 +56,7 @@
 				</el-form-item>
 			</div>
 
-			<div v-if="!isOffAlarm && (isUltrasound || isSDTsensor)" class="el-form-item">
+			<div v-if="!isOffAlarm && (isUltrasound || isSDTsensor)" class="content-row">
 				<el-form-item
 					v-if="formData.is_lube_zone_included && sensor && (isUltrasound || isSDTsensor)"
 					:label="tt('constants.Lubeline_zone')"
@@ -74,7 +74,7 @@
 				</el-form-item>
 			</div>
 
-			<div v-if="!isOffAlarm && enableLubeMatrixInputForBanner" class="el-form-item">
+			<div v-if="!isOffAlarm && enableLubeMatrixInputForBanner" class="content-row">
 				<el-form-item :label="tt('constants.Lubeline_zone')" prop="lube_zone" required>
 					<el-input-number v-model="formData.lube_zone" :min="0" />
 				</el-form-item>
@@ -82,7 +82,7 @@
 
 			<div
 				v-if="!isOffAlarm && isNCDTempVibeSensor && isOffAlarmZoneIncluded"
-				class="el-form-item"
+				class="content-row"
 			>
 				<el-form-item
 					v-if="sensor"

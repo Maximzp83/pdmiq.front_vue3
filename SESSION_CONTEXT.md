@@ -1,78 +1,53 @@
 # Continuation Briefing
 
 ## Project Stack
-- Vue 3 + Vite application using Vue Router 4, Pinia, Element Plus, and `<script setup>`.
+- Vue 3 + Vite app using Vue Router 4, Pinia, Element Plus, Highcharts, and `<script setup>`.
 - Migration source is `vue2_project/`; migrated target is `src/`.
-- Charts use Highcharts through local chart factory modules under `src/modules/charts_factory`.
-- API access is through local request helpers/composables such as `api_request`, `createGetRequest`, `useRequestsList`, and domain composables.
+- Charts use local Highcharts factory modules under `src/modules/charts_factory`.
+- API access should use project helpers/composables such as `api_request`, `createGetRequest`, `createGetByIdRequest`, `useRequestsList`, and domain composables.
 
 ## Key Architecture Rules
-- Before changing migrated behavior, compare the Vue3 file with the Vue2 original in `vue2_project/`.
-- Preserve Vue2 behavioral parity: template structure, slots, wrappers, conditionals, permissions, events, request timing, route/query behavior, and store-filter ownership.
-- Adapt Vue2 mixins to existing Vue3 composables/Pinia patterns; do not blindly copy mixin code.
-- Keep changes scoped to the requested component/flow and avoid unrelated refactors.
-- Use `apply_patch` for manual file edits.
-- Do not revert user/unrelated work in the dirty worktree.
-- After implementation, run `npm run build` when behavior/compile surface changes and run targeted `git diff --check`.
-- Keep responses concise and do not output code/diffs unless explicitly requested.
+- Apply code changes only after explicit user confirmation, except `docs/` and `SESSION_CONTEXT.md` may be updated automatically.
+- Work one step/file at a time; for tightly coupled files, one combined step is allowed.
+- Do not output code or diffs unless a risk/ambiguity must be discussed.
+- After each completed step, report the result and file path in plain text, then stop unless user explicitly requested continuous work.
+- Before changing migrated behavior, compare against the Vue2 original in `vue2_project/`.
+- Preserve Vue2 behavioral parity: template structure, wrappers, slots, conditions, permissions, request timing, route/query behavior, events, and store-filter ownership.
+- Use existing Vue3 patterns: Pinia, composables, `api_request`, global components where established, and Element Plus-valid APIs/icons.
+- Use `apply_patch` for manual edits; do not revert user or unrelated dirty work.
+- Run targeted `git diff --check` and `npm run build` after behavior/compile changes.
 
 ## Current Task Status
-- Recent focus was Sensors and BrandModels parity against `vue2_project`.
-- `src/views/Sensors/charts/ChartItemContainer.vue` was rechecked against Vue2 and restored for:
-  - one-chart legend rendering;
-  - compare-mode header classes;
-  - hidden-chart lazy fetch behavior;
-  - disable-chart button initialization;
-  - `additionalProps.showHistory` handling via `ChartZoom` ref.
-- `src/views/Sensors/charts/ChartZoom.vue` now exposes `resetInitialValues` and `zoomYAxis` for the restored parent ref flow.
-- `src/views/Sensors/charts/HeaderRightPart.vue` chart export payload now again includes `metricSystemType` and `X-Timezone-Offset`.
-- `src/views/Sensors/PossibleProblemsBlock.vue` watcher behavior was restored to Vue2-style separate non-immediate watchers for `sensorParamsForSetupProblems` and `daterange`.
-- Highcharts flag SVG assets were restored under `public/static/img/icons`, but the manual flag tooltip `pointFormatter` and hover `tooltip.refresh/hide` handlers were rolled back at user request.
-- `src/views/BrandModels/ItemsList.vue` was restored closer to Vue2 for storeroom grid/list behavior, original `activeGrid` store-based calculation, QTY/details navigation, and `preventSetNavbar` forwarding to `useItemsData`.
-- `src/views/Plants/Details/DetailsPage.vue` now stores `navbarSettings.value` instead of the computed ref to avoid readonly navbar warnings.
-- SuccessDashboard and CorporateDashboard had prior parity/runtime fixes and currently build, but still need authenticated runtime smoke testing.
+- User requested migration of the FFT Statistics section without per-file confirmations, using already migrated sections and existing composables.
+- FFT Statistics compile/build follow-up is complete:
+  - `src/views/Sensors/FFTStatisticsPage.vue` was re-aligned toward Vue2 structure with equipment header, prev/next FFT navigation, axis selector, split/metric controls, `AnalysisFFTContainer`, and equipment loading through `useRequestsList`.
+  - `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`, `FFTChartItemContainer.vue`, `ChartFFTAnalysisRulesBar.vue`, and `WaterfallStatisticsContainer.vue` were rechecked against Vue2 and restored closer to legacy behavior.
+  - `src/composables/useSensors.js` now includes FFT vibration-analysis rule override save/delete actions.
+  - `src/router/index.js` now enables `/ncd/:id/fft/:fftId` and `/banner/:id/fft/:fftId` compatibility routes.
+  - `npm run build` and targeted `git diff --check` passed after each step.
+- Docs were synchronized after the FFT work: `docs/new-session-handoff.md`, `docs/migration-progress.md`, and `docs/migration-todos.md`.
+- User manually changed Highcharts flags behavior and reports it works; do not modify those changes unless requested.
 
 ## Files Already Modified
 - `SESSION_CONTEXT.md`
+- `docs/new-session-handoff.md`
 - `docs/migration-progress.md`
 - `docs/migration-todos.md`
-- `src/views/Sensors/charts/ChartItemContainer.vue`
-- `src/views/Sensors/charts/ChartZoom.vue`
-- `src/views/Sensors/charts/HeaderRightPart.vue`
-- `src/views/Sensors/PossibleProblemsBlock.vue`
-- `src/views/Sensors/SensorFFTRequestButton.vue`
-- `src/modules/charts_factory/enums/index.js`
-- `public/static/img/icons/*.svg`
-- `src/views/BrandModels/ItemsList.vue`
-- `src/views/Plants/Details/DetailsPage.vue`
-- `src/views/SuccessDashboard/DetailsPage.vue`
-- `src/views/SuccessDashboard/MeetingTracker/ItemForm.vue`
-- `src/views/SuccessDashboard/MeetingTracker/DynamicFormItem.vue`
-- `src/views/SuccessDashboard/MeetingTracker/ItemPage.vue`
-- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
-- `src/views/SuccessDashboard/ROIOnePager/DynamicFormItem.vue`
-- `src/views/SuccessDashboard/ROIOnePager/ItemsList.vue`
-- `src/views/SuccessDashboard/ROIOnePager/ItemPage.vue`
-- `src/views/SuccessDashboard/common/SensorsAlarmsContainer.vue`
-- `src/views/SuccessDashboard/common/SensorAlarmsChartsListWrapper.vue`
-- `src/views/SuccessDashboard/common/SensorAlarmsChartItemContainer.vue`
-- `src/views/SuccessDashboard/common/NotesItem.vue`
-- `src/views/SuccessDashboard/common/ChartCommentForm.vue`
-- `src/views/SuccessDashboard/MainDashboard/HealthStatisticsCard.vue`
-- `src/views/SuccessDashboard/MainDashboard/ROIStatisticsContainer.vue`
-- `src/views/SuccessDashboard/MainDashboard/GaugeStatisticsContainer.vue`
-- `src/views/CorporateDashboard/CorporateDashboard.vue`
-- `src/views/CorporateDashboard/Details/PlantDetailsItem.vue`
+- `src/views/Sensors/FFTStatisticsPage.vue`
+- `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`
+- `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
+- `src/views/Sensors/charts/fft/ChartFFTAnalysisRulesBar.vue`
+- `src/views/Sensors/charts/fft/WaterfallStatisticsContainer.vue`
+- `src/composables/useSensors.js`
+- `src/router/index.js`
+- Existing dirty/user-edited files include Highcharts flag-related files; do not revert unrelated work.
 
 ## Unresolved Issues
-- No authenticated browser/API smoke test has been performed for the latest Sensors, SuccessDashboard, BrandModels, or CorporateDashboard fixes.
-- Sensors charts need runtime verification with real chart data, especially one-chart legend, show-history zoom reset, hidden-chart fetch behavior, export payload, and flags after tooltip rollback.
-- SuccessDashboard Meeting Tracker remains high-risk and needs deeper parity review against Vue2, especially submit payloads, dynamic rows, readonly mode, async initial values, and alarms dialog behavior.
+- No authenticated browser/API smoke test has been performed for the latest Sensors FFT changes.
+- Sensors charts still need runtime verification with real data, especially flags, FFT page prev/next navigation, FFT rule harmonics save, waterfall controls, one-chart legend, show-history zoom reset, hidden-chart fetch, and export payload.
+- SuccessDashboard Meeting Tracker remains high risk and needs deeper Vue2 parity review.
 - `src/views/SuccessDashboard/MeetingTracker/NextActivityFormItem.vue` remains simplified compared with Vue2.
-- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` was heavily restored but still needs runtime validation with real item data and API responses.
-- `src/views/SuccessDashboard/ROIAnalysis/DynamicFormItemRoi.vue` is a stub; Vue2 source is empty, so no current action unless requirements change.
-- Further files in `src/views/Sensors/charts` may still have Vue2 parity gaps beyond the targeted fixes already applied.
+- `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` still needs runtime validation with real item data/API responses.
 
 ## Next Actionable Step
-- Continue checking `src/views/Sensors/charts` against `vue2_project/src/views/Sensors/charts` one file at a time, starting with `ChartsListWrapper.vue` and then `ChartThresholdsOperations.vue`.
-- For each file: compare with Vue2, apply only behaviorally relevant parity fixes, run `npm run build`, run targeted `git diff --check`, and update handoff docs if the change is significant.
+- Continue Sensors chart parity work one file at a time: check remaining non-FFT `src/views/Sensors/charts` files against `vue2_project/src/views/Sensors/charts`, starting with `ChartsListWrapper.vue`, then `ChartThresholdsOperations.vue`.

@@ -32,6 +32,7 @@ import {
 	itemSpeedOptionsList
 } from '@/constants/global';
 import { ElMessage } from 'element-plus';
+import 'element-plus/es/components/message/style/css';
 
 // import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
 // import { storeGetter, dispatchGetter } from '@/store';

@@ -11,7 +11,7 @@ import 'element-plus/es/components/message-box/style/css';
 
 Highcharts.setOptions({
 	lang: {
-		locale: 'ru-RU',
+		locale: 'en-En',
 		decimalPoint: '.',
 		thousandsSep: ' ',
 	},

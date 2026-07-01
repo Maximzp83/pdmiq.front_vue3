@@ -91,15 +91,20 @@ const oee_plotline_template = {
 
 const flags_template = {
 	type: 'flags',
-	zIndex: 1600,
+	zIndex: 9600,
 	lineWidth: 2,
 	// cropThreshold: 150,
-	crisp: false,
+	// crisp: false,
 	clip: false,
 	allowOverlapX: true,
-	y: 20,
+	y: 25,
 	width: 15,
-	height: 16
+	height: 16,
+	tooltip: {
+		pointFormatter: function () {
+			return this.text || this.options?.text || '';
+		}
+	},	
 };
 
 const fft_flag_template = {
@@ -516,6 +521,7 @@ const chartSeriesTemplates1 = {
 			color: '#3366cc',
 			style: { color: '#3366cc' },
 			shape: 'squarepin',
+			skipTooltipBinding: true,
 			// enableMouseTracking: false,
 			y: -270,
 			width: 26
@@ -527,15 +533,16 @@ const chartSeriesTemplates1 = {
 			shape: 'squarepin',
 			// enableMouseTracking: false,
 			y: -270,
+			skipTooltipBinding: true,
 			width: 26,
 			zIndex: 2100
 		},
 
 		lube_lock_log_flag: {
 			...flags_template,
-			zIndex: 2000,
+			zIndex: 9000,
 			className: 'crash-flag lock-log-flag',
-			custom_id: 'lube_lock_flag'
+			custom_id: 'lube_lock_flag',
 			// style: { color: '#3366cc' }
 		},
 

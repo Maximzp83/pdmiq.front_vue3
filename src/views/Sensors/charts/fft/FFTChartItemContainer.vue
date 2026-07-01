@@ -39,6 +39,7 @@
 					class="zoom-block-container mcol-xs-6 mcol-lg-8 mcol-xlg-auto fft-chart-actions capitalize"
 				>
 					<ChartOperationsBar
+						ref="chartOperationsBarRef"
 						:actionButtons="chartOperationsButtons"
 						:activeButtonValues="activeButtonValues"
 						:xAxisTitle="xAxisTitle"
@@ -128,6 +129,7 @@ import { getCurrentRpmSource } from '@/helpers/specialHelpers';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useSensors } from '@/composables/useSensors';
 import { BANNER_REQUEST_TYPES } from '@/constants/global';
+import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import ChartZoom from '../ChartZoom.vue';
 import ChartOperationsBar from '../ChartOperationsBar.vue';
@@ -138,7 +140,7 @@ import WaterfallStatisticsContainer from './WaterfallStatisticsContainer.vue';
 import ChartFFTAnalysisRulesBar from './ChartFFTAnalysisRulesBar.vue';
 
 const { tt } = Lang;
-const { createFftWaveform, fetchFftWaveform, setFftRpmParams } = useSensors();
+const { createFftWaveform, fetchFftWaveform } = useSensors();
 
 defineOptions({
 	name: 'FFTChartItemContainer',
@@ -178,6 +180,8 @@ const createdWaveforms = reactive({
 	axis_3: '',
 });
 const selectedAnalysisRules = ref([]);
+const chartWrapperRef = ref(null);
+const chartOperationsBarRef = ref(null);
 
 const isRequestTypeStandard = computed(() =>
 	props.currentFFTItem?.banner_request_type === BANNER_REQUEST_TYPES.STANDARD,
@@ -265,6 +269,9 @@ const chartMainData = computed(() => Object.freeze({
 const chartPeaks = computed(() => chartOptionsUpdate.value ? Object.freeze(props.ChartInstance.peaksList) : null);
 const xAxisTitle = computed(() => chartOptionsUpdate.value ? props.ChartInstance.getXAxisTitle() : '');
 const yAxisTitle = computed(() => chartOptionsUpdate.value ? props.ChartInstance.getYAxisTitle() : '');
+const isPeriodicCursorsGenerated = computed(() =>
+	chartOptionsUpdate.value ? props.ChartInstance.checkIsPeriodicCursorsGenerated() : null,
+);
 const ChartAPI = computed(() => chartIsInit.value ? props.ChartInstance.ChartAPI : null);
 const chartTitle = computed(() => props.ChartInstance.chartTitle);
 const selectedChildComponents = computed(() => {
@@ -390,6 +397,26 @@ const handlePlaySound = () => {
 		});
 };
 
+const trimBuffer = (audioContext, buffer, trimDuration = 0.03) => {
+	const trimSamples = Math.floor(trimDuration * buffer.sampleRate);
+	const trimmedLength = buffer.length - trimSamples;
+	const newBuffer = audioContext.createBuffer(
+		buffer.numberOfChannels,
+		trimmedLength,
+		buffer.sampleRate,
+	);
+
+	for (let ch = 0; ch < buffer.numberOfChannels; ch += 1) {
+		const oldData = buffer.getChannelData(ch);
+		const newData = newBuffer.getChannelData(ch);
+		for (let i = 0; i < trimmedLength; i += 1) {
+			newData[i] = oldData[i];
+		}
+	}
+
+	return newBuffer;
+};
+
 const playSound = () => {
 	const audioContext = new AudioContext();
 	fetchFftWaveform({
@@ -400,47 +427,67 @@ const playSound = () => {
 		.then(({ value }) => value?.data || value)
 		.then((arrayBuffer) => audioContext.decodeAudioData(arrayBuffer))
 		.then((audioBuffer) => {
-			const source = audioContext.createBufferSource();
-			source.buffer = audioBuffer;
-			source.connect(audioContext.destination);
-			source.start(0);
+			const trimmedBuffer = trimBuffer(audioContext, audioBuffer, 0.04);
+			const duration = trimmedBuffer.duration;
+			const repeatCount = Math.ceil(2 / duration);
+			const now = audioContext.currentTime;
+
+			for (let i = 0; i < repeatCount; i += 1) {
+				const source = audioContext.createBufferSource();
+				source.buffer = trimmedBuffer;
+				source.connect(audioContext.destination);
+				source.start(now + i * duration);
+			}
 		});
 };
 
 const handleChartPointClick = ({ point } = {}) => {
-	emit('event', {
-		eventName: 'addNoteToChart',
-		data: point,
-		onward: true,
-	});
+	if (activeButtonValues.addCursorActive && point) {
+		hoverData.value = {};
+		props.ChartInstance.addCursor(point);
+	}
 };
 
 const addCursor = () => {
 	activeButtonValues.addCursorActive = !activeButtonValues.addCursorActive;
-	props.ChartInstance.callChartMethod?.('toggleCursorMode', activeButtonValues.addCursorActive);
 };
 const showPeaks = () => {
 	activeButtonValues.showPeaksActive = !activeButtonValues.showPeaksActive;
-	props.ChartInstance.callChartMethod?.('togglePeaks', activeButtonValues.showPeaksActive);
+	props.ChartInstance.togglePeaks(activeButtonValues.showPeaksActive);
+
+	setTimeout(() => {
+		const chartElement = chartWrapperRef.value?.$el || chartWrapperRef.value?.$?.vnode?.el;
+		if (chartElement && ChartAPI.value) {
+			ChartAPI.value.setSize(chartElement.clientWidth - 1, chartElement.clientHeight);
+		}
+	}, 50);
 };
 const showPeriodicCursors = () => {
 	activeButtonValues.showPeriodicActive = !activeButtonValues.showPeriodicActive;
+	if (activeButtonValues.showPeriodicActive && !isPeriodicCursorsGenerated.value) {
+		chartOperationsBarRef.value?.generatePeriodicCursors?.();
+	}
 };
 const generatePeriodicCursors = (payload) => {
-	props.ChartInstance.callChartMethod?.('generatePeriodicCursors', payload);
+	props.ChartInstance.generatePeriodicCursors(payload);
 };
 const showWaterfallCharts = () => {
 	activeButtonValues.showWaterfallActive = !activeButtonValues.showWaterfallActive;
 };
 const removeAllCursors = () => {
-	props.ChartInstance.callChartMethod?.('removeAllCursors');
+	props.ChartInstance.removeCursor();
 };
-const handleRpmCursorDrop = (data) => {
-	if (!currentRpmSource.value) return;
-	setFftRpmParams({
-		sensorId: chartMainData.value.sensorItem.id,
-		fftId: props.currentFFTItem.id,
-		data,
+const handleRpmCursorDrop = ({ x } = {}) => {
+	const rpmValue = props.rootFilters.measurement === METRIC_SYSTEM_TYPES.METRIC
+		? x * 60
+		: x;
+	emit('event', {
+		eventName: 'handleRpmCursorDrop',
+		data: {
+			rpm_value: getRoundedValue(rpmValue, 0, 0),
+			isFFTRPM: true,
+		},
+		onward: true,
 	});
 };
 

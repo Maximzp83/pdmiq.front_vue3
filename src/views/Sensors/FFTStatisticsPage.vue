@@ -1,56 +1,154 @@
 <template>
 	<div>
-		<VueElementLoadingWrapper :isLoading="itemLoading || fftLoading" :itemsName="tt('FFT')" />
+		<VueElementLoadingWrapper
+			:isLoading="itemLoading || fftLoading || equipmentLoading"
+			:itemsName="itemsName.one"
+		/>
 
-		<div class="view-wrapper fft-statistics-page-wrapper">
+		<div class="view-wrapper item-page-wrapper statistics-page fft-statistics-page">
 			<div class="mcontainer">
-				<div v-if="sensorData" class="view-content-card">
-					<div class="section-row flex wrap mrow align-center">
-						<div class="mcol-xs-12 mcol-sm-5">
-							<div class="page-title bold">{{ sensorTitle }}</div>
-							<div v-if="equipmentRPM" class="rpm-block content-row">
-								{{ `${tt('rpm')}: ${equipmentRPM}` }}
+				<div class="view-content-card card">
+					<div
+						v-if="loadContent && fftReady && equipmentData"
+						class="card-header flex mrow wrap align-center space-between main-card-header"
+					>
+						<SimpleSpinner :active="fftLoading" />
+
+						<div class="images-part mcol-xs-12 mcol-sm-2">
+							<EquipmentPictureBlock
+								:equipmentData="equipmentData"
+								@event="handleEvent"
+							/>
+						</div>
+
+						<div class="flex wrap align-center fluid mcol-xs-8">
+							<div class="title outside-bg-addition article-title capitalize span-block fluid">
+								<div v-html="sensorTitle"></div>
+							</div>
+							<span class="ml-auto mt-0 article-title outside-bg-addition timestamp">
+								{{ fftTimeStamp }}
+							</span>
+
+							<div class="mcol-xs-12 flex">
+								<div class="card filled_4 request-type-block">
+									<span v-if="isUltrasoundFFT">Fmax = </span>
+									<span v-else>{{ requestType }} - </span>
+									<span class="no-margin">{{ requestFMax }}</span>
+								</div>
 							</div>
 						</div>
 
-						<div class="mcol-xs-12 mcol-sm-7">
-							<div class="flex wrap justify-end">
-								<Datepicker
-									v-model="filters.daterange"
-									type="datetimerange"
-									:placeholder="tt('date')"
-									@change="applyFilters"
-								/>
+						<div class="mcol-xs-auto flex align-center prev-next-buttons-block">
+							<div
+								:class="['button prev-button', { disabled: !prevFFTItem }]"
+								@click="handleFFT({ prev: 1 })"
+							>
+								<i class="icomoon icon-path_2"></i>
 							</div>
+
+							<div
+								:class="['button next-button', { disabled: !nextFFTItem }]"
+								@click="handleFFT({ next: 1 })"
+							>
+								<i class="icomoon icon-path_2 rotate"></i>
+							</div>
+						</div>
+
+						<div v-if="equipmentRPM" class="rpm-block content-row">
+							{{ `${tt('rpm')}: ${equipmentRPM}` }}
+						</div>
+
+						<div class="mcol-xs-12 content-row">
+							<AnalysisFFTContainer
+								ref="analysisFFTContainerRef"
+								:fftItem="currentFFTItem"
+								:itemData="equipmentData"
+								:sensorData="sensorData"
+								:selectedChildComponentIds="selectedChildComponentIds"
+								:rootFilters="{ measurement }"
+								@event="handleEvent"
+								@save="handleAnalysisSave"
+							/>
 						</div>
 					</div>
 
-					<AnalysisFFTContainer
-						v-if="currentFFTItem && equipmentData"
-						:fftItem="currentFFTItem"
-						:itemData="equipmentData"
-						:sensorData="sensorData"
-						:selectedChildComponentIds="selectedChildComponentIds"
-						:rootFilters="filters"
-						@event="handleEvent"
-					/>
+					<div class="section-row margin-top-row axis-selection-container flex justify-center">
+						<RadioButtonsBlock
+							v-show="!splitCharts"
+							:settings="axisRadioBlockSettings"
+							:optionsList="axisRadioButtonsList"
+							:value="activeAxis"
+							@onChange="(value) => (activeAxis = value)"
+						/>
 
-					<FFTChartsListWrapper
-						v-if="currentFFTItem"
-						ref="fftChartsListWrapperRef"
-						:rootFilters="filters"
-						:sensorData="sensorData"
-						:additionalProps="additionalProps"
-						:activeAxis="activeAxis"
-						:sensorId="sensorData.id"
-						:fftId="currentFFTItem.id"
-						:measurement="filters.measurement"
-						:splitCharts="splitCharts"
-						:prevFFTItems="prevFFTItems"
-						:currentFFTItem="currentFFTItem"
-						:getParamsByIds="getParamsByIds"
-						@event="handleEvent"
-					/>
+						<div class="toggle-dropdown-button">
+							<el-button
+								type="primary"
+								native-type="button"
+								:class="[
+									'action-button inverted re-baseline-button operations-button toggle-additional-filters',
+									{ active: showFilterbar },
+								]"
+								@click="toggleFilterbar"
+							>
+								<i :class="`icomoon icon-${showFilterbar ? 'plus' : 'settings'}`"></i>
+							</el-button>
+						</div>
+					</div>
+
+					<DropdownFilterbar
+						ref="dropdownFilterbarRef"
+						hideToggleButton
+						filterbarDropdownId="statisticsPageDropdownFilterbar"
+					>
+						<div class="charts-page-operations flex justify-end triangle pos-top mcol-xs-12">
+							<div class="button-item">
+								<el-button
+									type="primary"
+									native-type="button"
+									:class="['report-button inverted', { active: splitCharts }]"
+									@click="handleSplitCharts"
+								>
+									<i class="icomoon icon-overlay"></i>
+									{{ tt('Split') }}
+								</el-button>
+							</div>
+							<div class="button-item">
+								<el-button-group>
+									<el-button
+										v-for="item in metricSystemsList"
+										:key="`metricSystem-${item.id}`"
+										type="primary"
+										native-type="button"
+										:class="['inverted', { active: measurement === item.id }]"
+										@click="switchMetricSystem(item)"
+									>
+										{{ item.name }}
+									</el-button>
+								</el-button-group>
+							</div>
+						</div>
+					</DropdownFilterbar>
+
+					<div
+						v-if="loadContent && fftReady && currentFFTItem && equipmentData"
+						class="1section-row card-content"
+					>
+						<FFTChartsListWrapper
+							ref="fftChartsListWrapperRef"
+							:activeAxis="activeAxis"
+							:sensorId="sensorData.id"
+							:fftId="currentFFTItem.id"
+							:sensorData="sensorData"
+							:splitCharts="splitCharts"
+							:rootFilters="{ measurement }"
+							:prevFFTItems="prevFFTPreparedItems"
+							:currentFFTItem="currentFFTItem"
+							:additionalProps="chartsAdditionalProps"
+							:getParamsByIds="getParamsByIds"
+							@event="handleEvent"
+						/>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -59,8 +157,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
-import { storeToRefs } from 'pinia';
+import { useRoute, useRouter } from 'vue-router';
 import Highcharts from 'highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
@@ -68,15 +165,40 @@ import draggablePoints from 'highcharts/modules/draggable-points';
 import highchartsMore from 'highcharts/highcharts-more';
 import annotations from 'highcharts/modules/annotations';
 
+import { createGetByIdRequest } from '@/api/request_factories';
+import { ENTITIES } from '@/config/entities';
 import { initHighchartsModule } from '@/helpers/charts';
+import {
+	cleanDateString,
+	cloneDeep,
+	findItemBy,
+	getItemValue,
+	getRoundedValue,
+} from '@/helpers';
+import { getSensorTitle } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
-import { getRoundedValue } from '@/helpers';
+import { useRequestsList } from '@/composables/mixins/useRequestsList';
+import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useSensors } from '@/composables/useSensors';
-import { useSensorsStore } from '@/stores/SensorsStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import {
+	bannerRequestFmaxTypesList,
+	bannerRequestTypesList,
+} from '@/constants/global';
+import {
+	METRIC_SYSTEM_TYPES,
+	NCD_SENSOR_PARAMETERS_TYPES,
+	SENSOR_PARAMETERS_TYPES,
+	metricSystemsList as getMetricSystemsList,
+	ncdAxisList,
+	sensorParametersListNCD,
+} from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
-import Datepicker from '@/components/common/Datepicker.vue';
+import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
+import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
+import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
+import EquipmentPictureBlock from './charts/EquipmentPictureBlock.vue';
 import AnalysisFFTContainer from './AnalysisFFT/AnalysisFFTContainer.vue';
 import FFTChartsListWrapper from './charts/fft/FFTChartsListWrapper.vue';
 
@@ -86,93 +208,384 @@ initHighchartsModule(draggablePoints, Highcharts);
 initHighchartsModule(highchartsMore, Highcharts);
 initHighchartsModule(annotations, Highcharts);
 
-const { tt } = Lang;
-const route = useRoute();
-const sensorsStore = useSensorsStore();
-const { fft_statistics_filters: filters } = storeToRefs(sensorsStore);
-const { fetchSensor, fetchNcdFft } = useSensors();
-
 defineOptions({
 	name: 'FFTStatisticsPage',
 });
 
+const emit = defineEmits(['event']);
+const { tt } = Lang;
+const route = useRoute();
+const router = useRouter();
+const { fetchSensor, fetchNcdFft } = useSensors();
+const { doFetchAction } = useRequestsList();
+const fetchEquipmentById = createGetByIdRequest(ENTITIES.Equipments.apiBase);
+
 const sensorData = ref(null);
+const equipmentData = ref(null);
 const currentFFTItem = ref(null);
 const prevFFTItems = ref([]);
+const prevFFTItem = ref(null);
+const nextFFTItem = ref(null);
 const itemLoading = ref(false);
+const equipmentLoading = ref(false);
 const fftLoading = ref(false);
+const fftReady = ref(false);
+const showFilterbar = ref(false);
 const splitCharts = ref(false);
-const activeAxis = ref(null);
-const selectedChildComponentIds = ref([]);
+const measurement = ref(null);
+const activeAxis = ref(1);
+const selectedChildComponents = ref([]);
+const dropdownFilterbarRef = ref(null);
+const analysisFFTContainerRef = ref(null);
 
-const sensorTitle = computed(() => sensorData.value?.name || `${tt('Sensor')} ${route.params.id}`);
-const equipmentData = computed(() => sensorData.value?.equipment || {});
+const sensorId = computed(() => route.params.id || route.params.sensorId);
+const fftId = computed(() => route.params.fftId || route.query.fftId);
+const loadContent = computed(() => !!sensorData.value);
+const itemsName = computed(() => Object.freeze({
+	one: tt('FFT'),
+	mult: tt('FFTs'),
+}));
+const metricSystemsList = computed(() => Object.freeze(getMetricSystemsList()));
+const { currentSensorType } = useSensorType({
+	currentSensorTypeData: sensorData,
+});
+const isUltrasoundFFT = computed(() => currentSensorType.value.isBannerM25);
+const axisRadioBlockSettings = computed(() => Object.freeze({
+	hideTitle: true,
+	inline: true,
+	buttonType: 'primary',
+	className: 'inverted standard',
+}));
+const axisRadioButtonsList = computed(() => {
+	const result = [];
+	const sensor = sensorData.value;
+	if (!sensor) return Object.freeze(result);
+
+	const {
+		ncd_active_vertical_axis,
+		is_hidden_ncd_active_vertical_axis,
+	} = sensor;
+
+	ncdAxisList.forEach((axis) => {
+		const axisName = isUltrasoundFFT.value ? axis.ultrasound_fft_name : axis.name;
+		if (ncd_active_vertical_axis === axis.id) {
+			if (!is_hidden_ncd_active_vertical_axis) {
+				result.push({ ...axis, name: `${axisName} (V)` });
+			}
+		} else {
+			result.push({ ...axis, name: axisName });
+		}
+	});
+
+	return Object.freeze(result);
+});
+const prevFFTPreparedItems = computed(() => {
+	if (!currentFFTItem.value) return [];
+
+	return [
+		{
+			id: currentFFTItem.value.id,
+			created_at: cleanDateString(currentFFTItem.value.created_at),
+			isCurrent: true,
+		},
+		...prevFFTItems.value.map((item) => ({
+			id: item.id,
+			created_at: cleanDateString(item.created_at),
+		})),
+	];
+});
+const fftTimeStamp = computed(() =>
+	currentFFTItem.value ? cleanDateString(currentFFTItem.value.created_at) : '',
+);
 const equipmentRPM = computed(() => {
-	const rpm = currentFFTItem.value?.equipment_rpm || equipmentData.value?.equipment_rpm;
+	const rpm = currentFFTItem.value?.equipment_rpm || sensorData.value?.equipment_rpm;
 	if (!rpm) return '';
-	if (filters.value.measurement === 'hz') {
+
+	if (measurement.value === METRIC_SYSTEM_TYPES.IMPERIAL) return `${rpm} CPM`;
+	if (measurement.value === METRIC_SYSTEM_TYPES.METRIC) {
 		return `${getRoundedValue(+rpm / 60, 0, 2)} Hz`;
 	}
-	return `${rpm} CPM`;
+
+	return '';
 });
 const getParamsByIds = computed(() => {
+	if (isUltrasoundFFT.value) {
+		return [
+			NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM,
+			NCD_SENSOR_PARAMETERS_TYPES.Y_WAVEFORM,
+			SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION,
+			NCD_SENSOR_PARAMETERS_TYPES.Y_AXIS_ACCELERATION,
+			SENSOR_PARAMETERS_TYPES.Z_AXIS_ACCELERATION,
+			NCD_SENSOR_PARAMETERS_TYPES.Z_WAVEFORM,
+			SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY,
+		];
+	}
 	if (Array.isArray(route.query.params)) return route.query.params.map(Number);
 	if (route.query.param) return [Number(route.query.param)];
 	return [];
 });
-const additionalProps = computed(() => Object.freeze({
-	hcInstance: Highcharts,
+const requestType = computed(() => {
+	if (!sensorData.value || !currentFFTItem.value) return '';
+	return getItemValue(
+		currentFFTItem.value.banner_request_type,
+		'name',
+		bannerRequestTypesList(),
+	);
+});
+const requestFMax = computed(() => {
+	if (!sensorData.value || !currentFFTItem.value) return '';
+	return getItemValue(
+		currentFFTItem.value.banner_request_fmax,
+		'name',
+		bannerRequestFmaxTypesList(),
+	);
+});
+const sensorTitle = computed(() => {
+	if (!sensorData.value || !currentFFTItem.value) return '';
+	return getSensorTitle(sensorData.value, {
+		boldLabels: true,
+		linkSettings: {
+			key: 'location_in_equipment',
+			to: `/equipments/${sensorData.value.equipment_id}/details/pdm/${sensorData.value.id}`,
+		},
+	});
+});
+const chartsAdditionalProps = computed(() => ({
+	selectedChildComponents: selectedChildComponents.value,
 	equipmentData: equipmentData.value,
-	selectedChildComponents: equipmentData.value.child_components || [],
+	isUltrasoundFFT: isUltrasoundFFT.value,
+	hcInstance: Highcharts,
 }));
+const selectedChildComponentIds = computed(() =>
+	selectedChildComponents.value.map((item) => item.id),
+);
 
-const applyFilters = () => {
-	sensorsStore.set_fft_statistics_filters({ ...filters.value });
+const setFFTReadySoon = () => {
+	setTimeout(() => {
+		fftReady.value = true;
+	}, 100);
 };
-const toggleFFTAnalysisRule = ({ rule }) => {
-	const id = rule.id || rule.original_rule_id;
-	if (selectedChildComponentIds.value.includes(id)) {
-		selectedChildComponentIds.value = selectedChildComponentIds.value.filter((item) => item !== id);
-	} else {
-		selectedChildComponentIds.value = [...selectedChildComponentIds.value, id];
+const setupActiveAxisByFFT = (fft) => {
+	if (fft?.alarm) {
+		const paramItem = findItemBy(
+			'id',
+			fft.alarm.sensor_parameter_type,
+			sensorParametersListNCD(),
+		);
+		if (paramItem?.axis_id) {
+			activeAxis.value = paramItem.axis_id;
+		}
 	}
 };
-const { handleEvent } = useEventHandler({
-	toggleFFTAnalysisRule,
-}, null);
+const normalizeFftResponse = (value) => {
+	if (Array.isArray(value)) return value;
+	if (Array.isArray(value?.items)) return value.items;
+	if (Array.isArray(value?.data)) return value.data;
+	return value || null;
+};
+const fetchEquipment = (id) => {
+	if (!id) return;
+	doFetchAction(
+		fetchEquipmentById,
+		equipmentData,
+		equipmentLoading,
+		{
+			itemId: id,
+			prepareDataSettings: {
+				addSettingItems: [
+					{ key: 'brand', val_key: 'brand' },
+					{ key: 'brand_model', val_key: 'model' },
+				],
+			},
+		},
+	);
+};
+const fetchFFT = ({ urlPostfix = '', target } = {}) => {
+	if (!sensorData.value?.id || !target) return Promise.resolve();
 
-const fetchFftData = () => {
-	if (!route.params.id) return;
 	fftLoading.value = true;
-	fetchNcdFft({
-		sensorId: route.params.id,
-		urlPostfix: route.query.fftId ? `/${route.query.fftId}` : '',
-		params: { ...filters.value },
+	return fetchNcdFft({
+		sensorId: sensorData.value.id,
+		urlPostfix,
+		notNotifyError: true,
 	})
 		.then(({ value }) => {
-			const list = Array.isArray(value) ? value : value?.items || value?.data || [];
-			currentFFTItem.value = Array.isArray(list) ? list[0] || null : value;
-			prevFFTItems.value = Array.isArray(list) ? list.slice(1) : [];
-			activeAxis.value = currentFFTItem.value?.active_axis || sensorData.value?.ncd_active_axial_axis || null;
+			target.value = normalizeFftResponse(value);
+		})
+		.catch(() => {
+			target.value = Array.isArray(target.value) ? [] : null;
+			fftReady.value = true;
 		})
 		.finally(() => {
 			fftLoading.value = false;
 		});
 };
+const fetchFFTBundle = () => {
+	const selectedFftId = fftId.value;
+	if (!sensorData.value?.id) return;
+
+	fftReady.value = false;
+	fetchFFT({
+		target: currentFFTItem,
+		urlPostfix: selectedFftId ? `/${selectedFftId}` : '',
+	});
+	if (selectedFftId) {
+		fetchFFT({
+			target: prevFFTItems,
+			urlPostfix: `/${selectedFftId}/prev?max=9`,
+		});
+		fetchFFT({
+			target: nextFFTItem,
+			urlPostfix: `/${selectedFftId}/next`,
+		});
+	}
+};
+const setupMeasurement = (sensor) => {
+	measurement.value = sensor?.controller?.plant
+		? sensor.controller.plant.metric_system_type
+		: sensor?.controller?.metric_system_type || metricSystemsList.value[0]?.id || null;
+};
 const fetchPageData = () => {
+	if (!sensorId.value) return;
+
 	itemLoading.value = true;
-	fetchSensor({ itemId: route.params.id })
+	fetchSensor({ itemId: sensorId.value })
 		.then(({ value }) => {
 			sensorData.value = value || null;
-			return fetchFftData();
+			if (sensorData.value) {
+				fetchEquipment(sensorData.value.equipment_id);
+				setupMeasurement(sensorData.value);
+				fetchFFTBundle();
+			}
 		})
 		.finally(() => {
 			itemLoading.value = false;
 		});
 };
+const toggleFilterbar = (event) => {
+	showFilterbar.value = !showFilterbar.value;
+	dropdownFilterbarRef.value?.toggleFilterbar(event);
+};
+const updateEquipmentAndFFT = ({
+	equipmentItem,
+	fftItem,
+	skipFFTReload,
+	updateRpmValue,
+	updateVibrationAnalysisRules,
+} = {}) => {
+	if (equipmentItem) {
+		setTimeout(() => {
+			equipmentData.value = equipmentItem;
+		}, 10);
+	}
+	if (fftItem && currentFFTItem.value) {
+		if (updateRpmValue) {
+			currentFFTItem.value.rpm_value = fftItem.rpm_value;
+		}
+		if (updateVibrationAnalysisRules) {
+			currentFFTItem.value.vibration_analysis_rules = fftItem.vibration_analysis_rules;
+		}
+		if (!skipFFTReload) {
+			fftReady.value = false;
+			setTimeout(() => {
+				currentFFTItem.value = fftItem;
+			}, 10);
+		}
+	}
+};
+const handleFFT = ({ prev, next } = {}) => {
+	if (!sensorData.value || !currentFFTItem.value) return;
 
+	const {
+		isBannerTempVibe2,
+		isBannerV2_1,
+		isBannerV2Generic,
+	} = currentSensorType.value;
+	const urlType = (isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic) ? 'banner' : 'ncd';
+
+	if (prev && prevFFTItem.value) {
+		fftReady.value = false;
+		router.replace(`/${urlType}/${sensorData.value.id}/fft/${prevFFTItem.value.id}`);
+		nextFFTItem.value = cloneDeep(currentFFTItem.value);
+		currentFFTItem.value = cloneDeep(prevFFTItem.value);
+		fetchFFT({
+			target: prevFFTItems,
+			urlPostfix: `/${prevFFTItem.value.id}/prev?max=9`,
+		});
+	} else if (next && nextFFTItem.value) {
+		fftReady.value = false;
+		router.replace(`/${urlType}/${sensorData.value.id}/fft/${nextFFTItem.value.id}`);
+		currentFFTItem.value = cloneDeep(nextFFTItem.value);
+		fetchFFT({
+			target: prevFFTItems,
+			urlPostfix: `/${nextFFTItem.value.id}/prev?max=11`,
+		});
+		fetchFFT({
+			target: nextFFTItem,
+			urlPostfix: `/${nextFFTItem.value.id}/next`,
+		});
+	}
+};
+const handleSplitCharts = () => {
+	splitCharts.value = !splitCharts.value;
+};
+const switchMetricSystem = ({ id }) => {
+	measurement.value = id;
+};
+const addChildComponentToSelected = (component) => {
+	const isSelected = selectedChildComponents.value.some((item) => item.id === component.id);
+	selectedChildComponents.value = isSelected
+		? selectedChildComponents.value.filter((item) => item.id !== component.id)
+		: [...selectedChildComponents.value, component];
+};
+const clearSelectedChildComponentsOnCharts = () => {
+	selectedChildComponents.value = [];
+};
+const handleRpmCursorDrop = (data) => {
+	analysisFFTContainerRef.value?.saveRpmParams?.({
+		...data,
+		successMessage: `RPM ${tt('updated')}`,
+		updateRpmValue: true,
+		skipFFTReload: true,
+	});
+};
+const handleAnalysisSave = ({ clearSelectedChildComponentsOnCharts: clearSelected } = {}) => {
+	if (clearSelected) clearSelectedChildComponentsOnCharts();
+};
+const rpmParamsSaved = (data) => {
+	updateEquipmentAndFFT({
+		fftItem: data,
+		updateRpmValue: true,
+		skipFFTReload: true,
+	});
+};
+const togglePreviewModal = (data) => {
+	emit('event', {
+		eventName: 'togglePreviewModal',
+		data,
+		onward: true,
+	});
+};
+
+const { handleEvent } = useEventHandler({
+	updateEquipmentAndFFT,
+	addChildComponentToSelected,
+	clearSelectedChildComponentsOnCharts,
+	handleRpmCursorDrop,
+	rpmParamsSaved,
+	togglePreviewModal,
+}, emit);
+
+watch(prevFFTItems, (items) => {
+	prevFFTItem.value = items?.length ? items[0] : null;
+});
+watch(currentFFTItem, (fft) => {
+	if (!fft) return;
+	setupActiveAxisByFFT(fft);
+	setFFTReadySoon();
+});
 watch(
-	() => route.params.id,
+	() => [sensorId.value, fftId.value],
 	() => fetchPageData(),
 );
 

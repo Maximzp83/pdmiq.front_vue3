@@ -87,13 +87,15 @@
 
 							<div v-if="enableShareLinkButton" class="ml-auto">
 								<el-button
-									class="share-button"
+									class="share-button mini"
 									type=""
 									native-type="button"
 									@click="handleShareLinkClick"
 								>
 									<span class="span-block">{{ tt('Share') }}</span>
-									<i class="span-block el-icon-share"></i>
+									<el-icon class="span-block el-icon-share">
+										<Share />
+									</el-icon>
 								</el-button>
 							</div>
 						</div>
@@ -123,6 +125,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { RouterView, useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
+import { Share } from '@element-plus/icons-vue';
 
 import { api_request } from '@/api/request_provider';
 import { copyToClipboard } from '@/helpers/specialHelpers';

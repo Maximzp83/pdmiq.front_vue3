@@ -459,7 +459,6 @@ body {
 			background-color: transparent;
 		}
 
-
 		&.link {
 			border: none;
 
@@ -676,6 +675,17 @@ body {
 				}
 			}
 		}
+
+		&.share-button {
+			padding-top: 3px !important;
+			padding-bottom: 3px !important;
+			border-color: #DEE2E6 !important;
+			& > span > * {vertical-align: middle;}
+
+			.el-icon-share {
+				font-size: 22px;
+			}
+		}
 	}
 
 	.el-input-group {
@@ -748,8 +758,11 @@ body {
 
 	.el-dialog {
 		padding: 0;
-		margin-top: 0;
 		margin-bottom: 0;
+
+		&:not(.vertical-margin) {
+			margin-top: 0;			
+		}
 
 		.el-dialog__body {
 			padding: 25px 25px 30px;
@@ -839,7 +852,7 @@ body {
 			}
 		}
 
-		width: 180px;
+		width: 180px !important;
 
 		.el-input__wrapper {
 			border: 1px solid #DEE2E6;

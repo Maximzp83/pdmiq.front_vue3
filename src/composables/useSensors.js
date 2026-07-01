@@ -162,6 +162,18 @@ export function useSensors() {
 	const setFftRpmParams = ({ sensorId, fftId, ...payload } = {}) =>
 		api_request.put(`/sensors/${sensorId}/ncd/fft/${fftId}/rpm-params`, payload);
 
+	const saveFftVibrationAnalysisRuleOverride = ({ sensorId, fftId, ...payload } = {}) =>
+		api_request.post(`/sensors/${sensorId}/ncd/fft/${fftId}/vibration-analysis-rules`, {
+			notNotify: true,
+			...payload,
+		});
+
+	const deleteFftVibrationAnalysisRuleOverride = ({ sensorId, fftId, originalRuleId, ...payload } = {}) =>
+		api_request.delete(`/sensors/${sensorId}/ncd/fft/${fftId}/vibration-analysis-rules/${originalRuleId}`, {
+			notNotify: true,
+			...payload,
+		});
+
 	const unlockFft = ({ sensorId, ...payload } = {}) =>
 		api_request.post(`/sensors/${sensorId}/fft/unlock`, payload);
 
@@ -237,6 +249,8 @@ export function useSensors() {
 		saveDatasetFormulas,
 		sendRpm,
 		setFftRpmParams,
+		saveFftVibrationAnalysisRuleOverride,
+		deleteFftVibrationAnalysisRuleOverride,
 		unlockFft,
 		createFftWaveform,
 		fetchFftWaveform,

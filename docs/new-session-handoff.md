@@ -58,8 +58,10 @@ Primary rules source:
   - Added `src/views/Sensors/FilterBlock/FFTRequestBlock.vue` as the list-level FFT request dialog.
   - Added chart support wrappers under `src/components/charts` and `src/views/Sensors/charts`.
   - Added final statistics/chart pages: `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, and `OneChartPage.vue`.
+  - `FFTStatisticsPage.vue` and `src/views/Sensors/charts/fft` were re-aligned toward Vue2 behavior for page header/controls, prev/next FFT navigation, FFT chart cursor/peaks/periodic/waveform/RPM cursor flow, vibration-analysis rule override save/delete, and waterfall 3D controls.
   - Added Analysis FFT helpers and statistics filter blocks.
   - Enabled `/sensors`, `/sensors/new`, `/sensors/:id`, `/sensors/ncd`, `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, and `/sensors/:id/chart` routes.
+  - FFT compatibility routes `/ncd/:id/fft/:fftId` and `/banner/:id/fft/:fftId` are enabled for legacy links and prev/next navigation.
   - Enabled Sensors sidebar menu entry.
   - Legacy Sensors-local mixin files were not copied as mixins; their behavior was folded into Vue3 components/composables, primarily `src/composables/useSensors.js`.
 - `BrandModels` details stack is now migrated in Vue3:

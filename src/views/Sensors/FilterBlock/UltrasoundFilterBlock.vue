@@ -155,7 +155,7 @@ const actionButtons = computed(() => {
 			id: 15,
 			text: `${tt('Trigger')} ${tt('Lube_Cycle')}`,
 			method: 'openLubeCycleDialog',
-			className: 'inverted report-button',
+			className: 'report-button',
 			loadingProp: 'purgeLoading',
 		});
 	}
