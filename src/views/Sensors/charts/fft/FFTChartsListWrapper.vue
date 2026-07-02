@@ -197,6 +197,10 @@ const buildCharts = ({ settings, payload } = {}) => {
 		nextHiddenChartsMap[chart.chart_id] = hiddenChartsMap.value[chart.chart_id] || false;
 	});
 	hiddenChartsMap.value = nextHiddenChartsMap;
+
+	if (process.env.NODE_ENV === 'development') {
+		window[`ChartsListInstance_0`] = chartsListInstance.value;
+	}
 };
 
 const { handleEvent } = useEventHandler({

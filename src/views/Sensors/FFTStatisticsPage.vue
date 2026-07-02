@@ -86,7 +86,7 @@
 								type="primary"
 								native-type="button"
 								:class="[
-									'action-button inverted re-baseline-button operations-button toggle-additional-filters',
+									'action-button inverted re-baseline-button operations-button toggle-additional-filters mini',
 									{ active: showFilterbar },
 								]"
 								@click="toggleFilterbar"
@@ -156,7 +156,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Highcharts from 'highcharts';
 import stockInit from 'highcharts/modules/stock';
@@ -181,6 +181,7 @@ import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useSensors } from '@/composables/useSensors';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useGlobalStore } from '@/stores/GlobalStore';
 import {
 	bannerRequestFmaxTypesList,
 	bannerRequestTypesList,
@@ -216,6 +217,7 @@ const emit = defineEmits(['event']);
 const { tt } = Lang;
 const route = useRoute();
 const router = useRouter();
+const globalStore = useGlobalStore();
 const { fetchSensor, fetchNcdFft } = useSensors();
 const { doFetchAction } = useRequestsList();
 const fetchEquipmentById = createGetByIdRequest(ENTITIES.Equipments.apiBase);
@@ -244,6 +246,10 @@ const loadContent = computed(() => !!sensorData.value);
 const itemsName = computed(() => Object.freeze({
 	one: tt('FFT'),
 	mult: tt('FFTs'),
+}));
+const navbarSettings = computed(() => Object.freeze({
+	hideBackButton: true,
+	pageTitle: `${tt('phrases.Spectrum_Analysis')} ${tt('Page')}`,
 }));
 const metricSystemsList = computed(() => Object.freeze(getMetricSystemsList()));
 const { currentSensorType } = useSensorType({
@@ -391,6 +397,7 @@ const fetchEquipment = (id) => {
 		equipmentLoading,
 		{
 			itemId: id,
+			prepareData: 'prepareEquipmentsList',
 			prepareDataSettings: {
 				addSettingItems: [
 					{ key: 'brand', val_key: 'brand' },
@@ -466,6 +473,7 @@ const toggleFilterbar = (event) => {
 	showFilterbar.value = !showFilterbar.value;
 	dropdownFilterbarRef.value?.toggleFilterbar(event);
 };
+
 const updateEquipmentAndFFT = ({
 	equipmentItem,
 	fftItem,
@@ -493,6 +501,7 @@ const updateEquipmentAndFFT = ({
 		}
 	}
 };
+
 const handleFFT = ({ prev, next } = {}) => {
 	if (!sensorData.value || !currentFFTItem.value) return;
 
@@ -542,8 +551,7 @@ const clearSelectedChildComponentsOnCharts = () => {
 	selectedChildComponents.value = [];
 };
 const handleRpmCursorDrop = (data) => {
-	analysisFFTContainerRef.value?.saveRpmParams?.({
-		...data,
+	analysisFFTContainerRef.value?.saveRpmParams?.(data, {
 		successMessage: `RPM ${tt('updated')}`,
 		updateRpmValue: true,
 		skipFFTReload: true,
@@ -589,5 +597,9 @@ watch(
 	() => fetchPageData(),
 );
 
-onMounted(fetchPageData);
+onMounted(() => {
+	globalStore.setup_navbar(navbarSettings.value);
+	fetchPageData();
+});
+onBeforeUnmount(() => globalStore.setup_navbar({}));
 </script>

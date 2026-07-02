@@ -340,6 +340,19 @@ class FFTChartsListFactory extends ChartsListFactoryBase {
 		this.useResources(resources);
 		// console.log('SensorChartsListFactory', resources, this)
 	}
+
+	syncRpmCursorsInCharts({point, isDrop}) {
+		this.chartsInstancesList.forEach(Chart => {
+			Chart.handleRpmCursorDrag({
+				target: {
+					serieId: point.series.userOptions.id,
+					pointId: point.id,
+					x: point.x,
+				}
+			},
+			{ isUpdateOnly: true, isDrop })
+		})
+	}
 }
 
 class SensorAlarmsChartsListFactory extends ChartsListFactoryBase {

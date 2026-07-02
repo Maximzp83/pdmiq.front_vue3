@@ -30,6 +30,7 @@ export function useAsyncSelect({
 	const innerOptionsList = ref([...(optionsList || [])]);
 	const innerOptionsLoading = ref(!!optionsLoading);
 	const fetchedByIds = ref([]);
+	const selectedItemsFetchPromise = ref(null);
 	const boundParams = ref({});
 	const boundPayload = ref({});
 	const previousBindValues = ref({});
@@ -68,6 +69,10 @@ export function useAsyncSelect({
 
 	const runFetchAction = (fetchAction, payload) =>
 		executeRequestAction(fetchAction, payload, '[useAsyncSelect]');
+	const getFetchByIdConfig = () => {
+		const { fetchByIdAction, fetchById } = resolveSettings();
+		return fetchByIdAction || fetchById;
+	};
 
 	const buildListPayload = ({ page = 1, queryValue = '', extraParams = {}, extraPayload = {} } = {}) => {
 		const localSettings = resolveSettings();
@@ -142,7 +147,7 @@ export function useAsyncSelect({
 			extraParams,
 			extraPayload,
 		});
-		// console.log('fetchItems', )
+		// console.log('fetchItems', payload)
 		return runFetchAction(fetchAction, payload)
 			.then((response) => {
 				if (!response || typeof response !== 'object') {
@@ -176,11 +181,13 @@ export function useAsyncSelect({
 	};
 
 	const fetchSelectedItemsById = () => {
+		if (selectedItemsFetchPromise.value) return selectedItemsFetchPromise.value;
+
 		const missingIds = getMissingIds();
 		if (!missingIds.length) return Promise.resolve([]);
 
-		const { fetchByIdAction, fetchById, itemIdParam = 'itemId' } = resolveSettings();
-		const fetchConfig = fetchByIdAction || fetchById;
+		const { itemIdParam = 'itemId' } = resolveSettings();
+		const fetchConfig = getFetchByIdConfig();
 		if (!fetchConfig) return Promise.resolve([]);
 
 		updateOptionsLoading(true);
@@ -188,8 +195,8 @@ export function useAsyncSelect({
 		const requests = missingIds.map((id) =>
 			runFetchAction(fetchConfig, { [itemIdParam]: id }),
 		);
-
-		return Promise.all(requests)
+		// console.log('fetchSelectedItemsById', requests)
+		selectedItemsFetchPromise.value = Promise.all(requests)
 			.then((responses) => {
 				const fetchedItems = responses.map((response) => response?.value).filter(Boolean);
 
@@ -215,7 +222,10 @@ export function useAsyncSelect({
 			})
 			.finally(() => {
 				updateOptionsLoading(false);
+				selectedItemsFetchPromise.value = null;
 			});
+
+		return selectedItemsFetchPromise.value;
 	};
 
 	const selectQuery = (value) => {
@@ -307,6 +317,12 @@ export function useAsyncSelect({
 			const shouldLoadInitial =
 				!hasLoadedInitialOptions.value || (innerOptionsList.value.length < minOptionsToFetch);
 			if (shouldLoadInitial || fetchNextTime.value) {
+				if (getFetchByIdConfig() && getMissingIds().length) {
+					return fetchSelectedItemsById().finally(() => {
+						fetchNextTime.value = false;
+					});
+				}
+
 				return loadmore({ isEmptyList: true }).finally(() => {
 					fetchNextTime.value = false;
 				});

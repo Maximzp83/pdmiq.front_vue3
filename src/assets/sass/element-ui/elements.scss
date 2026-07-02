@@ -929,6 +929,16 @@ body {
 		}
 	}
 
+	.el-form-item__content {
+		width: 100%;
+		display: block !important;
+		& > * {
+			width: inherit;
+
+			& > .flex {width: inherit;}
+		}
+	}
+
 	@media (max-width: 767px) {
 		.el-picker-panel {
 			width: 100% !important;

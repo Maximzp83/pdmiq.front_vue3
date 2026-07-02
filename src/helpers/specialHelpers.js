@@ -34,6 +34,10 @@ import {
 import { ElMessage } from 'element-plus';
 import 'element-plus/es/components/message/style/css';
 
+import {
+	METRIC_SYSTEM_TYPES,
+} from '@/modules/charts_factory/controllers/Sensor/enums';
+
 // import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
 // import { storeGetter, dispatchGetter } from '@/store';
 import { Lang } from '@/localization';
@@ -397,8 +401,12 @@ const getSensorTitle1 = (sensor, options = {}) => {
 			const value = setting.value || getObjectVal(sensor, setting.key);
 			if (value) {
 				const label = setting.label ? `${Lang.tt(setting.label)}:` : '';
-
-				if (options.boldLabels) {
+				if (options.linkSettings && setting.key == options.linkSettings.key) {
+					results.push(`
+						<span class="${options.boldLabels ? 'bold' : ''}">${label}</span>
+						<a class="link underline info-color" href="${options.linkSettings.to}">${value}</a>`
+					);
+				} else if (options.boldLabels) {
 					results.push(`<b>${label}</b> ${value}`);
 				} else {
 					results.push(`${label} ${value}`);
@@ -571,7 +579,7 @@ const copyToClipboard1 = (string, settings = {}) => {
 	});
 };
 
-const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem}) => {
+const setupItemSpeedOptionsList1 = ({rootFilters = {}, sensorData, itemSpeedOptionsList, fftItem}) => {
 	const {rpmSources} = sensorData;
 	let list = [];
 	const setupRpmOptionValues = value => {
@@ -584,7 +592,19 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem})
 	};
 
 	Object.keys(rpmSources).forEach(source_key => {
-		const option = findItemBy('source_key', source_key, itemSpeedOptionsList);
+		let key = 'source_key';
+
+		if (source_key == 'max_peak_frequency_at_imperial_evaluated') {
+			if (rootFilters.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+				key = `source_key_${METRIC_SYSTEM_TYPES.IMPERIAL}`;
+			}
+		} else if (source_key == 'max_peak_frequency_at_metric_evaluated') {
+			if (rootFilters.measurement === METRIC_SYSTEM_TYPES.METRIC) {
+				key = `source_key_${METRIC_SYSTEM_TYPES.METRIC}`;
+			}
+		}
+
+		const option = findItemBy(key, source_key, itemSpeedOptionsList);
   	// console.log('dialog', rpmSources, source_key, rpmSources[source_key])
 		if (option && (rpmSources[source_key] || rpmSources[source_key] == 0)) {
 			list.push({
@@ -597,7 +617,7 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem})
 		}
 	});
 
-	if (fftItem && fftItem.rpm_value != null) {
+	if (fftItem) {
 		list.push({
 			id: 'fft-rpm',
 			name: 'FFT',
@@ -609,14 +629,24 @@ const setupItemSpeedOptionsList1 = ({sensorData, itemSpeedOptionsList, fftItem})
 	return Object.freeze(list);
 };
 
-const getCurrentRpmSource1 = ({ sensorData = {}, fftItem = null, rpm_source_item = null }) => {
+const getCurrentRpmSource1 = ({ rootFilters = {}, sensorData = {}, fftItem = null, rpm_source_item = null }) => {
 	const preparedList = setupItemSpeedOptionsList1({
 		sensorData,
+		rootFilters,
 		itemSpeedOptionsList: itemSpeedOptionsList(),
-		fftItem,
 	});
-	const sourceId = fftItem?.rpm_source_item || rpm_source_item || sensorData.rpm_source_item;
-	return findItemBy('id', sourceId, preparedList) || preparedList[0] || null;
+	if (fftItem && fftItem.rpm_value) {
+		return {
+			id: 'fft-rpm',
+			value: fftItem.rpm_value,
+			name: 'FFT',
+			draggable: true,
+		};
+	}
+	if (rpm_source_item) {
+		return findItemBy('id', rpm_source_item, preparedList);
+	}
+	return null;
 };
 
 export const equipmentCardTitle = (titles, equipmentData) =>

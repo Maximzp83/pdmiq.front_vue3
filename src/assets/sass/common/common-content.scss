@@ -5207,7 +5207,7 @@ body {
 							background-color: transparent;
 							padding-left: 2px;
 							padding-right: 2px;
-							.el-icon-setting {font-size: 20px;}
+							.el-icon {font-size: 20px;}
 						}
 					}
 				}
@@ -5259,11 +5259,11 @@ body {
 				}
 			}
 			.settings-button {
-				height: 32px;
+				height: 32px !important;
 				padding: 3px;
 				// background-color: #f1f2f6;
 
-				.el-icon-setting {
+				.el-icon {
 					font-size: 24px;
 				}
 

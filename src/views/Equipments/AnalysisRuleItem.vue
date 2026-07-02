@@ -22,9 +22,10 @@
 				<el-button
 					native-type="button"
 					class="action-button settings-button"
-					icon="el-icon-setting"
 					@click.stop="handleShowAnalysisRuleFormDialog"
-				/>
+				>
+					<el-icon><Setting /></el-icon>
+				</el-button>
 			</div>
 		</div>
 
@@ -146,6 +147,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { Setting } from '@element-plus/icons-vue';
 
 import { createGetRequest } from '@/api/request_factories';
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';

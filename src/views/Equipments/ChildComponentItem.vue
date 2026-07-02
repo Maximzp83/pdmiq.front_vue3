@@ -22,9 +22,10 @@
 							:disabled="!preparedVibrationAnalysisItems.length"
 							native-type="button"
 							class="action-button settings-button"
-							icon="el-icon-setting"
 							@click.stop="handleShowAnalysisRuleFormDialog"
-						/>
+						>
+							<el-icon><Setting /></el-icon>
+						</el-button>
 					</div>
 				</div>
 			</div>
@@ -198,6 +199,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { Setting } from '@element-plus/icons-vue';
 
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
@@ -505,6 +507,7 @@ watch(
 
 defineExpose({
 	formData,
+	showAnalysisRulesDialog,
 	validateItemForm,
 	getFormData,
 	collectData,

@@ -1,8 +1,8 @@
 <template>
 	<div>
 		<el-button
-			:type="buttonType || 'primary'"
-			:class="['block-item mini inverted', buttonClass]"
+			:type="normalizedButtonType"
+			:class="['block-item mini inverted', normalizedButtonClass, buttonClass]"
 			@click="zoomYAxis(0)"
 		>
 			{{ tt('reset') }}
@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { getRoundedValue } from '@/helpers';
 import { Lang } from '@/localization';
 
@@ -35,6 +35,24 @@ const props = defineProps({
 
 const emit = defineEmits(['event']);
 
+const elementPlusButtonTypes = new Set([
+	'default',
+	'primary',
+	'success',
+	'warning',
+	'info',
+	'danger',
+	'text',
+	'',
+]);
+const normalizedButtonType = computed(() =>
+	elementPlusButtonTypes.has(props.buttonType) ? props.buttonType : '',
+);
+const normalizedButtonClass = computed(() =>
+	props.buttonType && !elementPlusButtonTypes.has(props.buttonType)
+		? `el-button--${props.buttonType}`
+		: '',
+);
 const initialChartYAxisMax = ref(null);
 const currentChartYAxisMax = ref(null);
 const initialChartYAxisMin = ref(null);

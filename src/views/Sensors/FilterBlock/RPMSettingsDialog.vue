@@ -177,6 +177,11 @@ watch(
 			padding: 2px 4px !important;
 		}
 	}
+
+	.additional-input-cell {
+		display: flex;
+		align-items: center;
+	}
 }
 
 .rpm-settings-grid__label {

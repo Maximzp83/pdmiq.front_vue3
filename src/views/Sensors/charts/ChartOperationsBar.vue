@@ -10,18 +10,22 @@
 					:close-delay="0"
 					popper-class="periodic-cursors-popover"
 					@show="event(item.event, item.args)"
-					@hide="event(item.event, item.args)"
+							@hide="event(item.event, item.args)"
 				>
 					<template #reference>
 						<el-button
-							:type="item.type || 'primary'"
+							:type="getButtonType(item)"
 							native-type="button"
 							:class="[
 								'item-action-button capitalize',
+								getButtonClass(item),
 								item.className,
 								{ active: activeButtonValues[item.activeKey] },
 							]"
 						>
+							<el-icon v-if="item.prefixIconComponent">
+								<component :is="item.prefixIconComponent" />
+							</el-icon>
 							<i v-if="item.prefix_icon" :class="[`icomoon ${item.prefix_icon}`]"></i>
 							<span v-if="item.text">{{ item.text }}</span>
 							<i v-if="item.icon" :class="[`icomoon ${item.icon}`]"></i>
@@ -66,17 +70,21 @@
 
 				<el-button
 					v-else
-					:type="item.type || 'primary'"
+					:type="getButtonType(item)"
 					native-type="button"
 					:class="[
 						'item-action-button capitalize',
 						{ 'delete-button inverted': item.isDelete },
+						getButtonClass(item),
 						item.className,
 						{ active: activeButtonValues && activeButtonValues[item.activeKey] },
 					]"
 					:loading="item.loadingKey && activeButtonValues && activeButtonValues[item.loadingKey]"
 					@click="event(item.event, item.args)"
 				>
+					<el-icon v-if="item.prefixIconComponent">
+						<component :is="item.prefixIconComponent" />
+					</el-icon>
 					<i v-if="item.prefix_icon" :class="[`icomoon ${item.prefix_icon}`]"></i>
 					<span v-if="item.text">{{ item.text }}</span>
 					<i v-if="item.icon" :class="[`icomoon ${item.icon}`]"></i>
@@ -111,14 +119,37 @@ const formData = ref({
 	step: 0,
 	max_steps: 10,
 });
+const elementPlusButtonTypes = new Set([
+	'default',
+	'primary',
+	'success',
+	'warning',
+	'info',
+	'danger',
+	'text',
+	'',
+]);
 
 const event = (name, data) => {
 	emit('event', name, data);
+};
+const normalizeButtonType = (type) => (typeof type === 'string' ? type.trim() : type);
+const getButtonType = (item) => {
+	const type = normalizeButtonType(item.type ?? 'primary');
+	return elementPlusButtonTypes.has(type) ? type : '';
+};
+const getButtonClass = (item) => {
+	const type = normalizeButtonType(item.type);
+	return type && !elementPlusButtonTypes.has(type) ? `el-button--${type}` : '';
 };
 
 const generatePeriodicCursors = () => {
 	event('generatePeriodicCursors', formData.value);
 };
+
+defineExpose({
+	generatePeriodicCursors,
+});
 
 watch(
 	() => props.chartPeaks,

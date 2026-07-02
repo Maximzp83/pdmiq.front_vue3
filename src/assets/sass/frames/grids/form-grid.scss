@@ -204,16 +204,6 @@
 		& > .el-form-item + .el-form-item { margin-top: 0;  }
 	}
 
-	.el-form-item__content {
-		width: 100%;
-		display: block;
-		& > * {
-			width: inherit;
-
-			& > .flex {width: inherit;}
-		}
-	}
-
 	&.half-width, .half-width {
 		max-width: 550px;
 		width: 50%;

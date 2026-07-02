@@ -265,7 +265,7 @@ input, select {
 
 .item-action-button {
 	span, i {
-		vertical-align: middle;
+		// vertical-align: middle;
 		font-weight: 600;
 	}
 
@@ -325,6 +325,12 @@ input, select {
 
 .filled_2 {
 	background-color: #fbfbfb;
+}
+.filled_3 {
+	background-color: #f6fafd;
+}
+.filled_4 {
+	background-color: #f7f7f7 !important;
 }
 
 .bordered {

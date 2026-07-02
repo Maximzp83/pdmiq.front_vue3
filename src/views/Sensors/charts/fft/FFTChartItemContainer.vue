@@ -11,7 +11,7 @@
 						<el-button
 							type=""
 							native-type="button"
-							class="item-action-button capitalize flex align-center secondary"
+							class="item-action-button capitalize flex align-center el-button--secondary"
 							@click="toggleChart"
 						>
 							<i :class="['icomoon', chartIsHidden ? 'icon-eye' : 'icon-eye-slash']"></i>
@@ -24,14 +24,18 @@
 					v-show="!chartIsHidden && hasStatistics"
 					class="zoom-block-container mcol-xs-9 mcol-sm-auto capitalize fft-chart-actions"
 				>
-					<ChartZoom
-						buttonType=""
-						buttonClass="secondary inverted"
-						class="mcol-xs-6 mcol-sm-auto"
-						:ChartInstance="ChartInstance"
-						:chartOptionsUpdate="chartOptionsUpdate"
-						@event="handleEvent"
-					/>
+					<div class="chart-actions-block">
+						<div class="flex wrap mrow">
+							<ChartZoom
+								buttonType="secondary"
+								buttonClass="inverted"
+								class="mcol-xs-6 mcol-sm-auto"
+								:ChartInstance="ChartInstance"
+								:chartOptionsUpdate="chartOptionsUpdate"
+								@event="handleEvent"
+							/>
+						</div>
+					</div>
 				</div>
 
 				<div
@@ -122,6 +126,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { VideoPlay } from '@element-plus/icons-vue';
 
 import { Lang } from '@/localization';
 import { getRoundedValue, findItemBy } from '@/helpers';
@@ -200,9 +205,9 @@ const chartOperationsButtons = computed(() => {
 	if (type === 'waveform') {
 		buttons.push({
 			id: 6,
-			prefix_icon: 'el-icon-video-play',
+			prefixIconComponent: VideoPlay,
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary icomoon el-icon-video-play inverted',
 			event: 'handlePlaySound',
 			loadingKey: 'generatingWaveform',
 		});
@@ -214,7 +219,7 @@ const chartOperationsButtons = computed(() => {
 			text: `${tt('Add')} ${tt('Cursor')}`,
 			prefix_icon: 'icon-cursor',
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary inverted',
 			activeKey: 'addCursorActive',
 			event: 'addCursor',
 		},
@@ -223,7 +228,7 @@ const chartOperationsButtons = computed(() => {
 			text: `${tt('Show')} ${tt('Peaks')}`,
 			event: 'showPeaks',
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary inverted',
 			prefix_icon: 'icon-peaks',
 			activeKey: 'showPeaksActive',
 		},
@@ -232,7 +237,7 @@ const chartOperationsButtons = computed(() => {
 			text: `${tt('Periodic')} ${tt('Cursors')}`,
 			event: 'showPeriodicCursors',
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary inverted',
 			prefix_icon: 'icon-periodic',
 			activeKey: 'showPeriodicActive',
 			isPeriodicCursors: true,
@@ -242,7 +247,7 @@ const chartOperationsButtons = computed(() => {
 			text: tt('Waterfall'),
 			event: 'showWaterfallCharts',
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary inverted',
 			prefix_icon: 'icon-waterfall',
 			activeKey: 'showWaterfallActive',
 		},
@@ -250,7 +255,7 @@ const chartOperationsButtons = computed(() => {
 			id: 2,
 			text: tt('Remove'),
 			type: '',
-			className: 'secondary inverted',
+			className: 'el-button--secondary inverted',
 			prefix_icon: 'icon-plus rotate',
 			isDelete: true,
 			event: 'removeAllCursors',
@@ -490,6 +495,37 @@ const handleRpmCursorDrop = ({ x } = {}) => {
 		onward: true,
 	});
 };
+const addAnalysisRuleToSelected = (rule) => {
+	const isSelected = selectedAnalysisRules.value.some((item) => item.id === rule.id);
+	selectedAnalysisRules.value = isSelected
+		? selectedAnalysisRules.value.filter((item) => item.id !== rule.id)
+		: [...selectedAnalysisRules.value, rule];
+
+	props.ChartInstance.generateAnnotationsFromFFTAnalysisRules(selectedAnalysisRules.value);
+};
+const updateEquipmentAndFFT = (data) => {
+	if (data?.fftItem) {
+		const nextFFTOverrides = data.fftItem.vibration_analysis_rules || [];
+
+		selectedAnalysisRules.value = selectedAnalysisRules.value.map((rule) => {
+			const overrideRule = findItemBy('original_rule_id', rule.original_rule_id, nextFFTOverrides);
+			return {
+				...rule,
+				active_harmonics: overrideRule?.harmonics != null
+					? overrideRule.harmonics
+					: rule.original_rule?.harmonics,
+			};
+		});
+
+		props.ChartInstance.generateAnnotationsFromFFTAnalysisRules(selectedAnalysisRules.value);
+	}
+
+	emit('event', {
+		eventName: 'updateEquipmentAndFFT',
+		data,
+		onward: true,
+	});
+};
 
 const chartPlotOptionsEventsList = computed(() => Object.freeze([
 	{
@@ -528,10 +564,16 @@ const { handleEvent } = useEventHandler({
 	generatePeriodicCursors,
 	showWaterfallCharts,
 	removeAllCursors,
+	addAnalysisRuleToSelected,
+	updateEquipmentAndFFT,
 }, emit);
 
 watch(() => props.rootFilters, () => {
 	refetchChartData.value = true;
+});
+
+watch(currentRpmSource, (data) => {
+	props.ChartInstance.setValue('rpmSourceValue', data);
 });
 
 onMounted(() => {
@@ -542,6 +584,9 @@ onMounted(() => {
 	props.ChartInstance.injectProps('events', chartInstanceEventsList.value);
 	props.ChartInstance.assignPlotOptionsEvents?.(chartPlotOptionsEventsList.value);
 	props.ChartInstance.setValue?.('seriesEvents', chartPointsEventsList.value);
+	if (currentRpmSource.value?.value != null) {
+		props.ChartInstance.setValue('rpmSourceValue', currentRpmSource.value);
+	}
 	props.ChartInstance.fetchChartData();
 });
 
