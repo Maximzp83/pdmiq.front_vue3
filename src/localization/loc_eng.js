@@ -604,6 +604,7 @@ export default {
 		harmonics: 'Harmonics',
 		editable: 'Editable',
 		difference: 'Difference',
+		devices: 'Devices',
 	},
 
 	sidebar_menu: {

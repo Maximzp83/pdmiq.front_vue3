@@ -59,9 +59,11 @@
 			</div>
 		</template>
 
-		<el-button :class="[buttonClass, 'upload-button']" :size="buttonSize" type="primary" v-if="!disabled">
+		<el-button :class="[buttonClass, '1upload-button']" :size="buttonSize" type="primary" v-if="!disabled">
 			<span>{{ buttonText || 'Upload img' }}</span>
-			<el-icon :class="['suffix-icon']" size="14">
+			<i v-if="buttonIcon" :class="['suffix-icon', buttonIcon]"></i>
+
+			<el-icon v-else :class="['suffix-icon']" size="14">
 				<PictureIcon />
 			</el-icon>
 			<!-- <i :class="['suffix-icon', buttonIcon || 'el-icon-picture-outline']"></i> -->
