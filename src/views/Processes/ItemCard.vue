@@ -15,17 +15,28 @@
 
 				<div class="actions-block ml-auto">
 					<template v-if="operationsSettings.actions">
-						<ButtonWithPopover
+						<el-popover
 							v-for="action in operationsSettings.actions"
 							:key="`action-${action.name}`"
 							:title="action.tooltip_text"
 							:disabled="!action.tooltip_text"
-							:settings="popoverSettings"
-							:buttonType="action.type"
-							:buttonIcon="action.icon"
-							:buttonClass="['action-button', action.className]"
-							@onClick="handleAction(action)"
-						/>
+							:placement="popoverSettings.placement || 'bottom'"
+							:popper-class="popoverSettings.popperClass"
+							:width="popoverSettings.width"
+							trigger="hover"
+						>
+							<template #reference>
+								<el-button
+									:class="['action-button', action.className]"
+									:type="action.type"
+									:size="popoverSettings.buttonSize"
+									native-type="button"
+									@click="handleAction(action)"
+								>
+									<i v-if="action.icon" :class="action.icon"></i>
+								</el-button>
+							</template>
+						</el-popover>
 					</template>
 				</div>
 			</div>
@@ -75,7 +86,7 @@
 										:key="`break-${item.id || idx}`"
 										class="value"
 									>
-										{{ item.start_time }} - {{ item.finish_time }}{{ idx !== (cardData.work_breaks || []).length - 1 ? ',' : '' }}
+										<span class="time-range">{{ item.start_time }} - {{ item.finish_time }}</span>{{ idx !== (cardData.work_breaks || []).length - 1 ? ',' : '' }}
 									</span>
 								</span>
 							</li>
@@ -110,8 +121,6 @@ import { computed } from 'vue';
 import { getCellValue } from '@/helpers';
 import { not_wifi_icon } from '@/constants/global';
 import { buildProps, useItemCard } from '@/composables/mixins/useItemCard';
-
-import ButtonWithPopover from '@/components/common/ButtonWithPopover.vue';
 
 defineOptions({
 	name: 'ProcessItemCard',
@@ -170,3 +179,16 @@ const handleAction = ({ name }) => {
 	});
 };
 </script>
+
+<style scoped lang="scss">
+.values-list {
+	.value {
+		display: block;
+		margin-left: 0;
+	}
+
+	.time-range {
+		white-space: nowrap;
+	}
+}
+</style>

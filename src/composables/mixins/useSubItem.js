@@ -75,7 +75,7 @@ export function useSubItem({
 			if (!mainFormIsValid) {
 				validationResults.push(false);
 			}
-			console.log('validationResults1', validationResults);
+			// console.log('validationResults1', validationResults);
 
 			const validations = [];
 			if (subItemsSettings && validateSubItemsForm) {
@@ -87,20 +87,20 @@ export function useSubItem({
 
 			return Promise.all(validations).then((results) => {
 				validationResults.push(...results);
-				console.log('validationResults2', validationResults, localValidationHook);
+				// console.log('validationResults2', validationResults, localValidationHook);
 				return validationResults.every((item) => item);
 			});
 		}).catch(() => {
 			const validationResults = [false];
-			console.log('validationResults1', validationResults);
+			// console.log('validationResults1', validationResults);
 			if (localValidationHook) {
 				return Promise.resolve(localValidationHook(options)).then((localResult) => {
 					validationResults.push(localResult);
-					console.log('validationResults2', validationResults, localValidationHook);
+					// console.log('validationResults2', validationResults, localValidationHook);
 					return false;
 				});
 			}
-			console.log('validationResults2', validationResults, localValidationHook);
+			// console.log('validationResults2', validationResults, localValidationHook);
 			return false;
 		});
 	};

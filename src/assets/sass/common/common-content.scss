@@ -2685,7 +2685,10 @@ body {
 					}
 				}
 
-				.value {color: $mainFontColor; }
+				.value {
+					color: $mainFontColor;
+					white-space: nowrap;
+				}
 
 				&.main {
 					display: flex;
@@ -2980,7 +2983,7 @@ body {
 			.actions-block {
 				display: flex;
 				align-items: center;
-				& > span + span {margin-left: 5px;}
+				& > button + button {margin-left: 5px;}
 			}
 			
 			.action-button:not(.with-text) {width: 38px; height: 22px;}

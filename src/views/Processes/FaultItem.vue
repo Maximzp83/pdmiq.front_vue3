@@ -11,13 +11,13 @@
 		</el-form-item>
 
 		<div>
-			<el-button
-				v-if="!hideRemove"
-				class="action-button remove-button"
-				size="mini"
-				type="danger"
-				@click="removeItem"
-			>
+				<el-button
+					v-if="!hideRemove"
+					class="action-button remove-button"
+					size="small"
+					type="danger"
+					@click="removeItem"
+				>
 				<i class="icomoon icon-cross"></i>
 			</el-button>
 		</div>

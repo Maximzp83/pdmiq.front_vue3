@@ -6,33 +6,45 @@
 		:rules="rules"
 	>
 		<el-form-item class="small-paddings-time">
-			<div class="flex mrow">
+			<div class="flex mrow small-padding">
 				<div class="mcol-xs-5">
 					<Datepicker
 						v-model="formData.date"
-						className=" "
+						className="no-min-width mini"
 						:placeholder="`${tt('Select')} ${tt('date')}`"
 					/>
 				</div>
 
 				<div class="mcol-xs-4">
 					<el-time-select
+						class="time-select"
 						v-model="formData.start_day"
 						value-format="HH:mm"
 						:placeholder="tt('start')"
-						:picker-options="startTimePickerOptions"
+						:start="startTimePickerOptions.start"
+						:end="startTimePickerOptions.end"
+						:step="startTimePickerOptions.step"
+						:min-time="startTimePickerOptions.minTime"
+						:max-time="startTimePickerOptions.maxTime"
 						@blur="clearValidate"
 						@change="formData.finish_day = null"
+						popper-class="small-paddings"
 					/>
 				</div>
 
 				<div class="mcol-xs-4">
 					<el-time-select
+						class="time-select"
 						v-model="formData.finish_day"
 						:disabled="!formData.start_day"
 						value-format="HH:mm"
 						:placeholder="tt('finish')"
-						:picker-options="endTimePickerOptions"
+						:start="endTimePickerOptions.start"
+						:end="endTimePickerOptions.end"
+						:step="endTimePickerOptions.step"
+						:min-time="endTimePickerOptions.minTime"
+						:max-time="endTimePickerOptions.maxTime"
+						popper-class="small-paddings"
 					/>
 				</div>
 			</div>
@@ -41,7 +53,7 @@
 		<div v-if="!hideRemove" class="action-buttons-container absolute">
 			<el-button
 				class="action-button remove-button"
-				size="mini"
+				size="small"
 				type="danger"
 				@click="removeItem"
 			>
@@ -88,11 +100,21 @@ const rules = computed(() => ({
 	date: requiredRule,
 }));
 
+const defaultTimePickerOptions = {
+	start: '00:00',
+	end: '23:45',
+	step: '00:15',
+	minTime: '',
+	maxTime: '',
+};
+
 const startTimePickerOptions = computed(() => ({
+	...defaultTimePickerOptions,
 	...props.timePickerOptions,
 }));
 
 const endTimePickerOptions = computed(() => ({
+	...defaultTimePickerOptions,
 	...props.timePickerOptions,
 	minTime: formData.value.start_day,
 }));

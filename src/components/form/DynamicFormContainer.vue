@@ -78,6 +78,7 @@ import { ElButton } from 'element-plus';
 // import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { Lang } from '@/localization';
+import { useEventHandler } from '@/composables/mixins/useEmitter';
 import CoverOverlay from '@/components/common/CoverOverlay.vue';
 import CustomModal from '@/components/common/CustomModal.vue';
 
@@ -218,9 +219,10 @@ const successModalSubmit = (answer) => {
 	}
 };
 
-const handleEvent = (event) => {
-	emit('event', event);
-};
+const { handleEvent } = useEventHandler({
+	toggleSaving,
+	successModalSubmit,
+}, emit);
 
 watch(
 	() => editModal.value.show,

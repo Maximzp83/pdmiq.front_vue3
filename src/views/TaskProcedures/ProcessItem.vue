@@ -26,6 +26,7 @@
 				<el-form-item class="mcol-xs-12 mcol-sm-3" prop="expected_time">
 					<label v-if="itemIndex === 0">{{ tt('Expected_time') }}</label>
 					<el-time-select
+						class="time-select"
 						v-model="formData.expected_time"
 						:picker-options="timePickerOptions"
 						:placeholder="`${tt('select')} ${tt('time')}`"

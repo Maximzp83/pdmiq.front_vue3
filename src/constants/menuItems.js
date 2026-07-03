@@ -94,15 +94,15 @@ const menuItems1 = [
 		enableInCompanyMenuForm: true
 	},
 
-	// {
-	// 	name: 'sidebar_menu.OEE',
-	// 	belongs_to_label: 'predictive_maintenance',
-	// 	id: MENU_TYPES.OEE,
-	// 	icon: 'icon-processes',
-	// 	path: '/processes',
-	// 	meta: { permissions: ['view_oee'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.OEE',
+		belongs_to_label: 'predictive_maintenance',
+		id: MENU_TYPES.OEE,
+		icon: 'icon-processes',
+		path: '/processes',
+		meta: { permissions: ['view_oee'] },
+		enableInCompanyMenuForm: true
+	},
 
 	{
 		name: 'sidebar_menu.System',

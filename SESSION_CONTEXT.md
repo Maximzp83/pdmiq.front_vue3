@@ -1,53 +1,51 @@
 # Continuation Briefing
 
 ## Project Stack
-- Vue 3 + Vite application using Vue Router 4, Pinia, Element Plus, Highcharts, and `<script setup>`.
-- Migration source is `vue2_project/`; Vue 3 target is `src/`.
-- Sensor chart logic uses Highcharts factory classes under `src/modules/charts_factory`.
-- API/request layer uses `api_request`, request factories, and composables such as `useRequestsList`, `useItemForm`, `useSubItemsList`, and domain composables.
+- Vue 3 + Vite app migrated from `vue2_project/`.
+- Vue Router 4, Pinia, Element Plus, Highcharts, `<script setup>`.
+- Shared form/list behavior is mainly in `src/composables/mixins/`: `useItemForm`, `useItemPage`, `useItemsData`, `useSubItemsList`, `useSubItem`, `useEmitter`.
+- API layer uses `api_request`, `createGetRequest`, `createGetByIdRequest`, and entity config from `src/config/entities`.
 
 ## Key Architecture Rules
-- Preserve Vue2 behavioral parity before inventing Vue3 behavior; compare with `vue2_project/` when touching migrated code.
-- Use existing project patterns and shared composables instead of local reimplementation where possible.
-- Element Plus `el-button.type` must use valid built-in values only; custom visual types like `secondary` should be classes such as `el-button--secondary`.
-- `prepareDataSettings` is effective only when paired with `prepareData`.
-- Do not revert unrelated/user dirty changes.
+- Keep Vue2 behavioral parity; compare target files with `vue2_project/` before changing migrated views.
+- Prefer existing composables, entity config, stores, and local UI conventions over new abstractions.
+- Element Plus migration rules matter: no legacy `picker-options` on `el-time-select`; use props like `start`, `end`, `step`, `min-time`, `max-time`. No `size="mini"`.
+- Do not revert unrelated dirty work.
 - Use `apply_patch` for manual edits.
-- After changes, run targeted `git diff --check` and `npm run build`.
-- User prefers concise step result plus changed file path; no code/diff output unless explicitly requested.
+- User requested no code/diff output in status reports; provide one step at a time, result, and changed file path.
+- Verify edits with targeted `git diff --check` and `npm run build` when feasible.
 
 ## Current Task Status
-- FFT Statistics migration/parity work is active and recently focused on `FFTStatisticsPage.vue`, `AnalysisFFTContainer.vue`, FFT chart wrappers, RPM settings, and Element Plus button warnings.
-- `AnalysisFFTContainer.vue` was corrected to use `useItemForm` like Vue2 `itemFormMixin`, and RPM save logic was extracted into a Vue3 composable equivalent of Vue2 `saveRPMParamsMixin`.
-- Equipment data fetch in `FFTStatisticsPage.vue` now applies `prepareData: 'prepareEquipmentsList'` so `prepareDataSettings.addSettingItems` works.
-- Project-wide search found no remaining `prepareDataSettings` usage without `prepareData`.
-- Element Plus warnings for `type="secondary"` and `type=" "` in FFT chart controls were addressed via centralized normalization in chart button components and valid empty button types.
-- Latest checks passed: `git diff --check` on touched files and `npm run build`.
+- `/graph/:sensorId` route was restored and `src/views/Sensors/OneChartPage.vue` was fully re-migrated for Vue3 parity.
+- `/kruger` and `/login/remote` login routes were checked/fixed; `/kruger` uses the login wrapper flow.
+- `/processes`, `/processes/new`, and `/processes/:id` routes were restored.
+- Processes list/form migration fixes are active:
+  - Fixed process card action icon crash caused by passing `icomoon icon-graphic` as an Element Plus icon component.
+  - Fixed Element Plus `size="mini"` warnings in Processes sub-items/forms.
+  - Migrated Processes time selects from legacy `picker-options` to Element Plus props in `ItemForm`, `BreakTimeItem`, and `WorkDateItem`.
+  - Restored missing tooltips in `Processes/ItemForm.vue` and replaced old `el-icon-question` with Element Plus `QuestionFilled`.
+  - Fixed modal save spinner/callback path by handling `toggleSaving` in `DynamicFormContainer.vue` and calling `editModal.callback` from `Processes/ItemForm.vue`.
+  - Fixed `Break Time` card display so each value starts on a new line and time ranges do not wrap after the dash.
+- Latest checks after the final Processes card fix passed: `git diff --check` for the touched file and `npm run build`.
 
 ## Files Already Modified
 - `SESSION_CONTEXT.md`
-- `src/composables/requests/useAsyncSelect.js`
-- `src/helpers/specialHelpers.js`
-- `src/modules/charts_factory/controllers/Sensor/classes/ChartsListFactory.js`
-- `src/utils/data-preparers.js`
-- `src/views/Equipments/AnalysisRuleItem.vue`
-- `src/views/Equipments/ChildComponentItem.vue`
-- `src/views/Sensors/AnalysisFFT/AnalysisFFTContainer.vue`
-- `src/views/Sensors/AnalysisFFT/ChildComponentItem.vue` deleted as unused duplicate
-- `src/views/Sensors/FFTStatisticsPage.vue`
-- `src/views/Sensors/FilterBlock/RPMSettingsDialog.vue`
-- `src/views/Sensors/charts/ChartOperationsBar.vue`
-- `src/views/Sensors/charts/ChartZoom.vue`
-- `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
-- `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`
-- `src/views/Sensors/mixins/useSaveRPMParams.js`
-- Several Sass files are dirty in the worktree and appear unrelated/user-edited: `src/assets/sass/common/common-blocks.scss`, `common-content.scss`, `common.scss`, `element-ui/elements.scss`, `frames/grids/form-grid.scss`.
+- `src/router/index.js`
+- `src/components/form/DynamicFormContainer.vue`
+- `src/views/Sensors/OneChartPage.vue`
+- `src/views/Processes/ItemsList.vue`
+- `src/views/Processes/ItemCard.vue`
+- `src/views/Processes/ItemForm.vue`
+- `src/views/Processes/BreakTimeItem.vue`
+- `src/views/Processes/WorkDateItem.vue`
+- `src/views/Processes/FaultItem.vue`
+- Other dirty files present in worktree and may be user/previous-session changes: `src/assets/sass/common/common-content.scss`, `src/assets/sass/element-ui/elements.scss`, `src/composables/mixins/useSubItem.js`, `src/constants/menuItems.js`, `src/views/TaskProcedures/ProcessItem.vue`.
 
 ## Unresolved Issues
-- No authenticated browser/API smoke test has been performed after the latest FFT/RPM/button changes.
-- FFT runtime behavior still needs verification with real data: RPM dialog values, RPM drag/drop save path, periodic cursors, flags/cursors, hidden-chart fetch/rebuild, FFT rule save/delete, waterfall controls, and prev/next FFT navigation.
-- There may be additional Element Plus validator warnings in components outside the checked FFT chart path; current known FFT warnings were fixed.
-- SuccessDashboard migration risks remain unrelated to the current FFT thread and are not resolved here.
+- No authenticated browser smoke test was run after the latest Processes changes; only production build was verified.
+- Need runtime confirmation that Processes modal save now shows spinner and invokes callback after real API response.
+- Need visual confirmation that `Break Time` card values match the Vue2 layout in the browser.
+- Additional Processes parity gaps may remain outside the fixed errors.
 
 ## Next Actionable Step
-- In the new session, run the app or reproduce the FFT page with real data and check browser console/runtime behavior for remaining warnings or parity issues, starting with FFT chart controls and RPM save flows.
+- Start the dev app, open `/processes`, edit a process from the modal, save it with real API data, and confirm: spinner appears, callback closes/refetches as expected, no console warnings, and `Break Time` values render one per line without wrapping inside the time range.

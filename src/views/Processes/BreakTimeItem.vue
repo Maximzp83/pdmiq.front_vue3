@@ -9,10 +9,15 @@
 			<div class="flex mrow">
 				<div class="mcol-xs-6">
 					<el-time-select
+						class="time-select"
 						v-model="formData.start_time"
 						value-format="HH:mm"
 						:placeholder="tt('start')"
-						:picker-options="startTimePickerOptions"
+						:start="startTimePickerOptions.start"
+						:end="startTimePickerOptions.end"
+						:step="startTimePickerOptions.step"
+						:min-time="startTimePickerOptions.minTime"
+						:max-time="startTimePickerOptions.maxTime"
 						@blur="clearValidate"
 						@change="formData.finish_time = ''"
 					/>
@@ -20,11 +25,16 @@
 
 				<div class="mcol-xs-6">
 					<el-time-select
+						class="time-select"
 						v-model="formData.finish_time"
 						:disabled="!formData.start_time"
 						value-format="HH:mm"
 						:placeholder="tt('finish')"
-						:picker-options="endTimePickerOptions"
+						:start="endTimePickerOptions.start"
+						:end="endTimePickerOptions.end"
+						:step="endTimePickerOptions.step"
+						:min-time="endTimePickerOptions.minTime"
+						:max-time="endTimePickerOptions.maxTime"
 					/>
 				</div>
 			</div>
@@ -33,7 +43,7 @@
 		<div v-if="!hideRemove" class="action-buttons-container absolute">
 			<el-button
 				class="action-button remove-button"
-				size="mini"
+				size="small"
 				type="danger"
 				@click="removeItem"
 			>
@@ -79,13 +89,23 @@ const rules = computed(() => ({
 	finish_time: props.required ? requiredRule : null,
 }));
 
+const defaultTimePickerOptions = {
+	start: '00:00',
+	end: '23:45',
+	step: '00:15',
+	minTime: '',
+	maxTime: '',
+};
+
 const startTimePickerOptions = computed(() => ({
+	...defaultTimePickerOptions,
 	...props.timePickerOptions,
 	minTime: props.workTime.start_work_day,
 	maxTime: props.workTime.finish_work_day,
 }));
 
 const endTimePickerOptions = computed(() => ({
+	...defaultTimePickerOptions,
 	...props.timePickerOptions,
 	minTime: formData.value.start_time,
 	maxTime: props.workTime.finish_work_day,

@@ -11,6 +11,7 @@ const LoginWrapper = () => import('@/components/pages/LoginWrapper.vue');
 const Login = () => import('@/components/pages/Login.vue');
 const NewPasswordForm = () => import('@/components/pages/NewPasswordForm.vue');
 const ForgotPasswordForm = () => import('@/components/pages/ForgotPasswordForm.vue');
+const RemoteLogin = () => import('@/components/pages/RemoteLogin.vue');
 
 const DashboardLayout = () => import('@/components/layout/DashboardLayout.vue');
 const Dashboard = () => import('@/views/Dashboard/Dashboard.vue');
@@ -37,6 +38,24 @@ const routes = [
 				meta: { guest: true },
 			},
 		],
+	},
+	{
+		path: '/kruger',
+		component: LoginWrapper,
+		children: [
+			{ path: '', name: 'KrugerLogin', component: Login },
+		],
+	},
+	{
+		path: '/login/remote',
+		name: 'RemoteLogin',
+		component: RemoteLogin,
+	},
+	{
+		path: '/graph/:sensorId',
+		name: 'OneChartPage',
+		component: () => import('@/views/Sensors/OneChartPage.vue'),
+		meta: { auth: true, permissions: ['view_sensors'] },
 	},
 	{
 		path: '/',
@@ -716,10 +735,22 @@ const routes = [
 				meta: { auth: true, permissions: ['view_sensors'] },
 			},
 			{
-				path: 'sensors/:id/chart',
-				name: 'SensorOneChart',
-				component: () => import('@/views/Sensors/OneChartPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				path: 'processes',
+				name: 'Processes',
+				component: () => import('@/views/Processes/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_oee'] },
+			},
+			{
+				path: 'processes/new',
+				name: 'ProcessCreate',
+				component: () => import('@/views/Processes/ItemPage.vue'),
+				meta: { auth: true, permissions: ['create_oee'] },
+			},
+			{
+				path: 'processes/:id',
+				name: 'ProcessEdit',
+				component: () => import('@/views/Processes/ItemPage.vue'),
+				meta: { auth: true, permissions: ['edit_oee'] },
 			},
 			{
 				path: 'requisitions',

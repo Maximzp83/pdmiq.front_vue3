@@ -73,7 +73,7 @@
 			<el-form-item
 				:label="`${tt('Process')} ${tt('image')}`"
 				prop="pictures"
-				class="upload-form-item"
+				class="upload-form-item content-row"
 			>
 				<FileUploadBlock
 					ref="fileUploadBlockRef"
@@ -85,9 +85,9 @@
 				/>
 			</el-form-item>
 
-			<hr class="el-form-item" />
+			<hr class="content-row" />
 
-			<div class="el-form-item">
+			<div class="content-row">
 				<el-form-item
 					:label="tt('phrases.maximum_capacity')"
 					prop="max_capacity"
@@ -118,10 +118,13 @@
 					<div class="flex mrow">
 						<div class="mcol-xs-6">
 							<el-time-select
+								class="time-select"
 								v-model="formData.start_work_day"
 								value-format="HH:mm"
 								:placeholder="tt('start')"
-								:picker-options="timePickerOptions"
+								:start="timePickerOptions.start"
+								:end="timePickerOptions.end"
+								:step="timePickerOptions.step"
 								@blur="clearValidate(['finish_work_day'])"
 								@change="handleStartTimeChange"
 							/>
@@ -129,11 +132,15 @@
 
 						<div class="mcol-xs-6">
 							<el-time-select
+								class="time-select"
 								v-model="formData.finish_work_day"
 								:disabled="!formData.start_work_day"
 								value-format="HH:mm"
 								:placeholder="tt('finish')"
-								:picker-options="endTimePickerOptions"
+								:start="endTimePickerOptions.start"
+								:end="endTimePickerOptions.end"
+								:step="endTimePickerOptions.step"
+								:min-time="endTimePickerOptions.minTime"
 								@blur="clearValidate(['finish_work_day'])"
 							/>
 						</div>
@@ -154,6 +161,18 @@
 					<template #label>
 						<div class="label-slot">
 							<label class="is-required">{{ `${tt('Stop_Time')} (${tt('minutes')})` }}</label>
+
+							<el-tooltip
+								placement="bottom"
+								:content="tt('phrases.stop_time_tooltip')"
+								popper-class="middle-width"
+							>
+								<span class="tooltip-container">
+									<el-icon>
+										<QuestionFilled />
+									</el-icon>
+								</span>
+							</el-tooltip>
 						</div>
 					</template>
 
@@ -161,10 +180,27 @@
 				</el-form-item>
 
 				<el-form-item
-					:label="tt('phrases.further_below_run_rate_percent')"
 					prop="extremal_deviation_percent"
 					class="mcol-xs-12 mcol-sm-9"
 				>
+					<template #label>
+						<div class="label-slot">
+							<label>{{ tt('phrases.further_below_run_rate_percent') }}</label>
+
+							<el-tooltip
+								placement="bottom"
+								:content="tt('phrases.further_below_run_rate_tooltip')"
+								popper-class="middle-width"
+							>
+								<span class="tooltip-container">
+									<el-icon>
+										<QuestionFilled />
+									</el-icon>
+								</span>
+							</el-tooltip>
+						</div>
+					</template>
+
 					<el-input-number
 						v-model="formData.extremal_deviation_percent"
 						:min="0"
@@ -190,12 +226,12 @@
 						</div>
 
 						<div v-if="isIndustrialMatrix || canEdit" class="margin-top-row">
-							<el-button
-								class="action-button create-button"
-								size="mini"
-								type="success"
-								@click="addFormItem(breakTimeItemsList, 'bt_i-')"
-							>
+								<el-button
+									class="action-button create-button"
+									size="small"
+									type="success"
+									@click="addFormItem(breakTimeItemsList, 'bt_i-')"
+								>
 								<i class="icomoon icon-cross"></i>
 							</el-button>
 						</div>
@@ -223,12 +259,12 @@
 						</div>
 
 						<div v-if="isIndustrialMatrix || canEdit" class="margin-top-row">
-							<el-button
-								class="action-button create-button"
-								size="mini"
-								type="success"
-								@click="addFormItem(workDatesItemsList, 'wd_i-')"
-							>
+								<el-button
+									class="action-button create-button"
+									size="small"
+									type="success"
+									@click="addFormItem(workDatesItemsList, 'wd_i-')"
+								>
 								<i class="icomoon icon-cross"></i>
 							</el-button>
 						</div>
@@ -251,12 +287,12 @@
 						</div>
 
 						<div v-if="isIndustrialMatrix || canEdit" class="margin-top-row">
-							<el-button
-								class="action-button create-button"
-								size="mini"
-								type="success"
-								@click="addFormItem(faultsItemsList, 'f_i-')"
-							>
+								<el-button
+									class="action-button create-button"
+									size="small"
+									type="success"
+									@click="addFormItem(faultsItemsList, 'f_i-')"
+								>
 								<i class="icomoon icon-cross"></i>
 							</el-button>
 						</div>
@@ -271,6 +307,7 @@
 
 <script setup>
 import { computed, ref, shallowRef } from 'vue';
+import { QuestionFilled } from '@element-plus/icons-vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
@@ -533,6 +570,7 @@ const { isMobile, validateForm, handleCancel, clearValidate } = useItemForm({
 	collectDataFromSubItems,
 	resetFormDataBySubItems,
 	uploadSettings: uploadSettings.value,
+	successSubmitCallback: (response) => props.editModal?.callback?.(response),
 	emit,
 });
 
