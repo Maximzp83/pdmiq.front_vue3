@@ -15,8 +15,8 @@
 			:headerClass="editModal.headerClass"
 			:active="editModal.show"
 			:title="modalTitle"
-			:activeSpinner="isSaving"
-			:spinnerText="editModal.itemName + ` ${tt('saving')}...`"
+			:activeSpinner="modalSpinnerActive"
+			:spinnerText="modalSpinnerText"
 			:hideFooter="editModal.hideFooter || editModal.multiform"
 			@onClose="handleCloseEditModal"
 		>
@@ -31,6 +31,7 @@
 				:formSettings="editModal.formSettings"
 				:additionalSettings="additionalSettings"
 				@event="handleEvent"
+				@vue:mounted="handleComponentMounted"
 			/>
 
 			<template #header>
@@ -99,6 +100,7 @@ const globalStore = useGlobalStore();
 const { show_edit_modal } = globalStore;
 
 const isSaving = ref(false);
+const isLoadingComponent = ref(false);
 const ItemFormComponent = ref(null);
 
 const tt = (key) => Lang.tt(key);
@@ -168,6 +170,11 @@ const modalSize = computed(() => {
 	return modal.size || 'standard';
 });
 
+const modalSpinnerActive = computed(() => isSaving.value || isLoadingComponent.value);
+const modalSpinnerText = computed(() =>
+	editModal.value.spinnerText || `${editModal.value.itemName || ''} ${tt('saving')}...`.trim()
+);
+
 const multiformClass = computed(() => {
 	const modal = editModal.value;
 	return modal.multiform ? 'multiform' : '';
@@ -175,6 +182,10 @@ const multiformClass = computed(() => {
 
 const toggleSaving = (saving) => {
 	isSaving.value = saving;
+};
+
+const handleComponentMounted = () => {
+	isLoadingComponent.value = false;
 };
 
 const handleCloseEditModal = () => {
@@ -191,7 +202,6 @@ const handleCloseEditModal = () => {
 
 const saveModalItem = () => {
 	if (ItemFormComponent.value && ItemFormComponent.value.validateForm) {
-		// console.log('validating form');
 		ItemFormComponent.value.validateForm({editModal: editModal.value});
 	}
 };
@@ -227,6 +237,7 @@ const { handleEvent } = useEventHandler({
 watch(
 	() => editModal.value.show,
 	(show) => {
+		isLoadingComponent.value = show ? !!editModal.value.activeSpinner : false;
 		if (show !== undefined && !show) {
 			setTimeout(() => {
 				show_edit_modal({ editModalProp: props.editModalProp });

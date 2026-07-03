@@ -40,6 +40,12 @@
 - `SuccessDashboard` Meeting Tracker alarms fetch trigger was fixed after the `useRequestsList` migration: when `graphsPeriod` is established during initial setup, `fetchAlarms` is now called from `initialRequestsListResponsesReadyCallback` after `isInitialSetup` is cleared.
 - `SuccessDashboard` Sensors alarms modal render error was fixed by removing `Object.freeze` around reactive `sensorData` / `equipmentData` in `SensorAlarmsChartsListWrapper.vue`.
 - `CorporateDashboard` section is migrated for the current Vue3 compile scope with container, main corporate view, plant details item, `/corporate/main` route, Corporate View sidebar/menu entry, and `view_corporate` permission mapping.
+- `Processes/Details` section is migrated for the current Vue3 compile scope:
+  - Added DetailsPage, DashboardPage, ChartItemContainer, LogsList, EventLogForm, and EditBreakTimeForm under `src/views/Processes/Details`.
+  - Added `src/composables/useProcesses.js` for process CRUD, downtimes, downtime close/create, break-time offset, and socket ping endpoints.
+  - Extended `src/stores/ProcessesStore.js` with `statistics_filters` and `downtimes_filters`.
+  - Enabled `/processes/:id/details`, `/processes/:id/details/dashboard`, and `/processes/:id/details/logs` routes.
+  - `npm run build`, targeted `git diff --check`, and migration-rule scan pass.
 - `Equipments` migration has started for the current Vue3 compile scope:
   - Added `src/views/Equipments/EquipmentsLayout.vue`.
   - Added `src/views/Equipments/ItemsList.vue`.
@@ -63,6 +69,7 @@
 - Project production build passes after `SuccessDashboard` migration.
 - Project production build passes after `CorporateDashboard` migration.
 - Project production build passes after `Plants/Details` re-migration.
+- Latest Vue2 changes were synced into already migrated Vue3 files: chart factory error events, Sensors chart `window.graphRenderError`, Equipment sensor detach flow, Banner sensor initial setup watcher, and LubeMatrix V4 Banner-type submit payload. The FFT statistics API base URL change was already present in Vue3.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE
@@ -796,3 +803,10 @@ await fetchUsers({ page: 1 });
   - Stored `navbarSettings.value` instead of the computed ref in the global navbar store
   - Fixes readonly `navbarSettings` warnings while switching embedded Asset/Storeroom lists
   - `npm run build` passed
+- [x] Settings Import section migration
+  - Added Vue3 `src/components/Import/ImportContainer.vue`, `ImportForm.vue`, and `DragDropCellItem.vue`
+  - Migrated `vue2_project/src/views/Settings/Import` including settings import tabs, master import, plant import, history logs, log detail, plant import logs, and row error correction components
+  - Extended `src/stores/TestingStore.js` with import upload/start/repeat/delete/progress/log actions
+  - Added `/settings/import/*`, `/settings/import/:id`, `/plant-import`, `/plant-import-logs`, `/plant-import-logs/:id`, and `/master-import` routes
+  - Enabled Import in Settings navigation and sidebar menu
+  - `npm run build`, targeted `git diff --check`, and migration-rule scan passed

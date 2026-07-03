@@ -1313,6 +1313,7 @@ const localPrepareSubmitData = (data) => {
 		delete preparedData.controller_id;
 		preparedData.type = SENSOR_TYPES.ULTRA_SOUND;
 		if (isLubeMatrixV4.value) {
+			preparedData.type = SENSOR_TYPES.BANNER;
 			preparedData.data_set = props.parentDataSet;
 		}
 	}

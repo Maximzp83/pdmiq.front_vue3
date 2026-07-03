@@ -55,6 +55,7 @@ const navigationLinksList = computed(() => [
 	{ id: 10, title: 'Industrial Services', path: '/settings/industrial-services' },
 	{ id: 12, title: 'Statistics', path: '/settings/statistics' },
 	{ id: 13, title: 'Banner V2 Subtypes', path: '/settings/banner-v2-subtypes' },
+	{ id: 14, title: 'Import', path: '/settings/import/logs' },
 ]);
 
 const setupNavbar = () => {

@@ -832,6 +832,14 @@ export default class ChartBase {
 		if (this.handleChartRenderEvent) this.handleChartRenderEvent(e);
 		if (this.events.chartRenderEvent) this.events.chartRenderEvent(e, this);
 	}
+	emitChartErrorEvent(e) {
+		// console.log('emitChartRenderEvent', this.chartTitle)
+		// console.log('emitChartRenderEvent', e)
+		this.setValue('isRendering', false);
+		// console.log(this.events.chartRenderEvent)
+		if (this.handleChartErrorEvent) this.handleChartErrorEvent(e);
+		if (this.events.chartErrorEvent) this.events.chartErrorEvent(e, this);
+	}
 
 	callChartMethod(methodName, payload) {
 		if (this[methodName]) {

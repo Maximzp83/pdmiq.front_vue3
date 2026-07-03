@@ -74,11 +74,12 @@
 				:label="`${tt('Process')} ${tt('image')}`"
 				prop="pictures"
 				class="upload-form-item content-row"
-			>
-				<FileUploadBlock
-					ref="fileUploadBlockRef"
-					multiple
-					rotate
+				>
+					<FileUploadBlock
+						v-if="showDeferredContent"
+						ref="fileUploadBlockRef"
+						multiple
+						rotate
 					showDeleteButton
 					:enableReorderFiles="{ appendTo: 'body', formKey: 'display_order' }"
 					:pictures="itemPictures"
@@ -208,7 +209,12 @@
 					/>
 				</el-form-item>
 
-				<el-form-item :label="tt('Breaktime')" prop="work_breaks" class="mcol-xs-12 mcol-sm-9">
+				<el-form-item
+					v-if="showDeferredContent"
+					:label="tt('Breaktime')"
+					prop="work_breaks"
+					class="mcol-xs-12 mcol-sm-9"
+				>
 					<div class="options-container">
 						<div v-if="breakTimeItemsList.length" class="content-row">
 							<BreakTimeItem
@@ -239,6 +245,7 @@
 				</el-form-item>
 
 				<el-form-item
+					v-if="showDeferredContent"
 					:label="tt('phrases.extended_work_date')"
 					prop="work_dates"
 					class="mcol-xs-11"
@@ -271,7 +278,12 @@
 					</div>
 				</el-form-item>
 
-				<el-form-item :label="tt('Faults')" prop="faults" class="mcol-xs-12 mcol-sm-9">
+				<el-form-item
+					v-if="showDeferredContent"
+					:label="tt('Faults')"
+					prop="faults"
+					class="mcol-xs-12 mcol-sm-9"
+				>
 					<div class="options-container">
 						<div v-if="faultsItemsList.length" class="content-row">
 							<FaultItem
@@ -306,7 +318,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, shallowRef } from 'vue';
 import { QuestionFilled } from '@element-plus/icons-vue';
 import { storeToRefs } from 'pinia';
 
@@ -322,10 +334,11 @@ import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
-import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
-import BreakTimeItem from './BreakTimeItem.vue';
-import FaultItem from './FaultItem.vue';
-import WorkDateItem from './WorkDateItem.vue';
+const FileUploadBlock = defineAsyncComponent(() => import('@/components/form/uploadBlock/FileUploadBlock.vue'));
+const BreakTimeItem = defineAsyncComponent(() => import('./BreakTimeItem.vue'));
+const FaultItem = defineAsyncComponent(() => import('./FaultItem.vue'));
+const loadWorkDateItem = () => import('./WorkDateItem.vue');
+const WorkDateItem = defineAsyncComponent(loadWorkDateItem);
 
 const { tt } = Lang;
 
@@ -350,6 +363,7 @@ const fileUploadBlockRef = ref(null);
 const breakTimeItemRefs = ref([]);
 const faultItemRefs = ref([]);
 const workDateItemRefs = ref([]);
+const showDeferredContent = ref(false);
 
 const plantsLoading = ref(false);
 const plantsList = shallowRef([]);
@@ -432,8 +446,9 @@ const workTimeSettings = computed(() => ({
 }));
 
 const itemPictures = computed(() => {
-	if (props.itemData?.pictures?.length) {
-		return sortArrayByKeyNumber(props.itemData.pictures, 'display_order');
+	const pictures = Array.isArray(props.itemData?.pictures) ? [...props.itemData.pictures] : [];
+	if (pictures.length) {
+		return sortArrayByKeyNumber(pictures, 'display_order');
 	}
 	return [];
 });
@@ -577,6 +592,22 @@ const { isMobile, validateForm, handleCancel, clearValidate } = useItemForm({
 useRequestsList({
 	methodsMap,
 	requestsToDoList,
+});
+
+const afterFirstPaint = (callback) => {
+	if (typeof requestAnimationFrame === 'function') {
+		requestAnimationFrame(callback);
+		return;
+	}
+
+	setTimeout(callback, 0);
+};
+
+onMounted(() => {
+	afterFirstPaint(() => {
+		showDeferredContent.value = true;
+		loadWorkDateItem();
+	});
 });
 
 defineExpose({

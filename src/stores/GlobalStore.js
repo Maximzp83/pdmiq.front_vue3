@@ -122,6 +122,7 @@ export const useGlobalStore = defineStore('globalStore', {
 			}
 
 			const editModalProp = data.editModalProp || 'editModal';
+			// console.log('show_edit_modal', editModalProp, data);
 			this.set_value(editModalProp, data);
 		},
 

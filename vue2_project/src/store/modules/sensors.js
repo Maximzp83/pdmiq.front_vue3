@@ -314,6 +314,14 @@ const actions = {
 		return delete_item(storeArgs, `/sensors`, payload);
 	},
 
+	detach_sensor(storeArgs, payload) {
+		const extendedPayload = {
+			method: 'PUT',
+			...payload
+		};
+		return multipurpose_response(storeArgs, `/sensors/${extendedPayload.sensorId}/detach`, extendedPayload);
+	},
+
 	toggle_ultrasound_command(storeArgs, payload) {
 		const extendedPayload = {
 			method: 'GET',

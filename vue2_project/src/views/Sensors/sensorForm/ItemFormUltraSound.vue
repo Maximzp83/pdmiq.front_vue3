@@ -1645,6 +1645,7 @@ export default {
 				// console.log('us loc submit', payload)
 				if (this.isLubeMatrixV4) {
 					// delete data.data_set;
+					data.type = SENSOR_TYPES.BANNER;
 					data.data_set = this.parentDataSet;
 				}
 			}

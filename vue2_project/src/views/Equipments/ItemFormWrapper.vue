@@ -278,6 +278,7 @@ export default {
 			show_edit_modal: 'show_edit_modal',
 			set_global_state: 'set_global_state',
 			delete_sensor: 'sensors/delete_sensor',
+			detach_sensor: 'sensors/detach_sensor',
 
 			set_assets: 'assets/set_assets',
 
@@ -444,7 +445,9 @@ export default {
 				type: 'warning'
 			})
 				.then(() => {
-					this.delete_sensor({ data: { ids: [sensorId] } }).then(() => {
+					// this.delete_sensor({ data: { ids: [sensorId] } }).then(() => {
+					this.detach_sensor({ sensorId: sensorId })
+					.then(() => {
 						this.removeFormItem(sensorId, 'sensorFormsList');
 						this.set_global_state({
 							stateProp: 'updateItemsList',

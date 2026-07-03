@@ -1230,6 +1230,7 @@ watch(
 watch(
 	() => props.itemData,
 	(item) => {
+		isInitialSetup.value = true;
 		setupPage(item);
 	},
 );

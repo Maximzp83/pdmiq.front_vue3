@@ -343,14 +343,14 @@ const menuItems1 = [
 		meta: { permissions: ['view_work_order_requests'] },
 		enableInCompanyMenuForm: true
 	},
-	{
+	/*{
 		name: 'Requests',
 		belongs_to_label: 'cmms',
 		icon: 'icon-fix',
 		path: '/rfqs',
 		meta: { permissions: ['view_rfqs'] },
 		enableInCompanyMenuForm: true
-	},
+	},*/
 	{
 		name: 'task_Procedures',
 		belongs_to_label: 'cmms',
@@ -398,43 +398,41 @@ const menuItems1 = [
 			userTypes: [USER_TYPES.SUPER_ADMIN, USER_TYPES.PLANT_ADMIN]
 		}
 	},*/
-	// {
-	// 	name: 'sidebar_menu.Import',
-	// 	belongs_to_label: 'cmms',
-	// 	// id: MENU_TYPES.IMPORT_MASTER,
-	// 	icon: 'icon-import-export',
-
-	// 	children: [
-	// 		{
-	// 			id: MENU_TYPES.IMPORT_WORK_ORDERS,
-	// 			name: 'sidebar_menu.work_order_import',
-	// 			path: '/maintenance-import',
-	// 			meta: { permissions: ['view_import_work_orders'] },
-	// 			enableInCompanyMenuForm: true
-	// 		},
-	// 		{
-	// 			id: MENU_TYPES.IMPORT_PLANT,
-	// 			name: 'sidebar_menu.plant_import',
-	// 			path: '/plant-import',
-	// 			meta: { permissions: ['view_import_plant'] },
-	// 			enableInCompanyMenuForm: true
-	// 		},
-	// 		{
-	// 			id: MENU_TYPES.IMPORT_PLANT_LOGS,
-	// 			name: 'sidebar_menu.plant_import_logs',
-	// 			path: '/plant-import-logs',
-	// 			meta: { permissions: ['view_import_plant_logs'] },
-	// 			enableInCompanyMenuForm: true
-	// 		},
-	// 		{
-	// 			id: MENU_TYPES.IMPORT_MASTER,
-	// 			name: 'sidebar_menu.master_import',
-	// 			path: '/master-import',
-	// 			meta: { permissions: ['view_import_master'] },
-	// 			enableInCompanyMenuForm: true
-	// 		}
-	// 	]
-	// },
+	{
+		name: 'sidebar_menu.Import',
+		belongs_to_label: 'cmms',
+		icon: 'icon-import-export',
+		children: [
+			{
+				id: MENU_TYPES.IMPORT_WORK_ORDERS,
+				name: 'sidebar_menu.work_order_import',
+				path: '/maintenance-import',
+				meta: { permissions: ['view_import_work_orders'] },
+				enableInCompanyMenuForm: true
+			},
+			{
+				id: MENU_TYPES.IMPORT_PLANT,
+				name: 'sidebar_menu.plant_import',
+				path: '/plant-import',
+				meta: { permissions: ['view_import_plant'] },
+				enableInCompanyMenuForm: true
+			},
+			{
+				id: MENU_TYPES.IMPORT_PLANT_LOGS,
+				name: 'sidebar_menu.plant_import_logs',
+				path: '/plant-import-logs',
+				meta: { permissions: ['view_import_plant_logs'] },
+				enableInCompanyMenuForm: true
+			},
+			{
+				id: MENU_TYPES.IMPORT_MASTER,
+				name: 'sidebar_menu.master_import',
+				path: '/master-import',
+				meta: { permissions: ['view_import_master'] },
+				enableInCompanyMenuForm: true
+			}
+		]
+	},
 
 	{
 		name: 'sidebar_menu.asset_management',

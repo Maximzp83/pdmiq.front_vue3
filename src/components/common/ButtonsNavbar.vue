@@ -10,7 +10,7 @@
 								'el-button ',
 								{ 'semi-bold': bold },
 								{ active: isActive(item) },
-								item.className || buttonType || ' el-button--primary inverted'
+								item.className || buttonClass || ' el-button--primary inverted'
 							]"
 						>
 							{{ item.label }}
@@ -35,7 +35,7 @@ defineProps({
 	inline: Boolean,
 	card: Boolean,
 	bold: Boolean,
-	buttonType: {
+	buttonClass: {
 		type: String,
 		default: '',
 	},

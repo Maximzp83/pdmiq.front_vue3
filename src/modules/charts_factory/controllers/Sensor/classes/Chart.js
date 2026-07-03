@@ -728,7 +728,8 @@ class SensorChartBase extends ChartBase {
 						.catch(e => {
 							// console.log('catch')
 							setTimeout(() => {
-								this.checkStatisticsResponses(e);
+								this.emitChartErrorEvent(e);
+								// this.checkStatisticsResponses(e);
 							}, 30);
 						});					
 				}

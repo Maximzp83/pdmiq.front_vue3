@@ -60,7 +60,7 @@ defineProps({
 	},
 	activeSpinner: {
 		type: Boolean,
-		default: false,
+		default: true,
 	},
 	spinnerText: {
 		type: String,

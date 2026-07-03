@@ -372,6 +372,13 @@ const handleChartRendered = (event, Chart) => {
 	if (!chartIsRendered.value && Chart?.lastInitialRedrawComplete) {
 		chartIsRendered.value = true;
 		window.isGraphMounted = true;
+		window.graphRenderError = null;
+	}
+};
+
+const handleChartHasError = (event) => {
+	if (!chartIsRendered.value) {
+		window.graphRenderError = event?.message || 'Something went wrong';
 	}
 };
 
@@ -499,6 +506,7 @@ const chartInstanceEventsList = computed(() => {
 	};
 	if (props.additionalProps.setIsGraphMountedToWindow) {
 		list.chartRenderEvent = handleChartRendered;
+		list.chartErrorEvent = handleChartHasError;
 	}
 	return Object.freeze(list);
 });

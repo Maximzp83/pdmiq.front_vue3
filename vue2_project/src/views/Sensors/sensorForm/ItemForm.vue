@@ -1490,6 +1490,7 @@ export default {
 
 	watch: {
 		itemData(data) {
+			this.isInitialSetup = true;
 			if (!this.blockSetupPageInWatcher) {
 				this.setupPage(data);
 			}

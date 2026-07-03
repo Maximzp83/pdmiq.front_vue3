@@ -34,6 +34,12 @@ export function useSensors() {
 			...payload,
 		});
 
+	const detachSensor = ({ sensorId, ...payload } = {}) =>
+		api_request.put(`/sensors/${sensorId}/detach`, {
+			storeName,
+			...payload,
+		});
+
 	const sensorRebaseLine = ({ itemId, ...payload } = {}) =>
 		api_request.put(`/sensors/${itemId}/rebaseline`, payload);
 
@@ -228,6 +234,7 @@ export function useSensors() {
 		fetchSensor,
 		saveSensor,
 		deleteSensor,
+		detachSensor,
 		sensorRebaseLine,
 		sensorMultipleRebaseline,
 		requestNcdFft,

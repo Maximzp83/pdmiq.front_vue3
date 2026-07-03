@@ -78,6 +78,26 @@ Primary rules source:
   - `src/views/Processes/ItemCard.vue` uses shared preview modal handling and restores the image overlay.
   - `npm run build` and targeted `git diff --check` pass after this follow-up.
 - `src/components/common/Datepicker.vue` now lazy-mounts Element Plus `el-date-picker` after first interaction, using a lightweight div placeholder styled like the datepicker input with icons from `@element-plus/icons-vue` before activation to reduce initial DOM from eager calendar panels.
+- `Processes/Details` section is migrated for the current Vue3 compile scope:
+  - `src/views/Processes/Details/DetailsPage.vue`
+  - `src/views/Processes/Details/DashboardPage.vue`
+  - `src/views/Processes/Details/ChartItemContainer.vue`
+  - `src/views/Processes/Details/LogsList.vue`
+  - `src/views/Processes/Details/EventLogForm.vue`
+  - `src/views/Processes/Details/EditBreakTimeForm.vue`
+  - `src/composables/useProcesses.js`
+  - `src/stores/ProcessesStore.js` now has statistics and downtime filters.
+  - `src/router/index.js` now enables `/processes/:id/details`, `/processes/:id/details/dashboard`, and `/processes/:id/details/logs`.
+  - `npm run build`, targeted `git diff --check`, and migration-rule scan pass.
+- Latest Vue2-side changes were synced into already migrated Vue3 files:
+  - `src/modules/charts_factory/classes/Chart.js` now emits chart error events.
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` now emits chart errors instead of marking statistics responses ready after fetch failure.
+  - `src/views/Sensors/charts/ChartItemContainer.vue` writes `window.graphRenderError` before initial render completes and clears it after render.
+  - `src/composables/useSensors.js` now exposes `detachSensor()`.
+  - `src/views/Equipments/ItemFormWrapper.vue` detaches sensors from equipment instead of deleting them.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` restores initial setup guarding in the `itemData` watcher.
+  - `src/views/Sensors/sensorForm/ItemFormUltraSound.vue` sends LubeMatrix V4 child payloads as Banner type with parent dataset.
+  - The FFT statistics API base URL change was already present in Vue3.
 - `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:
   - `src/views/Dashboard/Dashboard.vue` again acts as the plant dashboard container: it resolves the active plant from auth/global filters, fetches `plantItem`, resets child list filters on plant changes, and passes `plantItem`, `plantId`, and `additionalModalSettings` into the nested route.
   - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.

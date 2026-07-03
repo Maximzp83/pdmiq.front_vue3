@@ -264,6 +264,50 @@ const routes = [
 				},
 			},
 			{
+				path: 'plant-import',
+				name: 'PlantImportPage',
+				component: () => import('@/views/Settings/Import/Plant/PlantPage.vue'),
+				meta: {
+					auth: true,
+					containerClassName: 'mcontainer pt-20',
+					navbarSettings: { showFilter: true, pageTitle: 'Plant Import' },
+					permissionsMethod: 'some',
+					permissions: ['edit_import_plant', 'create_import_plant'],
+				},
+			},
+			{
+				path: 'plant-import-logs',
+				name: 'ImportLogs',
+				component: () => import('@/views/Settings/Import/Plant/Logs/ItemsList.vue'),
+				meta: {
+					auth: true,
+					permissionsMethod: 'some',
+					permissions: ['edit_import_plant_logs', 'create_import_plant_logs'],
+				},
+			},
+			{
+				path: 'plant-import-logs/:id',
+				name: 'PlantImportLogErrors',
+				component: () => import('@/views/Settings/Import/Plant/Logs/RowsList.vue'),
+				meta: {
+					auth: true,
+					permissionsMethod: 'some',
+					permissions: ['edit_import_plant_logs', 'create_import_plant_logs'],
+				},
+			},
+			{
+				path: 'master-import',
+				name: 'MasterImportPage',
+				component: () => import('@/views/Settings/Import/MasterPage.vue'),
+				meta: {
+					auth: true,
+					containerClassName: 'mcontainer pt-20',
+					navbarSettings: { showFilter: true, pageTitle: 'Master Import' },
+					permissionsMethod: 'some',
+					permissions: ['edit_import_master', 'create_import_master'],
+				},
+			},
+			{
 				path: 'maintenance-requests',
 				name: 'WorkOrderRequests',
 				component: () => import('@/views/WorkOrderRequests/ItemsList.vue'),
@@ -753,6 +797,26 @@ const routes = [
 				meta: { auth: true, permissions: ['edit_oee'] },
 			},
 			{
+				path: 'processes/:id/details',
+				name: 'ProcessDetailsPage',
+				component: () => import('@/views/Processes/Details/DetailsPage.vue'),
+				meta: { auth: true, permissions: ['view_oee'] },
+				children: [
+					{
+						path: 'dashboard',
+						name: 'ProcessDashboard',
+						component: () => import('@/views/Processes/Details/DashboardPage.vue'),
+						meta: { auth: true, permissions: ['view_oee'], preventSetupNavbar: true },
+					},
+					{
+						path: 'logs',
+						name: 'ProcessLogs',
+						component: () => import('@/views/Processes/Details/LogsList.vue'),
+						meta: { auth: true, permissions: ['view_oee'], preventSetupNavbar: true },
+					},
+				],
+			},
+			{
 				path: 'requisitions',
 				name: 'Requisitions',
 				component: () => import('@/views/Requisitions/RequisitionsDashboard.vue'),
@@ -942,6 +1006,45 @@ const routes = [
 						path: 'statistics',
 						name: 'StatisticsExport',
 						component: () => import('@/views/Settings/Statistics/ExportPage.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+					},
+					{
+						path: 'import',
+						redirect: '/settings/import/logs',
+						name: 'ImportTab',
+						component: () => import('@/views/Settings/Import/ImportTab.vue'),
+						meta: { auth: true, permissions: ['view_settings'] },
+						children: [
+							{
+								path: 'logs',
+								name: 'SettingsImportPlant',
+								component: () => import('@/views/Settings/Import/Plant/PlantPage.vue'),
+								meta: {
+									auth: true,
+									permissions: ['view_settings', 'view_import_plant'],
+								},
+							},
+							{
+								path: 'master',
+								name: 'SettingsImportMaster',
+								component: () => import('@/views/Settings/Import/MasterPage.vue'),
+								meta: {
+									auth: true,
+									permissions: ['view_settings', 'view_import_master'],
+								},
+							},
+							{
+								path: 'history',
+								name: 'HistoryPage',
+								component: () => import('@/views/Settings/Import/ItemsList.vue'),
+								meta: { auth: true, permissions: ['view_settings'] },
+							},
+						],
+					},
+					{
+						path: 'import/:id',
+						name: 'LogsPage',
+						component: () => import('@/views/Settings/Import/ItemPage.vue'),
 						meta: { auth: true, permissions: ['view_settings'] },
 					},
 				],

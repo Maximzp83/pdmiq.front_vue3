@@ -461,6 +461,7 @@ export default {
 
 			if (this.additionalProps.setIsGraphMountedToWindow) {
 				list.chartRenderEvent = (e, Chart) => this.handleChartRendered(e, Chart);
+				list.chartErrorEvent = (e, Chart) => this.handleChartHasError(e, Chart);
 			}
 
 			/*if (this.showCalculateThresholdsButton) {
@@ -529,6 +530,13 @@ export default {
 			if (!this.chartIsRendered && Chart.lastInitialRedrawComplete) {
 				this.chartIsRendered = true;
 				window.isGraphMounted = true;
+				window.graphRenderError = null;
+			}
+		},
+
+		handleChartHasError(e) {
+			if (!this.chartIsRendered) {
+				window.graphRenderError = e.message ? e.message : 'Something went wrong';
 			}
 		},
 

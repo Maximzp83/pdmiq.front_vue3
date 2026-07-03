@@ -135,7 +135,7 @@ const emit = defineEmits(['submit', 'onCancel', 'event']);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { Notify } = useNotify();
-const { fetchDatasetFormulas, deleteSensor } = useSensors();
+const { fetchDatasetFormulas, detachSensor } = useSensors();
 const refsMap = ref({});
 const disableTabs = ref(false);
 const formSubmitFinishCount = ref(0);
@@ -298,10 +298,7 @@ const removeSensorItem = ({ sensorId, isNew }) => {
 	)
 		.then(() => {
 			emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-			return deleteSensor({
-				data: { ids: [sensorId] },
-				itemName: 'Sensor',
-			})
+			return detachSensor({ sensorId })
 				.finally(() => {
 					emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 				});
