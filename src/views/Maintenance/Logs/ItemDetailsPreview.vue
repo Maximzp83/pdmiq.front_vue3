@@ -401,8 +401,8 @@ const editItem = () => {
 		additionalModalSettings: {
 			switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
 			plantId: itemData.value?.plant_id,
+			successSubmitCallback: props.editModal?.successSubmitCallback,
 		},
-		callback: props.editModal?.callback,
 	});
 };
 
@@ -438,7 +438,7 @@ const handleCreateRequest = ({ parentLog } = {}) => {
 		additionalModalSettings: {
 			plantId: log.plant_id,
 		},
-		callback: () => {
+		successSubmitCallback: () => {
 			globalStore.show_edit_modal({
 				show: false,
 				editModalProp: 'editModalClassicSecond',

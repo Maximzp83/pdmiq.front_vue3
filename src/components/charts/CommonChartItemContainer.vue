@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
 
 import { Lang } from '@/localization';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -93,15 +93,10 @@ const chartOptions = computed(() =>
 	chartOptionsUpdate.value ? Object.freeze(props.ChartInstance.getChartOptions()) : null,
 );
 
-const componentModules = {
-	...import.meta.glob('/src/components/**/*.vue'),
-	...import.meta.glob('/src/views/**/*.vue'),
-};
-
 const customChartHeaderFile = computed(() => {
-	const componentPath = customChartHeader.value?.componentPath;
-	if (!componentPath) return null;
-	return componentModules[`/src/${componentPath}.vue`] || null;
+	const componentFileLoader = customChartHeader.value?.componentFileLoader;
+	if (!componentFileLoader) return null;
+	return defineAsyncComponent(componentFileLoader);
 });
 
 const handleStatisticsResponsesReady = (ready) => {

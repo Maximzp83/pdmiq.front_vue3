@@ -76,7 +76,7 @@ const localSubmit = (data) =>
 		itemId: props.itemData?.id,
 		data,
 	}).then((response) => {
-		props.editModal?.callback?.(response);
+		props.editModal?.successSubmitCallback?.(response);
 		return response;
 	});
 

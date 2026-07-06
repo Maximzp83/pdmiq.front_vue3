@@ -95,7 +95,7 @@ const addOption = (itemData) => {
 		activeSpinner: true,
 		spinnerText: `${tt('loading')}...`,
 		settings: { createNewOptionsOnly: true },
-		callback: updateEquipmentTypes,
+		successSubmitCallback: updateEquipmentTypes,
 	});
 };
 const updateEquipmentTypes = () => {

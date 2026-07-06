@@ -97,6 +97,7 @@ export function useItemsData({
 		fromDashboard,
 		editInModal,
 		additionalModalSettings,
+		successSubmitOptions,
 		localModalSettingsHook,
 		formComponentFileLoader,
 		debug,
@@ -386,6 +387,19 @@ export function useItemsData({
 				itemData,
 				modalSettings,
 			});
+		}
+
+		if (successSubmitOptions) {
+			modalSettings.successSubmitCallbacks = [];
+
+			if (successSubmitOptions.refetchItemsList) {
+				modalSettings.successSubmitCallbacks.push(refetchItemsList);
+			}
+			if (successSubmitOptions.closeModal) {
+				modalSettings.successSubmitCallbacks.push(() => {
+					globalStore.show_edit_modal({ show: false });
+				});
+			}
 		}
 
 		return modalSettings;

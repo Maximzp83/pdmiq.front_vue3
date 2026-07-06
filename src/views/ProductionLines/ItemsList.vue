@@ -238,8 +238,8 @@ const {
 			editModalProp: 'editModalClassic',
 			instanceName: isProdLine.value ? 'ProductionLines' : 'Utilities',
 			multiform: true,
-			componentPath: 'Dashboard/MultiFormWrapper',
-			callback: () => refetchItemsList(),
+			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
+			successSubmitCallback: () => refetchItemsList(),
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		relatedFiltersStoresMap: {

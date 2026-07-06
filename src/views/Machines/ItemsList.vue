@@ -289,8 +289,8 @@ const {
 			editModalProp: 'editModalClassic',
 			instanceName: 'Machines',
 			multiform: true,
-			componentPath: 'Dashboard/MultiFormWrapper',
-			callback: () => refetchItemsList(),
+			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
+			successSubmitCallback: () => refetchItemsList(),
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		relatedFiltersStoresMap: {

@@ -80,14 +80,11 @@ const { itemsList, itemsLoading, createItem, refetchItemsList } = useItemsData({
 		formComponentFileLoader: () => import('./ClientApiCredentialItemForm.vue'),
 		additionalModalSettings: {
 			hideFooter: true,
-		},
-		localModalSettingsHook: ({ modalSettings }) => ({
-			...modalSettings,
-			hideFooter: true,
-			callback: () => {
+			successSubmitCallback: () => {
 				refetchItemsList();
+				// globalStore.show_edit_modal({ show: false });
 			},
-		}),
+		},
 		localDeleteItem: ({ ids }) =>
 			api_request
 				.delete('/client-api-credentials', {

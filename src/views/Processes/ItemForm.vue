@@ -585,7 +585,6 @@ const { isMobile, validateForm, handleCancel, clearValidate } = useItemForm({
 	collectDataFromSubItems,
 	resetFormDataBySubItems,
 	uploadSettings: uploadSettings.value,
-	successSubmitCallback: (response) => props.editModal?.callback?.(response),
 	emit,
 });
 

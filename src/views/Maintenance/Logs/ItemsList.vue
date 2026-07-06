@@ -216,11 +216,11 @@ const {
 				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
 				plantId: globalFilters.value?.plantId,
 				...propsFiltersRef.value,
-				callback: () => {
-					refetchItemsList();
-					globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
-				},
 			},			
+			successSubmitCallback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
+			},
 		},
 		predefinedFilters: {
 			orderByColumn: 'created_at',

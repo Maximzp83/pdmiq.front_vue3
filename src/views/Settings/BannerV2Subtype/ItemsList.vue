@@ -43,6 +43,8 @@ import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useBannerV2SubtypesStore } from '@/stores/BannerV2SubtypesStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
+
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 
@@ -58,6 +60,8 @@ defineOptions({
 
 const itemsTableRef = ref(null);
 const itemStore = useBannerV2SubtypesStore();
+const globalStore = useGlobalStore();
+
 const { filters } = storeToRefs(itemStore);
 const authStore = useAuthStore();
 const entity = ENTITIES.BannerV2Subtypes;
@@ -66,10 +70,20 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([entity.permissio
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([entity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([entity.permissions.delete]));
 
-const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems, refetchItemsList } = useItemsData({
 	entityKey: 'BannerV2Subtypes',
 	itemStore,
-	options: { tableRef: itemsTableRef },
+	options: {
+		tableRef: itemsTableRef,
+		editInModal: true,
+		formComponentFileLoader: () => import('./ItemForm.vue'),
+		additionalModalSettings: {
+			successSubmitCallback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false });
+			},
+		},
+	},
 });
 
 const tableSettings = computed(() => {

@@ -879,7 +879,7 @@ const createPart = () => {
 		},
 		title: tt('phrases.Create_Part'),
 		formComponentFileLoader: () => import('@/views/Parts/ItemForm.vue'),
-		callback: partCreated,
+		successSubmitCallback: partCreated,
 	});
 };
 
@@ -907,7 +907,7 @@ const createWOType = () => {
 		},
 		title: tt('phrases.Create_Work_Order_Type'),
 		formComponentFileLoader: () => import('@/views/MaintenanceCategories/ItemForm.vue'),
-		callback: woTypeCreated,
+		successSubmitCallback: woTypeCreated,
 	});
 };
 

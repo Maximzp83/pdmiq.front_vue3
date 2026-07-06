@@ -94,14 +94,11 @@ const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, refetch
 			sensorsListProps: props.sensorsListProps,
 			plantsListProps: props.plantsListProps,
 			sensorsLoadingProps: props.sensorsLoadingProps,
-		},
-		localModalSettingsHook: ({ modalSettings }) => ({
-			...modalSettings,
-			// hideFooter: true,
-			callback: () => {
+			successSubmitCallback: () => {
 				refetchItemsList();
+				// globalStore.show_edit_modal({ show: false });
 			},
-		}),
+		},
 		localDeleteItem: ({ ids }) =>
 			api_request
 				.delete(`/users/${props.userId}/scheduled-reports`, {

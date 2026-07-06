@@ -104,8 +104,8 @@ const setMultiFormFilters = (filters) => {
 	multiFormFilters.value = filters || {};
 };
 const successModalSubmit = (answer) => {
-	if (editModal.value?.callback) {
-		editModal.value.callback(answer);
+	if (editModal.value?.successModalSubmit) {
+		editModal.value.successModalSubmit(answer);
 	}
 };
 

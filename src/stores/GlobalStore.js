@@ -30,7 +30,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null,
+				successSubmitCallback: null,
 			},
 
 			editModalSecond: {
@@ -39,7 +39,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null,
+				successSubmitCallback: null,
 			},
 
 			editModalClassic: {
@@ -48,7 +48,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null,
+				successSubmitCallback: null,
 			},
 
 			editModalClassicSecond: {
@@ -57,7 +57,7 @@ export const useGlobalStore = defineStore('globalStore', {
 				itemName: '',
 				instanceData: null,
 				formSettings: null,
-				callback: null,
+				successSubmitCallback: null,
 			},
 
 			navbarSettings: {},

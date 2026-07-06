@@ -39,7 +39,6 @@
 						:propsData="rowData"
 						:additionalProps="action"
 						:componentFileLoader="action.buttonContent.component.componentFileLoader"
-						:componentPath="action.buttonContent.component.componentPath"
 						@event="handleEvent"
 					/>
 					<span v-else-if="preparedLink.label">{{ preparedLink.label }}</span>
@@ -62,7 +61,6 @@
 						:propsData="rowData"
 						:additionalProps="action"
 						:componentFileLoader="action.buttonContent.component.componentFileLoader"
-						:componentPath="action.buttonContent.component.componentPath"
 						@event="handleEvent"
 					/>
 
@@ -79,7 +77,6 @@
 				:propsData="rowData"
 				:additionalProps="action"
 				:componentFileLoader="action.popoverContent.component.componentFileLoader"
-				:componentPath="action.popoverContent.component.componentPath"
 			/>
 		</ElPopover>
 	</div>

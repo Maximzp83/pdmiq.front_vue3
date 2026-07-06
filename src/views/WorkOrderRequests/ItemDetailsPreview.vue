@@ -75,7 +75,7 @@ const editItem = () => {
 		additionalModalSettings: {
 			plantId: itemData.value?.plant_id,
 		},
-		callback: props.editModal?.callback,
+		successSubmitCallback: props.editModal?.successSubmitCallback,
 	});
 };
 
@@ -98,7 +98,7 @@ const convertItem = () => {
 				type: 'primary',
 			},
 		],
-		callback: props.editModal?.callback,
+		successSubmitCallback: props.editModal?.successSubmitCallback,
 	});
 };
 
@@ -108,7 +108,7 @@ const rejectItem = () => {
 		cancelButtonText: tt('CANCEL'),
 		type: 'warning',
 	}).then(() => rejectMaintenanceRequest({ itemId: itemData.value.id }).then((response) => {
-		props.editModal?.callback?.(response);
+		props.editModal?.successSubmitCallback?.(response);
 	}));
 };
 

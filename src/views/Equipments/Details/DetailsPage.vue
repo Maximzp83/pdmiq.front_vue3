@@ -343,9 +343,9 @@ const editEquipment = () => {
 		show: true,
 		instanceData: activeTab.value.equipmentData,
 		instanceName: 'Equipments',
-		componentPath: 'Equipments/ItemFormWrapper',
+		formComponentFileLoader: () => import('@/views/Equipments/ItemFormWrapper.vue'),
 		itemName: itemsName.value.one,
-		callback: successEquipmentSave,
+		successSubmitCallback: successEquipmentSave,
 	});
 };
 const moveEquipment = () => {
@@ -363,7 +363,7 @@ const moveEquipment = () => {
 			plantId: itemData.value.plant_id,
 			equipmentId: activeTab.value.equipmentData.id,
 		},
-		callback: successEquipmentSave,
+		successSubmitCallback: successEquipmentSave,
 	});
 };
 const successEquipmentSave = () => {

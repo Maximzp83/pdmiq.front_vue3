@@ -340,7 +340,7 @@ const createApplication = () => {
 			disablePlant: true,
 		},
 		title: 'Create Application',
-		callback: applicationCreated,
+		successSubmitCallback: applicationCreated,
 	});
 };
 const applicationCreated = ({ data } = {}) => {

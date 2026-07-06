@@ -151,8 +151,11 @@ const {
 			// editModalProp: 'editModalClassic',
 			instanceName: 'Equipments',
 			multiform: true,
-			componentPath: 'Dashboard/MultiFormWrapper',
-			callback: () => refetchItemsList(),
+			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
+			successSubmitCallback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false });
+			},
 			...(props.additionalModalSettings || {}),
 		},
 		listUpdateKey: 'equipmentsList',

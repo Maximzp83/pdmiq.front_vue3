@@ -26,7 +26,6 @@
 				:propsData="rowData"
 				:additionalProps="column"
 				:componentFileLoader="column.meta.cellComponent.componentFileLoader"
-				:componentPath="column.meta.cellComponent.componentPath"
 			/>
 
 			<span v-else-if="column.prop" v-html="cellValue"></span>
@@ -46,7 +45,6 @@
 					:propsData="rowData"
 					:additionalProps="column"
 					:componentFileLoader="column.meta.additionalContent.component.componentFileLoader"
-					:componentPath="column.meta.additionalContent.component.componentPath"
 				/>
 			</div>
 

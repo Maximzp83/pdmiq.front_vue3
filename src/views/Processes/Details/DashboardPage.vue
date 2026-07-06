@@ -191,7 +191,7 @@ const editProcess = () => {
 		instanceName: 'Processes',
 		itemName: 'Process',
 		formComponentFileLoader: () => import('../ItemForm.vue'),
-		callback: processSubmit,
+		successSubmitCallback: processSubmit,
 	});
 };
 const reloadChart = () => {

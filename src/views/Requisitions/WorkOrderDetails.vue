@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { ElMessageBox } from 'element-plus';
 
 import {
@@ -83,13 +83,14 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
 
 import ItemForm from './ItemForm.vue';
 import DetailsItem from './Details/DetailsItem.vue';
-import ApproveForm from './Details/ApproveForm.vue';
 import CompleteFormContainer from './Details/CompleteFormContainer.vue';
 import WorkOrderReportForPrint from './Details/WorkOrderReportForPrint.vue';
 
 const { tt, translate } = Lang;
 
 defineOptions({ name: 'RequisitionsWorkOrderDetails' });
+
+const ApproveForm = defineAsyncComponent(() => import('./Details/ApproveForm.vue'));
 
 const props = defineProps({
 	itemData: { type: Object, default: () => ({}) },
@@ -155,8 +156,8 @@ const actionButtons1 = computed(() => {
 	if (orderStatus.value.isPending && isFabManager.value) {
 		return Object.freeze(
 			translate([
-				{ id: 1, text: 'Deny', className: 'inverted', event: 'handleDetailsAction', args: { componentPath: 'DenyForm' } },
-				{ id: 2, text: 'Approve', event: 'handleDetailsAction', args: { componentPath: 'ApproveForm' } },
+				{ id: 1, text: 'Deny', className: 'inverted', event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/DenyForm.vue') } },
+				{ id: 2, text: 'Approve', event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/ApproveForm.vue') } },
 			], { key: 'text' }),
 		);
 	}
@@ -165,7 +166,7 @@ const actionButtons1 = computed(() => {
 const headerButtons1 = computed(() => {
 	const buttons = [];
 	if (isFabManager.value && (orderStatus.value.isApproved || orderStatus.value.isInWork)) {
-		buttons.push({ id: 1, text: tt('DENY'), event: 'handleDetailsAction', args: { componentPath: 'DenyForm' } });
+		buttons.push({ id: 1, text: tt('DENY'), event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/DenyForm.vue') } });
 		if (!props.itemData?.can_change_requisition) {
 			buttons.push({ id: 2, text: tt('UNLOCK'), event: 'handleUnapprove', icon: 'icomoon icon-unlock' });
 		}
@@ -181,7 +182,7 @@ const headerButtons2Denied = computed(() =>
 const reloadPage = () => emit('event', 'fetchPageData', props.itemData.id);
 const confirmAction = (message) =>
 	ElMessageBox.confirm(message, { confirmButtonText: tt('OK'), cancelButtonText: tt('CANCEL'), type: 'warning' });
-const handleDetailsAction = ({ componentPath }) => emit('event', 'openDetailsAction', { componentPath });
+const handleDetailsAction = ({ componentFileLoader }) => emit('event', 'openDetailsAction', { componentFileLoader });
 const handleTakeInWork = () =>
 	confirmAction(`${tt('Start')} ${tt('phrases.this_order')}?`).then(() =>
 		takeRequisition({ itemId: props.itemData.id }).then(reloadPage),

@@ -1,34 +1,32 @@
 <template>
-	<div class="view-wrapper view-list-wrapper">
-		<div class="mcontainer">
-			<div class="view-content-card card content-row">
-				<div class="card-content">
-					<Filterbar
-						:itemsLoading="itemsLoading"
-						:filters="filters"
-						:itemsName="itemsName"
-						:hideCreate="!hasAccessToCreate"
-						:hideDelete="!hasAccessToDelete"
-						@event="handleEvent"
-					/>
+	<div class="section-row view-list-wrapper">
+		<div class="view-content-card card content-row">
+			<div class="card-content">
+				<Filterbar
+					:itemsLoading="itemsLoading"
+					:filters="filters"
+					:itemsName="itemsName"
+					:hideCreate="!hasAccessToCreate"
+					:hideDelete="!hasAccessToDelete"
+					@event="handleEvent"
+				/>
 
-					<CustomDataListTable
-						ref="itemsTableRef"
-						:disableSelection="!hasAccessToDelete"
-						:itemsLoading="itemsLoading"
-						:tableData="itemsList"
-						:tableSettings="tableSettings"
-						:itemsName="itemsName"
-						@event="handleEvent"
-					/>
+				<CustomDataListTable
+					ref="itemsTableRef"
+					:disableSelection="!hasAccessToDelete"
+					:itemsLoading="itemsLoading"
+					:tableData="itemsList"
+					:tableSettings="tableSettings"
+					:itemsName="itemsName"
+					@event="handleEvent"
+				/>
 
-					<PaginationContainer
-						:itemsName="itemsName"
-						:filters="filters"
-						:meta="meta"
-						@setFilters="setFilters"
-					/>
-				</div>
+				<PaginationContainer
+					:itemsName="itemsName"
+					:filters="filters"
+					:meta="meta"
+					@setFilters="setFilters"
+				/>
 			</div>
 		</div>
 	</div>
@@ -45,6 +43,7 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useLubeTypesStore } from '@/stores/LubeTypesStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemsData } from '@/composables/mixins/useItemsData';
+// import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
@@ -58,6 +57,8 @@ defineOptions({
 
 const itemsTableRef = ref(null);
 const itemStore = useLubeTypesStore();
+// const globalStore = useGlobalStore();
+
 const { filters } = storeToRefs(itemStore);
 const authStore = useAuthStore();
 const entity = ENTITIES.LubeTypes;
@@ -69,7 +70,21 @@ const hasAccessToDelete = computed(() => authStore.hasAccessTo([entity.permissio
 const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	entityKey: 'LubeTypes',
 	itemStore,
-	options: { tableRef: itemsTableRef },
+	options: {
+		tableRef: itemsTableRef,
+		editInModal: true,
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
+		formComponentFileLoader: () => import('./ItemForm.vue'),
+		/*additionalModalSettings: {
+			successSubmitCallback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false });
+			},
+		},*/
+	},
 });
 
 const tableSettings = computed(() => {

@@ -326,7 +326,7 @@ const createRequisition = () => {
 		title: `${tt('Create')} ${tt('phrases.Requisition_Form')}`,
 		className: 'maintenance-modal',
 		modalClassName: 'fixed-header-footer small-header small-footer',
-		callback: () => {
+		successSubmitCallback: () => {
 			refetchItemsList();
 			globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 		},

@@ -16,13 +16,12 @@
 				:data-id="item.id"
 			>
 				<component
-					v-if="instanceName || componentPath || componentFileLoader"
+					v-if="instanceName || componentFileLoader"
 					ref="ItemCardContent"
 					:is="componentFile"
 					:cardData="item"
 					:selectedIds="selectedIds"
 					:instanceName="instanceName"
-					:componentPath="componentPath"
 					:operationsSettings="operationsSettings"
 					:additionalProps="additionalProps"
 					@event="handleEvent"
@@ -69,7 +68,6 @@ const props = defineProps({
 	disableSort: Boolean,
 	emptyText: String,
 	instanceName: String,
-	componentPath: String,
 	componentFileLoader: Function,
 	cardClassName: String,
 	itemsListClassName: String,
@@ -85,7 +83,7 @@ const componentFile = computed(() => {
 		return defineAsyncComponent(props.componentFileLoader);
 	}
 
-	const path = props.componentPath ? `${props.componentPath}` : `${props.instanceName}/ItemCard`;
+	const path = `${props.instanceName}/ItemCard`;
 	const loader = cardComponentModules[`/src/views/${path}.vue`];
 	if (!loader) {
 		console.warn(`[ItemsGridContainer] Unknown item card component: ${path}.vue`);

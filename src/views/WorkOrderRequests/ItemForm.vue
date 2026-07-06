@@ -263,7 +263,6 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	formRef: itemFormRef,
 	localSetupPage,
 	localPrepareSubmitData,
-	successSubmitCallback: (response) => props.editModal?.callback?.(response),
 	emit,
 });
 

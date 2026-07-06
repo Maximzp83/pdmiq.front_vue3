@@ -393,7 +393,7 @@ const editItem = () => {
 			switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
 			plantId: itemData.value?.plant_id,
 		},
-		callback: props.editModal?.callback,
+		successSubmitCallback: props.editModal?.successSubmitCallback,
 	});
 };
 
@@ -402,7 +402,7 @@ const editWOFromLogsList = editItem;
 const handleUnlockWorkOrder = () => {
 	if (!itemData.value?.id) return;
 	unlockWorkOrder({ itemId: itemData.value.id }).then(() => {
-		props.editModal?.callback?.();
+		props.editModal?.successSubmitCallback?.();
 		globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 	});
 };

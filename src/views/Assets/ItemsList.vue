@@ -291,8 +291,11 @@ const {
 			editModalProp: 'editModalClassic',
 			instanceName: 'Assets',
 			multiform: true,
-			componentPath: 'Dashboard/MultiFormWrapper',
-			callback: () => refetchItemsList(),
+			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
+			successSubmitCallback: () => {
+				refetchItemsList();
+				globalStore.show_edit_modal({ show: false });
+			},
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		relatedFiltersStoresMap: {

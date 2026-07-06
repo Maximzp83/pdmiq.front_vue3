@@ -118,8 +118,9 @@ const handleMove = ({ row }) =>
 				plantId: row.plant_id,
 				equipmentId: row.equipment_id,
 			},
-			callback: () => {
+			successSubmitCallback: () => {
 				refetchItemsList();
+				// globalStore.show_edit_modal({ show: false });
 			},
 		},
 	});

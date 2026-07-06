@@ -438,7 +438,7 @@ const {
 				plantId: globalFilters.value?.plantId,
 				...propsFiltersRef.value,
 			},
-			callback: () => {
+			successSubmitCallback: () => {
 				refetchItemsList();
 				globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 			},
@@ -757,7 +757,7 @@ const handleShowDetailsPreview = ({ row }) => {
 		additionalModalSettings: {
 			productionLinesList: productionLinesList.value,
 		},
-		callback: refetchItemsList,
+		successSubmitCallback: refetchItemsList,
 	});
 };
 

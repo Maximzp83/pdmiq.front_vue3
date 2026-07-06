@@ -71,7 +71,7 @@ const itemsName = computed(() => ({
 const modalSettingsForItemsLists = computed(() =>
 	Object.freeze({
 		multiform: true,
-		componentPath: 'Dashboard/MultiFormWrapper',
+		componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
 	}),
 );
 const plantId = computed(() => {

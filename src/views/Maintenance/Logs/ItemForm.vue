@@ -672,7 +672,7 @@ const showParentOrder = (row) => {
 		title: tt('phrases.See_Parent_Work_Order'),
 		instanceData: row,
 		editModalProp: 'editModalClassicSecond',
-		componentPath: 'Maintenance/WorkOrders/ItemDetailsPreview',
+		formComponentFileLoader: () => import('@/views/Maintenance/WorkOrders/ItemDetailsPreview.vue'),
 		className: 'maintenance-modal',
 		modalClassName: 'fixed-header-footer small-header small-footer',
 		additionalModalSettings: {

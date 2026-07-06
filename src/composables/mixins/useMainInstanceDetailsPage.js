@@ -75,7 +75,7 @@ export function useMainInstanceDetailsPage({
 			instanceData: instanceDataKey ? resolve(itemData)?.[instanceDataKey] : resolve(itemData),
 			instanceName: instanceViewName,
 			itemName: itemsName ? itemsName.one : '',
-			callback: successItemSave,
+			successSubmitCallback: successItemSave,
 		});
 	};
 

@@ -107,6 +107,13 @@ export function useItemForm({
 		}
 		return null;
 	});
+	const resolvedSuccessSubmitCallback = computed(() => {
+		const localSuccessSubmitCallback = resolve(successSubmitCallback) || editModal?.successSubmitCallback;
+		// console.log('localSuccessSubmitCallback', localSuccessSubmitCallback);
+		if (localSuccessSubmitCallback) {
+			return localSuccessSubmitCallback;
+		}
+	});
 
 	const clearValidate = (props = []) => {
 		const form = resolve(formRef);
@@ -267,7 +274,7 @@ export function useItemForm({
 						emit,
 						itemId: preparedData.id || 'new',
 						apiRoute: resolvedApiRoute,
-						successSubmitCallback,
+						successSubmitCallback: resolvedSuccessSubmitCallback.value,
 						propsSuccessSubmitCallback,
 						options
 					}).then((answer) => {
@@ -285,6 +292,12 @@ export function useItemForm({
 							globalStore.set_global_state({
 								stateProp: 'updateCounters',
 								value: true,
+							});
+						}
+
+						if (editModal.successSubmitCallbacks) {
+							editModal.successSubmitCallbacks.forEach((callback) => {
+								callback(answer);
 							});
 						}
 

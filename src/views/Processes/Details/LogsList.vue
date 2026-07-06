@@ -148,7 +148,7 @@ const {
 		formComponentFileLoader: () => import('./EventLogForm.vue'),
 		additionalModalSettings: {
 			...localModalSettings.value,
-			callback: () => {
+			successSubmitCallback: () => {
 				globalStore.show_edit_modal({ show: false });
 				refetchItemsList();
 			},

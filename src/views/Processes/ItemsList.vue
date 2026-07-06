@@ -107,7 +107,7 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 		editInModal: true,
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		additionalModalSettings: {
-			callback: () => {
+			successSubmitCallback: () => {
 				// this.refetchItemsList();
 				globalStore.show_edit_modal({ show: false });
 			}

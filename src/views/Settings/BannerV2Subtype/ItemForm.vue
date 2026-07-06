@@ -39,7 +39,7 @@
 				<el-switch v-model="formData.is_fft_allowed" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
-			<div :label="tt('IO_Parameters')" prop="parameters" class="el-form-item">
+			<div :label="tt('IO_Parameters')" prop="parameters" class="mt-20">
 				<div class="title article-title">{{ tt('IO_Parameters') }}:</div>
 				<div class="form-subitems-wrapper">
 					<div v-if="ioParametersItemsList.length" class="form-subitems-list content-row">

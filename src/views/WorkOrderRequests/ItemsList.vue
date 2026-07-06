@@ -206,7 +206,7 @@ const openRequestForm = (row = null) => {
 		additionalModalSettings: {
 			plantId: row?.plant_id || globalFilters.value?.plantId,
 		},
-		callback: () => {
+		successSubmitCallback: () => {
 			refetchItemsList();
 			globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 		},
@@ -273,7 +273,7 @@ const convertItem = ({ row }) => {
 				type: 'primary',
 			},
 		],
-		callback: () => {
+		successSubmitCallback: () => {
 			refetchItemsList();
 			globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 		},

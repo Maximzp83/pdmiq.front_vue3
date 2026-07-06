@@ -245,7 +245,7 @@ const createVendor = () => {
 		instanceName: 'PlantsVendors',
 		itemName: 'Vendor',
 		instanceData: null,
-		callback: fetchVendors,
+		successSubmitCallback: fetchVendors,
 		formComponentFileLoader: () => import('@/views/PlantsVendors/ItemForm.vue'),
 	});
 };
