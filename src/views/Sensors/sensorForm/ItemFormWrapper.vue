@@ -255,6 +255,7 @@ const { handleEvent } = useEventHandler({
 			onward: true,
 		});
 	},
+	frequencySettingsChanged: () => {},
 });
 
 watch(

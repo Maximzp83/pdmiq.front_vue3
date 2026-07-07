@@ -885,7 +885,6 @@ const finalFormulasList = computed(() =>
 const isSensorOnly = computed(
 	() => formData.value.functionality_type === ULTRASOUND_SENSOR_TYPES.SENSOR_ONLY,
 );
-const showPumpForm = computed(() => !isSensorOnly.value);
 const enableLevelZonesForm = computed(
 	() => props.isNew && !isSensorOnly.value && formData.value.lube_method === LUBE_METHODS.ALARM,
 );
@@ -1226,10 +1225,9 @@ const localValidationHook = () => {
 				return false;
 			}
 		}
-		console.log(next);
-		if (next.every((value) => value)) {
-			return true;
-		}
+			if (next.every((value) => value)) {
+				return true;
+			}
 
 		Notify({
 			type: 'warning',
@@ -1296,14 +1294,7 @@ const localPrepareSubmitData = (data) => {
 		].forEach((key) => delete preparedData[key]);
 	}
 
-	if (!props.fromBannerSensorForm && preparedData.lube_version === LUBE_VERSIONS.V3) {
-		if (!preparedData.ultrasound_position) {
-			preparedData.ultrasound_position = generateIdInRange(1, 2);
-		}
-		if (!preparedData.port_number) {
-			preparedData.port_number = generateIdInRange(0, 40);
-		}
-	} else {
+	if (props.fromBannerSensorForm || preparedData.lube_version !== LUBE_VERSIONS.V3) {
 		delete preparedData.device_address_id;
 		delete preparedData.fft_sensor_id;
 	}
@@ -1318,22 +1309,45 @@ const localPrepareSubmitData = (data) => {
 		}
 	}
 
-	if (preparedData.lube_version === LUBE_VERSIONS.V3) {
-		delete preparedData.ultrasound_position;
-		delete preparedData.port_number;
-	}
-
 	return preparedData;
 };
 
 const buildSubmitPayload = (preparedData) => {
-	const preparedPumpFormData = showPumpForm.value ? getPumpFormData() : null;
+	const preparedPumpFormData = getPumpFormData();
 	const levelZonesFormData = enableLevelZonesForm.value ? { ...levelZoneForm.value } : null;
 
 	if (preparedPumpFormData) {
-		preparedPumpFormData.position = preparedData.lube_version === LUBE_VERSIONS.V3
-			? 0
-			: preparedData.ultrasound_position;
+		if (!props.fromBannerSensorForm && preparedData.lube_version === LUBE_VERSIONS.V3) {
+			if (!preparedPumpFormData.position) {
+				preparedPumpFormData.position = generateIdInRange(1, 2);
+			}
+			if (!preparedData.ultrasound_position) {
+				preparedData.ultrasound_position = preparedPumpFormData.position;
+			}
+			if (!preparedData.port_number) {
+				preparedData.port_number = generateIdInRange(0, 40);
+			}
+		} else {
+			preparedPumpFormData.position = preparedData.ultrasound_position;
+		}
+
+		if (isSensorOnly.value) {
+			[
+				'lubricant_container',
+				'lube_cycle_max_count',
+				'lube_cycle_warning_count',
+				'lube_cycle_spent_count',
+				'lubricant_type_id',
+				'lubricant_amount',
+			].forEach((key) => delete preparedPumpFormData[key]);
+		}
+	}
+
+	if (props.itemData && props.itemData.data_set !== preparedData.data_set) {
+		delete preparedData.id;
+		if (preparedPumpFormData) {
+			delete preparedPumpFormData.id;
+		}
 	}
 
 	return preparedPumpFormData || levelZonesFormData

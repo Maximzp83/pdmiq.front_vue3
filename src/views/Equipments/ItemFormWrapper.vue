@@ -386,8 +386,8 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 		itemName: 'Item',
 	};
 
-	if (payload) {
-		console.log('payload equipment', payload.data)
+	if (process.env.NODE_ENV ==='development') {
+		console.log('payload equipment', payload)
 		return
 	}
 

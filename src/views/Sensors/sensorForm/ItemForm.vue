@@ -426,7 +426,7 @@
 				<ItemFormUltraSound
 					v-if="isLubeMatrixV4 || isLubeMatrixV3"
 					:ref="(el) => setSubItemRef('ItemFormUltraSound', el, 0)"
-					class="content-row"
+					class="mt-20"
 					fromBannerSensorForm
 					:isLubeMatrixV3="isLubeMatrixV3"
 					:isLubeMatrixV4="isLubeMatrixV4"
