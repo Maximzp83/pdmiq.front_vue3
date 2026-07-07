@@ -1084,10 +1084,10 @@ const localSubmit = (payloadData, options = {}) => {
 		return;
 	}
 
-	if (process.env.NODE_ENV === 'development') {
+	/*if (process.env.NODE_ENV === 'development') {
 		console.log('sensorSave banner', formDataForSave);
 		return;
-	}
+	}*/
 
 	toggleSubmitRequestResult({ fromSensorsList, isLoading: 1 });
 

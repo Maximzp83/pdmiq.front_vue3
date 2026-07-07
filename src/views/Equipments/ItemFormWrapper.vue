@@ -386,10 +386,10 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 		itemName: 'Item',
 	};
 
-	if (process.env.NODE_ENV ==='development') {
+	/*if (process.env.NODE_ENV ==='development') {
 		console.log('payload equipment', payload)
 		return
-	}
+	}*/
 
 	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
 
@@ -422,10 +422,10 @@ const submitMultiViews = (multiViewsItems) => {
 		itemName: 'Multi Views',
 	};
 
-	if (process.env.NODE_ENV === 'development') {
+	/*if (process.env.NODE_ENV === 'development') {
 		console.log('multiviews', multiViewsItems);
 		return;
-	}
+	}*/
 
 	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
 

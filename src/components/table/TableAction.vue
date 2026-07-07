@@ -203,7 +203,7 @@ const actionButtonText = computed(() => {
 
 const useCssIcon = computed(() => {
 	const icon = props.action?.icon;
-	return typeof icon === 'string' && /\s/.test(icon);
+	return typeof icon === 'string';
 });
 
 const elButtonIcon = computed(() => {

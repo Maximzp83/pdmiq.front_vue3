@@ -240,7 +240,7 @@
 		</el-form>
 
 		<el-form
-			v-if="showPumpForm"
+			v-if="!isSensorOnly"
 			ref="pumpForm"
 			class="item-edit-form content-row"
 			label-width="150px"
@@ -1241,7 +1241,6 @@ const localValidationHook = () => {
 const localPrepareSubmitData = (data) => {
 	const preparedData = {
 		...data,
-		type: SENSOR_TYPES.ULTRA_SOUND,
 	};
 
 	if (preparedData.lube_method !== LUBE_METHODS.ALARM) {
@@ -1253,7 +1252,10 @@ const localPrepareSubmitData = (data) => {
 		delete preparedData.lube_cycle_percent_danger_points;
 	}
 
-	if (!showGainControl.value) {
+	if (
+		preparedData.data_set !== DATASET.ULTRA_SOUND_SDT_DECIBELS_4_20 &&
+		preparedData.data_set !== DATASET.ULTRA_SOUND_SDT_DECIBELS
+	) {
 		delete preparedData.gain_ultrasound_signal;
 	}
 
@@ -1266,12 +1268,6 @@ const localPrepareSubmitData = (data) => {
 			preparedData.lube_cycle_dwell_time = preparedData.lube_cycle_dwell_time * 60;
 		}
 		preparedData.lube_cycle_scheduled_start_time = `${selectedLubeDate.value} ${selectedLubeTime.value}`;
-	}
-
-	if (pumpFormData.value.type !== PUMP_TYPES.PERMA) {
-		delete preparedData.bearing_id;
-		delete preparedData.bearing_rpm;
-		delete preparedData.replenishment_type;
 	}
 
 	if (isSensorOnly.value) {
@@ -1294,9 +1290,42 @@ const localPrepareSubmitData = (data) => {
 		].forEach((key) => delete preparedData[key]);
 	}
 
-	if (props.fromBannerSensorForm || preparedData.lube_version !== LUBE_VERSIONS.V3) {
+	return preparedData;
+};
+
+const localGetFormData = (data) => {
+	const preparedData = { ...data };
+	const preparedPumpFormData = getPumpFormData();
+
+	if (preparedPumpFormData.type !== PUMP_TYPES.PERMA) {
+		delete preparedData.bearing_id;
+		delete preparedData.bearing_rpm;
+		delete preparedData.replenishment_type;
+	}
+
+	if (!props.fromBannerSensorForm && preparedData.lube_version === LUBE_VERSIONS.V3) {
+		if (!preparedPumpFormData.position) {
+			preparedPumpFormData.position = generateIdInRange(1, 2);
+			preparedData.ultrasound_position = preparedPumpFormData.position;
+		}
+		if (!preparedData.port_number) {
+			preparedData.port_number = generateIdInRange(0, 40);
+		}
+	} else {
+		preparedPumpFormData.position = preparedData.ultrasound_position;
 		delete preparedData.device_address_id;
 		delete preparedData.fft_sensor_id;
+	}
+
+	if (isSensorOnly.value) {
+		[
+			'lubricant_container',
+			'lube_cycle_max_count',
+			'lube_cycle_warning_count',
+			'lube_cycle_spent_count',
+			'lubricant_type_id',
+			'lubricant_amount',
+		].forEach((key) => delete preparedPumpFormData[key]);
 	}
 
 	if (props.fromBannerSensorForm) {
@@ -1309,58 +1338,27 @@ const localPrepareSubmitData = (data) => {
 		}
 	}
 
-	return preparedData;
-};
-
-const buildSubmitPayload = (preparedData) => {
-	const preparedPumpFormData = getPumpFormData();
-	const levelZonesFormData = enableLevelZonesForm.value ? { ...levelZoneForm.value } : null;
+	const payload = {
+		formData: {
+			id: itemId.value,
+			...prepareSubmitData(preparedData),
+		},
+	};
 
 	if (preparedPumpFormData) {
-		if (!props.fromBannerSensorForm && preparedData.lube_version === LUBE_VERSIONS.V3) {
-			if (!preparedPumpFormData.position) {
-				preparedPumpFormData.position = generateIdInRange(1, 2);
-			}
-			if (!preparedData.ultrasound_position) {
-				preparedData.ultrasound_position = preparedPumpFormData.position;
-			}
-			if (!preparedData.port_number) {
-				preparedData.port_number = generateIdInRange(0, 40);
-			}
-		} else {
-			preparedPumpFormData.position = preparedData.ultrasound_position;
-		}
-
-		if (isSensorOnly.value) {
-			[
-				'lubricant_container',
-				'lube_cycle_max_count',
-				'lube_cycle_warning_count',
-				'lube_cycle_spent_count',
-				'lubricant_type_id',
-				'lubricant_amount',
-			].forEach((key) => delete preparedPumpFormData[key]);
-		}
+		payload.pumpFormData = preparedPumpFormData;
 	}
 
 	if (props.itemData && props.itemData.data_set !== preparedData.data_set) {
-		delete preparedData.id;
-		if (preparedPumpFormData) {
-			delete preparedPumpFormData.id;
-		}
+		delete payload.formData.id;
+		delete preparedPumpFormData.id;
 	}
 
-	return preparedPumpFormData || levelZonesFormData
-		? { formData: preparedData, pumpFormData: preparedPumpFormData, levelZonesFormData }
-		: { formData: preparedData };
-};
+	if (enableLevelZonesForm.value) {
+		payload.levelZonesFormData = { ...levelZoneForm.value };
+	}
 
-const prepareFormPayload = (data) => {
-	const preparedData = prepareSubmitData(localPrepareSubmitData({
-		id: itemId.value,
-		...data,
-	}));
-	return buildSubmitPayload(preparedData);
+	return payload;
 };
 
 const toggleSubmitRequestResult = (settings = {}) => {
@@ -1421,10 +1419,10 @@ const sensorSave = (payloadData) => {
 		delete formDataForSave.port_number;
 	}
 
-	if (process.env.NODE_ENV === 'development') {
+	/*if (process.env.NODE_ENV === 'development') {
 		console.log('sensorSave ultrasound', formData, pumpFormData);
 		return;
-	}
+	}*/
 
 	toggleSubmitRequestResult({ isLoading: 1 });
 
@@ -1495,7 +1493,8 @@ const {
 	itemFormRef: itemForm,
 	localSetupPageActions: localSetupPage,
 	localValidationHook,
-	localGetFormData: prepareFormPayload,
+	localGetFormDataCallback: localPrepareSubmitData,
+	localGetFormData,
 	localSubmit,
 	emit,
 });
