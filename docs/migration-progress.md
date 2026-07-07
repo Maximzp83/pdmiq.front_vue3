@@ -35,7 +35,7 @@
 - `src/views/SuccessDashboard/ROIOnePager/ItemsList.vue` now loads production-line and machine filter options through `useRequestsList` / `requestsToDoList` with bound plant and production-line params, replacing local manual async loader functions.
 - `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue` now loads the asset dropdown list through `useRequestsList` / `requestsToDoList` via `methodsMap.fetch_assets`, while `fetchAsset` and `fetchAssetSensors` use `doFetchAction` via `methodsMap.fetch_asset` / `methodsMap.fetch_sensors`.
 - `src/views/SuccessDashboard/ROIOnePager/DynamicFormItem.vue` add/remove buttons now render Icomoon icons as child `<i>` elements instead of Element Plus `icon` props, fixing the runtime invalid tag-name error.
-- `SuccessDashboard` form parity follow-up is active: `src/views/SuccessDashboard/MeetingTracker/ItemForm.vue` data loading was re-aligned with Vue2 `requestsToDoList` through Vue3 `useRequestsList`; continue checking remaining Success Dashboard forms one file at a time.
+- `SuccessDashboard` form parity follow-up has been code-level rechecked across the current form file set; Meeting Tracker and ROI One Pager have been re-aligned with Vue2 request/form patterns through Vue3 composables. Runtime smoke-test with real ROI One Pager / Meeting Tracker data remains open.
 - `SuccessDashboard` Sensors alarms modal runtime fix was applied: `MeetingTracker/ItemForm.vue` now passes legacy-compatible alarm props, and the common Sensors alarms components use the Vue2-style sensor alarm chart factory flow instead of the simplified maintenance chart wrapper that caused empty modal content and missing event handler warnings.
 - `SuccessDashboard` Meeting Tracker alarms fetch now uses `useRequestsList().doFetchAction` via `methodsMap.fetch_alarms`, matching the Vue2-style request helper pattern.
 - `SuccessDashboard` Meeting Tracker alarms fetch trigger was fixed after the `useRequestsList` migration: when `graphsPeriod` is established during initial setup, `fetchAlarms` is now called from `initialRequestsListResponsesReadyCallback` after `isInitialSetup` is cleared.
@@ -51,7 +51,7 @@
   - Added `src/views/Equipments/EquipmentsLayout.vue`.
   - Added `src/views/Equipments/ItemsList.vue`.
   - Added the first `src/views/Equipments/Card` grid-card scope.
-  - Added the first create/edit compile scope with `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue`.
+  - Added and later expanded the create/edit scope with `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue`.
   - Layout uses the Vue2-style `requestsToDoList` / `initiateRequestsToDoList` dropdown loading pattern through `useRequestsList`.
   - Nested list uses `/equipments/dashboard` with `prepareEquipmentsList`.
   - `src/router/index.js` now enables `/dashboard/equipments` for the migrated list.
@@ -59,7 +59,7 @@
   - Equipment edit in the multiform force-fetches `/equipments/:id` before handing data to `Equipments/ItemFormWrapper`.
   - Plant details embeds `src/views/Equipments/EquipmentsLayout.vue` directly, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed.
   - Migrated `vue2_project/src/views/Equipments/Details` into Vue3 with DetailsPage, EquipmentInfoBlock, Quote/Service tab, crossover/analogues tables, move history, PDM buttons, equipment mock image asset, nested `/equipments/:id/details/*` routes, and nested Sensors statistics route-param compatibility.
-  - Advanced form tabs remain pending.
+  - Code-level recheck confirms the Equipment form stack now includes RPM controls, vibration analysis rules, child component/type-related submit, PDM sensor tab wiring, sensor detach flow, and Multi View tab submit through `ItemFormWrapper.vue`; runtime smoke-test was not performed.
 - Sensors folder has been migrated for the current Vue3 scope, including the final statistics/charts stage.
 - Sensors `PDFandFFTrequestsBlock` has been re-aligned with the Vue2 original for the current compile scope: restored grouped RPM/FFT/PDF controls, PDF websocket/download flow, compare PDF export, FFT request/last/unlock bridge, BannerFilterBlock unlock forwarding, and supporting `useSensors` request helpers.
 - Sensors FFT Statistics page and FFT chart substack have been re-aligned toward Vue2 for the current compile scope: `FFTStatisticsPage.vue` restores the legacy equipment header, prev/next FFT navigation, axis selector, split/metric controls, and `AnalysisFFTContainer`; FFT chart wrapper/item/rules/waterfall files restore hidden-chart map rebuild, cursor/peaks/periodic/RPM cursor flow, vibration-analysis rule override saving, and waterfall 3D controls; `/ncd/:id/fft/:fftId` and `/banner/:id/fft/:fftId` routes are enabled; `npm run build` and targeted `git diff --check` pass.

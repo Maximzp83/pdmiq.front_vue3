@@ -103,7 +103,7 @@ Primary rules source:
   - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.
   - Plant details now uses `src/views/Equipments/EquipmentsLayout.vue` for equipments, matching Vue2. The temporary local `src/views/Plants/Details/EquipmentsList.vue` was removed; Equipments list ownership stays under `src/views/Equipments`.
   - `src/views/Equipments/EquipmentsLayout.vue` and `src/views/Equipments/ItemsList.vue` were added as the first Vue3 Equipments migration step. Layout owns the original-style dropdown/filter toolbar with `useRequestsList` + `initiateRequestsToDoList`; nested list uses `/equipments/dashboard` with `prepareEquipmentsList`.
-  - `src/views/Equipments/Card` now has the first grid-card scope, and `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue` cover the first create/edit compile scope. Advanced RPM/vibration/subtype/sensor/multiview form behavior remains pending.
+  - `src/views/Equipments/Card` now has the grid-card scope, and `src/views/Equipments/ItemPage.vue`, `ItemFormWrapper.vue`, and `ItemForm.vue` cover the create/edit scope. Code-level recheck confirms RPM controls, vibration analysis rules, child component/type-related submit, PDM sensor tab wiring, sensor detach flow, and Multi View tab submit are present; runtime smoke-test was not performed.
   - `vue2_project/src/views/Equipments/Details` has been migrated into `src/views/Equipments/Details` for the current Vue3 compile scope, including DetailsPage, EquipmentInfoBlock, Quote/Service tab, crossover/analogues tables, move history, PDM buttons, `/equipments/:id/details/*` nested routes, `equipment_mock.jpg`, and Sensors statistics route-param compatibility for nested PDM/multiview links.
   - `src/router/index.js` enables `/dashboard/equipments` for the migrated list and `/equipments/:id/details` nested details routes.
   - `src/views/Dashboard/MultiFormWrapper.vue` and `MultiFormItemWrapper.vue` were migrated from Vue2 for dashboard create/edit flows. `ProductionLines`, `Machines`, `Assets`, and `Equipments` lists now open the multiform modal; child forms receive parent instance data for chained ids.
@@ -219,7 +219,7 @@ Primary rules source:
 - Smoke-test Equipments details with authenticated real data, especially main/quote/service tabs, Move modal, PDM links, multiview links, crossover lists, RFQ submission, and maintenance/history sections.
 - Smoke-test Sensors list/create/edit/statistics/FFT/chart routes in browser.
 - Smoke-test Corporate Dashboard `/corporate/main` with authenticated data, especially company filter selection, date range, all-plants summary, print view, and per-plant ROI/PDM/counters rendering.
-- Review runtime completeness of the simplified chart/statistics controls against production data.
+- Runtime-check chart/statistics flows against production data after the code-level parity fixes already applied to Sensors and SuccessDashboard charts.
 - Do not reopen completed `BrandModels` details work unless a new issue is reported.
 
 ## Build Status
