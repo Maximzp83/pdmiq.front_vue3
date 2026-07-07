@@ -45,6 +45,7 @@ import { required } from '@/constants/validation';
 import { Lang } from '@/localization';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useMaintenance } from '@/composables/useMaintenance';
+import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Datepicker from '@/components/common/Datepicker.vue';
 
@@ -57,6 +58,7 @@ defineOptions({
 const props = defineProps(buildProps());
 const emit = defineEmits(['submit', 'onCancel', 'event']);
 
+const globalStore = useGlobalStore();
 const { convertMaintenanceRequest } = useMaintenance();
 const itemFormRef = ref(null);
 const formData = ref({
@@ -77,6 +79,13 @@ const localSubmit = (data) =>
 		data,
 	}).then((response) => {
 		props.editModal?.successSubmitCallback?.(response);
+		props.editModal?.successSubmitOptions?.refetchItemsList?.(response);
+		if (props.editModal?.successSubmitOptions?.closeModal) {
+			globalStore.show_edit_modal({
+				show: false,
+				editModalProp: props.editModal.editModalProp,
+			});
+		}
 		return response;
 	});
 

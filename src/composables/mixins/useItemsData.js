@@ -397,7 +397,10 @@ export function useItemsData({
 			}
 			if (successSubmitOptions.closeModal) {
 				modalSettings.successSubmitCallbacks.push(() => {
-					globalStore.show_edit_modal({ show: false });
+					globalStore.show_edit_modal({
+						show: false,
+						editModalProp: modalSettings.editModalProp,
+					});
 				});
 			}
 		}

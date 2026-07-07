@@ -43,7 +43,6 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useLubeTypesStore } from '@/stores/LubeTypesStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemsData } from '@/composables/mixins/useItemsData';
-// import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
@@ -57,7 +56,6 @@ defineOptions({
 
 const itemsTableRef = ref(null);
 const itemStore = useLubeTypesStore();
-// const globalStore = useGlobalStore();
 
 const { filters } = storeToRefs(itemStore);
 const authStore = useAuthStore();
@@ -78,12 +76,6 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 			closeModal: true,
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
-		/*additionalModalSettings: {
-			successSubmitCallback: () => {
-				refetchItemsList();
-				globalStore.show_edit_modal({ show: false });
-			},
-		},*/
 	},
 });
 

@@ -129,6 +129,8 @@ const ImagePreviewModal = defineAsyncComponent(
 import { getParamsFromUrl } from '@/utils/url-helpers';
 import IdleTimer from '@/utils/IdleTimer';
 import { Lang } from '@/localization';
+import { findItemBy, validateBySettings } from '@/helpers';
+import { menuItems } from '@/constants/menuItems';
 
 const { tt } = Lang;
 
@@ -200,6 +202,51 @@ const signIn = (token) => {
 	authStore.get_auth_user(token).then(() => {
 		router.push('/dashboard');
 	});
+};
+
+const validateByCompanySettings = (menuId, company) => {
+	if (!menuId || !company?.menu_items) return true;
+
+	const menuItem = findItemBy('id', menuId, company.menu_items);
+	return menuItem ? menuItem.on : true;
+};
+
+const hasAccessToMenuItem = (item, user) => {
+	const { meta = {}, id } = item;
+	const checks = [validateByCompanySettings(id, user?.company)];
+
+	if (meta.permissions) {
+		checks.push(authStore.hasAccessTo(meta.permissions, meta.permissionsMethod));
+	}
+
+	if (meta.conditionSettings) {
+		checks.push(validateBySettings({ ...meta.conditionSettings, dataObj: user }));
+	}
+
+	if (meta.userTypes) {
+		checks.push(meta.userTypes.includes(user?.type));
+	}
+
+	return checks.every(Boolean);
+};
+
+const findFirstAvailableMenuPath = (items, user) => {
+	for (const item of items) {
+		if (!hasAccessToMenuItem(item, user)) continue;
+
+		if (item.children?.length) {
+			const childPath = findFirstAvailableMenuPath(item.children, user);
+			if (childPath) return childPath;
+		}
+
+		if (item.path) return item.path;
+	}
+
+	return '';
+};
+
+const getDefaultRedirectPath = () => {
+	return findFirstAvailableMenuPath(menuItems(), authUser.value) || '/profile';
 };
 
 const handleLayoutClick = ({ target }) => {
@@ -332,12 +379,7 @@ onBeforeMount(() => {
 			router.push(redirectTo.value);
 			authStore.set_redirect_to(null);
 		} else if (path === '/') {
-			let redirectPath = '';
-
-			// Check user permissions for default route
-			// Note: You'll need to implement hasAccessTo composable
-			// For now, using a simple default
-			redirectPath = '/dashboard';
+			const redirectPath = getDefaultRedirectPath();
 
 			router.push(redirectPath);
 		}
@@ -345,7 +387,7 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-	console.log('DashboardLayout mounted');
+	// console.log('DashboardLayout mounted');
 
 	if (
 		import.meta.env.MODE !== 'development' &&

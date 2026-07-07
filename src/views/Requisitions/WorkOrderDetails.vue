@@ -61,11 +61,29 @@
 			:title="`${tt('Technician')}/${tt('constants.Plant_User')} ${tt('Details')}`"
 			@event="handleEvent"
 		/>
+
+		<el-dialog
+			v-model="dialogSettings.show"
+			append-to-body
+			center
+			class="small dialog-decorate-header"
+			:title="dialogSettings.title"
+		>
+			<component
+				:is="dialogComponent"
+				v-if="dialogComponent"
+				fromModal
+				:itemData="itemData"
+				:settings="dialogSettings.formSettings"
+				@event="handleEvent"
+				@onCancel="closeDetailsDialog"
+			/>
+		</el-dialog>
 	</div>
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 
 import {
@@ -103,9 +121,16 @@ const {
 	unapproveRequisition,
 	resetRequisition,
 	takeRequisition,
+	concludeRequisition,
 	deleteRequisition,
 } = usePlantRequisitions();
 
+const dialogSettings = ref({
+	show: false,
+	title: '',
+	componentFileLoader: null,
+	formSettings: null,
+});
 const isFabManager = computed(() => !!authStore.authUser?.role?.is_fab_shop_manager);
 const isRequestor = computed(() => authStore.authUser?.id === props.itemData?.requisition_user_id);
 const isFabricator = computed(() => authStore.authUser?.id === props.itemData?.fabrication_user_id);
@@ -156,8 +181,8 @@ const actionButtons1 = computed(() => {
 	if (orderStatus.value.isPending && isFabManager.value) {
 		return Object.freeze(
 			translate([
-				{ id: 1, text: 'Deny', className: 'inverted', event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/DenyForm.vue') } },
-				{ id: 2, text: 'Approve', event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/ApproveForm.vue') } },
+				{ id: 1, text: 'Deny', className: 'inverted', event: 'handleDetailsAction', args: { title: 'Deny', componentFileLoader: () => import('./Details/DenyForm.vue') } },
+				{ id: 2, text: 'Approve', event: 'handleDetailsAction', args: { title: 'Approve', componentFileLoader: () => import('./Details/ApproveForm.vue') } },
 			], { key: 'text' }),
 		);
 	}
@@ -166,7 +191,7 @@ const actionButtons1 = computed(() => {
 const headerButtons1 = computed(() => {
 	const buttons = [];
 	if (isFabManager.value && (orderStatus.value.isApproved || orderStatus.value.isInWork)) {
-		buttons.push({ id: 1, text: tt('DENY'), event: 'handleDetailsAction', args: { componentFileLoader: () => import('./Details/DenyForm.vue') } });
+		buttons.push({ id: 1, text: tt('DENY'), event: 'handleDetailsAction', args: { title: 'Deny', componentFileLoader: () => import('./Details/DenyForm.vue') } });
 		if (!props.itemData?.can_change_requisition) {
 			buttons.push({ id: 2, text: tt('UNLOCK'), event: 'handleUnapprove', icon: 'icomoon icon-unlock' });
 		}
@@ -178,11 +203,44 @@ const headerButtons2Denied = computed(() =>
 		? Object.freeze([{ id: 1, text: tt('RESET'), event: 'handleReset' }])
 		: Object.freeze([]),
 );
+const dialogComponent = computed(() =>
+	dialogSettings.value.show && dialogSettings.value.componentFileLoader
+		? defineAsyncComponent(dialogSettings.value.componentFileLoader)
+		: null,
+);
 
 const reloadPage = () => emit('event', 'fetchPageData', props.itemData.id);
 const confirmAction = (message) =>
 	ElMessageBox.confirm(message, { confirmButtonText: tt('OK'), cancelButtonText: tt('CANCEL'), type: 'warning' });
-const handleDetailsAction = ({ componentFileLoader }) => emit('event', 'openDetailsAction', { componentFileLoader });
+const closeDetailsDialog = () => {
+	dialogSettings.value = {
+		show: false,
+		title: '',
+		componentFileLoader: null,
+		formSettings: null,
+	};
+};
+const handleDetailsAction = ({ title, componentFileLoader, formSettings } = {}) => {
+	const nextSettings = {
+		show: true,
+		title,
+		componentFileLoader,
+		formSettings,
+	};
+
+	if (title === 'Shipping Details') {
+		confirmAction(`${tt('phrases.do_you_want_to_specify_shipping_details')}?`)
+			.then(() => {
+				dialogSettings.value = nextSettings;
+			})
+			.catch(() => {
+				concludeRequisition({ itemId: props.itemData.id }).then(reloadPage);
+			});
+		return;
+	}
+
+	dialogSettings.value = nextSettings;
+};
 const handleTakeInWork = () =>
 	confirmAction(`${tt('Start')} ${tt('phrases.this_order')}?`).then(() =>
 		takeRequisition({ itemId: props.itemData.id }).then(reloadPage),
@@ -199,7 +257,10 @@ const handleDeleteRequisition = (id) =>
 	confirmAction(`${tt('phrases.Do_you_really_want_to')} ${tt('phrases.delete_this_requisition')}?`).then(() =>
 		deleteRequisition({ data: { ids: [id] } }).then(() => changeRoute({ path: '/requisitions' })),
 	);
-const successModalSubmit = reloadPage;
+const successModalSubmit = () => {
+	closeDetailsDialog();
+	reloadPage();
+};
 
 const { handleEvent } = useEventHandler({
 	handleDetailsAction,
@@ -207,6 +268,7 @@ const { handleEvent } = useEventHandler({
 	handleUnapprove,
 	handleReset,
 	handleDeleteRequisition,
+	reloadPage,
 	successModalSubmit,
 });
 </script>

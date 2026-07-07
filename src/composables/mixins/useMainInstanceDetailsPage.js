@@ -153,7 +153,7 @@ export function useMainInstanceDetailsPage({
 			set_equipments_filters(newFilters);
 			if (alertType) {
 				layout.handleAlertTypesFilter([alertType.id]);
-			} else if (key === 'offline') {
+			} else if (key.toLowerCase() === 'offline') {
 				layout.handleAlertTypesFilter(['offline']);
 			} else {
 				layout.handleAlertTypesFilter([]);

@@ -4086,11 +4086,14 @@ body {
 				padding: 14px;
 				box-sizing: border-box;
 
-				i {
+				i, .el-icon {
 					color: #CED4DA;
 					font-size: 20px;
 				}
 
+				svg path {
+					fill: #666 !important;
+				}
 			}
 
 			.info-block {
@@ -4377,7 +4380,6 @@ body {
 		}
 
 		.statistic-block {
-			height: 100%;
 			.chart-container {min-height: 195px;}
 		}
 
@@ -4402,7 +4404,6 @@ body {
 			.progress-part {
 				.progress-item {
 					&.red-status {
-						&:before { background-color: #F30606; }
 						& > .circle {
 							background-color: #F30606;
 						}
@@ -5005,6 +5006,32 @@ body {
 		.maintenance-details-preview {
 			.section-row.flex.mrow.wrap {
 				flex-wrap: nowrap;
+			}
+		}
+
+		&.work-order-for-print-container {
+			.value-cell {
+				.icon-block {
+					.legacy-report-icon {
+						display: inline-flex !important;
+						align-items: center;
+						justify-content: center;
+						width: 20px !important;
+						height: 20px !important;
+						color: #CED4DA !important;
+						font-size: 20px !important;
+						line-height: 1 !important;
+						vertical-align: middle;
+
+						svg {
+							display: block !important;
+							width: 1em !important;
+							height: 1em !important;
+							color: inherit !important;
+							fill: currentColor !important;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -6331,5 +6358,3 @@ body {
 		}
 	}
 }
-
-

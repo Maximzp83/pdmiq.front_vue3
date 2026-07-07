@@ -287,15 +287,15 @@ const {
 		propsFilters: computed(() => props.propsFilters || {}),
 		showToggleListButton: props.showToggleListButton,
 		preventSetNavbar: props.preventSetNavbar,
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',
 			instanceName: 'Assets',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
-			successSubmitCallback: () => {
-				refetchItemsList();
-				globalStore.show_edit_modal({ show: false });
-			},
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		relatedFiltersStoresMap: {

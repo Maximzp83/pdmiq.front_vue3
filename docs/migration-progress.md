@@ -19,6 +19,7 @@
 - `WorkOrderRequests` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `StoreRooms` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `Requisitions` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `Requisitions/Details` section was re-migrated toward Vue2 parity: `WorkOrderDetails.vue` owns the details action modal with `componentFileLoader`; Complete/Approve flows use existing composables, Vue3 subitem forms, attachments/multipart handling, technical-process rendering, DetailsItem array/attachment rendering, and restored print report structure. `npm run build`, targeted `git diff --check`, and migration-rule scan pass.
 - `RFQS` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `ProductionLines` section is migrated for the current Vue3 compile scope and routes are enabled.
 - `Machines` section is migrated for the current Vue3 compile scope with list/grid, form, item page, details page, attachment/character subitems, `useMachines`, machine mock image asset, and machine create/edit/details routes enabled.

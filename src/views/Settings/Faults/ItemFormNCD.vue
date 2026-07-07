@@ -8,8 +8,12 @@
 			label-width="150px"
 			:label-position="isMobile ? 'top' : 'left'"
 		>
-			<el-form-item :label="tt('Name')" prop="title" class="mcol-xs-12">
-				<CustomInput v-model="formData.title" :placeholder="tt('name')" />
+			<el-form-item :label="`${tt('Name')} EN`" prop="title_en" class="mcol-xs-12">
+				<CustomInput v-model="formData.title_en" :placeholder="tt('name')" />
+			</el-form-item>
+
+			<el-form-item :label="`${tt('Name')} ESP`" prop="title_es" class="mcol-xs-12">
+				<CustomInput v-model="formData.title_es" :placeholder="tt('name')" />
 			</el-form-item>
 
 			<el-form-item class="mcol-xs-12" label="Type of equipments" prop="equipment_types">
@@ -99,6 +103,8 @@ const equipmentTypesLoading = ref(false);
 const formData = ref({
 	type: FAULTS_TYPES.NCD,
 	title: null,
+	title_en: '',
+	title_es: '',
 	equipment_types: [],
 	sensor_parameter_types: [],
 	alert_rules: [],
@@ -135,6 +141,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	editModal: props.editModal,
 	emit,
 	localSetupPage,
+	// localPrepareSubmitData
 });
 
 useRequestsList({ requestsToDoList });

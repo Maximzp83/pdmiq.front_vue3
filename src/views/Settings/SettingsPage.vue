@@ -15,7 +15,7 @@
 			</div>
 
 			<div class="section-row">
-				<router-view v-slot="{ Component }" :key="contentKey" preventSetNavbar>
+				<router-view v-slot="{ Component }" preventSetNavbar>
 					<transition name="standard-fade" mode="out-in">
 						<component :is="Component" />
 					</transition>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import { FAULTS_TYPES } from '@/constants/global';
@@ -41,7 +41,6 @@ defineOptions({
 const route = useRoute();
 const router = useRouter();
 const globalStore = useGlobalStore();
-const contentKey = ref(1);
 
 const currentPath = computed(() => route.fullPath);
 
@@ -69,7 +68,6 @@ const checkIsLinkActive = ({ link, currentPath: path }) => path === link.path;
 
 const handleChangeRoute = (link) => {
 	router.push(link.path);
-	contentKey.value += 1;
 };
 
 onMounted(() => {

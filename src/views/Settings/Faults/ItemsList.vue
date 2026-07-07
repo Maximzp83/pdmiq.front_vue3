@@ -1,28 +1,26 @@
 <template>
-	<div class="view-wrapper view-list-wrapper">
-		<div class="mcontainer">
-			<div class="view-content-card card content-row">
-				<div class="card-content">
-					<Filterbar
-						:itemsLoading="itemsLoading"
-						:filters="filters"
-						:itemsName="itemsName"
-						hidePerPageFilter
-						:hideCreate="!hasAccessToCreate"
-						:hideDelete="!hasAccessToDelete"
-						@event="handleEvent"
-					/>
+	<div class="section-row view-list-wrapper">
+		<div class="view-content-card card content-row">
+			<div class="card-content">
+				<Filterbar
+					:itemsLoading="itemsLoading"
+					:filters="filters"
+					:itemsName="itemsName"
+					hidePerPageFilter
+					:hideCreate="!hasAccessToCreate"
+					:hideDelete="!hasAccessToDelete"
+					@event="handleEvent"
+				/>
 
-					<CustomDataListTable
-						ref="itemsTableRef"
-						:disableSelection="!hasAccessToDelete"
-						:itemsLoading="itemsLoading"
-						:tableData="filteredItemsList"
-						:tableSettings="tableSettings"
-						:itemsName="itemsName"
-						@event="handleEvent"
-					/>
-				</div>
+				<CustomDataListTable
+					ref="itemsTableRef"
+					:disableSelection="!hasAccessToDelete"
+					:itemsLoading="itemsLoading"
+					:tableData="filteredItemsList"
+					:tableSettings="tableSettings"
+					:itemsName="itemsName"
+					@event="handleEvent"
+				/>
 			</div>
 		</div>
 	</div>
@@ -30,7 +28,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { ENTITIES } from '@/config/entities';
@@ -59,7 +57,6 @@ defineOptions({
 });
 
 const route = useRoute();
-const router = useRouter();
 const itemsTableRef = ref(null);
 const itemStore = useEquipmentsStore();
 const { filters } = storeToRefs(itemStore);
@@ -75,11 +72,30 @@ const sensorParametersList = computed(() => Object.freeze(getSensorParametersLis
 const sensorParametersListNCD = computed(() => Object.freeze(getSensorParametersListNCD()));
 const sensorParametersListNCDOnly = computed(() => Object.freeze(getSensorParametersListNCDOnly()));
 
-const { itemsList, itemsLoading, itemsName, setFilters, handleDeleteItems } = useItemsData({
+const resolveFaultType = (itemData = null) => Number(itemData?.type || faultType.value);
+const resolveFaultFormLoader = (itemData = null) =>
+	resolveFaultType(itemData) === FAULTS_TYPES.NCD
+		? () => import('./ItemFormNCD.vue')
+		: () => import('./ItemForm.vue');
+
+const { itemsList, itemsLoading, itemsName, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	entityKey: 'EquipmentFaults',
 	itemStore,
 	options: {
 		tableRef: itemsTableRef,
+		editInModal: true,
+		formComponentFileLoader: resolveFaultFormLoader(),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
+		additionalModalSettings: {
+			single: true,
+		},
+		localModalSettingsHook: ({ itemData, modalSettings }) => ({
+			...modalSettings,
+			formComponentFileLoader: resolveFaultFormLoader(itemData),
+		}),
 		predefinedFilters: { max: -1 },
 		excludeGetParams: [
 			'hasSensors',
@@ -93,21 +109,6 @@ const { itemsList, itemsLoading, itemsName, setFilters, handleDeleteItems } = us
 			'isAsset',
 			'plantId',
 		],
-		localCreateItem: () => {
-			const path =
-				faultType.value === FAULTS_TYPES.NCD
-					? '/settings/faults/ncd/new'
-					: '/settings/faults/new';
-			router.push(path);
-		},
-		localEditItem: (payload = {}) => {
-			const row = payload.row || payload.rowData || {};
-			const path =
-				Number(row.type) === FAULTS_TYPES.NCD
-					? `/settings/faults/ncd/${row.id}`
-					: `/settings/faults/${row.id}`;
-			router.push(path);
-		},
 	},
 });
 
@@ -180,11 +181,8 @@ const tableSettings = computed(() => {
 
 const { handleEvent } = useEventHandler({
 	setFilters,
-	createItem: () => router.push(faultType.value === FAULTS_TYPES.NCD ? '/settings/faults/ncd/new' : '/settings/faults/new'),
-	editItem: (payload) => {
-		const row = payload.row || payload.rowData || {};
-		router.push(Number(row.type) === FAULTS_TYPES.NCD ? `/settings/faults/ncd/${row.id}` : `/settings/faults/${row.id}`);
-	},
+	createItem,
+	editItem,
 	handleDeleteItems,
 });
 </script>

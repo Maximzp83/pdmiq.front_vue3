@@ -23,22 +23,38 @@
 				</div>
 			</div>
 
-			<div class="details-values-list">
-				<div v-for="item in settings" :key="`detail-${item.id}`" class="details-value-item">
-					<div class="muted">{{ item.label }}</div>
-					<div class="semi-bold">
-						<button
-							v-if="item.meta?.isAttachment && Array.isArray(getValue(item))"
-							v-for="attachment in getValue(item)"
-							:key="attachment.id || attachment.url || attachment.name"
-							class="link underline"
-							type="button"
-							@click="downloadFile(attachment)"
-						>
-							{{ attachment.name || attachment.file_name || attachment.url }}
-						</button>
-						<span v-else>{{ formatValue(item) }}</span>
+			<div class="content-row content-block mcol-xs-6">
+				<div v-for="item in detailsList" :key="`detail-${item.id}`" class="details-row">
+					<div class="label">{{ item.label }}</div>
+
+					<div v-if="item.buttons" class="semi-bold">
+						<div v-if="item.buttons.length">
+							<el-button
+								v-for="(button, idx) in item.buttons"
+								:key="`button-${idx}`"
+								:class="button.className"
+								:type="button.type || 'primary'"
+								@click="downloadFile(button)"
+							>
+								{{ button.text }}
+							</el-button>
+						</div>
+						<span v-else>-</span>
 					</div>
+
+					<div
+						v-else-if="item.values"
+						v-for="(valueItemSettings, idx) in item.values"
+						:key="`value-${idx}`"
+						class="flex mrow"
+					>
+						<div v-for="settingItem in valueItemSettings" :key="`value-${settingItem.id}`">
+							<div class="label">{{ settingItem.label }}</div>
+							<div class="semi-bold" v-html="settingItem.value"></div>
+						</div>
+					</div>
+
+					<div v-else class="semi-bold" v-html="item.value"></div>
 				</div>
 			</div>
 		</div>
@@ -58,7 +74,9 @@
 </template>
 
 <script setup>
-import { getObjectVal } from '@/helpers';
+import { computed } from 'vue';
+
+import { getCellValue, getObjectVal } from '@/helpers';
 
 defineOptions({ name: 'RequisitionDetailsItem' });
 
@@ -85,9 +103,48 @@ const formatValue = (item) => {
 	}
 	return `${item.prefix || ''}${value}${item.postfix || ''}`;
 };
+const detailsList = computed(() =>
+	props.settings.map((setting) => {
+		const item = {
+			...setting,
+			value: getCellValue(props.orderData, setting),
+		};
+
+		if (setting.meta?.isAttachment) {
+			const files = Array.isArray(item.value) ? item.value : [];
+			item.buttons = files.map((file) => {
+				const fullPath = file.file_path || file.url || file.path || '';
+				const pathArray = fullPath.split('/');
+				const filename = file.name || file.file_name || pathArray[pathArray.length - 1] || fullPath;
+				return {
+					...setting.buttonSettings,
+					filename,
+					fullPath,
+					text: filename,
+				};
+			});
+		} else if (setting.meta?.isArray) {
+			const values = Array.isArray(item.value) ? item.value : [];
+			item.values = values.map((valueItem) =>
+				setting.meta.isArray.map((arraySetting) => ({
+					...arraySetting,
+					value: getCellValue(valueItem, arraySetting),
+				})),
+			);
+		} else {
+			item.value = formatValue(setting);
+		}
+
+		return item;
+	}),
+);
 const emitAction = (button) => emit('event', button.event, button.args || button);
-const downloadFile = (attachment) => {
-	const url = attachment.url || attachment.path;
-	if (url) window.open(url, '_blank');
+const downloadFile = ({ filename, fullPath }) => {
+	if (!fullPath) return;
+	const link = document.createElement('a');
+	link.href = fullPath;
+	link.download = filename;
+	link.target = '_blank';
+	link.click();
 };
 </script>

@@ -1,34 +1,32 @@
 <template>
-	<div class="view-wrapper view-list-wrapper">
-		<div class="mcontainer">
-			<div class="view-content-card card content-row">
-				<div class="card-content">
-					<Filterbar
-						:itemsLoading="itemsLoading"
-						:filters="filters"
-						:itemsName="itemsName"
-						:hideCreate="!hasAccessToCreate"
-						:hideDelete="!hasAccessToDelete"
-						@event="handleEvent"
-					/>
+	<div class="section-row view-list-wrapper">
+		<div class="view-content-card card content-row">
+			<div class="card-content">
+				<Filterbar
+					:itemsLoading="itemsLoading"
+					:filters="filters"
+					:itemsName="itemsName"
+					:hideCreate="!hasAccessToCreate"
+					:hideDelete="!hasAccessToDelete"
+					@event="handleEvent"
+				/>
 
-					<CustomDataListTable
-						ref="itemsTableRef"
-						:disableSelection="!hasAccessToDelete"
-						:itemsLoading="itemsLoading"
-						:tableData="itemsList"
-						:tableSettings="tableSettings"
-						:itemsName="itemsName"
-						@event="handleEvent"
-					/>
+				<CustomDataListTable
+					ref="itemsTableRef"
+					:disableSelection="!hasAccessToDelete"
+					:itemsLoading="itemsLoading"
+					:tableData="itemsList"
+					:tableSettings="tableSettings"
+					:itemsName="itemsName"
+					@event="handleEvent"
+				/>
 
-					<PaginationContainer
-						:itemsName="itemsName"
-						:filters="filters"
-						:meta="meta"
-						@setFilters="setFilters"
-					/>
-				</div>
+				<PaginationContainer
+					:itemsName="itemsName"
+					:filters="filters"
+					:meta="meta"
+					@setFilters="setFilters"
+				/>
 			</div>
 		</div>
 	</div>
@@ -43,7 +41,6 @@ import { standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useBannerV2SubtypesStore } from '@/stores/BannerV2SubtypesStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
 
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -60,7 +57,6 @@ defineOptions({
 
 const itemsTableRef = ref(null);
 const itemStore = useBannerV2SubtypesStore();
-const globalStore = useGlobalStore();
 
 const { filters } = storeToRefs(itemStore);
 const authStore = useAuthStore();
@@ -70,19 +66,17 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([entity.permissio
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([entity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([entity.permissions.delete]));
 
-const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems, refetchItemsList } = useItemsData({
+const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	entityKey: 'BannerV2Subtypes',
 	itemStore,
 	options: {
 		tableRef: itemsTableRef,
 		editInModal: true,
-		formComponentFileLoader: () => import('./ItemForm.vue'),
-		additionalModalSettings: {
-			successSubmitCallback: () => {
-				refetchItemsList();
-				globalStore.show_edit_modal({ show: false });
-			},
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
 		},
+		formComponentFileLoader: () => import('./ItemForm.vue'),
 	},
 });
 

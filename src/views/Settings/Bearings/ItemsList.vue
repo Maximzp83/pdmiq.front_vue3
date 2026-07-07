@@ -1,34 +1,32 @@
 <template>
-	<div class="view-wrapper view-list-wrapper">
-		<div class="mcontainer">
-			<div class="view-content-card card content-row">
-				<div class="card-content">
-					<Filterbar
-						:itemsLoading="itemsLoading"
-						:filters="filters"
-						:itemsName="itemsName"
-						:hideCreate="!hasAccessToCreate"
-						:hideDelete="!hasAccessToDelete"
-						@event="handleEvent"
-					/>
+	<div class="section-row view-list-wrapper">
+		<div class="view-content-card card content-row">
+			<div class="card-content">
+				<Filterbar
+					:itemsLoading="itemsLoading"
+					:filters="filters"
+					:itemsName="itemsName"
+					:hideCreate="!hasAccessToCreate"
+					:hideDelete="!hasAccessToDelete"
+					@event="handleEvent"
+				/>
 
-					<CustomDataListTable
-						ref="itemsTableRef"
-						:disableSelection="!hasAccessToDelete"
-						:itemsLoading="itemsLoading"
-						:tableData="itemsList"
-						:tableSettings="tableSettings"
-						:itemsName="itemsName"
-						@event="handleEvent"
-					/>
+				<CustomDataListTable
+					ref="itemsTableRef"
+					:disableSelection="!hasAccessToDelete"
+					:itemsLoading="itemsLoading"
+					:tableData="itemsList"
+					:tableSettings="tableSettings"
+					:itemsName="itemsName"
+					@event="handleEvent"
+				/>
 
-					<PaginationContainer
-						:itemsName="itemsName"
-						:filters="filters"
-						:meta="meta"
-						@setFilters="setFilters"
-					/>
-				</div>
+				<PaginationContainer
+					:itemsName="itemsName"
+					:filters="filters"
+					:meta="meta"
+					@setFilters="setFilters"
+				/>
 			</div>
 		</div>
 	</div>
@@ -69,7 +67,15 @@ const hasAccessToDelete = computed(() => authStore.hasAccessTo([entity.permissio
 const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
 	entityKey: 'Bearings',
 	itemStore,
-	options: { tableRef: itemsTableRef },
+	options: {
+		tableRef: itemsTableRef,
+		editInModal: true,
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
+		formComponentFileLoader: () => import('./ItemForm.vue'),
+	},
 });
 
 const tableSettings = computed(() => {

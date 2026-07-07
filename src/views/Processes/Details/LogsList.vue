@@ -43,7 +43,6 @@ import { cleanDateString } from '@/helpers';
 import { setupLogTypeIcon } from '@/helpers/specialHelpers';
 import { standardTableOperations } from '@/constants/table';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
 import { useProcessesStore } from '@/stores/ProcessesStore';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -61,7 +60,6 @@ const props = defineProps({
 });
 
 const authStore = useAuthStore();
-const globalStore = useGlobalStore();
 const processesStore = useProcessesStore();
 const { downtimes_filters: filters } = storeToRefs(processesStore);
 const itemsTableRef = ref(null);
@@ -146,12 +144,12 @@ const {
 		tableRef: itemsTableRef,
 		editInModal: true,
 		formComponentFileLoader: () => import('./EventLogForm.vue'),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
 		additionalModalSettings: {
 			...localModalSettings.value,
-			successSubmitCallback: () => {
-				globalStore.show_edit_modal({ show: false });
-				refetchItemsList();
-			},
 		},
 	},
 });

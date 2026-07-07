@@ -58,7 +58,6 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useWebSocket } from '@/composables/mixins/useWebSocket';
 import { useProcessesStore } from '@/stores/ProcessesStore';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
 import ItemsGridContainer from '@/components/gridTable/ItemsGridContainer.vue';
@@ -75,7 +74,6 @@ const processesStore = useProcessesStore();
 const { filters } = storeToRefs(processesStore);
 
 const authStore = useAuthStore();
-const globalStore = useGlobalStore();
 const { changeRoute } = useNavigation();
 const { setupWebSocket, closeWebSocket, webSocketSend } = useWebSocket();
 
@@ -106,13 +104,9 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 		tableRef: itemsTableRef,
 		editInModal: true,
 		formComponentFileLoader: () => import('./ItemForm.vue'),
-		additionalModalSettings: {
-			successSubmitCallback: () => {
-				// this.refetchItemsList();
-				globalStore.show_edit_modal({ show: false });
-			}
-		}
-
+		successSubmitOptions: {
+			closeModal: true,
+		},
 	},
 });
 

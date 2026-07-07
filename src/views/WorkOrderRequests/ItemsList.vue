@@ -206,9 +206,9 @@ const openRequestForm = (row = null) => {
 		additionalModalSettings: {
 			plantId: row?.plant_id || globalFilters.value?.plantId,
 		},
-		successSubmitCallback: () => {
-			refetchItemsList();
-			globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
+		successSubmitOptions: {
+			refetchItemsList,
+			closeModal: true,
 		},
 	});
 };
@@ -273,9 +273,9 @@ const convertItem = ({ row }) => {
 				type: 'primary',
 			},
 		],
-		successSubmitCallback: () => {
-			refetchItemsList();
-			globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
+		successSubmitOptions: {
+			refetchItemsList,
+			closeModal: true,
 		},
 	});
 };

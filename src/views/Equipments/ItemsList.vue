@@ -147,15 +147,15 @@ const {
 			stateProp: 'itemsList',
 			loadingProp: 'isLoading',
 		},
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
 		additionalModalSettings: {
 			// editModalProp: 'editModalClassic',
 			instanceName: 'Equipments',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
-			successSubmitCallback: () => {
-				refetchItemsList();
-				globalStore.show_edit_modal({ show: false });
-			},
 			...(props.additionalModalSettings || {}),
 		},
 		listUpdateKey: 'equipmentsList',

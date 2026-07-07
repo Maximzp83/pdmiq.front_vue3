@@ -65,11 +65,11 @@
 				</el-form-item>
 			</div>
 
-			<el-form-item class="content-row">
+			<div class="content-row">
 				<el-button type="primary" native-type="button" class="item-action-button" @click="validateForm">
 					<span>Write Value to Register</span>
 				</el-button>
-			</el-form-item>
+			</div>
 		</el-form>
 	</div>
 </template>

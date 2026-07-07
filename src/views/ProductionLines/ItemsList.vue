@@ -234,12 +234,14 @@ const {
 		editInModal: true,
 		filtersStateProp: filtersStateProp.value,
 		predefinedFilters: { type: props.productionLineType || PRODUCTION_LINES_TYPES.PRODUCTION_LINE },
+		successSubmitOptions: {
+			refetchItemsList: true,
+		},
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',
 			instanceName: isProdLine.value ? 'ProductionLines' : 'Utilities',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
-			successSubmitCallback: () => refetchItemsList(),
 		},
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		relatedFiltersStoresMap: {

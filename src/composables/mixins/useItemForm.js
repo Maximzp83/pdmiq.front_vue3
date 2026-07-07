@@ -301,6 +301,18 @@ export function useItemForm({
 							});
 						}
 
+						if (editModal.successSubmitOptions) {
+							if (typeof editModal.successSubmitOptions.refetchItemsList === 'function') {
+								editModal.successSubmitOptions.refetchItemsList(answer);
+							}
+							if (editModal.successSubmitOptions.closeModal) {
+								globalStore.show_edit_modal({
+									show: false,
+									editModalProp: editModal.editModalProp,
+								});
+							}
+						}
+
 						return answer;
 					});
 				} else {

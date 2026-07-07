@@ -208,6 +208,10 @@ const {
 		fromDashboard: props.fromDashboard || props.insideOtherPage,
 		preventSetNavbar: props.preventSetNavbar,
 		formComponentFileLoader: () => import('../MaintenanceFormWrapper.vue'),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
 		additionalModalSettings: {
 			editModalProp: 'editModalClassic',
 			className: 'maintenance-modal',
@@ -216,10 +220,6 @@ const {
 				switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
 				plantId: globalFilters.value?.plantId,
 				...propsFiltersRef.value,
-			},			
-			successSubmitCallback: () => {
-				refetchItemsList();
-				globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });
 			},
 		},
 		predefinedFilters: {

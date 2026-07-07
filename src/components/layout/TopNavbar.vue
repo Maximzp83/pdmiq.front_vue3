@@ -309,8 +309,12 @@
 							native-type="button"
 						>
 							<i
-								:class="navbarSettings.printButtonSettings.icon || 'el-icon-printer'"
+								v-if="navbarSettings.printButtonSettings.icon"
+								:class="navbarSettings.printButtonSettings.icon"
 							></i>
+							<el-icon v-else>
+								<Printer />
+							</el-icon>
 						</el-button>
 					</div>
 				</Transition>
@@ -386,6 +390,7 @@ import { storeToRefs } from 'pinia';
 import { Lang } from '@/localization';
 const { tt } = Lang;
 import { USER_ROLES_TYPES } from '@/constants/global';
+import { Printer } from '@element-plus/icons-vue';
 
 const Datepicker = defineAsyncComponent(
 	() => import('@/components/common/Datepicker.vue'),

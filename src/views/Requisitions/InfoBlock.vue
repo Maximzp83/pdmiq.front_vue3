@@ -6,7 +6,11 @@
 
 		<div class="card-content">
 			<div class="info-item">
-				<div class="icon"><i class="el-range__icon el-icon-date"></i></div>
+				<div class="icon">
+					<el-icon class="el-range__icon">
+						<CalendarIcon />
+					</el-icon>
+				</div>
 				<div class="value semi-bold">
 					<div class="muted">{{ tt('phrases.Date_Sent') }}</div>
 					<div class="semi-bold">{{ dateSent }}</div>
@@ -36,6 +40,7 @@
 
 <script setup>
 import { computed } from 'vue';
+import { Calendar as CalendarIcon } from '@element-plus/icons-vue';
 
 import { requisitionStatusesList } from '@/constants/global';
 import { cleanDateString, findItemBy } from '@/helpers';
