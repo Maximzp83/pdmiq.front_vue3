@@ -88,6 +88,12 @@ const routes = [
 						meta: { auth: true },
 					},
 					{
+						path: 'equipments',
+						name: 'DashboardEquipmentsLayout',
+						component: () => import('@/views/Equipments/EquipmentsLayout.vue'),
+						meta: { auth: true },
+					},
+					{
 						path: 'production-lines',
 						name: 'ProductionLines',
 						component: () => import('@/views/ProductionLines/ItemsList.vue'),
