@@ -419,7 +419,12 @@ export function useItemsData({
 			return Promise.resolve(payload);
 		}
 
-		changeRoute({ path: `${resolvedItemRoute}/new` });
+		let path = `${resolvedItemRoute}/new`;
+		if (payload?.path) {
+			path = payload.path;
+		}
+		console.log('openCreateRoute', path);
+		changeRoute({ path });
 		return Promise.resolve(payload);
 	};
 

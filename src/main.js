@@ -1,10 +1,10 @@
 // import './assets/main.css'
 
 import { createApp } from 'vue';
-import { createPinia } from 'pinia';
 
 import App from './App.vue';
 import router from './router';
+import { pinia } from '@/stores/pinia';
 import HighchartsVue from 'highcharts-vue';
 import Highcharts from 'highcharts';
 import 'element-plus/es/components/message-box/style/css';
@@ -35,7 +35,7 @@ const app = createApp(App);
 app.component('CustomInput', CustomInput);
 app.component('CustomSelectV2', CustomSelectV2);
 
-app.use(createPinia());
+app.use(pinia);
 app.use(router);
 app.use(HighchartsVue);
 // app.use(ElementPlus, { size: 'small', zIndex: 3000 })

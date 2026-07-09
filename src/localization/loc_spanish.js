@@ -527,6 +527,7 @@ export default {
 		updated: 'actualizado',
 		deleting: 'eliminando',
 		section: 'Sección',
+		sections: 'Secciones',
 		roles: 'Roles',
 		child_roles: 'Roles Secundarios',
 		device: 'Dispositivo',

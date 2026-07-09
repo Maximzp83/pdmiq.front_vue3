@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
+import { pinia } from '@/stores/pinia';
 import { hasAccessTo as hasAccessToUtil } from '@/utils/hasAccessTo';
 import { validateBySettings } from '@/helpers';
 import { getParamsFromUrl } from '@/utils/url-helpers';
@@ -1202,7 +1203,7 @@ const hasRightsToRoute = (to, authStore) => {
 };
 
 router.beforeEach((to, from, next) => {
-	const authStore = useAuthStore();
+	const authStore = useAuthStore(pinia);
 	const { Notify } = useNotify();
 	const tt = Lang.tt;
 

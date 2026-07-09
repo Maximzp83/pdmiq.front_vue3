@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
 
@@ -122,6 +122,8 @@ defineOptions({ name: 'RequisitionsItemsList' });
 const props = defineProps({
 	pageType: { type: Object, default: () => ({}) },
 	usersList: { type: Array, default: () => [] },
+	filters: { type: Object, default: null },
+	preventSetNavbar: Boolean,
 });
 const emit = defineEmits(['event']);
 
@@ -374,6 +376,15 @@ const handleExportToExcel = () => {
 		showExportDateRangeFilter.value = false;
 	});
 };
+
+watch(
+	() => props.filters,
+	(newFilters) => {
+		if (!newFilters || !Object.keys(newFilters).length) return;
+		setFilters({ ...newFilters });
+	},
+	{ immediate: true },
+);
 
 const { handleEvent } = useEventHandler({
 	createRequisition,

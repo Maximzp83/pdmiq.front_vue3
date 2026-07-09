@@ -98,6 +98,13 @@ Primary rules source:
   - `src/views/Sensors/sensorForm/ItemForm.vue` restores initial setup guarding in the `itemData` watcher.
   - `src/views/Sensors/sensorForm/ItemFormUltraSound.vue` sends LubeMatrix V4 child payloads as Banner type with parent dataset.
   - The FFT statistics API base URL change was already present in Vue3.
+- Latest Requisitions-related Vue2-side changes were synced into already migrated Vue3 files:
+  - `src/constants/date_time.js` exposes `datePickerAdditionalShortcuts2()` for last 1/6/12 month shortcuts.
+  - `src/helpers/index.js` supports `last_6_months` in `getDateRange`.
+  - Requisition approve form now includes downtime/hour, hours saved, contractor quote, and paired downtime/hour + hours-saved validation.
+  - Requisition Work Order print report now includes those fields.
+  - ROI Calculator was re-aligned with the updated Vue2 flow for technician-only users, work-order selector, combined shortcuts, updated result field names, applied list filters, and PDF export payload.
+  - Vue3 localization already had the relevant new Requisitions/constants keys.
 - `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:
   - `src/views/Dashboard/Dashboard.vue` again acts as the plant dashboard container: it resolves the active plant from auth/global filters, fetches `plantItem`, resets child list filters on plant changes, and passes `plantItem`, `plantId`, and `additionalModalSettings` into the nested route.
   - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.

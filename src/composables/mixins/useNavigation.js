@@ -45,9 +45,8 @@ export function useNavigation() {
 			}
 
 			if (query) route += `?${query}`;
-			// console.log('nav: ', route)
 
-			router.push({ path: route });
+			router.push(route);
 
 			return;
 		}

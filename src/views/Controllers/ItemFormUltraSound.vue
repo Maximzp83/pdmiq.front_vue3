@@ -213,9 +213,9 @@ const isIndustrialMatrix = computed(() => authStore.isIndustrialMatrix || authSt
 const controllerTypesList = computed(() =>
 	Object.freeze(
 		getControllerTypesList().filter((type) =>
-			[CONTROLLER_TYPES.BANNER, CONTROLLER_TYPES.ULTRA_SOUND].includes(type.id)
-		)
-	)
+			[CONTROLLER_TYPES.BANNER, CONTROLLER_TYPES.ULTRA_SOUND].includes(type.id),
+		),
+	),
 );
 const timeZonesList = computed(() => Object.freeze(getTimeZonesList()));
 const cloudConnectionTypesList = computed(() => Object.freeze(getCloudConnectionTypesList()));

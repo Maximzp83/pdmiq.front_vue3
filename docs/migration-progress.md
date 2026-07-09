@@ -71,6 +71,7 @@
 - Project production build passes after `CorporateDashboard` migration.
 - Project production build passes after `Plants/Details` re-migration.
 - Latest Vue2 changes were synced into already migrated Vue3 files: chart factory error events, Sensors chart `window.graphRenderError`, Equipment sensor detach flow, Banner sensor initial setup watcher, and LubeMatrix V4 Banner-type submit payload. The FFT statistics API base URL change was already present in Vue3.
+- Latest Requisitions-related Vue2 changes were synced into already migrated Vue3 files: date picker added last 1/6/12 month shortcut export, `getDateRange` added `last_6_months`, Requisition approve form added downtime/hour, hours-saved, contractor quote fields with paired validation, Work Order print report added those fields, and ROI Calculator was re-aligned with the updated Vue2 flow for technician-only users, work-order selector, combined shortcuts, updated result field names, applied list filters, and PDF export payload. `npm run build` and targeted `git diff --check` pass.
 - Docs and handoff files should stay synchronized with the actual migration state whenever that state changes.
 
 ## Phase 1 — API Migration ✅ COMPLETE

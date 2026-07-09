@@ -259,7 +259,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeMount, onMounted, ref, watch, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import Highcharts from 'highcharts';
@@ -271,6 +271,10 @@ import { Lang } from '@/localization';
 import { useSensors } from '@/composables/useSensors';
 import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useNotify } from '@/composables/useNotify';
+import { useNavigation } from '@/composables/mixins/useNavigation';
+const { changeRoute } = useNavigation();
+
 import { useSensorsStore } from '@/stores/SensorsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -308,12 +312,14 @@ import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
 import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
 import ChartsListWrapper from './charts/ChartsListWrapper.vue';
 import EquipmentPictureBlock from './charts/EquipmentPictureBlock.vue';
-import PossibleProblemsBlock from './PossibleProblemsBlock.vue';
-import BannerFilterBlock from './FilterBlock/BannerFilterBlock.vue';
-import UltrasoundFilterBlock from './FilterBlock/UltrasoundFilterBlock.vue';
-import CustomPDMFilterBlock from './FilterBlock/CustomPDMFilterBlock.vue';
-import ChartMessageForm from './ChartMessageForm.vue';
-import LevelZoneFormWrapper from './LevelZoneFormWrapper.vue';
+
+
+const PossibleProblemsBlock = defineAsyncComponent(() => import('./PossibleProblemsBlock.vue'));
+const BannerFilterBlock = defineAsyncComponent(() => import('./FilterBlock/BannerFilterBlock.vue'));
+const UltrasoundFilterBlock = defineAsyncComponent(() => import('./FilterBlock/UltrasoundFilterBlock.vue'));
+const CustomPDMFilterBlock = defineAsyncComponent(() => import('./FilterBlock/CustomPDMFilterBlock.vue'));
+const ChartMessageForm = defineAsyncComponent(() => import('./ChartMessageForm.vue'));
+const LevelZoneFormWrapper = defineAsyncComponent(() => import('./LevelZoneFormWrapper.vue'));
 
 initHighchartsModule(stockInit, Highcharts);
 initHighchartsModule(boost, Highcharts);
@@ -384,6 +390,7 @@ const sensorData = computed(() => {
 });
 
 const { currentSensorType } = useSensorType({ currentSensorTypeData: sensorData });
+const { Notify } = useNotify();
 
 const isCompare = computed(() => Boolean(route.query.compare));
 const sensorId = computed(() => route.params.sensorId || route.params.id);
@@ -810,7 +817,14 @@ const fetchSensorsAction = (ids, sensorIdx) => {
 		.catch((error) => {
 			console.warn(error);
 			if (error?.response?.status === 404) {
-				router.back();
+				changeRoute({ history: true, steps: -1 });
+				setTimeout(() => {
+					Notify({
+						type: 'warning',
+						title: 'Redirect',
+						message: `${itemsName.one} with id: ${ids[sensorIdx]} - doesn't exists`
+					});
+				}, 200);
 			}
 			sensorLoading.value = false;
 		});

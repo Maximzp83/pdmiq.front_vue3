@@ -87,7 +87,7 @@
 				<div
 					v-show="activeTab?.prop === 'permissionsTab'"
 					:key="'tab-permissions'"
-					class="tab-container"
+					class="tab-container labels-on-top"
 				>
 					<el-form-item :label="`${tt('Permissions')}:`" prop="permissions" class="label_padding_top-0 width-75">
 						<div class="options-container">
@@ -95,7 +95,7 @@
 								<PermissionItem
 									v-for="(item, idx) in permissionsItemsList"
 									:key="`permission_item-${item.app_section}`"
-									class="permission-item content-row relative"
+									class="permission-item relative"
 									:ref="(el) => setSubItemRef('PermissionItem', el, idx)"
 									:item-data="item"
 									:item-index="idx"

@@ -529,6 +529,7 @@ export default {
 		updated: 'updated',
 		deleting: 'deleting',
 		section: 'Section',
+		sections: 'Sections',
 		roles: 'Roles',
 		child_roles: 'Child Roles',
 		device: 'Device',

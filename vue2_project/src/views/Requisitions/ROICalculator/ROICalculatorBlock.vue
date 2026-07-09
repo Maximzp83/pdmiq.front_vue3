@@ -32,13 +32,14 @@
 							<div class="el-form-item">
 								<div class="label">{{ tt('Technicians') }}</div>
 								<div class="el-form-item__content">
+									<!-- requisition-update -->
 									<CustomSelect
 										clearable
 										multiple
 										filterable
 										collapse-tags
 										:optionsLoading="usersLoading"
-										:optionsList="usersList"
+										:optionsList="techniciansUsersList"
 										:placeholder="`${tt('Select')} ${tt('users')}`"
 										labelKey="full_name"
 										v-model="formData.users_ids"
@@ -95,8 +96,8 @@
 						<div class="">
 							<div class="muted">{{ tt('phrases.Tech_Hours') }}</div>
 							<div class="bold">
-								{{ calculateResult.tech_hours_accumulated }} $ ({{
-									calculateResult.total_hours
+								{{ calculateResult.technician_hourly_rate }} $ ({{
+									calculateResult.tech_hours
 								}}:00 hours)
 							</div>
 						</div>
@@ -104,7 +105,7 @@
 						<div class="">
 							<div class="muted">{{ tt('Running_Total') }}</div>
 							<div class="bold">
-								{{ calculateResult.running_total_accumulated }} $
+								{{ calculateResult.running_total }} $
 							</div>
 						</div>
 					</div>
@@ -156,28 +157,18 @@
 							</div>
 						</div>
 
-						<div class="mcol-xs-12 mcol-sm-3">
+						<!-- requisition-update -->
+						<div class="mcol-xs-12 mcol-sm-3 self-end">
 							<div class="el-form-item">
-								<div class="label">{{ tt('phrases.Repair_Cost_Avoidance') }}</div>
-								<div class="el-form-item__content flex">
-									<el-input-number
-										:controls="false"
-										class="mcol-xs-5 span-block"
-										v-model.number="repair_cost_avoidance"
-										:min="0"
-									/>
-									<div class="span-block bold">$</div>
-
-									<div class="span-block mcol-xs-5 ml-auto">
-										<el-button
-											@click="handleCalculate"
-											type="success"
-											native-type="button"
-											class="item-action-button"
-										>
-											<span class="uppercase">{{ tt('CALCULATE') }}</span>
-										</el-button>
-									</div>
+								<div class="el-form-item__content">
+									<el-button
+										@click="handleCalculate"
+										type="success"
+										native-type="button"
+										class="item-action-button"
+									>
+										<span class="uppercase">{{ tt('CALCULATE') }}</span>
+									</el-button>
 								</div>
 							</div>
 						</div>
@@ -229,7 +220,12 @@ import { mapActions, mapState } from 'vuex';
 import { prepareRangeParams } from '@/helpers';
 
 import { REQUISITION_STATUSES_TYPES } from '@/constants/global';
-import { datePickerYearQuartersShortcuts } from '@/constants/date_time';
+// requisition-update
+import {
+	datePickerShortcuts,
+	datePickerYearQuartersShortcuts,
+	datePickerAdditionalShortcuts2
+} from '@/constants/date_time';
 
 import { requestsListMixin, exportListToFileMixin } from '@/mixins';
 
@@ -266,17 +262,16 @@ export default {
 			calculationsLoading: false,
 
 			calculateResult: {
-				running_total_accumulated: 0,
-				tech_hours_accumulated: 0,
+				running_total: 0,
+				technician_hourly_rate: 0,
 				contractor_hourly_rate: 0,
 				total_savings: 0,
-				total_hours: 0
+				tech_hours: 0
 			},
 
 			// contractor_hourly_rate: 0,
 			contractor_hourly_rate_input: 0,
-			contractor_markup_percent: 0,
-			repair_cost_avoidance: 0
+			contractor_markup_percent: 0
 		};
 	},
 
@@ -292,17 +287,25 @@ export default {
 
 		pickerOptions() {
 			return Object.freeze({
-				shortcuts: datePickerYearQuartersShortcuts()
+				// requisition-update
+				shortcuts: [
+					...datePickerShortcuts(),
+					...datePickerYearQuartersShortcuts(),
+					...datePickerAdditionalShortcuts2()
+				]
 			});
 		},
+		// requisition-update
+		techniciansUsersList: that =>
+			that.usersList.filter(user => user && user.role && user.role.is_technic),
 
 		contractor_markup_percent_final: that =>
-			that.calculateResult.running_total_accumulated +
-			that.calculateResult.running_total_accumulated *
+			that.calculateResult.running_total +
+			that.calculateResult.running_total *
 				(that.contractor_markup_percent / 100),
 
 		contractor_hourly_rate_final: that =>
-			that.contractor_hourly_rate_input * that.calculateResult.total_hours,
+			that.contractor_hourly_rate_input * that.calculateResult.tech_hours,
 
 		requestsToDoList: () =>
 			Object.freeze([
@@ -346,7 +349,6 @@ export default {
 		handleApply() {
 			this.contractor_hourly_rate_input = 0;
 			this.contractor_markup_percent = 0;
-			this.repair_cost_avoidance = 0;
 
 			const filters = {
 				daterange: this.periodDateRange,
@@ -372,7 +374,6 @@ export default {
 				id: this.formData.work_order_id,
 				contractor_hourly_rate: this.contractor_hourly_rate_input,
 				contractor_markup_percent: this.contractor_markup_percent,
-				repair_cost_avoidance: this.repair_cost_avoidance,
 				plantId: this.globalFilters.plantId
 			};
 
@@ -401,9 +402,7 @@ export default {
 			// console.log(response)
 			this.calculateResult = {
 				...value,
-				repair_cost_avoidance:
-					value.repair_cost_avoidance || this.calculateResult.repair_cost_avoidance,
-				total_hours: value.total_hours || this.calculateResult.total_hours
+				tech_hours: value.tech_hours || this.calculateResult.tech_hours
 			};
 		},
 
@@ -415,7 +414,6 @@ export default {
 				status: REQUISITION_STATUSES_TYPES.COMPLETED,
 				contractor_hourly_rate: this.contractor_hourly_rate_input,
 				contractor_markup_percent: this.contractor_markup_percent,
-				repair_cost_avoidance: this.repair_cost_avoidance,
 				format: 'pdf',
 				plantId: this.globalFilters.plantId,
 				max: -1
@@ -429,6 +427,15 @@ export default {
 				url: `plants/work-orders/roi`,
 				filters: filters
 			});
+		}
+	},
+	// requisition-update
+	watch: {
+		techniciansUsersList(newList) {
+			const availableIds = newList.map(user => user.id);
+			this.formData.users_ids = this.formData.users_ids.filter(id =>
+				availableIds.includes(id)
+			);
 		}
 	}
 };

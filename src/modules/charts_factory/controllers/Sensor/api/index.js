@@ -70,8 +70,8 @@ const fetch_sensor_statistics1 = payload => {
 				// let baseURL = 'https://e4qsnej4po7dizmnk4p2vfrv3m0ggvpj.lambda-url.ca-central-1.on.aws';
 				// let baseURL = 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws' // old;
 
-				// let baseURL = 'https://graph-points.industrialmatrix-stage.tools';
-				let baseURL = 'https://graph-points.industrialmatrix.tools';
+				let baseURL = 'https://graph-points.industrialmatrix-stage.tools';
+				// let baseURL = 'https://graph-points.industrialmatrix.tools';
 
 				if (import.meta.env.VITE_SENSOR_STATISTICS_API_URL) {
 					baseURL = import.meta.env.VITE_SENSOR_STATISTICS_API_URL;

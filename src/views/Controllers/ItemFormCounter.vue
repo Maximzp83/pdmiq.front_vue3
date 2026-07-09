@@ -154,6 +154,7 @@ const companiesEntity = ENTITIES.Companies;
 const plantsEntity = ENTITIES.Plants;
 
 const itemFormRef = ref(null);
+const companyPlantsList = shallowRef([]);
 const companiesLoading = ref(false);
 const companiesList = shallowRef([]);
 const plantsLoading = ref(false);
@@ -175,7 +176,7 @@ const formData = ref({
 	version: null,
 });
 
-const isIndustrialMatrix = computed(() => authStore.isIndustrialMatrix);
+const isIndustrialMatrix = computed(() => authStore.isIndustrialMatrix || authStore.isDeveloper);
 const timeZonesList = computed(() => Object.freeze(getTimeZonesList()));
 const cloudConnectionTypesList = computed(() => Object.freeze(getCloudConnectionTypesList()));
 

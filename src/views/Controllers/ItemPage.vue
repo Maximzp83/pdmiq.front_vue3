@@ -24,8 +24,9 @@
 						<component
 							:is="currentFormComponent"
 							v-if="currentFormComponent"
+							:key="itemType"
 							ref="itemFormRef"
-							:itemData="itemData"
+							:itemData="formItemData"
 							:itemsName="itemsName"
 							:activeTab="activeTab"
 							:tabsList="tabsList"
@@ -58,6 +59,7 @@ defineOptions({
 
 const ItemForm = defineAsyncComponent(() => import('./ItemForm.vue'));
 const ItemFormUltraSound = defineAsyncComponent(() => import('./ItemFormUltraSound.vue'));
+const ItemFormUltraSoundWhiteRiver = defineAsyncComponent(() => import('./ItemFormUltraSoundWhiteRiver.vue'));
 const ItemFormCounter = defineAsyncComponent(() => import('./ItemFormCounter.vue'));
 const ItemFormNCD = defineAsyncComponent(() => import('./ItemFormNCD.vue'));
 
@@ -65,6 +67,33 @@ const route = useRoute();
 const itemFormRef = ref(null);
 const activeTab = ref({ title: 'main', prop: 'mainTabActive' });
 const additionalItemType = ref('');
+
+const controllerTypeIds = Object.freeze(Object.values(CONTROLLER_TYPES));
+
+const parseControllerType = (value) => {
+	const rawValue = Array.isArray(value) ? value[0] : value;
+	const numericType = Number(rawValue);
+
+	if (Number.isNaN(numericType) || !controllerTypeIds.includes(numericType)) {
+		return undefined;
+	}
+
+	return numericType;
+};
+
+const getRouteControllerType = () => {
+	const queryType = parseControllerType(route.query?.type);
+	if (queryType) {
+		return queryType;
+	}
+
+	const [, queryString] = route.fullPath.split('?');
+	if (!queryString) {
+		return undefined;
+	}
+
+	return parseControllerType(new URLSearchParams(queryString).get('type'));
+};
 
 const preparePayload = (payload) => {
 	if (payload?.data?.configure_file || payload?.data?.sb_file) {
@@ -97,12 +126,9 @@ const itemType = computed(() => {
 		return itemData.value.type;
 	}
 
-	if (route.query?.type) {
-		const queryType = Array.isArray(route.query.type) ? route.query.type[0] : route.query.type;
-		const numericType = Number(queryType);
-		if (!Number.isNaN(numericType)) {
-			return numericType;
-		}
+	const routeType = getRouteControllerType();
+	if (routeType) {
+		return routeType;
 	}
 
 	const routePathParts = route.path.split('/').filter(Boolean);
@@ -111,6 +137,18 @@ const itemType = computed(() => {
 	}
 
 	return undefined;
+});
+
+const formItemData = computed(() => {
+	if (itemData.value) {
+		return itemData.value;
+	}
+
+	if (itemType.value) {
+		return { type: itemType.value };
+	}
+
+	return null;
 });
 
 const tabsList = computed(() => {
@@ -143,7 +181,7 @@ const currentFormComponent = computed(() => {
 		case CONTROLLER_TYPES.ULTRA_SOUND:
 			return ItemFormUltraSound;
 		case CONTROLLER_TYPES.ULTRA_SOUND_WHITE_RIVER:
-			return ItemFormUltraSound;
+			return ItemFormUltraSoundWhiteRiver;
 		case CONTROLLER_TYPES.COUNTER:
 			return ItemFormCounter;
 		case CONTROLLER_TYPES.NCD:

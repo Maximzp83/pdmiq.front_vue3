@@ -18,6 +18,7 @@
 				:class="['item-edit-form relative section-row mcol-xs-12', { 'showJustInfo bolded-values': showJustInfo }]"
 				label-width="150px"
 				:model="formData"
+				:rules="rules"
 				:label-position="isMobile || fromModal ? 'top' : 'left'"
 			>
 				<div class="flex mrow wrap">
@@ -113,6 +114,57 @@
 								/>
 							</div>
 							<div v-else class="semi-bold">{{ formData.actual_time }}</div>
+						</el-form-item>
+
+						<el-form-item :label="tt('phrases.DT_per_Hour')" prop="downtime_cost_per_hour">
+							<el-input-number
+								v-if="!showJustInfo"
+								v-model.number="formData.downtime_cost_per_hour"
+								:controls="false"
+								:min="0"
+								class="mcol-xs-12"
+							/>
+							<div v-else class="semi-bold">
+								{{
+									itemData?.downtime_cost_per_hour || itemData?.downtime_cost_per_hour === 0
+										? itemData.downtime_cost_per_hour
+										: '-'
+								}}
+							</div>
+						</el-form-item>
+
+						<el-form-item :label="tt('phrases.Hours_Saved_or_Lead_Time')" prop="hours_saved">
+							<el-input-number
+								v-if="!showJustInfo"
+								v-model.number="formData.hours_saved"
+								:controls="false"
+								:min="0"
+								class="mcol-xs-12"
+							/>
+							<div v-else class="semi-bold">
+								{{
+									itemData?.hours_saved || itemData?.hours_saved === 0
+										? itemData.hours_saved
+										: '-'
+								}}
+							</div>
+						</el-form-item>
+
+						<el-form-item :label="tt('phrases.Contractor_Quote')" prop="contractor_quote">
+							<el-input-number
+								v-if="!showJustInfo"
+								v-model.number="formData.contractor_quote"
+								:controls="false"
+								:min="0"
+								class="mcol-xs-12"
+							/>
+							<div v-else class="semi-bold">
+								{{
+									itemData?.contractor_quote || itemData?.contractor_quote === 0
+										? itemData.contractor_quote
+										: '-'
+								}}
+							</div>
 						</el-form-item>
 
 						<el-form-item v-show="fromModal" :label="tt('Materials')" prop="proposed_materials">
@@ -362,6 +414,9 @@ const formData = ref({
 	estimated_started_at: '',
 	estimated_finished_at: '',
 	po_number: '',
+	downtime_cost_per_hour: 0,
+	hours_saved: 0,
+	contractor_quote: 0,
 });
 
 const itemData = computed(() => props.itemData || {});
@@ -417,6 +472,32 @@ const executionTechniciansCost = computed(() => {
 	if (!itemData.value.technicalProcesses?.length || !selectedTechnicians.value) return 0;
 	return itemData.value.technicalProcesses.reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
 });
+const hasNumericValue = (value) => value !== null && value !== '' && typeof value !== 'undefined';
+const validateDowntimeCostPair = (rule, value, callback) => {
+	const hasDtHour = hasNumericValue(formData.value.downtime_cost_per_hour);
+	const hasHoursSaved = hasNumericValue(formData.value.hours_saved);
+	if (hasDtHour !== hasHoursSaved) {
+		callback(new Error(tt('aliases.dt_cost_req_togr')));
+		return;
+	}
+	callback();
+};
+const rules = computed(() =>
+	Object.freeze({
+		downtime_cost_per_hour: [
+			{
+				validator: validateDowntimeCostPair,
+				trigger: ['blur', 'change'],
+			},
+		],
+		hours_saved: [
+			{
+				validator: validateDowntimeCostPair,
+				trigger: ['blur', 'change'],
+			},
+		],
+	}),
+);
 
 const {
 	setupFormSubItemsList,
