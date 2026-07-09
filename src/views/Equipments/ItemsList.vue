@@ -99,7 +99,7 @@ const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const equipmentsStore = useEquipmentsStore();
 const { filters } = storeToRefs(equipmentsStore);
-const { globalFilters } = storeToRefs(globalStore);
+const { globalFilters, compareList } = storeToRefs(globalStore);
 const { changeRoute } = useNavigation();
 const itemsTableRef = ref(null);
 const isLoadingCards = ref(false);
@@ -387,6 +387,15 @@ const handleAddToFavorites = ({ row, subjectType = SUBJECT_TYPES.USER }) => {
 			isLoadingCards.value = false;
 		});
 };
+const compareClick = ({ row }) => {
+	let newList = compareList.value.filter((sensorId) => sensorId !== row.id);
+
+	if (newList.length === compareList.value.length && newList.length < 5) {
+		newList.push(row.id);
+	}
+
+	globalStore.set_compare_list(newList);
+};
 
 const { handleEvent } = useEventHandler({
 	setFilters,
@@ -396,6 +405,7 @@ const { handleEvent } = useEventHandler({
 	handleCreateWorkOrderButton,
 	handleShowDetails,
 	handleAddToFavorites,
+	compareClick,
 }, emit, 'itemsList');
 
 watch(

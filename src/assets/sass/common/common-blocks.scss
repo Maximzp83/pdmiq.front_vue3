@@ -925,7 +925,9 @@ body {
 		display: inline-block;
 		padding: 1px;
 		img {
+			position: relative;
 			margin: 0;
+			top: 1px;
 		}
 
 		&.animate {
@@ -1452,10 +1454,10 @@ body {
 		}
 
 		.rebase-line-button {
-			padding: 2px;
+			padding: 2px !important;
 
 			.rebase-lines {
-				top: 6px;
+				top: 5px;
 				width: 11px;
 			}
 		}

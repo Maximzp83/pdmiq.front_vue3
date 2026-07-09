@@ -392,8 +392,8 @@ const sensorData = computed(() => {
 const { currentSensorType } = useSensorType({ currentSensorTypeData: sensorData });
 const { Notify } = useNotify();
 
-const isCompare = computed(() => Boolean(route.query.compare));
 const sensorId = computed(() => route.params.sensorId || route.params.id);
+const isCompare = computed(() => Boolean(route.query.compare) || sensorId.value === 'compare');
 const equipmentData = computed(() => sensorData.value?.equipment || {});
 const itemsName = computed(() => ({
 	one: tt('PDM_Item'),
@@ -603,7 +603,6 @@ const pickerOptions = computed(() => {
 			rangeWithTime.value = timeRanges.some((rangeName) => rangeName === shortcut.rangeName);
 			setTimeout(() => {
 				isTodayRangeClicked.value = shortcut.rangeName === 'today';
-				console.log(shortcut.rangeName);
 				picker.$emit('pick', getDateRange(shortcut.rangeName));
 			}, 100);
 		},
@@ -1144,8 +1143,9 @@ const setupPage = () => {
 	const queryCompareList = route.query.compare
 		? `${route.query.compare}`.split(',').filter(Boolean)
 		: [];
-	currentSensorIds.value = isCompare.value && queryCompareList.length
-		? queryCompareList
+	splitNCDCharts.value = isCompare.value;
+	currentSensorIds.value = isCompare.value
+		? (queryCompareList.length ? queryCompareList : compareList.value)
 		: [sensorId.value].filter(Boolean);
 	initSensors();
 };

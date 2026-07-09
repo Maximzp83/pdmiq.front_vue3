@@ -123,7 +123,8 @@ watch(
 		if (props.daterange.length && params.length) {
 			fetchProblems({ params, daterange: props.daterange });
 		}
-	}
+	},
+	{ immediate: true }
 );
 
 watch(

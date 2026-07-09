@@ -774,6 +774,12 @@ const routes = [
 				meta: { auth: true, permissions: ['view_sensors'] },
 			},
 			{
+				path: 'sensors/:id/statistics',
+				name: 'SensorStatistics',
+				component: () => import('@/views/Sensors/StatisticsPage.vue'),
+				meta: { auth: true, permissions: ['view_sensors'] },
+			},
+			{
 				path: 'sensors/:id/multiview',
 				name: 'SensorMultiView',
 				component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),

@@ -156,7 +156,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 				runtimeTrackers,
 				issue_alerts,
 				includePlotlinesSeriesData,
-				thresholds,
+				thresholds, // for multiviews
 				flat_metric_data_anomalies,
 				parameter_item
 			} = statistics_data[statisticsKey];
@@ -249,11 +249,13 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.statsData = {...statistics_result.statsData, ...statsData};
 					}
 				}
-				if (actualSpecification.setupMultiviewThresholdsData) {
+				// ---------------------
+				if (actualSpecification.setupMultiviewThresholdsData) { //multiview
 					const {
 						enableSetupThresholds,
 						plotLinesSettings
 					} = actualSpecification.setupMultiviewThresholdsData;
+					// console.log('setupMultiviewThresholdsData', actualSpecification.setupMultiviewThresholdsData, thresholds)
 
 					if (enableSetupThresholds && thresholds && thresholds.length) {
 						const {
@@ -261,28 +263,23 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 							last_statistics_item
 						} = statistics_result.edgeStatisticsItems;
 
-						const {
-							plotlinesSeriesData,
-							plotlinesMaxValues,
-							plotlinesMinValues
-						} = this.setupMultiviewPlotlinesData({
+						const { plotlinesSeriesData, plotlinesMaxValues, plotlinesMinValues } = this.setupMultiviewPlotlinesData({
 							thresholds,
 							first_statistics_item: first_statistics_item || [],
 							last_statistics_item: last_statistics_item || [],
 							plotLinesSettings
-						});
+						})
 
-						statistics_result.plotlinesSeriesData = includePlotlinesSeriesData
-							? plotlinesSeriesData
-							: [];
+						statistics_result.plotlinesSeriesData = includePlotlinesSeriesData ? plotlinesSeriesData : [];
 						statistics_result.plotlinesMaxValues = plotlinesMaxValues;
 						statistics_result.plotlinesMinValues = plotlinesMinValues;
 					}
 				}
 				// --------------------
 				if (actualSpecification.setupPointsData) {
-					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
 					let zonesList;
+
+					const { method, enableZones, skipMaxMinValues } = actualSpecification.setupPointsData;
 
 					if (enableZones) {
 						zonesList = setupZonesList({
@@ -308,6 +305,11 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						...settings,
 						...actualSpecification.setupPointsData,
 					});
+					/*console.log(parameter_item.id, {
+						...settings,
+						...actualSpecification.setupPointsData,						
+					})*/
+
 
 					// statistics_result.pointsData.statsData = statistics_result.pointsData.statsData || {};
 
@@ -334,7 +336,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 
 					if (enable_crashes && crashes.length) {
 						statistics_result.flagsData = {
-							...this.setupMultiviewCrashesStatistics(
+							...this.setupCrashesStatistics(
 								crashes,
 								this.resources.sensorType == 'banner_humidity' ? 'Alarm' : undefined
 							)
@@ -353,8 +355,9 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 							pumpData: this.sensorItem.pump
 						});
 
-						statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(si => si.isSuccess)
-						statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(si => !si.isSuccess)
+						// statistics_result.flagsData.lube_statistics_successfull = all_lube_statistics.filter(si => si.isSuccess)
+						// statistics_result.flagsData.lube_statistics = all_lube_statistics.filter(si => !si.isSuccess)
+						statistics_result.flagsData.lube_statistics = all_lube_statistics;
 					}
 
 					if (enable_lube && lube.lock_log.length) {
@@ -397,7 +400,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 
 					if (enable_issue_alerts && (issue_alerts && issue_alerts.length)) {
 						statistics_result.flagsData = {
-							...this.setupCrashesStatistics(
+							...this.setupMultiviewCrashesStatistics(
 								issue_alerts,
 								this.resources.sensorType == 'banner_humidity' ? 'Alarm' : undefined
 							)
@@ -425,7 +428,6 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						statistics_result.additionalSeriesData[data_path] = 
 					})*/
 				}
-				// ---------------------
 
 				// -------------Max Values--------
 				resultData = this.updateDataMaxValues(resultData, statistics_result);

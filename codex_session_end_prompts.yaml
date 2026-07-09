@@ -30,4 +30,57 @@
   использовать уже мигрированные разделы в качестве примера.
   так же используй существующие composable
 
-3) codex resume 019edb20-71cc-7833-8b7b-4335dac6780f
+5) codex resume 019edb20-71cc-7833-8b7b-4335dac6780f
+
+# -------------------
+
+  1. High: JWT хранится в localStorage
+     src/stores/AuthStore.js:9, src/stores/AuthStore.js:71
+     access_token читается и пишется в localStorage. Любая XSS сразу дает полный bearer-token. С учетом большого
+     количества v-html это главный риск.
+
+  2. High: токен передается в URL query
+     src/utils/url-helpers.js:96, src/views/Controllers/ItemsList.vue:291
+     params.token = authStore.access_token, затем URL открывается/скачивается. Токен попадает в history, logs,
+     referrer, proxy logs, screenshots, crash reports. Это хуже, чем Authorization header.
+
+  3. High: массовое использование v-html без явной санации
+     src/components/table/TableCell.vue:31, src/components/itemDetails/InfoItem.vue:6, src/components/form/
+     CustomSelectV2.vue:33
+     Таблицы, details и select могут рендерить HTML из данных/настроек. Я не нашел DOMPurify/sanitize-layer. Если
+     backend или пользовательские поля вернут HTML, это прямой XSS-вектор.
+
+  4. High: динамическое выполнение формул через new Function
+     src/helpers/index.js:1603
+     buildFormula() превращает строку в исполняемый JS. Если формула приходит из пользовательского/админского ввода
+     или API без строгой backend-валидации, это code execution в браузере.
+
+  5. Medium/High: клиент сам повышает роль конкретному email
+     src/stores/AuthStore.js:184
+     Для maximzp83@gmail.com роль меняется на developer на клиенте. Даже если backend защищен, UI/route permissions
+     начинают показывать dev-функции. Если где-то backend полагается на frontend permissions, это критично.
+
+  6. Medium: route permissions только frontend-защита
+     src/router/index.js:1170, src/router/index.js:1205
+     Guard полезен для UX, но не является безопасностью. Все API endpoints обязаны независимо проверять permissions.
+     Особенно важно из-за client-side role mutation выше.
+
+  7. Medium: target="_blank" без rel="noopener noreferrer"
+     src/components/form/uploadBlock/FileUploadBlockItem.vue:49, src/views/Sensors/FilterBlock/
+     PDFandFFTrequestsBlock.vue:131
+     Есть reverse-tabnabbing риск, особенно для файлов/URL, которые могут быть внешними.
+
+  8. Medium: query string собирается без encode
+     src/utils/url-helpers.js:64
+     setupGetParamsStr конкатенирует key=value напрямую. Это ломает параметры с &, =, пробелами и может приводить к
+     parameter injection.
+
+  9. Low/Medium: fallback API указывает на stage
+     src/api/index.js:10
+     Если VITE_API_BASE_URL не задан, приложение ходит в stage API. Это операционный риск: случайная отправка
+     production-like данных в stage или непредсказуемое окружение.
+
+  10. Low: нет видимой CSP/anti-XSS политики в index.html
+     index.html:1
+     CSP обычно лучше ставить сервером, но в коде/HTML признаков политики нет. С текущим количеством v-html CSP
+     особенно нужна как второй слой защиты.
