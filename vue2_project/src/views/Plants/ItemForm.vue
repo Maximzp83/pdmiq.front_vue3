@@ -347,6 +347,18 @@
 				/>
 			</el-form-item>
 
+			<el-form-item
+				v-if="!isNew && $hasAccessTo(['archive_plants'])"
+				:label="tt('constants.Blocked')"
+				prop="is_blocked"
+			>	
+				<el-switch
+					v-model="formData.is_blocked"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="tt('Locations')" prop="locations">
 				<div class="options-container">
 					<div v-if="locationsItemsList.length" class="content-row">
@@ -520,6 +532,7 @@ export default {
 				is_commissioning: false,
 
 				is_archived: false,
+				is_blocked: false,
 				joined_at: '',
 				zoho_id: '',
 				// workStations: []

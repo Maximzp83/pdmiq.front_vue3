@@ -186,7 +186,7 @@ export default {
 			return Object.freeze([
 				{
 					label: 'Hours',
-					prop: 'actual_time',
+					prop: 'execution_total_time',
 					icon: 'icomoon icon-clock_2',
 					meta: {
 						prepareValue: { localMethod: formatTime, args: 'h:m' }

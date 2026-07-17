@@ -123,6 +123,11 @@ Primary rules source:
   - Requisition Work Order print report now includes those fields.
   - ROI Calculator was re-aligned with the updated Vue2 flow for technician-only users, work-order selector, combined shortcuts, updated result field names, applied list filters, and PDF export payload.
   - Vue3 localization already had the relevant new Requisitions/constants keys.
+- Latest Machine/Plant/ProductionLine/Requisitions Vue2-side changes were synced into already migrated Vue3 files:
+  - `src/views/Machines/ItemForm.vue` and `src/views/ProductionLines/ItemForm.vue` support `is_silence_mode` / `silence_mode_until`, restrict silence dates to today/future, and normalize `silence_mode_until` on submit.
+  - `src/views/Plants/ItemForm.vue` exposes `is_blocked` for existing plants when the user has `archive_plants` access.
+  - `src/views/Requisitions/ItemsList.vue`, `src/views/Requisitions/Details/WorkOrderReportForPrint.vue`, and `src/views/Requisitions/ROICalculator/ItemsList.vue` use `execution_total_time` for Hours.
+  - Vue3 localization already had `phrases.silence_mode` and `phrases.silence_mode_until`.
 - `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:
   - `src/views/Dashboard/Dashboard.vue` again acts as the plant dashboard container: it resolves the active plant from auth/global filters, fetches `plantItem`, resets child list filters on plant changes, and passes `plantItem`, `plantId`, and `additionalModalSettings` into the nested route.
   - `src/views/Plants/Details/DetailsPage.vue` now follows the legacy nested content role: it primarily consumes `plantItem` from the parent and renders PDM health, counters, embedded EquipmentsLayout/Assets/Machines/ProductionLines/Utilities lists, and Maintenance tabs. It keeps only a fallback fetch for direct `/plants/:id/details`.

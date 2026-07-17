@@ -139,7 +139,7 @@ export default {
 						// width: 120,
 					},
 					{
-						prop: 'actual_time',
+						prop: 'execution_total_time',
 						label: 'Hours',
 						// sortable: true,
 						width: 90,

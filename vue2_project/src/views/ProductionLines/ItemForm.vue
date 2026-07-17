@@ -202,6 +202,29 @@
 				</div>
 			</el-form-item>
 
+			<el-form-item
+				:label="tt('phrases.Silence_Mode')"
+				prop="is_silence_mode"
+			>
+				<el-switch
+					v-model="formData.is_silence_mode"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
+			<el-form-item prop="silence_mode_until"
+				:label="tt('phrases.Silence_Mode_Until')"
+				v-if="formData.is_silence_mode"
+			>
+				<Datepicker
+					v-model="formData.silence_mode_until"
+					:placeholder="tt('phrases.Select_date')"
+					className=" "
+					:pickerOptions="pickerOptions"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="tt('Order')" v-if="itemData && itemData.id">
 				<CustomSelect
 					filterable
@@ -229,7 +252,7 @@
 import { mapActions } from 'vuex';
 import { required } from '@/constants/validation';
 import { PRODUCTION_LINES_TYPES, rpmSourcesTypesList, RPM_SOURCES_TYPES } from '@/constants/global';
-import { findItemBy } from '@/helpers';
+import { findItemBy, cleanDateString } from '@/helpers';
 
 import {
 	itemFormMixin,
@@ -248,6 +271,7 @@ export default {
 		subItemsListMixin()
 	],
 	components: {
+		Datepicker: () => import('@/components/common/Datepicker.vue'),
 		FileUploadBlock: () => import('@/components/form/uploadBlock/FileUploadBlock.vue'),
 		CharacterItem: () => import('../Machines/CharacterItem.vue'),
 		AttachmentItem: () => import('./AttachmentItem.vue')
@@ -293,7 +317,9 @@ export default {
 				rpm_source_type: null,
 				rpm_value: null,
 				rpm_node_id: null,
-				rpm_node_parameter: null
+				rpm_node_parameter: null,
+				is_silence_mode: 0,
+				silence_mode_until: ''
 			}
 		};
 	},
@@ -307,6 +333,17 @@ export default {
 			{ ref: 'AttachmentItem', targetProp: 'libraries' },
 			{ ref: 'FileUploadBlock', setIfEmpty: { prop:'delete_file', val: 1 }, cleanIfEmpty: { prop:'file', val: null } },
 		]),
+
+		pickerOptions: () =>
+			Object.freeze({
+				disabledDate(date) {
+					const start = new Date();
+					const today = start.getTime() - 3600000 * 24;
+					const dateMs = date.getTime();
+
+					return dateMs < today;
+				}
+			}),
 
 		new_item_type: that =>
 			that.editModal.instanceName == 'Utilities'
@@ -445,13 +482,21 @@ export default {
 			}
 		},
 
-		/*localPrepareSubmitData(data) {
-			if (!this.enable_linespeed_overlay) {
+		localPrepareSubmitData(data) {
+			/*if (!this.enable_linespeed_overlay) {
 				delete data.linespeed_sensor_id;
+			}*/
+
+			if (!data.is_silence_mode) {
+				data.silence_mode_until = null;
+			}
+
+			if (data.silence_mode_until) {
+				data.silence_mode_until = cleanDateString(data.silence_mode_until, { withoutTime: 1 });
 			}
 
 			return data;
-		},*/
+		},
 
 		successSubmitCallback() {
 			const { itemData, desiredId } = this;

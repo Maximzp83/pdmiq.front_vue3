@@ -306,7 +306,7 @@ const tableSettings = computed(() => {
 			{ prop: 'technicians', label: 'Assigned', min_width: 200, meta: { fromArray: { subProp: 'full_name', delimeter: ', ' } } },
 			{ label: 'PO', label_postfix: '#', prop: 'po_number' },
 			{ prop: 'status', label: 'Status', width: 120, meta: { prepareValue: { localMethod: getWOStatus, args: { list: requisitionStatusesList() } } } },
-			{ prop: 'actual_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
+			{ prop: 'execution_total_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
 			{ prop: 'proposed_cost', label: 'Budget', width: 70 },
 			{ prop: 'actual_cost', label: 'Fab_Shop_Budget', width: 82 },
 			{ label: 'phrases.Running_Total_Materials', prop: 'execution_materials_cost', width: 70 },

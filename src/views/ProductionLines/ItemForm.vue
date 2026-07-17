@@ -97,6 +97,26 @@
 				/>
 			</el-form-item>
 
+			<el-form-item :label="tt('phrases.silence_mode')" prop="is_silence_mode">
+				<el-switch
+					v-model="formData.is_silence_mode"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
+			<el-form-item
+				v-if="formData.is_silence_mode"
+				:label="tt('phrases.silence_mode_until')"
+				prop="silence_mode_until"
+			>
+				<Datepicker
+					v-model="formData.silence_mode_until"
+					:placeholder="`${tt('Select')} ${tt('date')}`"
+					:pickerOptions="pickerOptions"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="tt('Attachments')" prop="libraries">
 				<div class="options-container">
 					<div v-if="librariesItemsList.length" class="content-row">
@@ -146,7 +166,7 @@ import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { PRODUCTION_LINES_TYPES, rpmSourcesTypesList, RPM_SOURCES_TYPES } from '@/constants/global';
 import { required } from '@/constants/validation';
-import { findItemBy } from '@/helpers';
+import { cleanDateString, findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
@@ -154,6 +174,7 @@ import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
 import { useProductionLines } from '@/composables/useProductionLines';
 
+import Datepicker from '@/components/common/Datepicker.vue';
 import FileUploadBlock from '@/components/form/uploadBlock/FileUploadBlock.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import AttachmentItem from './AttachmentItem.vue';
@@ -201,6 +222,8 @@ const initialFormData = {
 	rpm_value: null,
 	rpm_node_id: null,
 	rpm_node_parameter: null,
+	is_silence_mode: 0,
+	silence_mode_until: '',
 };
 const formData = ref({ ...initialFormData });
 
@@ -224,6 +247,15 @@ const rules = {
 	name: required,
 	plant_id: required,
 };
+const pickerOptions = Object.freeze({
+	disabledDate(date) {
+		const start = new Date();
+		const today = start.getTime() - 3600000 * 24;
+		const dateMs = date.getTime();
+
+		return dateMs < today;
+	},
+});
 const subItemsSettings = computed(() =>
 	Object.freeze([
 		{ ref: 'CharacterItem', targetProp: 'characters' },
@@ -318,6 +350,16 @@ const successSubmitCallback = () => {
 		});
 	}
 };
+const localPrepareSubmitData = (data) => {
+	if (!data.is_silence_mode) {
+		data.silence_mode_until = null;
+	}
+	if (data.silence_mode_until) {
+		data.silence_mode_until = cleanDateString(data.silence_mode_until, { withoutTime: 1 });
+	}
+
+	return data;
+};
 
 const { isMobile, validateForm, handleCancel } = useItemForm({
 	entityKey: 'ProductionLines',
@@ -329,6 +371,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	editModal: props.editModal,
 	new_item_type: newItemType.value,
 	localSetupPage,
+	localPrepareSubmitData,
 	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,

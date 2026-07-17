@@ -1159,6 +1159,8 @@ export default {
 		lube_based_physical_sensor_id: 'ID físico de sensor de lubricación',
 		lube_trigger_metric_type: 'Tipo de métrica de disparo de lubricación',
 		re_trigger_samples: 'Muestras de re-disparo',
+		silence_mode: 'Modo Silencio',
+		silence_mode_until: 'Modo Silencio hasta',
 	},
 
 	aliases: {
@@ -1185,15 +1187,15 @@ export default {
 		mfa_warn_1: 'Mantenga su cuenta segura',
 		mfa_warn_2: 'La autenticación de dos factores (2FA) será requerida para iniciar sesión a partir del 1 de octubre de 2025 para todos los usuarios con acceso de administrador de planta',
 		mfa_warn_link: 'Configure 2FA hoy',		
-	  	prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
+		prodline_warn_1: 'Seleccione al menos una línea de producción notificable',
 	  	creation_link_exp: 'El enlace para crear la contraseña ha expirado. Ingrese su correo electrónico a continuación y haga clic en enviar. <b>Recibirá un nuevo enlace en su bandeja de entrada en breve.</b>',
 	  	to_clipboard_msg: 'El enlace fue copiado al portapapeles',
 	  	mfa_warn_3: 'Si desea cambiar el número de teléfono, desactive 2FA o cámbielo a Authenticator',
 	  	anomaly1: 'Anomalia de datos de metrica',
 	  	api_secret_warn: 'Es la única vez que podrás ver el secreto',
 	  	frequency_reset: 'La configuración de frecuencia se ha restablecido correctamente antes de guardar debido a que el método de lubricación ha cambiado. Configure los nuevos ajustes de frecuencia y guarde.',
-	  	del_sensor: 'Eliminaste el sensor de la tarjeta de artículos', 
 	  	dt_cost_req_togr: 'Hora de inactividad/Hora y Horas Ahorradas deben completarse juntos',
+	  	del_sensor: 'Eliminaste el sensor de la tarjeta de artículos', 
 	},
 
 	constants: {

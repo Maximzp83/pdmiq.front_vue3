@@ -117,6 +117,29 @@
 				/>
 			</el-form-item>
 
+			<el-form-item
+				:label="tt('phrases.Silence_Mode')"
+				prop="is_silence_mode"
+			>
+				<el-switch
+					v-model="formData.is_silence_mode"
+					:active-value="1"
+					:inactive-value="0"
+				/>
+			</el-form-item>
+
+			<el-form-item prop="silence_mode_until"
+				:label="tt('phrases.Silence_Mode_Until')"
+				v-if="formData.is_silence_mode"
+			>
+				<Datepicker
+					v-model="formData.silence_mode_until"
+					:placeholder="tt('phrases.Select_date')"
+					className=" "
+					:pickerOptions="pickerOptions"
+				/>
+			</el-form-item>
+
 			<el-form-item :label="`${tt('Custom')} ${tt('Fields')}`" prop="characters">
 				<div class="options-container">
 					<div v-if="charactersItemsList.length" class="content-row">
@@ -264,7 +287,9 @@ export default {
 				downtime_cost: 0,
 				libraries: [],
 
-				linespeed_sensor_id: null
+				linespeed_sensor_id: null,
+				is_silence_mode: 0,
+				silence_mode_until: '',
 			}
 		};
 	},
@@ -276,6 +301,17 @@ export default {
 			// production_line_id: required
 			// application_id: required
 		}),
+
+		pickerOptions: () =>
+			Object.freeze({
+				disabledDate(date) {
+					const start = new Date();
+					const today = start.getTime() - 3600000 * 24;
+					const dateMs = date.getTime();
+
+					return dateMs < today;
+				}
+			}),
 
 		subItemsSettings: () => Object.freeze([
 			{ ref: 'CharacterItem', targetProp: 'characters' },			
@@ -443,6 +479,14 @@ export default {
 
 			if (data.installed_at) {
 				data.installed_at = cleanDateString(data.installed_at, { withoutTime: 1 });
+			}
+
+			if (!data.is_silence_mode) {
+				data.silence_mode_until = null;
+			}
+
+			if (data.silence_mode_until) {
+				data.silence_mode_until = cleanDateString(data.silence_mode_until, { withoutTime: 1 });
 			}
 
 			return data;

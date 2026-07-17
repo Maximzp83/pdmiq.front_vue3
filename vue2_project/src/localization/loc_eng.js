@@ -1141,6 +1141,8 @@ export default {
 		lube_based_physical_sensor_id: 'Lube Based Physical Sensor ID',
 		lube_trigger_metric_type: 'Lube Trigger Metric Type',
 		re_trigger_samples: 'Re-trigger Samples',
+		silence_mode: 'Silence Mode',
+		silence_mode_until: 'Silence Mode Until',
 	},
 
 	aliases: {
@@ -1167,15 +1169,15 @@ export default {
 		mfa_warn_1: 'Keep your account safe',
 		mfa_warn_2: 'Two-Factor Authentication (2FA) will be required to login starting October 1st 2025 for all Plant Admin access users',
 		mfa_warn_link: 'Set up 2FA today',
-	  	prodline_warn_1: 'Please select at least one notifiable production line',
-	  	creation_link_exp: 'The Password Creation Link has expired. Please enter your email below and click send. <b>A new link will then be sent to your inbox momentarily</b>',
-	  	to_clipboard_msg: 'Link was copied to the clipboard',
-	  	mfa_warn_3: 'If You want to change Phone Number - Please disable MFA or change it to Authenticator',
-	  	anomaly1: 'Flat metric data anomaly',
-	  	api_secret_warn: 'Is the only time You will be able to see the secret',
-	  	frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
-	  	del_sensor: 'You’re removing the sensor from the item card',
-	  	dt_cost_req_togr: 'Downtime Hour and Hours Saved must be filled together',
+		prodline_warn_1: 'Please select at least one notifiable production line',
+		creation_link_exp: 'The Password Creation Link has expired. Please enter your email below and click send. <b>A new link will then be sent to your inbox momentarily</b>',
+		to_clipboard_msg: 'Link was copied to the clipboard',
+		mfa_warn_3: 'If You want to change Phone Number - Please disable MFA or change it to Authenticator',
+		anomaly1: 'Flat metric data anomaly',
+		api_secret_warn: 'Is the only time You will be able to see the secret',
+		frequency_reset: 'Frequency settings successfully reset before saving because the lube method changed. Set new frequency settings and save.',
+		dt_cost_req_togr: 'Downtime Hour and Hours Saved must be filled together',
+		del_sensor: 'You’re removing the sensor from the item card',
 	},
 
 	constants: {

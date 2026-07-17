@@ -23,6 +23,11 @@
   - `src/views/Sensors/sensorForm/ItemForm.vue` now limits Banner M25 running-threshold parameter choices to the updated legacy parameter subset.
 - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
 - `vue2_project/src/services/WebSocketService.js` changed the legacy Pusher broadcasting auth fallback from stage to production, but Vue3 uses `src/composables/mixins/useWebSocket.js` with native websocket endpoint env/fallback and has no equivalent broadcasting auth endpoint to update.
+- Latest `vue2_project/` sync was applied into already migrated Vue3 files:
+  - `src/views/Machines/ItemForm.vue` and `src/views/ProductionLines/ItemForm.vue` now include silence mode fields, future-date picker restriction, and submit cleanup/date normalization for `silence_mode_until`.
+  - `src/views/Plants/ItemForm.vue` now exposes the `is_blocked` switch for users with plant archive access on existing plants.
+  - Requisitions list/print/ROI list Hours fields now use `execution_total_time` instead of `actual_time`.
+  - Vue3 localization already contained the new `phrases.silence_mode` / `phrases.silence_mode_until` keys, so no localization file update was needed.
 - Latest verification during the session: targeted `git diff --check` passed; `npm run build` passed with existing Vite mixed-import/chunk-size warnings.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
