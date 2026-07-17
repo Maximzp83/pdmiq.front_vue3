@@ -526,7 +526,10 @@ import { required } from '@/constants/validation';
 import { findItemBy, prepareSubmitData, removeDuplicatesObjectsArray } from '@/helpers';
 import { Lang } from '@/localization';
 import { chartsListsConfig } from '@/modules/charts_factory/controllers/Sensor/chartsListsConfig';
-import { ncdAxisList } from '@/modules/charts_factory/controllers/Sensor/enums';
+import {
+	BANNER_M25_PARAMETERS_TYPES,
+	ncdAxisList,
+} from '@/modules/charts_factory/controllers/Sensor/enums';
 import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useSubItem } from '@/composables/mixins/useSubItem';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
@@ -846,6 +849,21 @@ const runningThresholdParametersList = computed(() => {
 			resultWithThresholdsOnly = resultWithThresholdsOnly.concat(item.requestsList[0]);
 		}
 	});
+
+	if (sensorType.isBannerM25) {
+		const paramsList = [
+			BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
+			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
+			BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
+		];
+		result = result.filter((item) => paramsList.some((paramId) => paramId === item.id));
+		resultWithThresholdsOnly = resultWithThresholdsOnly.filter((item) =>
+			paramsList.some((paramId) => paramId === item.id),
+		);
+	}
 
 	return Object.freeze({
 		all: Object.freeze(removeDuplicatesObjectsArray(result, 'id')),

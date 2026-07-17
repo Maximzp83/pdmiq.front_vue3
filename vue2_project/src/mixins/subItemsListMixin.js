@@ -140,7 +140,11 @@ const subItemsListMixin = {
 			let hasNoValue = !target || (Array.isArray(target) && target.length === 0) || isEmpty(target);
 
 			if (setIfEmpty) {
-				context.collectedData[setIfEmpty.prop] = hasNoValue ? setIfEmpty.val : !setIfEmpty.val;
+				let val = hasNoValue ? setIfEmpty.val : !setIfEmpty.val;
+				if (typeof val == 'boolean') {
+			    val = val ? val : 0;
+				}
+				context.collectedData[setIfEmpty.prop] = val;
 			}
 
 			if (hasNoValue && cleanIfEmpty) {

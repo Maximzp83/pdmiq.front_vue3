@@ -17,31 +17,30 @@
 
 ## Current Task Status
 - Latest `vue2_project/` changes were synced into already migrated Vue3 files:
-  - `src/constants/date_time.js` now exposes `datePickerAdditionalShortcuts2()` with last 1/6/12 month shortcuts.
-  - `src/helpers/index.js` now supports `getDateRange('last_6_months')`.
-  - `src/views/Requisitions/Details/ApproveForm.vue` now includes downtime/hour, hours saved, contractor quote fields, and paired downtime/hour + hours-saved validation.
-  - `src/views/Requisitions/Details/WorkOrderReportForPrint.vue` now prints downtime/hour, hours saved, and contractor quote.
-  - `src/views/Requisitions/ROICalculator/ROICalculatorBlock.vue`, `ROICalculatorContainer.vue`, and `ItemsList.vue` now follow the updated Vue2 ROI calculator flow: technician-only users, work-order selector, combined date shortcuts, running-total result names, contractor inputs without repair cost avoidance, applied list filters, and PDF export payload updates.
-- Localization changes from `vue2_project/src/localization` were already present in Vue3 for the relevant keys.
+  - `src/composables/mixins/useSubItemsList.js` now normalizes boolean `setIfEmpty` values to `0` when false, matching the updated legacy sub-items mixin behavior.
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` now disables navigator/scrollbar and enables x panning for `oneChartOnly`.
+  - `src/views/Sensors/charts/ChartsListWrapper.vue` now passes per-chart computed `additionalProps`, hides chart headers for single one-chart results, and guards `getParamsByIds` with an array fallback.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` now limits Banner M25 running-threshold parameter choices to the updated legacy parameter subset.
+- `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
+- `vue2_project/src/services/WebSocketService.js` changed the legacy Pusher broadcasting auth fallback from stage to production, but Vue3 uses `src/composables/mixins/useWebSocket.js` with native websocket endpoint env/fallback and has no equivalent broadcasting auth endpoint to update.
 - Latest verification during the session: targeted `git diff --check` passed; `npm run build` passed with existing Vite mixed-import/chunk-size warnings.
 
 ## Files Already Modified
 - Current visible dirty working tree from `git status --short`:
-  - `src/constants/date_time.js`
-  - `src/helpers/index.js`
-  - `src/views/Requisitions/Details/ApproveForm.vue`
-  - `src/views/Requisitions/Details/WorkOrderReportForPrint.vue`
-  - `src/views/Requisitions/ItemsList.vue`
-  - `src/views/Requisitions/ROICalculator/ROICalculatorBlock.vue`
-  - `src/views/Requisitions/ROICalculator/ROICalculatorContainer.vue`
+  - `src/composables/mixins/useSubItemsList.js`
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
+  - `src/views/Sensors/charts/ChartsListWrapper.vue`
+  - `src/views/Sensors/sensorForm/ItemForm.vue`
   - `SESSION_CONTEXT.md`
-  - `vue2_project/src/constants/date_time.js`
-  - `vue2_project/src/helpers/index.js`
-  - `vue2_project/src/localization/loc_eng.js`
-  - `vue2_project/src/localization/loc_spanish.js`
-  - `vue2_project/src/views/Requisitions/Details/ApproveForm.vue`
-  - `vue2_project/src/views/Requisitions/Details/WorkOrderReportForPrint.vue`
-  - `vue2_project/src/views/Requisitions/ROICalculator/ROICalculatorBlock.vue`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
+  - `vue2_project/src/mixins/subItemsListMixin.js`
+  - `vue2_project/src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
+  - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js`
+  - `vue2_project/src/services/WebSocketService.js`
+  - `vue2_project/src/views/Sensors/charts/ChartsListWrapper.vue`
+  - `vue2_project/src/views/Sensors/sensorForm/ItemForm.vue`
 - Do not revert the remaining `vue2_project/` source changes; they are the upstream legacy-side changes that were analyzed and synced where applicable.
 
 ## Unresolved Issues

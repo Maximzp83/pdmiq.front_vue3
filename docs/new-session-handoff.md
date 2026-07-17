@@ -78,6 +78,14 @@ Primary rules source:
   - `src/views/Processes/ItemCard.vue` uses shared preview modal handling and restores the image overlay.
   - `npm run build` and targeted `git diff --check` pass after this follow-up.
 - `src/components/common/Datepicker.vue` now lazy-mounts Element Plus `el-date-picker` after first interaction, using a lightweight div placeholder styled like the datepicker input with icons from `@element-plus/icons-vue` before activation to reduce initial DOM from eager calendar panels.
+- Latest Sensors/chart/sub-item Vue2 changes were synced into Vue3:
+  - `src/composables/mixins/useSubItemsList.js` normalizes boolean `setIfEmpty` false values to `0`.
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` handles `oneChartOnly` by disabling navigator/scrollbar and enabling x panning.
+  - `src/views/Sensors/charts/ChartsListWrapper.vue` guards `getParamsByIds`, passes computed per-chart `additionalProps`, and hides chart headers for single one-chart results.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` limits Banner M25 running-threshold parameters to the updated Vue2 subset.
+  - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
+  - `vue2_project/src/services/WebSocketService.js` changed legacy Pusher broadcasting auth fallback from stage to production, but Vue3 has no equivalent broadcasting auth endpoint because `src/composables/mixins/useWebSocket.js` uses native websocket endpoint env/fallback.
+  - `npm run build` and targeted `git diff --check` pass after this sync.
 - `Processes/Details` section is migrated for the current Vue3 compile scope:
   - `src/views/Processes/Details/DetailsPage.vue`
   - `src/views/Processes/Details/DashboardPage.vue`

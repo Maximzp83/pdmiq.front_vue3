@@ -18,7 +18,7 @@
 						:ChartInstance="chart"
 						:rootFilters="rootFilters"
 						:sensorData="sensorData"
-						:additionalProps="additionalProps"
+						:additionalProps="chartItemAdditionalProps"
 						:currentSensorType="currentSensorType"
 						:forceLoading="overlayChartsListWrapperLoading"
 						:chartsListWrapperReadyCounter="chartsListWrapperReadyCounter"
@@ -221,6 +221,13 @@ const chartsListInstance = computed(() =>
 );
 
 const chartsList = computed(() => updateChartsList.value ? chartsListInstance.value.getCharts() : []);
+const chartItemAdditionalProps = computed(() => {
+	const additionalProps = { ...props.additionalProps };
+	if (props.oneChartOnly) {
+		additionalProps.hideChartHeader = chartsList.value.length <= 1;
+	}
+	return Object.freeze(additionalProps);
+});
 const chartsConfigsFullList = computed(() =>
 	chartsListInstancesInitialBuild.value ? [] : chartsListInstance.value.chartsConfigsFullList,
 );
@@ -238,19 +245,20 @@ const editThresholdsByStagesEnabled = computed(() => {
 	);
 });
 const buildChartsSettings = computed(() => {
+	const paramIds = Array.isArray(props.getParamsByIds) ? props.getParamsByIds : [];
 	const settings = {
 		chartFactoryName: 'SensorChart',
 		setupChartsConfigsListSettings: {
 			configsKey: 'sensorChartsListsConfig',
 			chartKey: currentChartSettingsKey.value,
 			joinChartsBy: props.joinChartsBy,
-			getParamsByIds: props.getParamsByIds,
+			getParamsByIds: paramIds,
 			filterParamsBy: [],
 		},
 	};
 
 	if (props.oneChartOnly) {
-		if (props.getParamsByIds.length > 1) {
+		if (paramIds.length > 1) {
 			settings.setupChartsConfigsListSettings.getParamsByIdsFilterMethod = 'every';
 		} else {
 			settings.setupChartsConfigsListSettings.filterParamsBy.push({

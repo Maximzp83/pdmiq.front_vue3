@@ -920,7 +920,7 @@ class SensorChart extends SensorChartBase {
 		this.allowYAxisMinChange =
 			resources.chart_config.requestsList[0]['type'] == 'temperature';
 
-		const { editThresholdsByStagesEnabled } = resources.payload_1;
+		const { editThresholdsByStagesEnabled, oneChartOnly } = resources.payload_1;
 		this.isPlotLinesReady = false;
 		this.isDraggablePlotLinesReady = false;
 
@@ -971,7 +971,18 @@ class SensorChart extends SensorChartBase {
 			};
 		}
 
-		if (!resources.settings_payload.disableNavigator) {
+		if (oneChartOnly) {
+			options.chart = {
+				...options.chart,
+				zoomType: '',
+				panning: {
+					enabled: true,
+					type: 'x'
+				}
+			};
+			options.navigator = { enabled: false };
+			options.scrollbar = { enabled: false };
+		} else if (!resources.settings_payload.disableNavigator) {
 			options.navigator = {
 				// enabled: false,
 				adaptToUpdatedData: true,

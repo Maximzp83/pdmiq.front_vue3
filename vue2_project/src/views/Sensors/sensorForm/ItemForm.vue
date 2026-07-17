@@ -688,7 +688,7 @@ import {
 import { ADJUSTMENT_ACTIONS_TYPES, LUBE_VERSIONS } from '@/constants/ultrasound';
 
 import { 
-	ncdAxisList,
+	ncdAxisList, BANNER_M25_PARAMETERS_TYPES
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { chartsListsConfig } from '@/modules/charts_factory/controllers/Sensor/chartsListsConfig';
@@ -1108,6 +1108,19 @@ export default {
 						}
 						// console.log(ci.transformator_settings.specification.setupPlotlinesData === false, ci.transformator_settings.specification.setupPlotlinesData)
 					})
+
+					if (isBannerM25) {
+						const paramsList = [
+							BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
+							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
+							BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
+						];
+						result = result.filter(pi => paramsList.some(paramId => paramId === pi.id));
+						resultWithThresholdsOnly = resultWithThresholdsOnly.filter(pi => paramsList.some(paramId => paramId === pi.id));
+					}
 
 					return {
 						all: Object.freeze(removeDuplicatesObjectsArray(result, 'id')),

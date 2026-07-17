@@ -676,7 +676,7 @@ const setupMultiviewCrashesStatistics1 = (crashesData, crashText) => {
 		}
 		
 		tooltip_text += crashText || alert_type_item.short_name || alert_type_item.name;
-		
+
 		if (alert_type === ALERT_TYPES.WARNING) {
 			shape = 'url(/static/img/icons/warning_flag.svg)';
 			color = warningColor;

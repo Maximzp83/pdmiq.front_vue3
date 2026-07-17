@@ -43,7 +43,7 @@
 						:ChartInstance="chart"
 						:rootFilters="rootFilters"
 						:sensorData="sensorData"
-						:additionalProps="additionalProps"
+						:additionalProps="chartItemAdditionalProps"
 						:currentSensorType="currentSensorType"
 						:forceLoading="overlayChartsListWrapperLoading"
 						:chartsListWrapperReadyCounter="chartsListWrapperReadyCounter"
@@ -312,6 +312,7 @@ export default {
 				oneChartOnly,
 				currentChartSettingsKey
 			} = this;
+			const paramIds = Array.isArray(getParamsByIds) ? getParamsByIds : [];
 			// console.log('metric', this.metric)
 			let settings = {
 				chartFactoryName: 'SensorChart',
@@ -320,14 +321,15 @@ export default {
 					configsKey: 'sensorChartsListsConfig',
 					chartKey: currentChartSettingsKey,
 					joinChartsBy,
-					getParamsByIds,
+					getParamsByIds: paramIds,
 					filterParamsBy: []
 				}
 			};
 
 			if (oneChartOnly) {
-				if (getParamsByIds.length > 1) {
-					settings.setupChartsConfigsListSettings.getParamsByIdsFilterMethod = 'every';
+				if (paramIds.length > 1) {
+					settings.setupChartsConfigsListSettings.getParamsByIdsFilterMethod =
+						'every';
 				} else {
 					settings.setupChartsConfigsListSettings.filterParamsBy.push(
 						{ prop: 'skipTitle', method: '==', value: null },
@@ -382,6 +384,16 @@ export default {
 
 		chartsList: that =>
 			that.updateChartsList ? that.ChartsListInstance.getCharts() : [],
+
+		chartItemAdditionalProps() {
+			const props = { ...this.additionalProps };
+
+			if (this.oneChartOnly) {
+				props.hideChartHeader = this.chartsList.length <= 1;
+			}
+
+			return Object.freeze(props);
+		},
 
 		chartsConfigsFullList() {
 			return this.chartsListInstancesInitialBuild
