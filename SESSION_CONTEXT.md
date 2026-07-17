@@ -24,12 +24,25 @@
 - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
 - `vue2_project/src/services/WebSocketService.js` changed the legacy Pusher broadcasting auth fallback from stage to production, but Vue3 uses `src/composables/mixins/useWebSocket.js` with native websocket endpoint env/fallback and has no equivalent broadcasting auth endpoint to update.
 - Latest verification during the session: targeted `git diff --check` passed; `npm run build` passed with existing Vite mixed-import/chunk-size warnings.
+- Follow-up charts_factory parity fix applied:
+  - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now returns `USg` for Banner M25 FFT X waveform / transformed acceleration / X acceleration.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` also now uses the Vue2-style RPM cursor drag/update flow: supports `isUpdateOnly`, `serieId` / `pointId`, point title updates, drop-time options sync, and factory-level cursor synchronization.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now builds FFT analysis annotations from `option_value.value` with `custom_value` fallback, matching Vue2 custom-rule behavior.
+  - `src/modules/charts_factory/classes/StatisticsTransformator.js` now initializes `this.requestsList = []` in the base constructor, matching Vue2 and preventing early `setupDataAccessor()` crashes before request injection.
+  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue` now passes the FFT page Highcharts instance into `ChartWrapper`, restoring annotation/draggable-points module availability for draggable FFT annotations.
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` now guards history-series detection against non-string Highcharts series ids, fixing Banner grouped-by-axis chart mount crashes.
+  - Other previously listed charts_factory differences were not changed.
+  - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
 - Current visible dirty working tree from `git status --short`:
   - `src/composables/mixins/useSubItemsList.js`
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js`
   - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
+  - `src/modules/charts_factory/controllers/Sensor/enums.js`
   - `src/views/Sensors/charts/ChartsListWrapper.vue`
+  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
   - `src/views/Sensors/sensorForm/ItemForm.vue`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`

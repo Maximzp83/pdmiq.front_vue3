@@ -1173,9 +1173,9 @@ body {
 			}
 
 			.chart-filter-selector {
-				// max-width: 210px;
+				max-width: 210px;
 				// min-width: 180px;
-				width: inherit;
+				width: 100%;
 				overflow: hidden;
 				text-align: left;
 				white-space: nowrap;

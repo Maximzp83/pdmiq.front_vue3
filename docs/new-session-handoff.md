@@ -59,6 +59,8 @@ Primary rules source:
   - Added chart support wrappers under `src/components/charts` and `src/views/Sensors/charts`.
   - Added final statistics/chart pages: `StatisticsPage.vue`, `FFTStatisticsPage.vue`, `MultiViewStatisticsPage.vue`, and `OneChartPage.vue`.
   - `FFTStatisticsPage.vue` and `src/views/Sensors/charts/fft` were re-aligned toward Vue2 behavior for page header/controls, prev/next FFT navigation, FFT chart cursor/peaks/periodic/waveform/RPM cursor flow, vibration-analysis rule override save/delete, and waterfall 3D controls.
+  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue` passes `additionalProps.hcInstance` into `ChartWrapper`, so FFT annotations use the Highcharts instance initialized with `annotations` and `draggable-points`.
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` guards history-series detection against numeric/non-string Highcharts series ids, which are reachable in Banner grouped-by-axis chart rendering.
   - Added Analysis FFT helpers and statistics filter blocks.
   - Enabled `/sensors`, `/sensors/new`, `/sensors/:id`, `/sensors/ncd`, `/sensors/:id/fft`, `/sensors/:id/stats`, `/sensors/:id/multiview`, and `/sensors/:id/chart` routes.
   - FFT compatibility routes `/ncd/:id/fft/:fftId` and `/banner/:id/fft/:fftId` are enabled for legacy links and prev/next navigation.
@@ -86,6 +88,14 @@ Primary rules source:
   - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
   - `vue2_project/src/services/WebSocketService.js` changed legacy Pusher broadcasting auth fallback from stage to production, but Vue3 has no equivalent broadcasting auth endpoint because `src/composables/mixins/useWebSocket.js` uses native websocket endpoint env/fallback.
   - `npm run build` and targeted `git diff --check` pass after this sync.
+- Follow-up charts_factory parity fix applied:
+  - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now returns `USg` for Banner M25 FFT X waveform / transformed acceleration / X acceleration.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now uses the Vue2-style RPM cursor drag/update flow with `isUpdateOnly`, `serieId` / `pointId`, direct point title updates, drop-time options sync, and factory-level cursor synchronization.
+  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now builds FFT analysis annotations from `option_value.value` with `custom_value` fallback, matching Vue2 custom-rule behavior.
+  - `src/modules/charts_factory/classes/StatisticsTransformator.js` now initializes `this.requestsList = []` in the base constructor, matching Vue2 and preventing early `setupDataAccessor()` crashes before request injection.
+  - Other previously reported charts_factory differences were not changed.
+  - `npm run build` and targeted `git diff --check` pass.
 - `Processes/Details` section is migrated for the current Vue3 compile scope:
   - `src/views/Processes/Details/DetailsPage.vue`
   - `src/views/Processes/Details/DashboardPage.vue`

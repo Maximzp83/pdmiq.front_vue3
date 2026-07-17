@@ -212,7 +212,8 @@ export const UNIT_TYPES = {
 	IAQ: 98,
 	MM: 97,
 	INCHES: 96,
-	CPM: 95
+	CPM: 95,
+	ULTRASONIC_G: 94,
 };
 
 const unitTypesList1 = [
@@ -230,7 +231,8 @@ const unitTypesList1 = [
 	{ id: UNIT_TYPES.IAQ, name: 'constants.IAQ' },
 	{ id: UNIT_TYPES.MM, name: 'constants.mm' },
 	{ id: UNIT_TYPES.INCHES, name: 'constants.inches' },
-	{ id: UNIT_TYPES.CPM, name: 'constants.cpm' }
+	{ id: UNIT_TYPES.CPM, name: 'constants.cpm' },
+	{ id: UNIT_TYPES.ULTRASONIC_G, name: 'constants.usg' }
 ];
 
 const metricKeysTable1 = {
@@ -408,8 +410,8 @@ const metricKeysTable1 = {
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.HZ,
 			
-			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
-			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.ULTRASONIC_G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.ULTRASONIC_G,
 			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
 			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
 			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
@@ -462,8 +464,8 @@ const metricKeysTable1 = {
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.CPM,
 			[BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_PEAK_ACCEL_FREQ_COMPONENT]: UNIT_TYPES.CPM,
 
-			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.G,
-			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS]: UNIT_TYPES.ULTRASONIC_G,
+			[BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_PEAK]: UNIT_TYPES.ULTRASONIC_G,
 			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION]: UNIT_TYPES.G,
 			[BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION]: UNIT_TYPES.G,
 			[BANNER_M25_PARAMETERS_TYPES.FULL_BAND_RMS_ACCELERATION]: UNIT_TYPES.G,
@@ -777,7 +779,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_HIGH_FREQ_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_hi_frequency_RMS_acceleration',
-		short_name: 'Ahf',
+		short_name: 'short_name.hi_freq_accel',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -814,7 +816,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.MAGNITUDE_FULL_BAND_RMS_ACCELERATION,
 		icon: 'icon-acceleration',
 		name: 'constants.magnitude_xyz_full_band_rms_acceleration',
-		short_name: 'Alf',
+		short_name: 'short_name.full_band_accel',
 		type: 'acceleration',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -832,7 +834,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.X_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.x_rms_velocity_mm',
-		short_name: 'Vx',
+		short_name: 'short_name.x_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -841,7 +843,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Y_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.y_rms_velocity_mm',
-		short_name: 'Vy',
+		short_name: 'short_name.y_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'
@@ -850,7 +852,7 @@ const bannerV21vibrationParametersList1 = {
 		id: BANNER_V2_1_VIBRATION_PARAMETERS_TYPES.Z_RMS_VELOCITY,
 		icon: 'icon-velocity',
 		name: 'constants.z_rms_velocity_mm',
-		short_name: 'Vz',
+		short_name: 'short_name.z_rms_velocity',
 		type: 'velocity',
 		color: '#ffde32',
 		metricKeysTableName: 'extra_vibration'

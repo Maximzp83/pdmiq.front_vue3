@@ -224,13 +224,18 @@ class SensorChartBase extends ChartBase {
 	}
 
 	isHistorySerie(serie) {
+		const className = serie?.userOptions?.className;
+		const serieId = serie?.userOptions?.id;
+
 		return !!(
 			serie &&
 			serie.userOptions &&
 			(
-				serie.userOptions.className?.includes('history-line') ||
-				serie.userOptions.id?.includes('_history-serie') ||
-				serie.userOptions.id?.includes('-history-serie')
+				(typeof className === 'string' && className.includes('history-line')) ||
+				(typeof serieId === 'string' && (
+					serieId.includes('_history-serie') ||
+					serieId.includes('-history-serie')
+				))
 			)
 		);
 	}

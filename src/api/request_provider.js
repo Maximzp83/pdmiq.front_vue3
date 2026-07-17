@@ -24,13 +24,13 @@ const isPrevent = () => {
  * @returns {Object}
  */
 const getOptions = (payload) => {
-	const { loading = false, notNotify = false, notifyError = true } = payload;
+	const { loading = false, notNotify = false, notNotifyError = false } = payload;
 
 	return {
 		loading,
 		toStore: payload.setToStore || payload.toStore || false,
 		notify: !notNotify && payload.notify !== false,
-		notifyError: notifyError,
+		notifyError: !notNotifyError,
 	};
 };
 
@@ -170,7 +170,7 @@ const handleError = (error, options = {}) => {
 		errorMessageSettings?.customMessage ||
 		error.message ||
 		Lang.tt('phrases.request_error');*/
-
+	// console.log('handleError', message, error, notify);
 	if (notify) {
 		// Use Element Plus notification if available
 		Notify({
@@ -228,7 +228,7 @@ const api_request = (url, payload = {}) => {
 	} = payload;
 
 	// Get useLoadStore function
-
+	// console.log('api_request', url, payload, notify, notifyError);
 	// Create store loading promise
 	const storePromise = (toStore || loading) && payload.storeName
 		? useLoadStore(payload.storeName)

@@ -407,14 +407,17 @@ const fetchEquipment = (id) => {
 		},
 	);
 };
-const fetchFFT = ({ urlPostfix = '', target } = {}) => {
+const fetchFFT = ({ urlPostfix = '', target, settings = {} } = {}) => {
 	if (!sensorData.value?.id || !target) return Promise.resolve();
+
+	const requestPayload = settings.requestPayload || {};
 
 	fftLoading.value = true;
 	return fetchNcdFft({
 		sensorId: sensorData.value.id,
 		urlPostfix,
 		notNotifyError: true,
+		...requestPayload,
 	})
 		.then(({ value }) => {
 			target.value = normalizeFftResponse(value);
@@ -444,6 +447,9 @@ const fetchFFTBundle = () => {
 		fetchFFT({
 			target: nextFFTItem,
 			urlPostfix: `/${selectedFftId}/next`,
+			settings: {
+				requestPayload: { notNotify: true }
+			}
 		});
 	}
 };

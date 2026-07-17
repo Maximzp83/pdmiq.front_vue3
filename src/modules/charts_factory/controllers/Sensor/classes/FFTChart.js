@@ -1,8 +1,12 @@
 import ChartBase from '../../../classes/Chart';
 
 import { fetch_ncd_sensor_fft_statistics } from '../api/index.js';
-import { mergeObjects, cloneDeep, findItemBy, buildFormula } from '@/helpers';
-import { METRIC_SYSTEM_TYPES } from '../enums';
+import { mergeObjects, cloneDeep, findItemBy, buildFormula, getRoundedValue } from '@/helpers';
+import {
+	METRIC_SYSTEM_TYPES,
+	NCD_SENSOR_PARAMETERS_TYPES,
+	SENSOR_PARAMETERS_TYPES,
+} from '../enums';
 
 // import { ncdAxisList } from '@/constants/global';
 import {
@@ -74,6 +78,17 @@ class FFTChartBase extends ChartBase {
 
 	setupUnitTypeName(payload) {
 		// const { requestsList } = this;
+		if (
+			this.currentSensorType.isBannerM25 &&
+			(
+				this.parameterItem.id === NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM ||
+				this.parameterItem.id === NCD_SENSOR_PARAMETERS_TYPES.X_TRANSFORM_ACCELERATION ||
+				this.parameterItem.id === SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION
+			)
+		) {
+			return 'USg';
+		}
+
 		return getUnitType(payload);
 	}
 
@@ -721,20 +736,46 @@ class FFTChart extends FFTChartBase {
 
 	handleRpmCursorDrag({ target }, settings = {}) {
 		try {
-			const { x, point_idx, serie_idx } = target;
-			// console.log(target, x, point_idx, serie_idx, this.options.series[serie_idx].data);
-			let newData = this.options.series[serie_idx].data || [];
+			if (!this.ChartAPI || !this.rpmSourceValue || !this.hasCursorFlagConfig()) {
+				return;
+			}
 
-			newData[point_idx] = setupFFTCursorItem({ ...newData[point_idx], x });
-			this.ChartAPI.series[serie_idx].setData(newData, false);
+			const { x, serieId, pointId, point_idx, serie_idx } = target;
+			const serieIdx = settings.isUpdateOnly
+				? this.ChartAPI.series.find((serie) => serie.userOptions.id === serieId)?.index
+				: serie_idx;
+			const pointIdx = settings.isUpdateOnly
+				? this.ChartAPI.series[serieIdx]?.points.find((point) => point.id === pointId)?.index
+				: point_idx;
+
+			const point = this.ChartAPI.series[serieIdx]?.points[pointIdx];
+			if (!point) return;
 
 			this.updateAnnotationsFromFFTAnalysisRules({xValue: x});
+
+			if (settings.isUpdateOnly) {
+				const title = `<div class="fft-cursor"><b>${getRoundedValue(x, 0, 3)} ${point.units_x}</b></div>`;
+
+				point.update({ x, title }, true, false);
+
+				if (settings.isDrop) {
+					this.options.series[serieIdx].data[pointIdx].x = x;
+					this.options.series[serieIdx].data[pointIdx].title = title;
+				}
+
+				return;
+			}
 
 			if (this.events.rpmCursorDrag) {
 				this.events.rpmCursorDrag({ x });
 			}
 
+			if (this.events.rpmCursorDragFactoryHandler) {
+				this.events.rpmCursorDragFactoryHandler({ point, isDrop: settings.isDrop });
+			}
+
 			if (settings.isDrop) {
+				this.options.series[serieIdx].data[pointIdx].x = x;
 				if (this.events.rpmCursorDrop) {
 					this.events.rpmCursorDrop({ x });
 				}
@@ -831,10 +872,11 @@ class FFTChart extends FFTChartBase {
 			const harmonics = rule_item.active_harmonics != null
 				? rule_item.active_harmonics
 				: rule_item.original_rule.harmonics;
+			const activeValue =
+				(rule_item.option_value_id && rule_item.option_value?.value) || rule_item.custom_value;
 			this.options.annotations[idx].customSettings.harmonics = harmonics;
-			this.options.annotations[idx].customSettings.value = +rule_item.option_value.value;
-			// let start = rule_item.vibration_analysis_custom_value || rule_item.vibration_analysis_value || rule_item.option_value || rule_item.custom_value;
-			let start = calcFormula({ rpm: rpmValue, value: +rule_item.option_value.value });
+			this.options.annotations[idx].customSettings.value = +activeValue;
+			let start = calcFormula({ rpm: rpmValue, value: +activeValue });
 			start = +start;
 			const step = +start;
 			const startX = this.convertFormulaResultToXAxisValue(start);

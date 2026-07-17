@@ -83,7 +83,11 @@
 		<div v-show="!chartIsHidden && (initialFetch || hasStatistics)" class="chart-container fft-chart-container">
 			<div class="flex mrow wrap">
 				<div class="mcol-xs-12 mcol-sm-8 mcol-xlg-9 fluid">
-					<ChartWrapper ref="chartWrapperRef" :chartOptions="chartOptions" />
+					<ChartWrapper
+						ref="chartWrapperRef"
+						:chartOptions="chartOptions"
+					/>
+						<!-- :hcInstance="additionalProps.hcInstance" -->
 				</div>
 
 				<div v-if="activeButtonValues.showPeaksActive" class="mcol-xs-12 mcol-sm-4 mcol-xlg-3 fft-peaks-wrapper">

@@ -153,7 +153,7 @@ const {
 	globalFilters,
 } = storeToRefs(globalStore);
 
-const { set_value: set_global_store } = globalStore;
+const { set_value: set_global_store, set_compare_list } = globalStore;
 
 // ========== Composables ==========
 const route = useRoute();
@@ -189,9 +189,9 @@ const toggleSidebar = () => {
 	isSidebarShow.value = !isSidebarShow.value;
 };
 
-const set_compare_list = (data) => {
-	set_global_store('compareList', data);
-};
+/*const set_compare_list = (data) => {
+	set_compare_list(data);
+};*/
 
 const setGlobalFilters = ({ id, filterName }) => {
 	const newFilters = { ...globalFilters.value, [filterName]: id };

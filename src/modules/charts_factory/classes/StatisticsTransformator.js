@@ -9,6 +9,7 @@ export default class StatisticsTransformatorBase {
 			// chart_id: this.chart_id,
 			statistics_result: {}
 		};
+		this.requestsList = [];
 	}
 
 	getStatisticsKeys() {
