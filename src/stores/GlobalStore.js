@@ -96,7 +96,6 @@ export const useGlobalStore = defineStore('globalStore', {
 			callMethod: null,
 
 			beforeEachHook: null,
-			redirectTo: null,
 			printHTMLWindowIsOpen: false,
 		};
 	},

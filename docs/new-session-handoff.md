@@ -86,7 +86,14 @@ Primary rules source:
   - `src/views/Sensors/charts/ChartsListWrapper.vue` guards `getParamsByIds`, passes computed per-chart `additionalProps`, and hides chart headers for single one-chart results.
   - `src/views/Sensors/sensorForm/ItemForm.vue` limits Banner M25 running-threshold parameters to the updated Vue2 subset.
   - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
-  - `vue2_project/src/services/WebSocketService.js` changed legacy Pusher broadcasting auth fallback from stage to production, but Vue3 has no equivalent broadcasting auth endpoint because `src/composables/mixins/useWebSocket.js` uses native websocket endpoint env/fallback.
+  - WebSocket transport was re-migrated from `vue2_project/src/services/WebSocketService.js` into `src/services/WebSocketService.js`, preserving channel auth, private/presence channels, reconnect/resubscribe, heartbeat, and event dispatch with Vite environment adaptation.
+  - `src/composables/mixins/useWebSocket.js` now acts as the Vue Composition API wrapper around that service while retaining the existing Vue3 consumer API.
+  - Channel callbacks are normalized centrally to the `{ type, data }` message contract expected by all audited Vue3 WebSocket consumers.
+  - Consumer `onOpen` now runs after successful channel subscription rather than raw transport connection, matching the legacy DXM/FFT request ordering; `localHandleConnected` remains available for transport state.
+  - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication socket-completion flow through the re-migrated wrapper, including pre-request subscription, lube-shot/controller/status matching, chart update forwarding, and socket cleanup.
+  - Full active-consumer scan found and migrated the remaining direct native socket in `src/views/Sensors/ItemPage.vue`; its NCD save-status flow now uses `useWebSocket`, and native socket construction remains only inside `WebSocketService`.
+  - `src/components/layout/DashboardLayout.vue` now reacts to `authUser` becoming available after first login and starts the idle timer without requiring a page reload; duplicate timer creation is guarded and existing timeout comments/settings are unchanged.
+  - `src/composables/mixins/useNavigation.js` now obtains the route during setup and reads the latest `fullPath` for every navigation request, so delayed auto-logout no longer invokes `useRoute()` outside setup or stores a stale redirect path.
   - `npm run build` and targeted `git diff --check` pass after this sync.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.

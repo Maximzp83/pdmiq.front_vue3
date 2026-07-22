@@ -208,14 +208,12 @@ const stateSocketCallback = ({ type, data } = {}) => {
 	}
 };
 
-const setupEquipmentSocket = (resources) => {
-	if (!socketChannel.value || !resources) return;
-
+const setupEquipmentSocket = () => {
 	setupWebSocket({
 		socketName: 'state_socket',
 		socketReadyRef: stateSocketReady,
 		socketChannel: socketChannel.value,
-		resources,
+		// resources,
 		onMessage: stateSocketCallback,
 	});
 };
@@ -417,11 +415,11 @@ watch(
 		if (!sensorIds) return;
 
 		if (!stateSocketReady.value) {
-			setupEquipmentSocket(sensorIds);
+			setupEquipmentSocket();
 		} else {
 			webSocketSend({
 				socketName: 'state_socket',
-				resources: sensorIds,
+				// resources: sensorIds,
 			});
 		}
 	},

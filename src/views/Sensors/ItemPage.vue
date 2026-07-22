@@ -37,6 +37,7 @@ import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
 import { useNavigation } from '@/composables/mixins/useNavigation';
+import { useWebSocket } from '@/composables/mixins/useWebSocket';
 import { useNotify } from '@/composables/useNotify';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -54,11 +55,18 @@ const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { changeRoute } = useNavigation();
 const { Notify } = useNotify();
+const { setupWebSocket, closeWebSocket } = useWebSocket();
+
+const NCD_STATUS_SOCKET_NAME = 'ncd_status_socket';
 
 const itemFormRef = ref(null);
 const equipmentData = shallowRef({});
 const equipmentLoading = ref(false);
 const sensorSaving = ref(false);
+
+const socketChannel = computed(() =>
+	authStore.authUser?.uuid ? `user.${authStore.authUser.uuid}` : null,
+);
 
 const itemsName = computed(() => ({
 	one: tt('Sensor'),
@@ -161,6 +169,40 @@ const handleNcdSocketResponse = (response = {}, settings = {}) =>
 		}
 	});
 
+const handleNcdWebSocketError = () => {
+	toggleMainPreloader(false);
+	Notify({
+		type: 'warning',
+		title: tt('Fail'),
+		message: tt('phrases.web_socket_error'),
+		duration: 0,
+	});
+	closeWebSocket({ socketName: NCD_STATUS_SOCKET_NAME });
+};
+
+const waitForNcdSocketResponse = ({ sensorId, successMessage, failMessage }) => {
+	setupWebSocket({
+		socketName: NCD_STATUS_SOCKET_NAME,
+		socketChannel: socketChannel.value,
+		onError: handleNcdWebSocketError,
+		onMessage: (response) => {
+			handleNcdSocketResponse(response, {
+				sensorId,
+				successMessage,
+				failMessage,
+			})
+				.then(() => {
+					closeWebSocket({ socketName: NCD_STATUS_SOCKET_NAME });
+					changeRoute({ path: ENTITIES.Sensors.routeBase });
+				})
+				.catch(() => {
+					closeWebSocket({ socketName: NCD_STATUS_SOCKET_NAME });
+				})
+				.finally(() => toggleMainPreloader(false));
+		},
+	});
+};
+
 const handleSubmitForm = (data) => {
 	if (data?.enableWebSocket) {
 		const { payload, isNCDSDT, successMessage, failMessage } = data;
@@ -180,29 +222,11 @@ const handleSubmitForm = (data) => {
 				}
 
 				toggleMainPreloader(true, `${tt('Working')}...`);
-				const socket = new WebSocket(`${window.location.origin.replace(/^http/, 'ws')}/ws/user.${authStore.authUser?.uuid}`);
-				socket.onmessage = (event) => {
-					handleNcdSocketResponse(JSON.parse(event.data), {
-						sensorId: savedSensor.id,
-						successMessage,
-						failMessage,
-					})
-						.then(() => {
-							socket.close();
-							changeRoute({ path: ENTITIES.Sensors.routeBase });
-						})
-						.finally(() => toggleMainPreloader(false));
-				};
-				socket.onerror = () => {
-					toggleMainPreloader(false);
-					Notify({
-						type: 'warning',
-						title: tt('Fail'),
-						message: tt('phrases.web_socket_error'),
-						duration: 0,
-					});
-					socket.close();
-				};
+				waitForNcdSocketResponse({
+					sensorId: savedSensor.id,
+					successMessage,
+					failMessage,
+				});
 			})
 			.finally(() => {
 				sensorSaving.value = false;

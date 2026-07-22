@@ -22,7 +22,14 @@
   - `src/views/Sensors/charts/ChartsListWrapper.vue` now passes per-chart computed `additionalProps`, hides chart headers for single one-chart results, and guards `getParamsByIds` with an array fallback.
   - `src/views/Sensors/sensorForm/ItemForm.vue` now limits Banner M25 running-threshold parameter choices to the updated legacy parameter subset.
 - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
-- `vue2_project/src/services/WebSocketService.js` changed the legacy Pusher broadcasting auth fallback from stage to production, but Vue3 uses `src/composables/mixins/useWebSocket.js` with native websocket endpoint env/fallback and has no equivalent broadcasting auth endpoint to update.
+- WebSocket transport was re-migrated from `vue2_project/src/services/WebSocketService.js` into `src/services/WebSocketService.js`; the service keeps channel authorization, private/presence subscriptions, reconnect/resubscribe, heartbeat, and event handling, with only Vue CLI environment access adapted to Vite.
+- `src/composables/mixins/useWebSocket.js` is now the Vue Composition API wrapper around `WebSocketService`, while preserving the existing Vue3 `setupWebSocket` / `closeWebSocket` / `webSocketSend` consumer API.
+- Incoming channel events in `useWebSocket` are normalized to the legacy/current consumer contract `{ type, data }`; all existing Vue3 `onMessage` handlers were audited against this shape.
+- `useWebSocket` now invokes consumer `onOpen` / legacy `localHandleOpen` only after private-channel subscription succeeds; `localHandleConnected` remains the transport-connected callback. This restores the Vue2 ordering for DXM and FFT requests.
+- Full static consumer audit completed: `src/views/Sensors/ItemPage.vue` was the last direct native-WebSocket consumer and now uses `useWebSocket` for its `NCD.COMMAND` result flow. Native `new WebSocket` construction remains only inside `WebSocketService`.
+- `src/components/layout/DashboardLayout.vue` now starts its idle timer reactively when `authUser` becomes available after the first post-login `get_auth_user()` request, fixing auto-logout only working after a page reload. Existing timeout comments/settings were preserved.
+- `src/composables/mixins/useNavigation.js` now captures the injected route object during composable setup and reads its current `fullPath` inside each navigation call. Logout no longer calls `useRoute()` outside setup or receives an undefined/stale route.
+- Targeted ESLint, `git diff --check`, and `npm run build` pass after the WebSocket re-migration.
 - Latest verification during the session: targeted `git diff --check` passed; `npm run build` passed with existing Vite mixed-import/chunk-size warnings.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
@@ -36,25 +43,17 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
-- Current visible dirty working tree from `git status --short`:
-  - `src/composables/mixins/useSubItemsList.js`
-  - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js`
-  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
-  - `src/modules/charts_factory/controllers/Sensor/enums.js`
-  - `src/views/Sensors/charts/ChartsListWrapper.vue`
-  - `src/views/Sensors/charts/fft/FFTChartItemContainer.vue`
-  - `src/views/Sensors/sensorForm/ItemForm.vue`
+- Current visible dirty working tree:
+  - `src/services/WebSocketService.js`
+  - `src/composables/mixins/useWebSocket.js`
+  - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue`
+  - `src/views/Sensors/ItemPage.vue`
+  - `src/components/layout/DashboardLayout.vue`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-  - `vue2_project/src/mixins/subItemsListMixin.js`
-  - `vue2_project/src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
-  - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js`
-  - `vue2_project/src/services/WebSocketService.js`
-  - `vue2_project/src/views/Sensors/charts/ChartsListWrapper.vue`
-  - `vue2_project/src/views/Sensors/sensorForm/ItemForm.vue`
-- Do not revert the remaining `vue2_project/` source changes; they are the upstream legacy-side changes that were analyzed and synced where applicable.
+- Do not revert these WebSocket migration changes.
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.
@@ -63,6 +62,7 @@
   - Sensors list/create/edit/statistics/FFT/chart routes with real data.
   - Settings, Maintenance, Work Order Requests, StoreRooms, Assets/Machines/Equipments flows as listed in docs.
 - Legacy `vue2_project/src/views/Sensors/sensorForm/ItemFormPump.vue` is not present as a separate Vue3 file; pump logic is represented inside the migrated ultrasound form stack.
+- `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Start the new session by running `git status --short`, then continue with runtime-free code/doc checks only unless the user explicitly asks for browser/API smoke-tests.
+- Continue one confirmed file/step at a time; all statically discovered active WebSocket consumers now use the migrated service wrapper, with runtime validation remaining when explicitly requested.
