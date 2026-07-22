@@ -1,124 +1,174 @@
-import { computed, ref } from 'vue';
-import { useAuthStore } from '@/stores/AuthStore';
+import { computed, onBeforeUnmount, ref } from 'vue'
+import { useAuthStore } from '@/stores/AuthStore'
+import { WebSocketService } from '@/services/WebSocketService'
 
-export function useWebSocket() {
-	const authStore = useAuthStore();
-	const sockets = {};
-	const readyMap = ref({});
+const getRuntimeEnv = () => import.meta.env || {}
 
-	const appKey = computed(() => {
-		const env = import.meta.env || {};
-		if (env.VITE_WEB_SOCKET_APP_KEY) return `${env.VITE_WEB_SOCKET_APP_KEY}`;
-		if (env.VUE_APP_WEB_SOCKET_APP_KEY) return `${env.VUE_APP_WEB_SOCKET_APP_KEY}`;
-		if (window.location.origin === 'https://app.industrialmatrix.com') {
-			return 'pdmmatrix';
+const getDefaultSocketEndpoint = () => {
+	const env = getRuntimeEnv()
+
+	if (env.VITE_WEB_SOCKET_ENDPOINT || env.VUE_APP_WEB_SOCKET_ENDPOINT) {
+		return env.VITE_WEB_SOCKET_ENDPOINT || env.VUE_APP_WEB_SOCKET_ENDPOINT
+	}
+
+	const host = typeof window !== 'undefined' ? window.location.hostname : ''
+	return host.includes('stage')
+		? 'wss://ws.industrialmatrix-stage.tools/'
+		: 'wss://ws.industrialmatrix.tools/'
+}
+
+const parseSocketData = (data) => {
+	if (typeof data !== 'string') return data
+
+	try {
+		return JSON.parse(data)
+	} catch {
+		return data
+	}
+}
+
+export const useWebSocket = () => {
+	const authStore = useAuthStore()
+	const sockets = new Map()
+	const channels = new Map()
+	const readyRefs = new Map()
+	const readyKeys = new Map()
+	const readyMap = ref({})
+
+	const socketEndpoint = computed(getDefaultSocketEndpoint)
+
+	const buildUrl = (url, parameters = {}) => {
+		const query = Object.entries(parameters)
+			.filter(([, value]) => value !== undefined && value !== null && value !== '')
+			.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+			.join('&')
+
+		if (!query) return url
+		return `${url}${url.includes('?') ? '&' : '?'}${query}`
+	}
+
+	const setReady = (socketName, value) => {
+		readyMap.value = {
+			...readyMap.value,
+			[socketName]: value,
 		}
-		return 'pdmmatrix';
-	});
 
-	const socketEndpoint = computed(() => {
-		const env = import.meta.env || {};
-		if (env.VITE_WEB_SOCKET_ENDPOINT) return `${env.VITE_WEB_SOCKET_ENDPOINT}`;
-		if (env.VUE_APP_WEB_SOCKET_ENDPOINT) return `${env.VUE_APP_WEB_SOCKET_ENDPOINT}`;
-		return 'wss://0xnszsa5m8.execute-api.ca-central-1.amazonaws.com/socketprod';
-	});
+		const socketReadyRef = readyRefs.get(socketName)
+		if (socketReadyRef && typeof socketReadyRef === 'object' && 'value' in socketReadyRef) {
+			socketReadyRef.value = value
+		}
+	}
 
-	const buildUrl = (url, parameters) => {
-		let qs = '';
-		for (const key in parameters) {
-			const value = parameters[key];
-			qs += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
+	const closeWebSocket = ({ socketName }) => {
+		const socket = sockets.get(socketName)
+		const readyKey = readyKeys.get(socketName) || socketName
+		if (!socket) {
+			setReady(readyKey, false)
+			return
 		}
-		if (qs.length > 0) {
-			qs = qs.substring(0, qs.length - 1);
-			return `${url}?${qs}`;
-		}
-		return url;
-	};
+
+		socket.disconnect()
+		setReady(readyKey, false)
+		sockets.delete(socketName)
+		channels.delete(socketName)
+		readyRefs.delete(readyKey)
+		readyKeys.delete(socketName)
+	}
+
+	const webSocketSend = ({ socketName, resources }) => {
+		const socket = sockets.get(socketName)
+		if (!socket) return false
+
+		return socket.send('message', {
+			type: 'connect',
+			resources,
+		})
+	}
 
 	const setupWebSocket = ({
 		socketName,
 		socketReadyRef,
+		socketNameReadyProp,
 		socketChannel,
 		onOpen,
 		onError,
 		onMessage,
 		resources,
+		url = socketEndpoint.value,
+		socketCallback,
+		localHandleOpen,
+		localHandleError,
+		localHandleConnected,
+		subscriptionSuccededCallback,
 	}) => {
-		const url = buildUrl(socketEndpoint.value, {
-			topicId: socketChannel,
-			appKey: appKey.value,
-			accessToken: authStore.access_token,
-			resources: resources || null,
-		});
+		if (!socketName || !socketChannel || !url) return null
 
-		const socket = new WebSocket(url);
-		sockets[socketName] = socket;
+		if (sockets.has(socketName)) closeWebSocket({ socketName })
 
-		if (onOpen) {
-			socket.onopen = onOpen;
-		} else {
-			socket.onopen = () => {
-				if (socketReadyRef && 'value' in socketReadyRef) {
-					socketReadyRef.value = true;
-				} else {
-					readyMap.value[socketName] = true;
-				}
-			};
+		const readyKey = socketNameReadyProp || socketName
+		readyKeys.set(socketName, readyKey)
+		if (socketReadyRef) readyRefs.set(readyKey, socketReadyRef)
+		setReady(readyKey, false)
+
+		const accessToken = authStore.access_token || ''
+		const socket = WebSocketService({
+			wsUrl: url,
+			channelAuthConfig: {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			},
+		})
+
+		sockets.set(socketName, socket)
+
+		socket.on('connected', (data) => {
+			localHandleConnected?.(data)
+		})
+
+		socket.on('disconnected', () => setReady(readyKey, false))
+		socket.on('error', (error) => {
+			onError?.(error)
+			localHandleError?.(error)
+		})
+
+		const channel = socket.private(socketChannel)
+		channels.set(socketName, channel)
+
+		channel.listenToAll((event, data) => {
+			const parsedData = parseSocketData(data)
+			const message =
+				event === undefined && parsedData?.type !== undefined
+					? parsedData
+					: { type: event, data: parsedData }
+
+			onMessage?.(message)
+			socketCallback?.(message)
+		})
+
+		channel.onSubscriptionSucceeded((data) => {
+			setReady(readyKey, true)
+			onOpen?.(data)
+			localHandleOpen?.(data)
+			subscriptionSuccededCallback?.(data)
+			if (resources !== undefined) webSocketSend({ socketName, resources })
+		})
+
+		return socket
+	}
+
+	onBeforeUnmount(() => {
+		for (const socketName of [...sockets.keys()]) {
+			closeWebSocket({ socketName })
 		}
-
-		if (onError) {
-			socket.onerror = onError;
-		} else {
-			socket.onerror = (err) => {
-				console.error('Socket encountered error:', err?.message || err, 'Closing socket');
-				socket.close();
-			};
-		}
-
-		if (onMessage) {
-			socket.onmessage = (e) => {
-				onMessage(JSON.parse(e.data));
-			};
-		}
-
-		socket.onclose = () => {
-			if (socketReadyRef && 'value' in socketReadyRef) {
-				socketReadyRef.value = false;
-			} else {
-				readyMap.value[socketName] = false;
-			}
-		};
-
-		return socket;
-	};
-
-	const closeWebSocket = ({ socketName }) => {
-		const socket = sockets[socketName];
-		if (socket) {
-			socket.close();
-		}
-	};
-
-	const webSocketSend = ({ socketName, resources }) => {
-		const socket = sockets[socketName];
-		if (!socket) return;
-		socket.send(
-			JSON.stringify({
-				action: 'message',
-				type: 'connect',
-				resources,
-			}),
-		);
-	};
+	})
 
 	return {
-		appKey,
 		socketEndpoint,
 		readyMap,
 		setupWebSocket,
 		buildUrl,
 		closeWebSocket,
 		webSocketSend,
-	};
+	}
 }

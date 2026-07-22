@@ -6,17 +6,17 @@ import { useAuthStore } from '@/stores/AuthStore';
 
 export function useNavigation() {
 	const { set_redirect_to, sign_out } = useAuthStore();
-	const currentPath = useRoute().fullPath;
+	const route = useRoute();
 	const router = useRouter();
 
-	const changeRoute = ({ addToCurrent, parent, steps, path, history, query }) => {
+	const changeRoute = ({ addToCurrent, parent, steps, path, history, query, payload }) => {
 		// console.log('go to: ', path)
+		const currentPath = route.fullPath;
 
 		if (path === '/logout') {
-			// console.log('logout')
 			set_redirect_to(currentPath);
-			router.push({ path: '/login' });
-			sign_out();
+			router.push('/login');
+			sign_out(payload);
 			return;
 		}
 

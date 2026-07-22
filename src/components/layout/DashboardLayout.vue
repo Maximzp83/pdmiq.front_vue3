@@ -102,7 +102,7 @@ import {
 	provide,
 	watch,
 } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 
@@ -138,16 +138,16 @@ const { tt } = Lang;
 // -----Auth------
 import { useAuthStore } from '@/stores/AuthStore';
 const authStore = useAuthStore();
-const { authUser, isAuthenticated, authIsLoading } =
+const { authUser, isAuthenticated, authIsLoading, redirectTo } =
 	storeToRefs(authStore);
 
 // -----Global------
 import { useGlobalStore } from '@/stores/GlobalStore';
+
 const globalStore = useGlobalStore();
 const {
 	viewContentComponentKey,
 	overlayData,
-	redirectTo,
 	isSidebarCollapse,
 	mainPreloader,
 	globalFilters,
@@ -155,9 +155,12 @@ const {
 
 const { set_value: set_global_store, set_compare_list } = globalStore;
 
+import { useNavigation } from '@/composables/mixins/useNavigation';
+const { changeRoute } = useNavigation();
+
 // ========== Composables ==========
 const route = useRoute();
-const router = useRouter();
+// const router = useRouter();
 
 // ========== Data ==========
 const isSidebarShow = ref(false);
@@ -200,7 +203,8 @@ const setGlobalFilters = ({ id, filterName }) => {
 
 const signIn = (token) => {
 	authStore.get_auth_user(token).then(() => {
-		router.push('/dashboard');
+		changeRoute({path: '/dashboard'});
+		// router.push('/dashboard');
 	});
 };
 
@@ -319,12 +323,32 @@ const printHTML = ({ querySelector }) => {
 };
 
 const autoLogout = () => {
-	authStore.set_redirect_to(currentPath.value);
-	authStore.sign_out({
+	changeRoute({path: '/logout', payload: {
 		message: 'You were logged out due to inactivity',
 		type: 'warning',
 		duration: 0,
-	});
+	}})
+};
+
+const setupAutoLogoutTimer = () => {
+	if (
+		// import.meta.env.MODE !== 'development' &&
+		!timer.value &&
+		authUser.value &&
+		authUser.value.id !== 2
+	) {
+		timer.value = new IdleTimer({
+			// timeout: 2000, // 2 s for testing
+			timeout: 1200000, // 20 mins
+			onTimeout: () => {
+				if (timer.value) {
+					timer.value.cleanUp();
+					timer.value = null;
+				}
+				autoLogout();
+			},
+		});
+	}
 };
 
 const methodsMap = {
@@ -363,6 +387,8 @@ watch(currentPath, (path) => {
 	}
 });
 
+watch(authUser, setupAutoLogoutTimer);
+
 // ========== Lifecycle Hooks ==========
 onBeforeMount(() => {
 	setGlobalFilters({ id: null, filterName: 'companyId' });
@@ -376,35 +402,19 @@ onBeforeMount(() => {
 		isAuthChecking.value = false;
 
 		if (redirectTo.value) {
-			router.push(redirectTo.value);
+			// console.log('redirectTo', redirectTo.value);
+			changeRoute({path: redirectTo.value});
 			authStore.set_redirect_to(null);
 		} else if (path === '/') {
 			const redirectPath = getDefaultRedirectPath();
-
-			router.push(redirectPath);
+			changeRoute({path: redirectPath});
 		}
 	});
 });
 
 onMounted(() => {
 	// console.log('DashboardLayout mounted');
-
-	if (
-		import.meta.env.MODE !== 'development' &&
-		authUser.value &&
-		authUser.value.id !== 2
-	) {
-		timer.value = new IdleTimer({
-			timeout: 1200000, // 20 mins
-			onTimeout: () => {
-				if (timer.value) {
-					timer.value.cleanUp();
-					timer.value = null;
-				}
-				autoLogout();
-			},
-		});
-	}
+	setupAutoLogoutTimer();
 });
 
 onBeforeUnmount(() => {
