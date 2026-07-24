@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
 import { pinia } from '@/stores/pinia';
 import { hasAccessTo as hasAccessToUtil } from '@/utils/hasAccessTo';
 import { validateBySettings } from '@/helpers';
@@ -207,7 +208,7 @@ const routes = [
 				path: 'equipments',
 				name: 'EquipmentsLayout',
 				component: () => import('@/views/Equipments/EquipmentsLayout.vue'),
-				meta: { auth: true, permissions: ['view_items'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			// {
 			// 	path: 'machines',
@@ -637,37 +638,37 @@ const routes = [
 				name: 'EquipmentsDetails',
 				component: () => import('@/views/Equipments/Details/DetailsPage.vue'),
 				redirect: (to) => `/equipments/${to.params.id}/details/main`,
-				meta: { auth: true, permissions: ['view_items'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 				children: [
 					{
 						path: 'main',
 						name: 'EquipmentInfoBlock',
 						component: () => import('@/views/Equipments/Details/EquipmentInfoBlock.vue'),
-						meta: { auth: true, permissions: ['view_items'] },
+						meta: { auth: true, permissions: ['view_dashboard'] },
 					},
 					{
 						path: 'pdm/:sensorId',
 						name: 'DetailsStatPage',
 						component: () => import('@/views/Sensors/StatisticsPage.vue'),
-						meta: { auth: true, permissions: ['view_items'] },
+						meta: { auth: true, permissions: ['view_dashboard'] },
 					},
 					{
 						path: 'multi-view/:multiViewId',
 						name: 'DetailsMultiViewPage',
 						component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),
-						meta: { auth: true, permissions: ['view_items'] },
+						meta: { auth: true, permissions: ['view_dashboard'] },
 					},
 					{
 						path: 'quote',
 						name: 'EquipmentsQuoteTab',
 						component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
-						meta: { auth: true, permissions: ['view_items'], request_type: 1 },
+						meta: { auth: true, permissions: ['view_dashboard'], request_type: 1 },
 					},
 					{
 						path: 'service',
 						name: 'EquipmentsServiceTab',
 						component: () => import('@/views/Equipments/Details/QuoteTab.vue'),
-						meta: { auth: true, permissions: ['view_items'], request_type: 2 },
+						meta: { auth: true, permissions: ['view_dashboard'], request_type: 2 },
 					},
 				],
 			},
@@ -1216,8 +1217,54 @@ const hasRightsToRoute = (to, authStore) => {
 
 router.beforeEach((to, from, next) => {
 	const authStore = useAuthStore(pinia);
+	const globalStore = useGlobalStore(pinia);
 	const { Notify } = useNotify();
 	const tt = Lang.tt;
+
+	const nextStep = () => {
+		const { hasAccess, reason, authUser } = hasRightsToRoute(to, authStore);
+		// console.log('hasAccess', to, hasAccess, reason, authUser);
+		if (hasAccess) {
+			if (authUser?.role?.is_forced_mfa && !authUser.is_mfa_enabled && to.path !== '/profile') {
+				Notify({
+					type: 'warning',
+					title: tt('phrases.limited_access'),
+					message: tt('aliases.mfa_auth_restriction'),
+				});
+				return next('/profile?enableMfa=true');
+			}
+
+			const beforeEachHook = globalStore.beforeEachHook;
+			if (beforeEachHook && !beforeEachHook({ from, to })) {
+				return next(false);
+			}
+
+			return next();
+		}
+
+		if (reason === 'limited_access') {
+			Notify({
+				type: 'warning',
+				title: tt('phrases.limited_access'),
+				message: tt('phrases.you_do_not_have_permissions_to_view_this_page'),
+			});
+			return next(from.fullPath);
+		}
+
+		if (reason === 'not_auth') {
+			Notify({
+				type: 'warning',
+				title: tt('phrases.limited_access'),
+				message: tt('phrases.you_are_not_authorized_to_view_this_page'),
+			});
+
+			authStore.set_redirect_to?.(to.fullPath);
+			return next('/login');
+		}
+
+		authStore.set_redirect_to?.(to.fullPath);
+		return next('/login');
+	};
 
 	const params = getParamsFromUrl(to.fullPath);
 	if (params.error) {
@@ -1225,43 +1272,14 @@ router.beforeEach((to, from, next) => {
 		return next('/login');
 	}
 
-	const { hasAccess, reason, authUser } = hasRightsToRoute(to, authStore);
-	// console.log('hasAccess', to, hasAccess, reason, authUser);
-	if (hasAccess) {
-		if (authUser?.role?.is_forced_mfa && !authUser.is_mfa_enabled && to.path !== '/profile') {
-			Notify({
-				type: 'warning',
-				title: tt('phrases.limited_access'),
-				message: tt('aliases.mfa_auth_restriction'),
-			});
-			return next('/profile?enableMfa=true');
-		}
-		return next();
+	if (params.token) {
+		return authStore
+			.get_auth_user(params.token)
+			.then(nextStep)
+			.catch(() => next('/login'));
 	}
 
-	if (reason === 'limited_access') {
-		Notify({
-			type: 'warning',
-			title: tt('phrases.limited_access'),
-			message: tt('phrases.you_do_not_have_permissions_to_view_this_page'),
-		});
-		authStore.set_redirect_to?.(to.fullPath);
-		return next(from.fullPath);
-	}
-
-	if (reason === 'not_auth') {
-		Notify({
-			type: 'warning',
-			title: tt('phrases.limited_access'),
-			message: tt('phrases.you_are_not_authorized_to_view_this_page'),
-		});
-
-		authStore.set_redirect_to?.(to.fullPath);
-		return next('/login');
-	}
-
-	authStore.set_redirect_to?.(to.fullPath);
-	return next('/login');
+	return nextStep();
 });
 
 export default router;
