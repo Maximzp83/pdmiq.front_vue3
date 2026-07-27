@@ -95,6 +95,7 @@ Primary rules source:
   - `src/components/layout/DashboardLayout.vue` now reacts to `authUser` becoming available after first login and starts the idle timer without requiring a page reload; duplicate timer creation is guarded and existing timeout comments/settings are unchanged.
   - `src/composables/mixins/useNavigation.js` now obtains the route during setup and reads the latest `fullPath` for every navigation request, so delayed auto-logout no longer invokes `useRoute()` outside setup or stores a stale redirect path.
   - `src/router/index.js` now restores the Vue2 query-token authentication and global navigation-hook flow, including unsaved-threshold route blocking, and no longer stores permission-denied destinations in `redirectTo`; the corrected Vue3 MFA early return is preserved.
+  - `src/components/pages/NewPasswordForm.vue` now safely extracts Axios status for expired reset-token handling and uses `tt` instead of the nonexistent `Lang.t`, so a 422 response shows the intended warning and redirect rather than an uncaught TypeError.
   - `npm run build` and targeted `git diff --check` pass after this sync.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
