@@ -104,23 +104,23 @@ const handleSubmit = () => {
 				.then(() => {
 					router.push('/login');
 				})
-				.catch((error) => {
+				.catch(() => {
 					// Error handling is done in the store
 				});
 		} else {
-			ElNotification({
-				type: 'warning',
-				title: Lang.t('Warning'),
-				message: Lang.t('aliases.passwords_compar_error'),
-				duration: 0
-			});
+				ElNotification({
+					type: 'warning',
+					title: tt('Warning'),
+					message: tt('aliases.passwords_compar_error'),
+					duration: 0
+				});
 			return false;
 		}
 	} else {
 		ElNotification({
 			type: 'warning',
-			title: Lang.t('Warning'),
-			message: Lang.t('aliases.password_validation'),
+			title: tt('Warning'),
+			message: tt('aliases.password_validation'),
 			duration: 0
 		});
 		return false;
@@ -137,11 +137,12 @@ const checkToken = ({ token, email: emailParam }) => {
 			email.value = emailParam;
 		})
 		.catch((error) => {
-			if (error.response?.status === 422) {
+			const status = error?.status ?? error?.response?.status;
+			if (status === 422) {
 				ElNotification({
 					type: 'warning',
-					title: Lang.t('Warning'),
-					message: Lang.t('aliases.creation_link_exp'),
+					title: tt('Warning'),
+					message: tt('aliases.creation_link_exp'),
 					dangerouslyUseHTMLString: true,
 					duration: 0
 				});
