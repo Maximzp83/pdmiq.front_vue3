@@ -21,7 +21,7 @@
 									<el-button
 										v-if="canEdit"
 										type=""
-										class="ml-auto action-button tertiary"
+										class="ml-auto action-button tertiary vertical-fluid"
 										@click="editItem"
 									>
 										<i class="icomoon icon-pencil"></i>
@@ -227,7 +227,9 @@ const setupNavbar = () => {
 		showStandardNavItem: true,
 		showCompareButton: true,
 		pageTitle: itemData.value?.name || tt('phrases.machine_without_name'),
-		showPlantName: itemData.value?.plant ? { name: itemData.value.plant.name } : undefined,
+		showPlantName: itemData.value?.plant
+			? { id: itemData.value.plant.id, name: itemData.value.plant.name }
+			: undefined,
 	});
 };
 const fetchItem = () => {

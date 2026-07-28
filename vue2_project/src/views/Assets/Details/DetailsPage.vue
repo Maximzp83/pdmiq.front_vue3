@@ -31,7 +31,7 @@
 										v-if="$hasAccessTo(['edit_dashboard'])"
 										@click="editItem"
 										type="tertiary"
-										class="ml-auto action-button"
+										class="ml-auto action-button vertical-fluid"
 										icon="icomoon icon-pencil"
 									/>
 								</div>
@@ -184,7 +184,10 @@ export default {
 					showStandardNavItem: true,
 					pageTitle: itemData.name || this.$t('phrases.asset_without_name'),
 					showCompareButton: true,
-					showPlantName: { name: itemData.plant ? itemData.plant.name : '' }
+					showPlantName: { 
+						id: itemData.plant ? itemData.plant.id : '',
+						name: itemData.plant ? itemData.plant.name : ''
+					}
 				});
 			}
 

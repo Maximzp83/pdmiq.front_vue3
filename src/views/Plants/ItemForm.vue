@@ -170,10 +170,6 @@
 				<el-switch v-model="formData.is_archived" :active-value="1" :inactive-value="0" />
 			</el-form-item>
 
-			<el-form-item v-if="canArchivePlant && itemId" :label="tt('constants.Blocked')" prop="is_blocked">
-				<el-switch v-model="formData.is_blocked" :active-value="1" :inactive-value="0" />
-			</el-form-item>
-
 			<el-form-item :label="tt('Locations')" prop="locations">
 				<div class="options-container">
 					<div v-if="locationsItemsList.length" class="content-row">
@@ -278,7 +274,6 @@ const formData = ref({
 	amplitude_alarm_threshold_multiplier: 2.5,
 	is_equipment_runtime_tracking: 0,
 	is_archived: 0,
-	is_blocked: 0,
 	is_commissioning: 0,
 	joined_at: '',
 	zoho_id: '',

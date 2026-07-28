@@ -340,7 +340,7 @@ export default {
 					payload: {
 						params: {
 							max: -1,
-							plantId: this.globalFilters.plantId || this.showPlant.id
+							plantId: this.showPlant?.id ||  this.globalFilters.plantId
 						}
 					},
 					localProp: 'productionLinesList',
@@ -368,7 +368,7 @@ export default {
 					payload: {
 						params: {
 							max: -1,
-							plantId: this.globalFilters.plantId || this.showPlant.id
+							plantId: this.showPlant?.id ||  this.globalFilters.plantId
 						}
 					},
 					localProp: 'applicationsList',
@@ -379,7 +379,7 @@ export default {
 					payload: {
 						params: {
 							max: -1,
-							plantId: this.globalFilters.plantId || this.showPlant.id
+							plantId: this.showPlant?.id ||  this.globalFilters.plantId
 						}
 					},
 					localProp: 'machinesList',
@@ -474,7 +474,7 @@ export default {
 
 		localPrepareSubmitData(data) {
 			if (!data.plant_id) {
-				data.plant_id = this.globalFilters.plantId || this.showPlant.id;
+				data.plant_id =  this.showPlant?.id || this.globalFilters.plantId;
 			}
 
 			if (data.installed_at) {

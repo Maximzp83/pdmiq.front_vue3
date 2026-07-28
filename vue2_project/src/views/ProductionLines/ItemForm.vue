@@ -408,8 +408,7 @@ export default {
 					payload: {
 						params: {
 							max: -1,
-							plantId:
-								this.globalFilters.plantId || (this.showPlant && this.showPlant.id)
+							plantId: (this.showPlant && this.showPlant.id) || this.globalFilters.plantId
 						}
 					},
 					localProp: 'productionLinesList',

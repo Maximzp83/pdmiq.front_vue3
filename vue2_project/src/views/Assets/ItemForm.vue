@@ -187,7 +187,7 @@ export default {
 				payload: {
 					params: {
 						max: -1,
-						plantId: that.globalFilters.plantId || that.showPlant.id
+						plantId: that.showPlant?.id || that.globalFilters.plantId
 					}
 				},
 				bindTo: [
@@ -206,7 +206,7 @@ export default {
 				payload: {
 					params: {
 						max: -1,
-						plantId: that.globalFilters.plantId || that.showPlant.id
+						plantId: that.showPlant?.id || that.globalFilters.plantId
 					}
 				},
 				localProp: 'equipmentTypesList',
@@ -217,7 +217,7 @@ export default {
 				payload: {
 					params: {
 						max: -1,
-						plantId: that.globalFilters.plantId || that.showPlant.id
+						plantId: that.showPlant?.id || that.globalFilters.plantId
 					}
 				},
 				localProp: 'assetsList',

@@ -147,7 +147,11 @@ export default {
 				return `user.${authUser.uuid}`;
 			}
 			return null;
-		}
+		},
+
+		skipWebSocketList: () => Object.freeze([
+			'CMD0200'
+		]),
 
 		/*commandsList() {
 			const { tt } = this;
@@ -202,19 +206,23 @@ export default {
 					return;
 				}*/
 
-				try {
-					this.processingDXMCommandRequest = true;
-					this.setupWebSocket({
-						socketName: 'dxm_command_socket',
-						socketNameReadyProp: 'dxm_command_socket_ready',
-						socketChannel: this.socketChannelDXMCommandRequest,
-						subscriptionSuccededCallback: () => this.handleSubscriptionSucceded(payload),
-						socketCallback: (type, data) => this.dxmCommand_socketCallback({ type, data })
-					});
+				if ( this.skipWebSocketList.some(command => command == message_body) ) {
+					this.handleSubscriptionSucceded(payload);
+				} else {
+					try {
+						this.processingDXMCommandRequest = true;
+						this.setupWebSocket({
+							socketName: 'dxm_command_socket',
+							socketNameReadyProp: 'dxm_command_socket_ready',
+							socketChannel: this.socketChannelDXMCommandRequest,
+							subscriptionSuccededCallback: () => this.handleSubscriptionSucceded(payload),
+							socketCallback: (type, data) => this.dxmCommand_socketCallback({ type, data })
+						});
 
-					// this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
-				} catch (e) {
-					console.log(e);
+						// this.toggleMainPreloader(true, `${this.tt('phrases.working_config')}...`);
+					} catch (e) {
+						console.log(e);
+					}					
 				}
 
 				
