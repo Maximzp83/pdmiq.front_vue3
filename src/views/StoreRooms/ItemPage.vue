@@ -45,5 +45,6 @@ const {
 } = useItemPage({
 	entityKey: 'StoreRooms',
 	itemFormRef,
+	goToListAfterSave: true,
 });
 </script>

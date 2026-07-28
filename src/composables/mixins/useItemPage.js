@@ -132,6 +132,7 @@ export function useItemPage({
 	};
 
 	const handleSubmitForm = (preparedData, ) => {
+		// console.log('handleSubmitForm', preparedData);
 		if (!resolvedApiRoute) {
 			console.warn('[useItemPage] apiRoute is not defined');
 			itemSaving.value = false;
@@ -224,7 +225,7 @@ export function useItemPage({
 	const initialPageSetup = ({ path }) => {
 		_loadContent.value = false;
 		setup_navbar(navbarSettings.value);
-		console.log('initialPageSetup', navbarSettings.value);
+		// console.log('initialPageSetup', navbarSettings.value);
 		let id = getRouteItemId();
 
 		if (path === '/profile') {

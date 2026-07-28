@@ -235,7 +235,7 @@ const props = defineProps(buildProps({
 	hideCompanies: Boolean,
 }));
 
-// const emit = defineEmits(['submit', 'onCancel']);
+const emit = defineEmits(['submit', 'onCancel', 'event']);
 const companiesEntity = ENTITIES.Companies;
 const usersEntity = ENTITIES.Users;
 const industrialServicesEntity = ENTITIES.IndustrialServices;
@@ -458,7 +458,7 @@ const {
 	resetFormDataBySubItems,
 	localPrepareSubmitData,
 	prepareSubmitDataSettings: prepareSubmitDataSettings.value,
-	// emit,
+	emit,
 });
 
 defineExpose({

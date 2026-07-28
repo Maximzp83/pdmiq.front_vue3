@@ -187,7 +187,7 @@
 					<div class="filter-item checkbox-item ml-auto">
 						<el-checkbox
 							:model-value="filters.favorites"
-							:false-label="null"
+							:false-value="null"
 							@change="(favorites) => setFilters({ favorites: favorites ? true : null })"
 						>
 							{{ tt('Favorites') }}
@@ -197,8 +197,8 @@
 					<div class="filter-item checkbox-item ml-auto">
 						<el-checkbox
 							:model-value="filters.hasSensors"
-							:false-label="null"
-							@change="(hasSensors) => setFilters({ hasSensors })"
+							:false-value="null"
+							@change="(hasSensors) => setFilters({ hasSensors: hasSensors ? true : null })"
 						>
 							{{ tt('PDM') }}
 						</el-checkbox>
@@ -207,8 +207,8 @@
 					<div v-show="filters.hasSensors" class="filter-item checkbox-item">
 						<el-checkbox
 							:model-value="filters.archivedNodes"
-							:false-label="null"
-							@change="(archivedNodes) => setFilters({ archivedNodes })"
+							:false-value="null"
+							@change="(archivedNodes) => setFilters({ archivedNodes: archivedNodes ? true : null })"
 						>
 							{{ tt('phrases.Display_Archived_Sensors') }}
 						</el-checkbox>
@@ -588,6 +588,7 @@ initiateRequestsToDoList.value = false;
 
 const setFilters = (value, bindedFilters = [], settings = {}) => {
 	const nextValues = { ...value };
+
 	Object.keys(nextValues).forEach((key) => {
 		const item = nextValues[key];
 		if (Array.isArray(item) || typeof item === 'boolean') return;
@@ -595,11 +596,13 @@ const setFilters = (value, bindedFilters = [], settings = {}) => {
 		const numericValue = item ? +item : item;
 		nextValues[key] = numericValue && !Number.isNaN(numericValue) ? numericValue : item;
 	});
+
 	bindedFilters.forEach((prop) => {
 		if (!Object.prototype.hasOwnProperty.call(nextValues, prop) && finalFilters.value[prop]) {
 			nextValues[prop] = null;
 		}
 	});
+
 	const newFilters = {
 		...finalFilters.value,
 		...nextValues,

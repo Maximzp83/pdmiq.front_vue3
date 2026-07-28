@@ -17,7 +17,7 @@
 									:model-value="filters.archived"
 									:true-value="1"
 									:false-value="null"
-									@change="(value) => setFilters({ archived: value })"
+									@change="(value) => setFilters({ archived: value ? 1 : null })"
 								>
 									{{ tt('phrases.show_archived') }}
 								</el-checkbox>

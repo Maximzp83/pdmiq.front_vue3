@@ -27,9 +27,6 @@ import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapp
 import ItemForm from './ItemForm.vue';
 
 import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
-
-const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
 
@@ -44,7 +41,6 @@ const {
 } = useItemPage({
 	entityKey: 'Applications',
 	itemFormRef,
-	changeRoute,
 	goToListAfterSave: true,
 });
 </script>

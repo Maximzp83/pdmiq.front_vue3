@@ -208,6 +208,7 @@ export function useItemForm({
 			} else if (options.skipSubmit) {
 				return true;
 			} else {
+				// console.log('submitForm', options);
 				submitForm(options);
 			}
 		} else {
@@ -220,22 +221,31 @@ export function useItemForm({
 		}
 	};
 
-	const validateForm = (options = {}) => {
+	const validateForm = async (options = {}) => {
 		clearValidate();
 		const activeForm = options.activeFormRef || formRef;
 		const form = resolve(activeForm);
-		if (!form?.validate) return;
 
-		form.validate((mainFormIsValid) => {
+		if (!form?.validate) return false;
+
+		let formIsValid = false;
+		
+		await form.validate(async (mainFormIsValid) => {
 			const validationResults = [mainFormIsValid];
 
 			const currentSubItemsSettings = resolveSubItemsSettings();
 			if (currentSubItemsSettings && validateSubItemsForm) {
-				validationResults.push(validateSubItemsForm(currentSubItemsSettings));
+				try {
+					validationResults.push(await validateSubItemsForm(currentSubItemsSettings));
+				} catch {
+					validationResults.push(false);
+				}
 			}
-
-			handleValidationResult(validationResults, options);
+			// console.log('validationResults', validationResults);
+			const handlingResult = handleValidationResult(validationResults, options);
+			formIsValid = validationResults.every((item) => item) && handlingResult !== false;
 		});
+		return formIsValid;
 	};
 
 	const submitForm = (options = {}) => {

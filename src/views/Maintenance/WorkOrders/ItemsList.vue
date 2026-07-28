@@ -101,8 +101,8 @@
 								<div class="mcol-xs-auto checkbox-item" v-if="authStore.isCustomer">
 									<el-checkbox
 										:model-value="filters.my"
-										:false-label="null"
-										@change="(val) => setFilters({ my: val })"
+										:false-value="null"
+										@change="(val) => setFilters({ my: val ? true : null })"
 									>
 										<b class="capitalize">{{ tt('phrases.assigned_to_me') }}</b>
 									</el-checkbox>
@@ -111,8 +111,8 @@
 								<div class="mcol-xs-auto checkbox-item">
 									<el-checkbox
 										:model-value="filters.onlyFromRequest"
-										:false-label="null"
-										@change="(val) => setFilters({ onlyFromRequest: val })"
+										:false-value="null"
+										@change="(val) => setFilters({ onlyFromRequest: val ? true : null })"
 									>
 										<b class="capitalize">{{ tt('phrases.From_Request') }}</b>
 									</el-checkbox>
