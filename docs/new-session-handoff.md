@@ -96,8 +96,7 @@ Primary rules source:
   - `src/composables/mixins/useNavigation.js` now obtains the route during setup and reads the latest `fullPath` for every navigation request, so delayed auto-logout no longer invokes `useRoute()` outside setup or stores a stale redirect path.
   - `src/router/index.js` now restores the Vue2 query-token authentication and global navigation-hook flow, including unsaved-threshold route blocking, and no longer stores permission-denied destinations in `redirectTo`; the corrected Vue3 MFA early return is preserved.
   - `src/components/pages/NewPasswordForm.vue` now safely extracts Axios status for expired reset-token handling and uses `tt` instead of the nonexistent `Lang.t`, so a 422 response shows the intended warning and redirect rather than an uncaught TypeError.
-  - Vue2 changes from local commit `681a6b8` are synced into the six migrated Assets/Machines/ProductionLines details/form files on the current branch: details buttons include `vertical-fluid`, navbar plant objects include `id`, and form requests prioritize the navbar plant. Utilities details was skipped because its Vue3 counterpart does not exist.
-  - Latest uncommitted Vue2 changes are synced into Controllers and Plants: `CMD0200` bypasses WebSocket setup in `DXMCommandsTab.vue`, and `Plants/ItemForm.vue` no longer exposes/submits `is_blocked`. English/Spanish localization changes were non-functional whitespace/key-order changes and required no Vue3 edit.
+  - The migrated legacy delta from commit `550d339` was restored after a later `src/` overwrite: Assets/Machines/ProductionLines navbar/form changes and the Controllers `CMD0200` WebSocket bypass are present again. Plants already retained the `is_blocked` removal, localization values already matched, and Utilities details remains skipped because no Vue3 counterpart exists.
   - `npm run build` and targeted `git diff --check` pass after this sync.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
@@ -136,7 +135,7 @@ Primary rules source:
   - Vue3 localization already had the relevant new Requisitions/constants keys.
 - Latest Machine/Plant/ProductionLine/Requisitions Vue2-side changes were synced into already migrated Vue3 files:
   - `src/views/Machines/ItemForm.vue` and `src/views/ProductionLines/ItemForm.vue` support `is_silence_mode` / `silence_mode_until`, restrict silence dates to today/future, and normalize `silence_mode_until` on submit.
-  - `src/views/Plants/ItemForm.vue` exposes `is_blocked` for existing plants when the user has `archive_plants` access.
+  - `src/views/Plants/ItemForm.vue` no longer exposes `is_blocked`; the later Vue2 change in `550d339` removed that field.
   - `src/views/Requisitions/ItemsList.vue`, `src/views/Requisitions/Details/WorkOrderReportForPrint.vue`, and `src/views/Requisitions/ROICalculator/ItemsList.vue` use `execution_total_time` for Hours.
   - Vue3 localization already had `phrases.silence_mode` and `phrases.silence_mode_until`.
 - `Plants Dashboard/Details` is re-migrated for the current Vue3 compile scope:

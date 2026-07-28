@@ -272,7 +272,7 @@ const requestsToDoList = computed(() =>
 			payload: {
 				params: {
 					max: -1,
-					plantId: () => globalFilters.value?.plantId || showPlant.value?.id,
+					plantId: () => showPlant.value?.id || globalFilters.value?.plantId,
 				},
 			},
 			localProp: productionLinesList,

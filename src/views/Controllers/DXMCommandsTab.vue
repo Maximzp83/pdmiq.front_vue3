@@ -109,6 +109,7 @@ const commandsList = reactive([
 		dxm_response: '',
 	},
 ]);
+const skipWebSocketList = Object.freeze(['CMD0200']);
 
 const socketChannelDXMCommandRequest = computed(() =>
 	authStore.authUser ? `user.${authStore.authUser.uuid}` : null
@@ -201,6 +202,11 @@ const handleSendDXMCommand = (messageBody) => {
 		controllerId: props.controllerData.id,
 		data: { message_body: messageBody },
 	};
+
+	if (skipWebSocketList.includes(messageBody)) {
+		handleSubscriptionSucceded(payload);
+		return;
+	}
 
 	try {
 		processingDXMCommandRequest.value = true;

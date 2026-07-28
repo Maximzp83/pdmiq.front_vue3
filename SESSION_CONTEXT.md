@@ -31,8 +31,7 @@
 - `src/composables/mixins/useNavigation.js` now captures the injected route object during composable setup and reads its current `fullPath` inside each navigation call. Logout no longer calls `useRoute()` outside setup or receives an undefined/stale route.
 - `src/router/index.js` guard was re-aligned with `vue2_project/src/router/beforeEach.js`: query-token authentication now resolves before access checks, the active `GlobalStore.beforeEachHook` can block navigation for unsaved thresholds, and limited-access routes are no longer persisted as post-login redirects. The Vue3 MFA early-return behavior remains intact.
 - `src/components/pages/NewPasswordForm.vue` now reads the Axios status from `error.status` with `error.response.status` fallback and handles 422 expired-link responses without throwing `Lang.t is not a function`; all notification translations in the file use the existing `tt` API.
-- Vue2 changes from local commit `681a6b8` were synced into the migrated Assets, Machines, and ProductionLines details/forms on the current branch: details navbar plant data now includes `id`, edit buttons include `vertical-fluid`, and form plant resolution prioritizes the navbar plant over global filters. The changed Utilities details file was skipped because no migrated Vue3 counterpart exists. Targeted ESLint, `git diff --check`, and `npm run build` pass.
-- Latest uncommitted Vue2 changes were synced into `src/views/Controllers/DXMCommandsTab.vue` and `src/views/Plants/ItemForm.vue`: DXM reboot command `CMD0200` now submits without opening a WebSocket, and the Plant form no longer exposes or submits `is_blocked`. The English/Spanish localization diffs only reorder existing equal-valued keys and change whitespace, so no Vue3 localization edit was needed. Targeted ESLint, targeted `git diff --check`, and `npm run build` pass.
+- The migrated legacy delta from commit `550d339` was restored after the later `src/` overwrite: Assets/Machines/ProductionLines details again pass plant `id` and use `vertical-fluid`; their forms prioritize the navbar plant; `DXMCommandsTab.vue` sends `CMD0200` without WebSocket setup. `Plants/ItemForm.vue` already retained the removal of `is_blocked`, localization values already matched, and Utilities details remains skipped because no Vue3 counterpart exists. Targeted ESLint, targeted `git diff --check`, and `npm run build` pass.
 - Targeted ESLint, `git diff --check`, and `npm run build` pass after the WebSocket re-migration.
 - Latest verification during the session: targeted `git diff --check` passed; `npm run build` passed with existing Vite mixed-import/chunk-size warnings.
 - Follow-up charts_factory parity fix applied:
@@ -55,23 +54,11 @@
   - `src/views/ProductionLines/Details/DetailsPage.vue`
   - `src/views/ProductionLines/ItemForm.vue`
   - `src/views/Controllers/DXMCommandsTab.vue`
-  - `src/views/Plants/ItemForm.vue`
-  - `vue2_project/src/localization/loc_eng.js`
-  - `vue2_project/src/localization/loc_spanish.js`
-  - `vue2_project/src/views/Assets/Details/DetailsPage.vue`
-  - `vue2_project/src/views/Assets/ItemForm.vue`
-  - `vue2_project/src/views/Controllers/DXMCommandsTab.vue`
-  - `vue2_project/src/views/Machines/Details/DetailsPage.vue`
-  - `vue2_project/src/views/Machines/ItemForm.vue`
-  - `vue2_project/src/views/Plants/ItemForm.vue`
-  - `vue2_project/src/views/ProductionLines/Details/DetailsPage.vue`
-  - `vue2_project/src/views/ProductionLines/ItemForm.vue`
-  - `vue2_project/src/views/Utilities/Details/DetailsPage.vue`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-- Do not revert the Vue2 source changes or their migrated Vue3 counterparts.
+- Do not revert these restored `550d339` migration changes.
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.

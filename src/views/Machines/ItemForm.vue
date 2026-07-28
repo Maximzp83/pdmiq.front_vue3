@@ -258,7 +258,7 @@ const methodsMap = {
 	fetch_locations: createGetRequest(ENTITIES.Locations.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 };
-const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || formData.value.plant_id;
+const currentPlantId = () => showPlant.value?.id || globalFilters.value?.plantId || formData.value.plant_id;
 const requestsToDoList = computed(() =>
 	Object.freeze([
 		{
