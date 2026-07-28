@@ -120,7 +120,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref } from 'vue';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import highcharts3d from 'highcharts/highcharts-3d';
 
 import { initHighchartsModule } from '@/helpers/charts';

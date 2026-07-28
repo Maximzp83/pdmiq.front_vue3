@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/stores/AuthStore';
-import api from '@/api/index.js';
 import {getBaseURL} from '@/api/index.js';
 
 /**

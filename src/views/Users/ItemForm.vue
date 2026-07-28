@@ -341,7 +341,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { createGetRequest } from '@/api/request_factories';
@@ -371,14 +371,25 @@ import { useAuthStore } from '@/stores/AuthStore';
 
 import CustomTransition from '@/components/common/CustomTransition.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
-import PhoneInput from '@/components/form/PhoneInput.vue';
-import PasswordCheckList from '@/components/pages/PasswordCheckList.vue';
-import ReportsList from '@/views/UserReports/ItemsList.vue';
-import ClientApiCredentialsList from './ClientApiCredentialsList.vue';
-import MFABlock from './MFABlock.vue';
-import NotificationsBlock from './NotificationsBlock.vue';
-import PhoneVerificationBlock from './PhoneVerificationBlock.vue';
-import ProdlinesSelectItem from './ProdlinesSelectItem.vue';
+
+const PhoneInput = defineAsyncComponent(() => import('@/components/form/PhoneInput.vue'));
+// import PhoneInput from '@/components/form/PhoneInput.vue';
+const PasswordCheckList = defineAsyncComponent(() => import('@/components/pages/PasswordCheckList.vue'));
+const ReportsList = defineAsyncComponent(() => import('@/views/UserReports/ItemsList.vue'));
+const ClientApiCredentialsList = defineAsyncComponent(() => import('./ClientApiCredentialsList.vue'));
+const MFABlock = defineAsyncComponent(() => import('./MFABlock.vue'));
+const NotificationsBlock = defineAsyncComponent(() => import('./NotificationsBlock.vue'));
+const PhoneVerificationBlock = defineAsyncComponent(() => import('./PhoneVerificationBlock.vue'));
+const ProdlinesSelectItem = defineAsyncComponent(() => import('./ProdlinesSelectItem.vue'));
+
+
+// import PasswordCheckList from '@/components/pages/PasswordCheckList.vue';
+// import ReportsList from '@/views/UserReports/ItemsList.vue';
+// import ClientApiCredentialsList from './ClientApiCredentialsList.vue';
+// import MFABlock from './MFABlock.vue';
+// import NotificationsBlock from './NotificationsBlock.vue';
+// import PhoneVerificationBlock from './PhoneVerificationBlock.vue';
+// import ProdlinesSelectItem from './ProdlinesSelectItem.vue';
 
 const { tt } = Lang;
 const { Notify } = useNotify();

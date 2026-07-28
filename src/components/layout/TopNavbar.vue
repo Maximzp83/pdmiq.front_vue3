@@ -149,11 +149,11 @@
 					</Transition> -->
 
 					<template v-if="navbarSettings.customButtons && navbarSettings.customButtons.length">
-						<Transition	name="standard-fade" mode="out-in"
+						<div
 							v-for="button in navbarSettings.customButtons"
 							:key="'custom-button-'+button.id"
+							:class="button.wrapper_class || 'menu-block buttonWrapper'"
 						>
-							<div :class="button.wrapper_class || 'menu-block buttonWrapper'">
 								<el-button
 									@click="button.handler"
 									:class="['el-button--secondary', button.class]"
@@ -161,8 +161,7 @@
 								>
 									<i v-if="button.icon" :class="button.icon"></i>
 								</el-button>
-							</div>
-						</Transition>
+						</div>
 					</template>
 
 					<!-- <Transition	name="standard-fade" mode="out-in">

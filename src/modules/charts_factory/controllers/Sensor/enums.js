@@ -1,5 +1,8 @@
 import { Lang } from '@/localization';
 import { cloneDeep, mergeObjects } from '@/helpers';
+import { METRIC_SYSTEM_TYPES } from '@/constants/metric-system';
+
+export { METRIC_SYSTEM_TYPES } from '@/constants/metric-system';
 
 export const lubeColor = '#75c2db';
 
@@ -185,11 +188,6 @@ export const BANNER_M25_PARAMETERS_TYPES = {
 	RMS_VELOCITY: 112,
 	PEAK_VELOCITY_FREQ_COMPONENT: 113,
 	TEMPERATURE: 5,
-};
-
-export const METRIC_SYSTEM_TYPES = {
-	METRIC: 1,
-	IMPERIAL: 2
 };
 
 const metricSystemsList1 = [

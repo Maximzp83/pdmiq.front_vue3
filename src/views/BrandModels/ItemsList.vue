@@ -180,7 +180,6 @@ const hasAccessToCreate = computed(() => authStore.hasAccessTo([brandModelsEntit
 const hasAccessToEdit = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.edit]));
 const hasAccessToDelete = computed(() => authStore.hasAccessTo([brandModelsEntity.permissions.delete]));
 const storeRoomLocationsList = computed(() => props.storeroomItem?.locations || []);
-const showGridSwitcher = computed(() => !!props.storeroomItem);
 const activeGrid = computed(() =>
 	props.fromEquipmentsLayout
 		? storeroomBrandModelsFilters.value?.items_active_grid_type

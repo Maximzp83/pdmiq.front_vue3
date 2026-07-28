@@ -131,7 +131,7 @@ const formData = ref({ ...initialFormData });
 const itemData = computed(() => props.itemData);
 const showPlant = computed(() => globalStore.navbarSettings?.showPlantName || null);
 const instancesItemsData = computed(() => props.instancesItemsData || null);
-const currentPlantId = () => showPlant.value?.id || globalFilters.value?.plantId || props.itemData?.plant_id;
+const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || props.itemData?.plant_id;
 const selectedMachine = computed(() =>
 	formData.value.machine_id && machinesList.value.length
 		? findItemBy('id', formData.value.machine_id, machinesList.value)

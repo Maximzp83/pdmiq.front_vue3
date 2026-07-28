@@ -2,13 +2,12 @@ import { checkUploadSettings } from '@/helpers/specialHelpers';
 import { api_request } from '@/api/request_provider';
 
 export function executeFormSubmit({
-	formData, itemsName, uploadSettings,
+	formData, uploadSettings,
 	preparePayload, debug, emit,
 	localPreSubmitHook,
 	itemId,
 	successSubmitCallback,
 	propsSuccessSubmitCallback,
-	changeRoute,
 	apiRoute,
 	itemSaving,
 	itemName,
@@ -37,7 +36,7 @@ export function executeFormSubmit({
 	let method = itemId === 'new' ? 'post' : 'put';
 	const url = itemId === 'new' ? apiRoute : `${apiRoute}/${itemId}`;
 
-	if (debug && process.env.NODE_ENV === 'development') {
+	if (debug && import.meta.env.DEV) {
 		if (payload) {
 			console.log('options', options);
 			console.log('payload', method, url, payload);

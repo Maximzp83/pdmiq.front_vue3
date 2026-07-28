@@ -29,7 +29,8 @@ const itemsName = computed(() => ({
 	one: `${tt('Move')} ${tt('History')}`,
 	mult: `${tt('Move')} ${tt('History')}`,
 }));
-const setupActionsCell = ({ asset_name, storeroom }, args = null, idx) => {
+const setupActionsCell = ({ asset_name, storeroom }, ...args) => {
+	const idx = args[1];
 	if (idx === 0) return tt('Created');
 	if (asset_name) return `${tt('Asset')}: ${asset_name}`;
 	if (storeroom) return `${tt('Storeroom')}: ${storeroom.name}`;

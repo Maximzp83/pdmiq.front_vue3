@@ -173,7 +173,7 @@ export const useAuthStore = defineStore('authStore', {
 				headers,
 				loading: true,
 				notNotify: true,
-			}).then(({value}) => {
+			}).then(async ({value}) => {
 				if (value.user) {
 					// Use temp_role if available, otherwise use regular role
 					const user = {
@@ -186,7 +186,7 @@ export const useAuthStore = defineStore('authStore', {
 					}
 
 					// Set user language
-					Lang.set(user.language);
+					await Lang.set(user.language);
 					// Update auth store
 					this.set_auth_user(user);
 				}
@@ -218,14 +218,11 @@ export const useAuthStore = defineStore('authStore', {
 			};
 
 			// Call server-side logout in production
-			if (process.env.NODE_ENV !== 'development') {
+			if (import.meta.env.PROD) {
 				return this.logout().then(() => {
 					Notify(notifySettings);
 				})
 			}
-
-			// Clear all module filters
-			// this.clearFilters();
 
 			// Show notification after a short delay
 
@@ -359,52 +356,6 @@ export const useAuthStore = defineStore('authStore', {
 				return response;
 			});
 		},*/
-
-		/**
-		 * Clear all module filters on logout
-		 * This calls set filter actions across all stores
-		 */
-		clearFilters() {
-			// Import stores as needed
-			try {
-				// Users
-				const { useUsersStore } = require('@/stores/UsersStore');
-				useUsersStore()?.set_users_filters?.(null);
-
-				// Maintenance
-				const { useMaintenanceStore } = require('@/stores/MaintenanceStore');
-				useMaintenanceStore()?.set_maintenance_logs_filters?.(null);
-
-				// Companies
-				const { useCompaniesStore } = require('@/stores/CompaniesStore');
-				useCompaniesStore()?.set_companies_filters?.(null);
-
-				// Controllers
-				const { useControllersStore } = require('@/stores/ControllersStore');
-				useControllersStore()?.set_controllers_filters?.(null);
-
-				// Equipments
-				const { useEquipmentsStore } = require('@/stores/EquipmentsStore');
-				useEquipmentsStore()?.set_equipments_filters?.(null);
-
-				// Sensors
-				const { useSensorsStore } = require('@/stores/SensorsStore');
-				const sensorsStore = useSensorsStore();
-				sensorsStore?.set_report_filters?.(null);
-				sensorsStore?.set_sensors_filters?.(null);
-				sensorsStore?.set_statistics_filters?.(null);
-
-				// Plants
-				const { usePlantsStore } = require('@/stores/PlantsStore');
-				usePlantsStore()?.set_plants_filters?.(null);
-
-				// Global
-				const { useGlobalStore } = require('@/stores/GlobalStore');
-				useGlobalStore()?.set_global_filters?.(null);
-			} catch (error) {
-				console.warn('Error clearing filters:', error);
-			}
-		},
 
 		set_value(key, value, settings = {}) {
 		  this[key] = value;

@@ -274,7 +274,6 @@ const {
 	editItem,
 	handleDeleteItems,
 	handleShowNextInstanceItem,
-	refetchItemsList,
 } = useItemsData({
 	entityKey: 'Machines',
 	itemStore: machinesStore,

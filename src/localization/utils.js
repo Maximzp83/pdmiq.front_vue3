@@ -1,5 +1,4 @@
 import loc_eng from './loc_eng';
-import loc_spanish from './loc_spanish';
 // import { getObjectVal } from '@/helpers';
 
 export const LANGUAGE_TYPES = {
@@ -12,14 +11,28 @@ export const languagesList = [
 	{ id: LANGUAGE_TYPES.SPANISH, name: 'Spanish' }
 ];
 
-const localization_lib = {
-	[LANGUAGE_TYPES.ENGLISH]: () => loc_eng,
-	[LANGUAGE_TYPES.SPANISH]: () => loc_spanish
+const localizationLib = {
+	[LANGUAGE_TYPES.ENGLISH]: loc_eng,
+};
+
+let spanishLanguagePromise;
+
+export const loadLanguage = async (langId) => {
+	if (langId === LANGUAGE_TYPES.SPANISH && !localizationLib[langId]) {
+		spanishLanguagePromise ||= import('./loc_spanish').then(({ default: language }) => {
+			localizationLib[langId] = language;
+			return language;
+		});
+
+		await spanishLanguagePromise;
+	}
+
+	return localizationLib[langId] || loc_eng;
 };
 
 const dispatchFile = langId => {
 	// console.log(langId)
-	return langId ? localization_lib[langId]() : {};
+	return localizationLib[langId] || loc_eng;
 };
 
 export const getText = (langId, accessor) => {

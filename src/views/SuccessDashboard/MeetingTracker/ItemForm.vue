@@ -813,8 +813,11 @@ const filterEmptyItems = (list = []) =>
 	list.filter((item) => item.id || item.description || item.users_name || item.users_ids?.length || item.machine_id || item.sensor_id || item.sensor_ids?.length);
 
 const cleanRows = (rows = [], includeUsers = true) =>
-	filterEmptyItems(rows).map(({ _id, sensor_id, ...row }) => {
+	filterEmptyItems(rows).map((row) => {
 		const next = { ...row };
+		const sensor_id = next.sensor_id;
+		delete next._id;
+		delete next.sensor_id;
 		if (sensor_id && !next.sensor_ids?.length) {
 			next.sensor_ids = [sensor_id];
 		}

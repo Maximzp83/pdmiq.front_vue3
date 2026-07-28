@@ -28,7 +28,7 @@
 
 <script setup>
 import { computed, onBeforeMount, onBeforeUnmount, ref } from 'vue';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';

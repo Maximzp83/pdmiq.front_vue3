@@ -25,16 +25,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
-import { ENTITIES } from '@/config/entities';
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
 
 import { useItemPage } from '@/composables/mixins/useItemPage';
 import { useNavigation } from '@/composables/mixins/useNavigation';
-import { Lang } from '@/localization';
-
 defineOptions({
 	name: 'MachinePage',
 });

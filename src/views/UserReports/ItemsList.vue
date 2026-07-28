@@ -64,6 +64,7 @@ const props = defineProps({
 	sensorsListProps: { type: Array, default: () => [] },
 	plantsListProps: { type: Array, default: () => [] },
 	sensorsLoadingProps: Boolean,
+
 });
 
 const itemsTableRef = ref(null);
@@ -83,6 +84,7 @@ const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, refetch
 	itemStore: usersStore,
 	itemFiltersName: 'users_reports_filters',
 	options: {
+		preventSetNavbar: props.insideOtherPage,
 		filtersStateProp: 'reports_filters',
 		tableRef: itemsTableRef,
 		editInModal: true,

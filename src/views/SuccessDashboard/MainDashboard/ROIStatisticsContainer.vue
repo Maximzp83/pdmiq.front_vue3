@@ -86,7 +86,7 @@ defineOptions({ name: 'SuccessDashboardROIStatisticsContainer' });
 
 const emit = defineEmits(['event']);
 
-const props = defineProps({
+defineProps({
 	plantItem: { type: Object, default: () => ({}) },
 	plantsList: { type: Array, default: null },
 	predefinedFilters: { type: Object, default: () => ({}) },

@@ -134,10 +134,19 @@ const enableCheckbox = computed(() => {
 const enableParallelCheckbox = computed(() => {
 	if (props.hasProdlineWithoutMachine && errorItem.value) {
 		if (props.cellData.column_name === 'machine_name') return true;
-		if (props.cellData.column_name === 'production_line_name') columnIsChecked.value = true;
+		if (props.cellData.column_name === 'production_line_name') return true;
 	}
 	return false;
 });
+watch(
+	[enableParallelCheckbox, () => props.cellData.column_name],
+	([enabled, columnName]) => {
+		if (enabled && columnName === 'production_line_name') {
+			columnIsChecked.value = true;
+		}
+	},
+	{ immediate: true },
+);
 const radioOptionsList = computed(() => {
 	if (props.enableRadioProp) return props.enableRadioProp.radioOptionsList;
 	if (!errorItem.value || !enableRadio.value) return [];

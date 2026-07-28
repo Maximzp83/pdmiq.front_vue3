@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeMount, shallowReactive, ref, watch } from 'vue';
+import { computed, onMounted, onBeforeMount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 

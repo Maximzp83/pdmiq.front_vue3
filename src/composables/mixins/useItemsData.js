@@ -1,6 +1,5 @@
-import { ref, shallowRef, shallowReactive, computed, watch, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, shallowRef, shallowReactive, computed, toRef, watch, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
-import { storeToRefs } from 'pinia';
 import { ElMessageBox } from 'element-plus';
 import { ENTITIES } from '@/config/entities';
 import { api_request } from '@/api/request_provider.js';
@@ -45,7 +44,8 @@ export function useItemsData({
 	const route = useRoute();
 	const globalStore = useGlobalStore();
 	const { set_value: set_global_store } = globalStore;
-	const { globalFilters } = storeToRefs(globalStore);
+	// Pinia 3 storeToRefs enumerates runtime fields and throws when one contains null.
+	const globalFilters = toRef(globalStore, 'globalFilters');
 	const { changeRoute } = useNavigation();
 	const { tt } = Lang;
 	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
@@ -114,8 +114,8 @@ export function useItemsData({
 	const itemData = shallowRef(null);
 	const preventFetch = ref(false);
 	const doNotFetchItems = ref(false);
-	const filtersRef = itemStore ? storeToRefs(itemStore)[filtersStateProp] : filters;
-	const { updateItemsList } = storeToRefs(globalStore);
+	const filtersRef = itemStore ? toRef(itemStore, filtersStateProp) : filters;
+	const updateItemsList = toRef(globalStore, 'updateItemsList');
 
 	// ========== Computed-like ==========
 	const getRouteMeta = () => route.meta;

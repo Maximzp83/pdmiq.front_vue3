@@ -158,7 +158,7 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 import draggablePoints from 'highcharts/modules/draggable-points';

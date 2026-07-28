@@ -57,7 +57,7 @@ const handleSubmit = () => {
 		.then(() => {
 			// Success handling is done in the store
 		})
-		.catch((error) => {
+		.catch(() => {
 			// Error handling is done in the store
 		})
 		.finally(() => {

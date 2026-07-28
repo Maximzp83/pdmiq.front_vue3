@@ -1,5 +1,5 @@
 <template>
-	<highcharts
+	<HighchartsChart
 		v-if="chartOptions && Object.keys(chartOptions).length"
 		ref="chartRef"
 		class="chart"
@@ -12,12 +12,16 @@
 </template>
 
 <script setup>
+import { Chart as HighchartsChart } from 'highcharts-vue';
+
+import Highcharts from '@/config/highcharts';
+
 defineOptions({
 	name: 'ChartWrapper',
 });
 
 defineProps({
-	hcInstance: { type: Object, default: null },
+	hcInstance: { type: Object, default: () => Highcharts },
 	chartOptions: { type: Object, default: null },
 	chartAPI: { type: Object, default: null },
 	constructorType: { type: String, default: undefined },

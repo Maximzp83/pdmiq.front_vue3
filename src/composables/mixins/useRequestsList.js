@@ -228,7 +228,6 @@ export function useRequestsList({
 			withoutClean,
 			param,
 			// params: mainParams,
-			cleanKey,
 			mergeWith,
 			fetchAnyWay,
 			noFetch,

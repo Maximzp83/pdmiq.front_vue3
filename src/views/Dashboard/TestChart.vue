@@ -1,11 +1,14 @@
 <template>
 	<div class="">
-		<highcharts :options="chartOptions" />
+		<HighchartsChart :options="chartOptions" :highcharts="Highcharts" />
 	</div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { Chart as HighchartsChart } from 'highcharts-vue';
+
+import Highcharts from '@/config/highcharts';
 
 const generateData = (count = 100) => {
 	const data = [];

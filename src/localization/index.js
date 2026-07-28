@@ -1,6 +1,4 @@
-// import { storeGetter } from '@/store';
-import { findItemBy } from '@/helpers';
-import { getText, languagesList } from './utils.js';
+import { getText, languagesList, loadLanguage } from './utils.js';
 
 const translate = (data, method, currentLangId, settings) => {
 	if (data instanceof Array) {
@@ -51,11 +49,12 @@ class Lang1 {
 		return translate(data, this.tt, this.currentLangId, settings);
 	}
 
-	set(id) {
+	async set(id) {
+		await loadLanguage(id);
 		this.currentLangId = id;
 	}
 	current() {
-		return findItemBy('id', this.currentLangId, languagesList);
+		return languagesList.find(({ id }) => id === this.currentLangId) || null;
 	}
 }
 

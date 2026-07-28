@@ -154,7 +154,6 @@ const companiesEntity = ENTITIES.Companies;
 const plantsEntity = ENTITIES.Plants;
 
 const itemFormRef = ref(null);
-const companyPlantsList = shallowRef([]);
 const companiesLoading = ref(false);
 const companiesList = shallowRef([]);
 const plantsLoading = ref(false);

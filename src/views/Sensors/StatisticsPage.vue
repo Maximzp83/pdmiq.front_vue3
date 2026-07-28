@@ -262,7 +262,7 @@
 import { computed, nextTick, onBeforeMount, onMounted, ref, watch, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 
@@ -821,7 +821,7 @@ const fetchSensorsAction = (ids, sensorIdx) => {
 					Notify({
 						type: 'warning',
 						title: 'Redirect',
-						message: `${itemsName.one} with id: ${ids[sensorIdx]} - doesn't exists`
+						message: `${itemsName.value.one} with id: ${ids[sensorIdx]} - doesn't exists`
 					});
 				}, 200);
 			}

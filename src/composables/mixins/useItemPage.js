@@ -26,7 +26,6 @@ export function useItemPage({
 	hasAccessTo,
 	uploadSettings,
 	preparePayload,
-	localSubmit,
 	successSubmitCallback,
 	propsSuccessSubmitCallback,
 	itemFormRef,
@@ -225,6 +224,7 @@ export function useItemPage({
 	const initialPageSetup = ({ path }) => {
 		_loadContent.value = false;
 		setup_navbar(navbarSettings.value);
+		console.log('initialPageSetup', navbarSettings.value);
 		let id = getRouteItemId();
 
 		if (path === '/profile') {

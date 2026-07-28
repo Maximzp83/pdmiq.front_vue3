@@ -1,4 +1,3 @@
-import { setFiltersViaList } from '@/helpers/specialHelpers';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 
 export const buildProps = (extra = {}) => ({
@@ -43,12 +42,6 @@ export function useItemCard({ cardData, changeRoute, titleLinkRoute, resetPageFi
 		const resetConfig = resolve(resetPageFiltersList);
 		if (typeof resetConfig === 'function') {
 			resetConfig();
-		} else if (resetConfig) {
-			try {
-				setFiltersViaList(resetConfig);
-			} catch (error) {
-				console.warn('[useItemCard] resetPageFiltersList is not available in the current store setup', error);
-			}
 		}
 	};
 

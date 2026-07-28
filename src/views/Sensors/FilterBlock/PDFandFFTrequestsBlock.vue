@@ -189,7 +189,6 @@ import { generateUrl } from '@/utils/url-helpers';
 import { getCurrentRpmSource } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
-import { useGlobalStore } from '@/stores/GlobalStore';
 import { useSensorsStore } from '@/stores/SensorsStore';
 import { api_request } from '@/api/request_provider';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
@@ -227,7 +226,6 @@ const props = defineProps({
 const emit = defineEmits(['event']);
 
 const authStore = useAuthStore();
-const globalStore = useGlobalStore();
 const sensorsStore = useSensorsStore();
 const { sensorJobSaving, statistics_filters: filters } = storeToRefs(sensorsStore);
 const { Notify } = useNotify();

@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
+
 import { pinia } from '@/stores/pinia';
 import { hasAccessTo as hasAccessToUtil } from '@/utils/hasAccessTo';
-import { validateBySettings } from '@/helpers';
+import { validateBySettings } from '@/utils/condition-validation';
 import { getParamsFromUrl } from '@/utils/url-helpers';
 
 import { useNotify } from '@/composables/useNotify';

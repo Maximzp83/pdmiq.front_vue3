@@ -36,9 +36,9 @@ import 'element-plus/es/components/message/style/css';
 
 import {
 	METRIC_SYSTEM_TYPES,
+	sensorParametersList,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
-// import { sensorParametersList } from '@/modules/charts_factory/controllers/Sensor/enums';
 // import { storeGetter, dispatchGetter } from '@/store';
 import { Lang } from '@/localization';
 
@@ -421,7 +421,7 @@ const getSensorTitle1 = (sensor, options = {}) => {
 };
 
 // ----------From charts.js----------
-/*const setupWarningsData1 = data => {
+const setupWarningsData1 = data => {
 	const alarms_count = data.alarmsCount;
 	const warnings_count = data.warningsCount;
 	const meta = {
@@ -442,7 +442,7 @@ const getSensorTitle1 = (sensor, options = {}) => {
 			sensor_name:
 				dataItem.sensor && dataItem.sensor.equipment
 					? dataItem.sensor.equipment.machine_name ||
-					  dataItem.sensor.equipment.location_name
+						dataItem.sensor.equipment.location_name
 					: '',
 			sensor_parameter_name: getItemValue(
 				dataItem.sensor_parameter_type,
@@ -452,12 +452,12 @@ const getSensorTitle1 = (sensor, options = {}) => {
 			alert_rule_name: getItemValue(
 				dataItem.alert_rule,
 				'name',
-				alertRulesListArray()
+				alertRulesListArray
 			),
 			alert_type_name: getItemValue(
 				dataItem.alert_type,
 				'name',
-				alertTypesListArray()
+				alertTypesListArray
 			),
 			// created_at: '2020-07-07T13:15:51.000000Z'
 			created_at: cleanDateString(dataItem.created_at)
@@ -470,7 +470,7 @@ const getSensorTitle1 = (sensor, options = {}) => {
 		warnings_count: warnings_count,
 		meta: meta
 	};
-};*/
+};
 
 const setupTresholdsOurList1 = dataArray => {
 	let newList = [];
@@ -506,33 +506,6 @@ const setupTresholdsOurList1 = dataArray => {
 
 	return newList;
 };
-
-/*const setFiltersViaList1 = ({ filters, value }) => {
-	filters.forEach(fi => {
-		const actionArr = fi.action.split('/');
-		const stateKey = actionArr.length > 1 ? actionArr[0] : 'global';
-
-		let newFilters = {};
-		fi.params.forEach(param => {
-			if (typeof param === 'object') {
-				newFilters[param.key] = param.val;
-			} else {
-				newFilters[param] = value;
-			}
-		});
-
-		const currentFilters = storeGetter(stateKey).filters;
-
-		if (stateKey !== 'global') {
-			currentFilters.plantId ? (newFilters.plantId = null) : null;
-		}
-		// console.log(stateKey, storeGetter(stateKey).filters)
-		dispatchGetter(fi.action, {
-			...currentFilters,
-			...newFilters
-		});
-	});
-};*/
 
 const isPasswordStrong1 = password => {
   const minLength = 8;
@@ -679,7 +652,6 @@ export const resetDaterangeIfExpired = (filters, resetTo, withTime) =>
 
 export const setupWarningsData = data => setupWarningsData1(data);
 export const setupTresholdsOurList = dataArray => setupTresholdsOurList1(dataArray);
-export const setFiltersViaList = payload => setFiltersViaList1(payload);
 export const getSensorTitle = (payload, options) =>
 	getSensorTitle1(payload, options);
 

@@ -2,7 +2,6 @@ import api from './index.js';
 import { Lang } from '@/localization';
 import { useHelpers } from '@/composables/mixins/useHelpers';
 const { useLoadStore } = useHelpers();
-import { prepareDataFunctions } from '@/utils/data-preparers';
 
 import { useNotify } from '@/composables/useNotify';
 const { Notify } = useNotify();
@@ -79,18 +78,29 @@ const getResponseValue = (response, payload) => {
 		value = response.data.data;
 	}
 
-	// Handle prepareData - supports both function and string (legacy compatibility)
-	if (prepareData) {
-		if (typeof prepareData === 'function') {
-			// Direct function
-			return prepareData(value, prepareDataSettings);
-		} else if (typeof prepareData === 'string' && prepareDataFunctions[prepareData]) {
-			// String lookup from registry (legacy compatibility)
-			return prepareDataFunctions[prepareData](value, prepareDataSettings);
-		}
+	if (typeof prepareData === 'function') {
+		return prepareData(value, prepareDataSettings);
 	}
 
 	return value;
+};
+
+/**
+ * Resolve legacy string-based data preparers without loading their full registry
+ * into the initial application bundle.
+ */
+const getPreparedResponseValue = async (response, payload) => {
+	if (typeof payload.prepareData !== 'string') {
+		return getResponseValue(response, payload);
+	}
+
+	const { prepareDataFunctions } = await import('@/utils/data-preparers');
+	const prepareData = prepareDataFunctions[payload.prepareData];
+
+	return getResponseValue(response, {
+		...payload,
+		prepareData,
+	});
 };
 
 /**
@@ -245,7 +255,7 @@ const api_request = (url, payload = {}) => {
 
 				// Execute API request
 				return api(method, url, payload)
-					.then((response) => {
+					.then(async (response) => {
 						if (isSuccessStatus(response, statusCheckSettings)) {
 							try {
 								const {
@@ -262,7 +272,7 @@ const api_request = (url, payload = {}) => {
 								// console.log('response', response);
 								const value = returnResponseOnly
 									? response
-									: getResponseValue(response, payload);
+									: await getPreparedResponseValue(response, payload);
 
 								// Save to store
 								if (toStore && store && store.set_value) {

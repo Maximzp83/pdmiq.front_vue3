@@ -6,9 +6,8 @@ export const cloneDeep2 = item =>
 import { default as cloneDeep1 } from 'lodash.clonedeep';
 export const cloneDeep = cloneDeep1;
 // console.log(cloneDeep1)
-import { hasAccessTo } from '@/utils/hasAccessTo';
-
 import { isEmptyString } from '@/utils/validate';
+import { compareValues, validateBySettings, validateConditionItem } from '@/utils/condition-validation';
 import {
 	alertRulesList,
 	pumpTypesList,
@@ -500,123 +499,6 @@ const getCellValue1 = (row, column, scope) => {
 	} catch (e) {
 		console.warn(e);
 	}
-};
-
-const compareValues1 = ({ val1, val2, method }) => {
-	if (method == '==') {
-		return val1 == val2;
-	} else if (method == '!=') {
-		return val1 != val2;
-	} else if (method == '>') {
-		return val1 > val2;
-	} else if (method == '<') {
-		return val1 < val2;
-	} else if (method == 'notEmpty') {
-		return val1 ? !isEmpty(val1) : null;
-	} else if (method == 'empty') {
-		return val1 ? false : isEmpty(val1);
-	}
-	console.warn('wrong compare method str');
-	return null;
-};
-
-const validateConditionItem1 = item => {
-	// console.log('1', item)
-	try {
-		// let checkResults = [];
-		let {
-			method,
-			call_method,
-			array_method,
-			prop,
-			control_value_prop,
-			control_value,
-			controlObj,
-			dataObj,
-			data_value,
-			next_conditions,
-			checkMethod_next /*checkMethod*/
-		} = item;
-
-		let pre_result;
-		// checkMethod = checkMethod || 'every';
-		// console.log('1', prop, control_value, control_value_prop)
-
-		if (prop || data_value !== undefined) {
-			const first_ctrl_value = prop
-				? getObjectValUtil(controlObj, prop.split('.'), {skipDeepCopy:false})
-				: data_value;
-			// console.log('1.1', prop, data_value, first_ctrl_value)
-
-			const second_ctrl_value = control_value_prop
-				? getObjectValUtil(controlObj, control_value_prop.split('.'), {skipDeepCopy:false})
-				: control_value;
-			// console.log('1.2', control_value_prop, second_ctrl_value)
-
-			if (call_method) {
-				// pre_result = methodsList[call_method](first_ctrl_value, control_value);
-				pre_result = call_method.method({
-					...call_method.payload,
-					first_ctrl_value
-				});
-			} else {
-				if (second_ctrl_value instanceof Array) {
-					array_method = array_method || 'every';
-					// console.log(first_ctrl_value, second_ctrl_value)
-					pre_result = second_ctrl_value[array_method](vi =>
-						compareValues({
-							val1: first_ctrl_value,
-							val2: vi,
-							method: method || '=='
-						})
-					);
-				} else {
-					pre_result = compareValues({
-						val1: first_ctrl_value,
-						val2: second_ctrl_value,
-						method: method || '=='
-					});
-				}
-			}
-
-			/*if (prop == 'is_acknowledge_by_supervisor' ||
-					prop == 'creator.id') {
-				console.log(first_ctrl_value, control_value, pre_result)
-			}*/
-		}
-
-		// let pre_result = checkResults[checkMethod](i => i);
-
-		if (pre_result && next_conditions) {
-			return validateBySettings({
-				checkMethod: checkMethod_next || 'every',
-				conditions: next_conditions,
-				data_value: data_value,
-				dataObj: dataObj
-			});
-		}
-		// console.log('2', prop, pre_result)
-		return pre_result;
-	} catch (e) {
-		console.warn(e);
-	}
-};
-
-const validateBySettings1 = settings => {
-	let { data_value, dataObj, checkMethod, conditions } = settings;
-	checkMethod = checkMethod || 'every';
-
-	if (conditions) {
-		return conditions[checkMethod](ci =>
-			validateConditionItem1({
-				...ci,
-				controlObj: ci.controlObj || dataObj,
-				dataObj: dataObj,
-				data_value: ci.data_value !== undefined ? ci.data_value : data_value
-			})
-		);
-	}
-	return false;
 };
 
 const setupAssignedUsers1 = (cellValue, args) => {
@@ -1523,7 +1405,6 @@ export const sortArrayByKeyNumber = (array = [], key, direction = 'asc') =>
 		const diff = Number(a[key]) - Number(b[key]);
 		return direction === 'asc' ? diff : -diff;
 	});
-export const hasRightsToRoute = route => hasRightsToRoute1(route);
 export const validateRouteParams = id => validateRouteParams1(id);
 export const getParentPageRoute = (path, steps) => getParentPageRoute1(path, steps);
 export const updateFormData = (itemData, formData, additionalRules, settings) =>
@@ -1537,9 +1418,7 @@ export const getValuesFromArray = (array, options) =>
 export const prepareValue = settings => prepareValue1(settings);
 export const getCellValue = (row, column, scope) =>
 	getCellValue1(row, column, scope);
-export const compareValues = payload => compareValues1(payload);
-export const validateConditionItem = item => validateConditionItem1(item);
-export const validateBySettings = settings => validateBySettings1(settings);
+export { compareValues, validateBySettings, validateConditionItem };
 export const setupAssignedUsers = (cellValue, args) =>
 	setupAssignedUsers1(cellValue, args);
 export const getWOStatus = (status, args) => getWOStatus1(status, args);

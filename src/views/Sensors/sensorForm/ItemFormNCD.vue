@@ -518,11 +518,6 @@ const controllersSelectSettings = computed(() => ({
 		plantId: globalStore.navbarSettings?.showPlantName?.id || globalStore.globalFilters?.plantId,
 	},
 }));
-const equipmentsSelectSettings = computed(() => ({
-	fetchAction: createGetRequest(ENTITIES.Equipments.apiBase),
-	fetchByIdAction: createGetByIdRequest(ENTITIES.Equipments.apiBase),
-	params: { max: 100 },
-}));
 const usersSelectSettings = computed(() => ({
 	fetchAction: createGetRequest(ENTITIES.Users.apiBase),
 	fetchByIdAction: createGetByIdRequest(ENTITIES.Users.apiBase),

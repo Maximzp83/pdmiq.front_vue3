@@ -25,7 +25,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
 import boost from 'highcharts/modules/boost';
 import annotations from 'highcharts/modules/annotations';

@@ -25,6 +25,8 @@ import { useEventHandler } from '@/composables/mixins/useEmitter';
 
 import CounterItem from './CounterItem.vue';
 
+defineOptions({ name: 'RequisitionCounters' });
+
 const props = defineProps({
 	filters: { type: Object, default: () => ({}) },
 });

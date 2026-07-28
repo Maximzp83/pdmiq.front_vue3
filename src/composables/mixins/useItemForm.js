@@ -113,6 +113,7 @@ export function useItemForm({
 		if (localSuccessSubmitCallback) {
 			return localSuccessSubmitCallback;
 		}
+		return null;
 	});
 
 	const clearValidate = (props = []) => {

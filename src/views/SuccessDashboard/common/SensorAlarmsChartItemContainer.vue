@@ -86,7 +86,7 @@
 
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
@@ -109,8 +109,6 @@ const props = defineProps({
 	sensorData: { type: Object, required: true },
 	currentSensorType: { type: Object, default: () => ({}) },
 });
-const emit = defineEmits(['event']);
-
 const { tt } = Lang;
 
 const chartIsDisabled = ref(false);

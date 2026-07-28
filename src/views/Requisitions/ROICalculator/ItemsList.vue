@@ -20,7 +20,7 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { requisitionCategoriesList } from '@/constants/global';
-import { cleanDateString, formatTime } from '@/helpers';
+import { cleanDateString } from '@/helpers';
 import { Lang } from '@/localization';
 import { usePlantRequisitionsStore } from '@/stores/PlantRequisitionsStore';
 import { useItemsData } from '@/composables/mixins/useItemsData';
@@ -59,7 +59,6 @@ const tableSettings = computed(() =>
 			{ prop: 'created_at', label: 'phrases.Date_Sent', meta: { prepareValue: { localMethod: cleanDateString } } },
 			{ prop: 'requisitionPlant.name', label: 'Requisition_Plant' },
 			{ prop: 'requisition_details', label: 'Details', meta: { cell_class: 'ellipsis' } },
-			{ prop: 'execution_total_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
 			{ prop: 'proposed_cost', label: 'Budget' },
 			{ prop: 'actual_cost', label: 'Fab_Shop_Budget' },
 			{ prop: 'category', label: 'Category', meta: { getItemValue: { prop: 'name', list: requisitionCategoriesList() } } },

@@ -45,7 +45,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 

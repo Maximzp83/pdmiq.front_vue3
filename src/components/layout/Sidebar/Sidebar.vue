@@ -135,12 +135,14 @@ import { computed } from 'vue';
 // import { storeToRefs } from 'pinia';
 
 import { validateBySettings, findItemBy, cloneDeep } from '@/helpers';
-import { logoSrc, main_logo } from '@/constants/global';
+import { main_logo } from '@/constants/global';
 import { hasAccessTo } from '@/utils/hasAccessTo';
 import { menuItems } from '@/constants/menuItems';
 
 import { Lang } from '@/localization';
 const { tt, translate } = Lang;
+
+defineOptions({ name: 'AppSidebar' });
 
 // -----Store-----
 import { useAuthStore } from "@/stores/AuthStore";
@@ -259,10 +261,6 @@ const isActiveItem = (itemPath) => {
 		}
 	}
 	return false;
-};
-
-const editProfile = () => {
-	changeRoute({ path: '/profile' });
 };
 
 const minimizeSidebar = () => {

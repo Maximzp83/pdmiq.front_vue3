@@ -75,7 +75,7 @@
 
 				<div
 					v-else-if="currentFaultsType === 'lubematrix' || currentFaultsType === 'ultrasoundSDT'"
-					:class="['counters-part', { column_3: hasLubeZone }]"
+					:class="['counters-part']"
 				>
 					<div>
 						<span>{{ tt('constants.Alarm') }}</span>

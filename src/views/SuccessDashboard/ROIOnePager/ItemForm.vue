@@ -522,7 +522,7 @@ const localValidationHook = (options) => {
 	return true;
 };
 
-const { validateForm, handleCancel, isInitialSetup } = useItemForm({
+const { validateForm, isInitialSetup } = useItemForm({
 	entityKey: 'RoiOnePagers',
 	itemData,
 	formData,

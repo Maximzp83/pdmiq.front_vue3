@@ -1,7 +1,7 @@
 // console.log('global.js')
 import { cloneDeep } from '@/helpers';
 import { Lang } from '@/localization';
-import { METRIC_SYSTEM_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums.js';
+import { METRIC_SYSTEM_TYPES } from '@/constants/metric-system';
 
 export const USER_ROLES_TYPES = {
 	DEVELOPER: 0,

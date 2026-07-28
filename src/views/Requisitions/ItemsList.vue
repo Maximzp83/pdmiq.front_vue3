@@ -3,7 +3,7 @@
 		<div class="card-content">
 			<Filterbar
 				:itemsLoading="itemsLoading"
-				:filters="filters"
+				:filters="storeFilters"
 				:itemsName="itemsName"
 				:actionButtons="actionButtons"
 				hideSearchbar
@@ -24,7 +24,7 @@
 
 					<div class="ml-auto filter-item">
 						<CustomSelectV2
-							:model-value="filters.category"
+							:model-value="storeFilters.category"
 							filterable
 							clearable
 							:optionsList="requisitionCategoriesListOptions"
@@ -82,7 +82,7 @@
 				@event="handleEvent"
 			/>
 
-			<PaginationContainer :itemsName="itemsName" :filters="filters" :meta="meta" @setFilters="setFilters" />
+			<PaginationContainer :itemsName="itemsName" :filters="storeFilters" :meta="meta" @setFilters="setFilters" />
 		</div>
 	</div>
 </template>
@@ -130,7 +130,7 @@ const emit = defineEmits(['event']);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const requisitionsStore = usePlantRequisitionsStore();
-const { filters } = storeToRefs(requisitionsStore);
+const { filters: storeFilters } = storeToRefs(requisitionsStore);
 const { globalFilters } = storeToRefs(globalStore);
 const { changeRoute } = useNavigation();
 const {
@@ -196,8 +196,8 @@ const radioButtonsList = computed(() =>
 	]),
 );
 const activeRadioFilter = computed(() => {
-	if (filters.value?.onHold) return REQUISITION_STATUSES_TYPES.ON_HOLD;
-	return filters.value?.status ?? undefined;
+	if (storeFilters.value?.onHold) return REQUISITION_STATUSES_TYPES.ON_HOLD;
+	return storeFilters.value?.status ?? undefined;
 });
 
 const tableSettings = computed(() => {
@@ -306,7 +306,7 @@ const tableSettings = computed(() => {
 			{ prop: 'technicians', label: 'Assigned', min_width: 200, meta: { fromArray: { subProp: 'full_name', delimeter: ', ' } } },
 			{ label: 'PO', label_postfix: '#', prop: 'po_number' },
 			{ prop: 'status', label: 'Status', width: 120, meta: { prepareValue: { localMethod: getWOStatus, args: { list: requisitionStatusesList() } } } },
-			{ prop: 'execution_total_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
+			{ prop: 'actual_time', label: 'Hours', width: 90, meta: { prepareValue: { localMethod: formatTime, args: 'h:m' } } },
 			{ prop: 'proposed_cost', label: 'Budget', width: 70 },
 			{ prop: 'actual_cost', label: 'Fab_Shop_Budget', width: 82 },
 			{ label: 'phrases.Running_Total_Materials', prop: 'execution_materials_cost', width: 70 },
@@ -368,7 +368,7 @@ const handleExportToExcel = () => {
 	exportingInProgress.value = true;
 	const params = {
 		...globalFilters.value,
-		...filters.value,
+		...storeFilters.value,
 		...(exportDaterange.value?.length ? prepareRangeParams(exportDaterange.value) : {}),
 	};
 	exportRequisitionsToExcel(params).finally(() => {

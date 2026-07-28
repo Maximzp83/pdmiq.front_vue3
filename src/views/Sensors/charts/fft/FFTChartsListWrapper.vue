@@ -198,7 +198,7 @@ const buildCharts = ({ settings, payload } = {}) => {
 	});
 	hiddenChartsMap.value = nextHiddenChartsMap;
 
-	if (process.env.NODE_ENV === 'development') {
+	if (import.meta.env.DEV) {
 		window[`ChartsListInstance_0`] = chartsListInstance.value;
 	}
 };

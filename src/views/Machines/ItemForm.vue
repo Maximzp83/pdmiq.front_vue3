@@ -75,27 +75,6 @@
 				<Datepicker v-model="formData.installed_at" :placeholder="`${tt('Select')} ${tt('date')}`" />
 			</el-form-item>
 
-			<el-form-item :label="tt('phrases.silence_mode')" prop="is_silence_mode" class="half-width">
-				<el-switch
-					v-model="formData.is_silence_mode"
-					:active-value="1"
-					:inactive-value="0"
-				/>
-			</el-form-item>
-
-			<el-form-item
-				v-if="formData.is_silence_mode"
-				:label="tt('phrases.silence_mode_until')"
-				prop="silence_mode_until"
-				class="half-width"
-			>
-				<Datepicker
-					v-model="formData.silence_mode_until"
-					:placeholder="`${tt('Select')} ${tt('date')}`"
-					:pickerOptions="pickerOptions"
-				/>
-			</el-form-item>
-
 			<el-form-item :label="`${tt('Custom')} ${tt('Fields')}`" prop="characters">
 				<div class="options-container">
 					<div v-if="charactersItemsList.length" class="content-row">
@@ -239,8 +218,6 @@ const initialFormData = {
 	downtime_cost: 0,
 	libraries: [],
 	linespeed_sensor_id: null,
-	is_silence_mode: 0,
-	silence_mode_until: '',
 };
 const formData = ref({ ...initialFormData });
 
@@ -257,15 +234,6 @@ const rules = {
 	name: required,
 	application_id: required,
 };
-const pickerOptions = Object.freeze({
-	disabledDate(date) {
-		const start = new Date();
-		const today = start.getTime() - 3600000 * 24;
-		const dateMs = date.getTime();
-
-		return dateMs < today;
-	},
-});
 const subItemsSettings = computed(() =>
 	Object.freeze([
 		{ ref: 'CharacterItem', targetProp: 'characters' },
@@ -290,7 +258,7 @@ const methodsMap = {
 	fetch_locations: createGetRequest(ENTITIES.Locations.apiBase),
 	fetch_machines: createGetRequest(ENTITIES.Machines.apiBase),
 };
-const currentPlantId = () => showPlant.value?.id || globalFilters.value?.plantId || formData.value.plant_id;
+const currentPlantId = () => globalFilters.value?.plantId || showPlant.value?.id || formData.value.plant_id;
 const requestsToDoList = computed(() =>
 	Object.freeze([
 		{
@@ -358,12 +326,6 @@ const localPrepareSubmitData = (data) => {
 	if (!data.plant_id) data.plant_id = currentPlantId();
 	if (data.installed_at) {
 		data.installed_at = cleanDateString(data.installed_at, { withoutTime: 1 });
-	}
-	if (!data.is_silence_mode) {
-		data.silence_mode_until = null;
-	}
-	if (data.silence_mode_until) {
-		data.silence_mode_until = cleanDateString(data.silence_mode_until, { withoutTime: 1 });
 	}
 	return data;
 };

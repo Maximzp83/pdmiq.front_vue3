@@ -881,11 +881,6 @@ const controllersSelectSettings = computed(() => ({
 		plantId: globalStore.navbarSettings?.showPlantName?.id || globalStore.globalFilters?.plantId,
 	},
 }));
-const equipmentsSelectSettings = computed(() => ({
-	fetchAction: createGetRequest(ENTITIES.Equipments.apiBase),
-	fetchByIdAction: createGetByIdRequest(ENTITIES.Equipments.apiBase),
-	params: { max: 100 },
-}));
 const usersSelectSettings = computed(() => ({
 	fetchAction: createGetRequest(ENTITIES.Users.apiBase),
 	fetchByIdAction: createGetByIdRequest(ENTITIES.Users.apiBase),
@@ -1117,14 +1112,6 @@ const localSubmit = (payloadData, options = {}) => {
 		.catch(() => {
 			toggleSubmitRequestResult({ fromSensorsList, isLoading: 0, success: 0 });
 		});
-};
-
-const toggleSpinner = (val) => {
-	emit('event', { eventName: 'toggleSpinner', data: val });
-};
-
-const handleFormSubmitFinish = (payload) => {
-	emit('event', { eventName: 'handleFormSubmitFinish', data: payload });
 };
 
 const sendRpm = () => {

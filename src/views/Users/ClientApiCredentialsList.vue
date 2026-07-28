@@ -71,6 +71,7 @@ const { itemsList, itemsLoading, createItem, refetchItemsList } = useItemsData({
 	itemStore: usersStore,
 	itemFiltersName: 'users_client_api_credentials',
 	options: {
+		preventSetNavbar: true,
 		filtersStateProp: 'client_api_credentials_filters',
 		requestOptions: {
 			params: { max: -1 },

@@ -24,7 +24,7 @@ export function useEmitter(emit) {
 	return { emitEvent };
 }
 
-export function useEventHandler(methodsMap, emit, settingsForDebug) {
+export function useEventHandler(methodsMap, emit) {
 	const handleEvent = (eventOrName, payload) => {
 		/*if (eventOrName == 'handleDeleteItems') {
 			debugger

@@ -276,7 +276,6 @@ const {
 	editItem,
 	handleDeleteItems,
 	handleShowNextInstanceItem,
-	refetchItemsList,
 } = useItemsData({
 	entityKey: 'Assets',
 	itemStore: assetsStore,

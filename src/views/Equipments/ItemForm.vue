@@ -881,7 +881,7 @@ const submitReorder = () => {
 	return null;
 };
 
-const { isMobile, validateForm, handleCancel } = useItemForm({
+const { isMobile, validateForm } = useItemForm({
 	entityKey: 'Equipments',
 	itemData,
 	formData,

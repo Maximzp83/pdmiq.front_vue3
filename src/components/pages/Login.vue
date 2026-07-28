@@ -135,6 +135,8 @@ const authStore = useAuthStore();
 
 const { tt } = Lang;
 
+defineOptions({ name: 'LoginPage' });
+
 // Data
 const alternateForm = ref(false);
 const isVerification = ref(false);
@@ -155,15 +157,15 @@ const hideTabsBar = computed(() => route.path !== '/kruger');
 const isLoading = computed(() => authStore.isLoading);
 
 const authApiUrl = computed(() => {
-	if (import.meta.env.VITE_API_URL) {
-		return `${import.meta.env.VITE_API_URL}`;
+	if (import.meta.env.VITE_API_BASE_URL) {
+		return `${import.meta.env.VITE_API_BASE_URL}`;
 	}
 
 	if (window.location.origin === 'https://app.industrialmatrix.com') {
-		return 'https://api.pdmmatrix.assetmatrix.com/api';
+		return 'https://api.industrialmatrix.tools/api';
 	}
 
-	return 'https://api.testmatrix.assetmatrix.com/api';
+	return 'https://api.industrialmatrix-dev.tools/api';
 });
 
 const googleAuthUrl = computed(() => `${authApiUrl.value}/auth/google/redirect`);
@@ -214,7 +216,7 @@ const handleSubmit = () => {
 				router.push('/');
 			}
 		})
-		.catch((error) => {
+		.catch(() => {
 			// Error handling is done in the store
 		});
 };

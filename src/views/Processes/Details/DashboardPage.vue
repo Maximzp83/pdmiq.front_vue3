@@ -82,7 +82,6 @@
 import { computed, ref, toRaw } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { Lang } from '@/localization';
 import { getYmdDateString, decomposeDate } from '@/helpers';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -93,8 +92,6 @@ import Datepicker from '@/components/common/Datepicker.vue';
 import CommonChartItemWrapper from '@/components/charts/CommonChartItemWrapper.vue';
 import EventLogForm from './EventLogForm.vue';
 import EditBreakTimeForm from './EditBreakTimeForm.vue';
-
-const { tt } = Lang;
 
 defineOptions({ name: 'ProcessDashboard' });
 

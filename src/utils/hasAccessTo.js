@@ -1,6 +1,5 @@
 import { MENU_TYPES } from '@/constants/menuItems';
 import { USER_ROLES_TYPES } from '@/constants/global';
-import { findItemBy } from '@/helpers';
 
 const rolesHasAccessToMap = {
 	view_dashboard: { app_section: MENU_TYPES.DASHBOARD, permissions: ['is_viewing'] },
@@ -274,10 +273,8 @@ const getPermission = (key, role) => {
 		}
 
 		if (role.permissions) {
-			const permissionItem = findItemBy(
-				'app_section',
-				item.app_section,
-				role.permissions
+			const permissionItem = role.permissions.find(
+				(permission) => permission.app_section === item.app_section,
 			);
 			if (permissionItem) {
 				return item.permissions.every(pk => permissionItem[pk]);

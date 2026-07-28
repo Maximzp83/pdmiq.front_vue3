@@ -38,7 +38,7 @@
 <script setup>
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import Highcharts from 'highcharts';
+import Highcharts from '@/config/highcharts';
 import stockInit from 'highcharts/modules/stock';
 import boost from 'highcharts/modules/boost';
 
@@ -52,7 +52,6 @@ import {
 	validateRouteParams,
 } from '@/helpers';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
-import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useSensors } from '@/composables/useSensors';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
@@ -101,7 +100,6 @@ const sensorData = computed(() => {
 	if (allSensorsReady.value) return sensors.value[0] || null;
 	return null;
 });
-const { currentSensorType } = useSensorType({ currentSensorTypeData: sensorData });
 const itemsName = computed(() => ({
 	one: tt('PDM_Item'),
 	mult: tt('PDM_Items'),
@@ -193,16 +191,6 @@ const showRPM = computed(() => Boolean(enableRPM.value && sensorData.value?.equi
 const equipmentDataReady = computed(() => {
 	if (showRPM.value && sensorData.value?.equipment_id) return Boolean(equipmentData.value);
 	return true;
-});
-const isNCDSensor = computed(() => {
-	const type = currentSensorType.value || {};
-	return Boolean(
-		type.isNCDTempVibe ||
-		type.isNCDWiredTempVibe ||
-		type.isNCDTempVibeCurr ||
-		type.isNCDSDT ||
-		type.isNCDEnv,
-	);
 });
 const rpmOverlayData = computed(() => {
 	if (!sensorData.value || !equipmentData.value?.rpm_source_item) return null;

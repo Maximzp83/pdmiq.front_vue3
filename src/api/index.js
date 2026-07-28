@@ -11,9 +11,9 @@ export const getBaseURL = () => {
 	if (import.meta.env.VITE_API_BASE_URL) {
 		return import.meta.env.VITE_API_BASE_URL;
 	}
-	// return 'https://api.industrialmatrix-dev.tools/api';
+	return 'https://api.industrialmatrix-dev.tools/api';
 	// return 'https://api.industrialmatrix-stage.tools/api';
-	return 'https://api.industrialmatrix.tools/api';
+	// return 'https://api.industrialmatrix.tools/api';
 };
 
 /**
@@ -139,7 +139,7 @@ apiInstance.interceptors.response.use(
 						});
 					}, 0);
 				}
-			} catch (e) {
+			} catch {
 				// Fallback if router import fails
 				window.location.href = '/login?reason=unauthorized';
 			}

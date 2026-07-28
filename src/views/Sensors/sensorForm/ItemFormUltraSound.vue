@@ -1017,30 +1017,6 @@ const controllersSelectSettings = computed(() => ({
 		plantId: globalStore.navbarSettings?.showPlantName?.id || globalStore.globalFilters?.plantId,
 	},
 }));
-const equipmentsSelectSettings = computed(() => ({
-	fetchAction: createGetRequest(ENTITIES.Equipments.apiBase),
-	fetchByIdAction: createGetByIdRequest(ENTITIES.Equipments.apiBase),
-	params: { max: 100 },
-}));
-
-const validateDataSet = () => {
-	if (props.fromBannerSensorForm) return true;
-	if (!isLubeMatrixV3.value) return true;
-
-	const hasDataSet = dataSets.value.some((item) => item.id === formData.value.data_set);
-	if (!hasDataSet) {
-		datasetChanged.value = true;
-		Notify({
-			type: 'warning',
-			title: tt('phrases.form_isnt_ready'),
-			message: tt('Wrong data set'),
-		});
-		return false;
-	}
-
-	return true;
-};
-
 const generateIdInRange = (min, max) => {
 	const now = Date.now();
 	const perf = Math.floor(performance.now());

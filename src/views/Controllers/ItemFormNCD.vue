@@ -185,11 +185,8 @@ const initCrashIndicationThreshold = ref(5);
 const editStableSamples = ref(false);
 const initStableSamples = ref(10);
 
-const companyPlantsList = shallowRef([]);
 const companiesLoading = ref(false);
-const companiesLoading2 = ref(false);
 const companiesList = shallowRef([]);
-const companiesList2 = shallowRef([]);
 const plantsLoading = ref(false);
 const plantsList = shallowRef([]);
 

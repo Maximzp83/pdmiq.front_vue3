@@ -132,7 +132,6 @@ const {
 	setFilters,
 	createItem,
 	editItem,
-	refetchItemsList,
 } = useItemsData({
 	apiRoute: apiRoute.value,
 	itemStore: processesStore,
