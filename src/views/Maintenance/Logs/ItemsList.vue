@@ -198,6 +198,8 @@ const {
 	createItem,
 	editItem,
 	handleDeleteItems,
+	openModal,
+	buildModalSettings
 } = useItemsData({
 	entityKey: 'MaintenanceLogs',
 	itemStore: maintenanceStore,
@@ -392,7 +394,36 @@ const openDetailsModal = ({
 	hideFooter = true,
 	additionalModalSettings = {},
 }) => {
-	globalStore.show_edit_modal({
+	const payload = {
+		modal_settings: {
+			formComponentFileLoader,
+			title,
+			itemName,
+			hideSubmitButtons: true,
+			hideFooter,
+			settings: {
+				successSubmitOptions: {
+					refetchItemsList: true,
+					closeModal: true,
+				},
+			},
+			successSubmitOptions: {
+				refetchItemsList: true,
+				closeModal: true,
+			},
+			additionalModalSettings: {
+				productionLinesList: productionLinesList.value,
+				maintenanceReasonTypesList: maintenanceReasonTypesList(),
+				...additionalModalSettings,
+			},
+			headerActions,
+			footerActions,
+		}
+	}
+
+	openModal( buildModalSettings({ payload, itemData: row }) );
+
+	/*globalStore.show_edit_modal({
 		show: true,
 		editModalProp: 'editModalClassic',
 		instanceData: row,
@@ -409,7 +440,7 @@ const openDetailsModal = ({
 		},
 		headerActions,
 		footerActions,
-	});
+	});*/
 };
 
 const handleShowDetails = ({ row }) => {

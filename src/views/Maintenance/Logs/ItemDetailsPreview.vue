@@ -280,13 +280,13 @@ const column2Settings = computed(() =>
 		translate([
 			{
 				label: 'Production_Line',
-				prop: 'production_line_id',
-				meta: {
+				prop: 'productionLine.name',
+				/*meta: {
 					getItemValue: {
 						prop: 'name',
 						list: props.additionalSettings.productionLinesList || [],
 					},
-				},
+				},*/
 			},
 			{
 				label: 'Machine',
@@ -398,10 +398,10 @@ const editItem = () => {
 		itemName: tt('Maintenance_Log'),
 		className: 'maintenance-modal',
 		modalClassName: 'fixed-header-footer small-header small-footer',
+		successSubmitCallbacks: props.editModal?.successSubmitCallbacks,
 		additionalModalSettings: {
 			switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.LOG },
 			plantId: itemData.value?.plant_id,
-			successSubmitCallback: props.editModal?.successSubmitCallback,
 		},
 	});
 };

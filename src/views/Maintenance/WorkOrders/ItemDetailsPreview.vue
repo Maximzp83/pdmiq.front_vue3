@@ -393,7 +393,7 @@ const editItem = () => {
 			switchTabTo: { key: 'item_type', value: MAINTENANCE_TYPES.WORK_ORDER },
 			plantId: itemData.value?.plant_id,
 		},
-		successSubmitCallback: props.editModal?.successSubmitCallback,
+		successSubmitCallbacks: props.editModal?.successSubmitCallbacks,
 	});
 };
 

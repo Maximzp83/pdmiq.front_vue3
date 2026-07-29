@@ -827,6 +827,7 @@ const { isMobile, itemId, validateForm, handleCancel, clearValidate } = useItemF
 	formRef: itemFormRef,
 	fromModal: props.fromModal,
 	fromAnotherInstance: props.fromAnotherInstance,
+	editModal: () => props.editModal,
 	formSettings: props.formSettings,
 	localSetupPage,
 	localValidationHook,

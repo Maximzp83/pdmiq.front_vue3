@@ -1,4 +1,4 @@
-import { ref, computed, watch, onMounted, onBeforeMount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeMount, toValue } from 'vue';
 import { ENTITIES } from '@/config/entities';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -72,6 +72,7 @@ export function useItemForm({
 
 	const resolve = (val) =>
 		val && typeof val === 'object' && 'value' in val ? val.value : val;
+	const resolveEditModal = () => toValue(editModal);
 	const resolveSubItemsSettings = () => resolve(subItemsSettings);
 	const entityConfig = entityKey ? ENTITIES[entityKey] : null;
 	const resolvedApiRoute = apiRoute || entityConfig?.apiBase || null;
@@ -108,7 +109,7 @@ export function useItemForm({
 		return null;
 	});
 	const resolvedSuccessSubmitCallback = computed(() => {
-		const localSuccessSubmitCallback = resolve(successSubmitCallback) || editModal?.successSubmitCallback;
+		const localSuccessSubmitCallback = resolve(successSubmitCallback) || resolveEditModal()?.successSubmitCallback;
 		// console.log('localSuccessSubmitCallback', localSuccessSubmitCallback);
 		if (localSuccessSubmitCallback) {
 			return localSuccessSubmitCallback;
@@ -272,7 +273,7 @@ export function useItemForm({
 					return localSubmit(preparedData, options);
 				}
 
-				const itemName = resolve(editModal)?.itemName || resolvedItemsName.value.one || 'Item';
+				const itemName = resolveEditModal()?.itemName || resolvedItemsName.value.one || 'Item';
 
 				if (editInModal || fromModal || showSubmitButtons) {
 					return executeFormSubmit({
@@ -305,21 +306,22 @@ export function useItemForm({
 								value: true,
 							});
 						}
+						const currentEditModal = resolveEditModal();
 
-						if (editModal.successSubmitCallbacks) {
-							editModal.successSubmitCallbacks.forEach((callback) => {
+						if (currentEditModal?.successSubmitCallbacks) {
+							currentEditModal.successSubmitCallbacks.forEach((callback) => {
 								callback(answer);
 							});
 						}
 
-						if (editModal.successSubmitOptions) {
-							if (typeof editModal.successSubmitOptions.refetchItemsList === 'function') {
-								editModal.successSubmitOptions.refetchItemsList(answer);
+						if (currentEditModal?.successSubmitOptions) {
+							if (typeof currentEditModal.successSubmitOptions.refetchItemsList === 'function') {
+								currentEditModal.successSubmitOptions.refetchItemsList(answer);
 							}
-							if (editModal.successSubmitOptions.closeModal) {
+							if (currentEditModal.successSubmitOptions.closeModal) {
 								globalStore.show_edit_modal({
 									show: false,
-									editModalProp: editModal.editModalProp,
+									editModalProp: currentEditModal.editModalProp,
 								});
 							}
 						}

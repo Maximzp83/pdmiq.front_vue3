@@ -418,6 +418,8 @@ const {
 	createItem,
 	editItem,
 	handleDeleteItems,
+	// openModal,
+	// buildModalSettings
 } = useItemsData({
 	entityKey: 'WorkOrders',
 	itemStore: maintenanceStore,
@@ -779,6 +781,33 @@ const handleShowLog = ({ order, log }) => {
 			parentLog: log,
 		});
 	}
+
+	/*const payload = {
+		modal_settings: {
+			formComponentFileLoader: () => import('../Logs/ItemDetailsPreview.vue'),
+			title: `${tt('Maintenance_Log')} ${tt('Details')}`,
+			hideFooter: !footerActions.length,
+			hideSubmitButtons: true,
+			settings: {
+				showJustInfo: true,
+				parentOrderData: order,
+			},
+			itemName: tt('Maintenance_Log'),
+			headerActions,
+			footerActions,
+			additionalModalSettings: {
+				plantId: order.plant_id,
+				parentWO: order,
+				maintenanceReasonTypesList: maintenanceReasonTypesList(),
+				productionLinesList: productionLinesList.value,
+				taskProcedure: order.taskProcedure,
+				...propsFiltersRef.value,
+			},
+		}
+	}
+
+	openModal( buildModalSettings({ payload, itemData: row }) );*/
+
 
 	globalStore.show_edit_modal({
 		show: true,

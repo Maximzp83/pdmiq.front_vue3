@@ -389,13 +389,15 @@ export function useItemsData({
 			});
 		}
 
-		if (successSubmitOptions) {
+		const resolvedSuccesSubmitOptions = successSubmitOptions || modalSettings.successSubmitOptions;
+
+		if (resolvedSuccesSubmitOptions) {
 			modalSettings.successSubmitCallbacks = [];
 
-			if (successSubmitOptions.refetchItemsList) {
+			if (resolvedSuccesSubmitOptions.refetchItemsList) {
 				modalSettings.successSubmitCallbacks.push(refetchItemsList);
 			}
-			if (successSubmitOptions.closeModal) {
+			if (resolvedSuccesSubmitOptions.closeModal) {
 				modalSettings.successSubmitCallbacks.push(() => {
 					globalStore.show_edit_modal({
 						show: false,
@@ -404,7 +406,7 @@ export function useItemsData({
 				});
 			}
 		}
-		console.log('modalSettings', modalSettings)
+		// console.log('modalSettings', modalSettings)
 		return modalSettings;
 	};
 
@@ -452,6 +454,7 @@ export function useItemsData({
 
 	// -------------------------------------
 	const editItem = (payload = {}) => {
+		console.log('editItem')
 		if (typeof localEditItem === 'function') {
 			return Promise.resolve(localEditItem(payload));
 		}
@@ -677,5 +680,7 @@ export function useItemsData({
 		deleteItem,
 		handleDeleteItems,
 		handleShowNextInstanceItem,
+		openModal,
+		buildModalSettings
 	};
 }

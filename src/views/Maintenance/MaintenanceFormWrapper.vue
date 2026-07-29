@@ -20,6 +20,7 @@
 				:formSettings="formSettings"
 				:additionalSettings="additionalSettings"
 				@event="handleEvent"
+				:editModal="editModal"
 			/>
 		</div>
 
@@ -33,6 +34,7 @@
 				:formSettings="formSettings"
 				:additionalSettings="additionalSettings"
 				@event="handleEvent"
+				:editModal="editModal"
 			/>
 		</div>
 
@@ -45,6 +47,7 @@
 				:formSettings="formSettings"
 				:additionalSettings="additionalSettings"
 				@event="handleEvent"
+				:editModal="editModal"
 			/>
 		</div>
 	</div>
@@ -122,7 +125,7 @@ const handleSubmitForm = (payloadArg = {}) => {
 
 			if (props.editModal?.successSubmitCallbacks) {
 				props.editModal.successSubmitCallbacks.forEach((callback) => {
-					console.log(callback)
+					// console.log(callback)
 					callback(answer);
 				});
 			}
