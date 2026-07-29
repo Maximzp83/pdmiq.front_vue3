@@ -289,7 +289,7 @@ const tableSettings = computed(() => {
 					additionalActions: [
 						{
 							name: 'togglePreviewModal',
-							type: 'transparent',
+							className: 'el-button--transparent',
 							img: images_icon,
 							className: 'borderless button-with-img',
 							disablePopover: true,
@@ -298,7 +298,7 @@ const tableSettings = computed(() => {
 						},
 						{
 							name: 'openFile',
-							type: 'transparent',
+							className: 'el-button--transparent',
 							img: pdf_icon,
 							className: 'borderless button-with-img',
 							tooltip_text: ' ',
@@ -416,14 +416,14 @@ const handleShowDetails = ({ row }) => {
 	const headerActions = translate([
 		{
 			name: 'exportLog',
-			type: 'transparent',
+			className: 'el-button--transparent',
 			icon: 'icomoon icon-pdf',
 			tooltip_text: 'phrases.Export_To_PDF',
 		},
 	], { key: 'tooltip_text' });
 
 	if (hasAccessToEdit.value) {
-		headerActions.push(...translate([{ ...standardTableOperations.edit, type: 'transparent' }], { key: 'tooltip_text' }));
+		headerActions.push(...translate([{ ...standardTableOperations.edit, className: 'el-button--transparent' }], { key: 'tooltip_text' }));
 	}
 
 	const footerActions = [];
@@ -455,7 +455,7 @@ const handleShowParentWO = ({ row }) => {
 	const headerActions = translate([
 		{
 			name: 'handlePrintWO',
-			type: 'transparent',
+			className: 'el-button--transparent',
 			icon: 'icomoon icon-printer',
 			tooltip_text: 'Print',
 		},
@@ -467,7 +467,7 @@ const handleShowParentWO = ({ row }) => {
 				name: 'editWOFromLogsList',
 				icon: 'icomoon icon-pencil',
 				tooltip_text: 'Edit',
-				type: 'transparent',
+				className: 'el-button--transparent',
 				conditionSettings: {
 					checkMethod: 'some',
 					conditions: [

@@ -89,8 +89,8 @@
 								</span>
 							</div>
 
-							<div class="mcol-xs-6 form-item">
-								<div class="semi-bold span-block el-form-item__label no-paddings">
+							<div class="mcol-xs-6 form-item label-margin-0">
+								<div class="semi-bold span-block el-form-item__label no-paddings no-">
 									<b>{{ tt('phrases.Total_time') }}: </b>
 								</div>
 								<div class="semi-bold span-block inherit-color">{{ totalTime }}</div>
@@ -211,9 +211,9 @@
 				<div :class="['mcol-xs-12 mcol-lg-6', { showJustInfo }]">
 					<div :class="['card filled no-shadow el-form-item', { 'has-error': mainInstancesError }]">
 						<div class="card-content" @click="mainInstancesError = false">
-							<div class="semi-bold title article-title">{{ tt('Equipment') }}</div>
+							<div class="content-row semi-bold title article-title">{{ tt('Equipment') }}</div>
 
-							<div class="el-form-item mrow flex">
+							<div class="content-row el-form-item mrow flex">
 								<div class="mcol-xs-9 fluid">
 									<el-form-item :label="tt('Production_Line')" prop="production_line_id">
 										<CustomSelectV2

@@ -404,7 +404,7 @@ export function useItemsData({
 				});
 			}
 		}
-
+		console.log('modalSettings', modalSettings)
 		return modalSettings;
 	};
 
@@ -423,7 +423,7 @@ export function useItemsData({
 		if (payload?.path) {
 			path = payload.path;
 		}
-		console.log('openCreateRoute', path);
+		// console.log('openCreateRoute', path);
 		changeRoute({ path });
 		return Promise.resolve(payload);
 	};

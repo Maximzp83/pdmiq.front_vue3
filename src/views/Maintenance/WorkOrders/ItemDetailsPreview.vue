@@ -278,13 +278,13 @@ const column2Settings = computed(() =>
 		translate([
 			{
 				label: 'Production_Line',
-				prop: 'production_line_id',
-				meta: {
+				prop: 'productionLine.name',
+				/*meta: {
 					getItemValue: {
 						prop: 'name',
 						list: props.additionalSettings.productionLinesList || [],
 					},
-				},
+				},*/
 			},
 			{
 				label: 'Machine',

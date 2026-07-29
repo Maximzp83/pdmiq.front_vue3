@@ -51,16 +51,18 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 
+import { api_request } from '@/api/request_provider';
+import { ENTITIES } from '@/config/entities';
 import { MAINTENANCE_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
 import { useTabs } from '@/composables/mixins/useTabs';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 
-import TabsBar from '@/components/common/TabsBar.vue';
-import WorkOrderForm from './WorkOrders/ItemForm.vue';
-import MaintenanceLogForm from './Logs/ItemForm.vue';
+const TabsBar = defineAsyncComponent(() => import('@/components/common/TabsBar.vue'));
+const WorkOrderForm = defineAsyncComponent(() => import('./WorkOrders/ItemForm.vue'));
+const MaintenanceLogForm = defineAsyncComponent(() => import('./Logs/ItemForm.vue'));
 
 defineOptions({
 	name: 'MaintenanceFormWrapper',
@@ -71,7 +73,10 @@ const props = defineProps({
 	additionalSettings: { type: Object, default: () => ({}) },
 	settings: { type: Object, default: () => ({}) },
 	formSettings: { type: Object, default: () => ({}) },
+	editModal: { type: Object, default: null },
 });
+
+const emit = defineEmits(['event']);
 
 const itemFormComponentRef = ref(null);
 const tabsList = computed(() =>
@@ -100,7 +105,37 @@ const validateForm = () => {
 	itemFormComponentRef.value?.validateForm?.();
 };
 
-const { handleEvent } = useEventHandler({}, null);
+const handleSubmitForm = (payloadArg = {}) => {
+	const payload = { ...payloadArg };
+	const itemId = payload.data?.id;
+	const method = itemId ? 'put' : 'post';
+	const url = itemId
+		? `${ENTITIES.WorkOrders.apiBase}/${itemId}`
+		: ENTITIES.WorkOrders.apiBase;
+
+	emit('event', { eventName: 'toggleSaving', data: true, onward: true });
+
+	return api_request[method](url, payload)
+		.then((answer) => {
+			emit('event', { eventName: 'toggleSaving', data: false, onward: true });
+			emit('event', { eventName: 'successModalSubmit', data: answer, onward: true });
+
+			if (props.editModal?.successSubmitCallbacks) {
+				props.editModal.successSubmitCallbacks.forEach((callback) => {
+					console.log(callback)
+					callback(answer);
+				});
+			}
+
+			return answer;
+		})
+		.catch(() => {
+			emit('event', { eventName: 'toggleSaving', data: false, onward: true });
+			return false;
+		});
+};
+
+const { handleEvent } = useEventHandler({ handleSubmitForm }, emit);
 
 defineExpose({
 	validateForm,

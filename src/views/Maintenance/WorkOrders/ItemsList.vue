@@ -699,7 +699,7 @@ const handleShowDetailsPreview = ({ row }) => {
 	const headerActions = translate([
 		{
 			name: 'handlePrintWO',
-			type: 'transparent',
+			className: 'el-button--transparent',
 			icon: 'icomoon icon-printer',
 			tooltip_text: 'Print',
 		},
@@ -709,7 +709,7 @@ const handleShowDetailsPreview = ({ row }) => {
 		headerActions.push(...translate([
 			{
 				name: 'editItem',
-				type: 'transparent',
+				className: 'el-button--transparent',
 				icon: 'icomoon icon-pencil',
 				tooltip_text: 'Edit',
 				conditionSettings: {
@@ -748,6 +748,7 @@ const handleShowDetailsPreview = ({ row }) => {
 		instanceData: row,
 		formComponentFileLoader: () => import('./ItemDetailsPreview.vue'),
 		title: `${tt('Work_Order')} ${tt('Details')}`,
+		modalClassName: 'fixed-header-footer small-header small-footer',
 		hideFooter: !footerActions.length,
 		hideSubmitButtons: true,
 		settings: {},
