@@ -76,7 +76,7 @@ export function useSensors() {
 		});
 
 	const deleteManualRouteSensor = (payload = {}) =>
-		api_request.delete('/manual-route-sensors', {
+		api_request.delete(`/manual-route-sensors/${payload.sensorId}`, {
 			storeName,
 			...payload,
 			itemName: payload.itemName || 'Sensor',

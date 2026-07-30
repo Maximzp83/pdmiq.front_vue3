@@ -306,7 +306,7 @@ const removeSensorItem = ({ sensorId, sensorType, isNew }) => {
 			const deleteRequest =
 				sensorType === SENSOR_TYPES.MANUAL_ROUTE
 					? deleteManualRouteSensor({
-							data: { id: sensorId },
+							sensorId,
 							itemName: 'Sensor',
 						})
 					: detachSensor({ sensorId });
