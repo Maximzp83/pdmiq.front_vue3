@@ -454,7 +454,7 @@ export function useItemsData({
 
 	// -------------------------------------
 	const editItem = (payload = {}) => {
-		console.log('editItem')
+		// console.log('editItem')
 		if (typeof localEditItem === 'function') {
 			return Promise.resolve(localEditItem(payload));
 		}

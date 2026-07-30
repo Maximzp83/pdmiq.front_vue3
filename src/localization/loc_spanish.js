@@ -598,6 +598,7 @@ export default {
 		editable: 'Editable',
 		difference: 'Diferencia',
 		devices: 'Dispositivos',
+		saved: 'salvado'
 	},
 
 	sidebar_menu: {

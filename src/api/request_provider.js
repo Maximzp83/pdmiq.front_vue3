@@ -267,7 +267,8 @@ const api_request = (url, payload = {}) => {
 									concatData,
 									returnResponse,
 									returnResponseOnly,
-									incudeMeta
+									incudeMeta,
+									itemName
 								} = payload;
 								// console.log('response', response);
 								const value = returnResponseOnly

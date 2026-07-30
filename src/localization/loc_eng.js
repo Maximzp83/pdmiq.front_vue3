@@ -606,6 +606,7 @@ export default {
 		editable: 'Editable',
 		difference: 'Difference',
 		devices: 'Devices',
+		saved: 'saved'
 	},
 
 	sidebar_menu: {

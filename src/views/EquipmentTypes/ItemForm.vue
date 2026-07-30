@@ -106,7 +106,7 @@
 
 			<el-form-item :label="`${tt('Type')} ${tt('image')}`" prop="file_name" class="section-row upload-form-item">
 				<FileUploadBlock
-					ref="fileUploadBlockRef"
+					:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
 					rotate
 					deleteFileId
 					:pictures="itemPictures"
@@ -235,7 +235,7 @@
 				<VibrationAnalysisItemsBlock
 					class="vibration-analysis-items-block"
 					v-if="itemId"
-					ref="vibrationAnalysisItemsBlockRef"
+					:ref="(el) => setSubItemRef('VibrationAnalysisItemsBlock', el, 0)"
 					:equipmentTypeId="itemId"
 				/>
 			</div>
@@ -246,7 +246,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, ref, shallowRef, shallowReactive } from 'vue';
 
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
@@ -281,8 +281,6 @@ const brandsEntity = ENTITIES.Brands;
 const brandModelsEntity = ENTITIES.BrandModels;
 
 const itemFormRef = ref(null);
-const fileUploadBlockRef = ref(null);
-const vibrationAnalysisItemsBlockRef = ref(null);
 const equipmentTypesLoading = ref(false);
 const equipmentTypesList = shallowRef([]);
 const typesCategoriesList = shallowRef([]);
@@ -296,14 +294,15 @@ const typesMediaList = ref([]);
 const drivesList = ref([]);
 const childComponentsList = ref([]);
 const activeTab = ref({ title: 'options', prop: 'optionsTab' });
-const refsMap = ref({
+/*const refsMap = ref({
 	FileUploadBlock: [],
 	TypeOptionItem: [],
 	TypeMediaItem: [],
 	DriveItem: [],
 	VibrationAnalysisItemsBlock: [],
 	ComponentItem: [],
-});
+});*/
+const refsMap = shallowReactive({});
 
 const formData = ref({
 	name: '',
@@ -403,12 +402,13 @@ const methodsMap = {
 
 const subItemsSettings = computed(() =>
 	Object.freeze([
-		{
-			ref: 'FileUploadBlock',
-			destructure: true,
-			removeFilePropIfNull: true,
-			fileProp: 'file',
-		},
+		{ ref: 'FileUploadBlock', cleanIfEmpty: { prop: 'file', val: null } },
+		// {
+		// 	// ref: 'FileUploadBlock',
+		// 	// destructure: true,
+		// 	// removeFilePropIfNull: true,
+		// 	// fileProp: 'file',
+		// },
 		{ ref: 'TypeOptionItem', targetProp: 'type_options' },
 		{ ref: 'TypeMediaItem', targetProp: 'type_medias' },
 		{ ref: 'DriveItem', targetProp: 'drives' },

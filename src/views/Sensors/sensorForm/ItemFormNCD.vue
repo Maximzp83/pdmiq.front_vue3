@@ -780,6 +780,7 @@ const saveSensor = (formDataForSave, settings = {}) => {
 		data: formDataForSave,
 		itemName: 'Sensor',
 		notNotify: settings?.enableWebSocket,
+		resultMessage: `${tt('Sensor')} ${tt('saved')}`
 	});
 };
 

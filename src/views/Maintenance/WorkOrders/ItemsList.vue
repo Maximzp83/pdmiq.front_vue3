@@ -418,8 +418,8 @@ const {
 	createItem,
 	editItem,
 	handleDeleteItems,
-	// openModal,
-	// buildModalSettings
+	openModal,
+	buildModalSettings
 } = useItemsData({
 	entityKey: 'WorkOrders',
 	itemStore: maintenanceStore,
@@ -744,7 +744,33 @@ const handleShowDetailsPreview = ({ row }) => {
 		});
 	}
 
-	globalStore.show_edit_modal({
+	const payload = {
+		modal_settings: {
+			editModalProp: 'editModalClassic',
+			instanceData: row,
+			formComponentFileLoader: () => import('./ItemDetailsPreview.vue'),
+			title: `${tt('Work_Order')} ${tt('Details')}`,
+			modalClassName: 'fixed-header-footer small-header small-footer',
+			hideFooter: !footerActions.length,
+			hideSubmitButtons: true,
+			settings: {},
+			itemName: tt('Work_Order'),
+			headerActions,
+			footerActions,
+			successSubmitOptions: {
+				refetchItemsList: true,
+				closeModal: true,
+			},
+			additionalModalSettings: {
+				productionLinesList: productionLinesList.value,
+			},
+		}
+		// successSubmitCallback: refetchItemsList,
+	}
+
+	openModal( buildModalSettings({ payload, itemData: row }) );
+
+	/*globalStore.show_edit_modal({
 		show: true,
 		editModalProp: 'editModalClassic',
 		instanceData: row,
@@ -761,7 +787,7 @@ const handleShowDetailsPreview = ({ row }) => {
 			productionLinesList: productionLinesList.value,
 		},
 		successSubmitCallback: refetchItemsList,
-	});
+	});*/
 };
 
 const handleShowLog = ({ order, log }) => {

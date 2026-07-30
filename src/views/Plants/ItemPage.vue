@@ -45,6 +45,7 @@ const {
 	entityKey: 'Plants',
 	itemFormRef,
 	goToListAfterSave: true,
+	uploadSettings: { fileProp: 'file' },
 	successSubmitCallback: (answer) =>
 		globalStore
 			.fetch_global_plants({

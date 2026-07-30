@@ -122,6 +122,7 @@ const handleSubmitForm = (payloadArg = {}) => {
 		.then((answer) => {
 			emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 			emit('event', { eventName: 'successModalSubmit', data: answer, onward: true });
+			// console.log('currentEditModal', props.editModal)
 
 			if (props.editModal?.successSubmitCallbacks) {
 				props.editModal.successSubmitCallbacks.forEach((callback) => {

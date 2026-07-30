@@ -200,6 +200,7 @@ const { handleEvent } = useEventHandler({
 		handleFormSubmitFinish(!!success);
 	},
 }, emit);
+
 const {
 	setupFormSubItemsList,
 	addFormItem,
@@ -354,15 +355,12 @@ const handleFormSubmitFinish = (success) => {
 	emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 
 	if (formSubmitSuccessCount.value >= formsCount.value) {
-		globalStore.set_global_state({
-			stateProp: 'updateItemsList',
-			value: { key: 'equipmentsList', val: true },
-		});
-		emit('event', {
-			eventName: 'successModalSubmit',
-			data: true,
-			onward: true,
-		});
+		// console.log(props.editModal)
+		if (props.editModal?.successSubmitCallbacks) {
+			props.editModal.successSubmitCallbacks.forEach((callback) => {
+				callback();
+			});
+		}
 	}
 
 	formsCount.value = 0;
@@ -384,6 +382,7 @@ const submitEquipment = (equipmentSubmitPayload = {}) => {
 		data: equipmentForm,
 		withFile,
 		itemName: 'Item',
+		resultMessage: `${Lang.tt('Item')} ${Lang.tt('saved')}`
 	};
 
 	/*if (process.env.NODE_ENV ==='development') {

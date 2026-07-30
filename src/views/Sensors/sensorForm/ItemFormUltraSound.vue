@@ -1358,6 +1358,7 @@ const saveSensor = (formDataForSave) => {
 	return api_request[method](url, {
 		data: formDataForSave,
 		itemName: 'Sensor',
+		resultMessage: `${tt('Sensor')} ${tt('saved')}`
 	});
 };
 

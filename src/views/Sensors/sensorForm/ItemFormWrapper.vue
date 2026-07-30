@@ -228,7 +228,6 @@ const setupSensorLabelMethod = (sensor) => {
 	return setupLabel(sensor, sensorLabelOptions);
 };
 
-
 const validateItemForm = async () => {
 	if (!props.hasAccessToCreate) {
 		Notify({
@@ -256,6 +255,7 @@ const { handleEvent } = useEventHandler({
 		});
 	},
 	frequencySettingsChanged: () => {},
+	toggleSpinner: val => { sensorSaving.value = val; }
 });
 
 watch(

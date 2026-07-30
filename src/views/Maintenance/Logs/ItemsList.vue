@@ -333,7 +333,7 @@ const tableSettings = computed(() => {
 		operations: {
 			actions: [
 				{
-					name: 'handleShowDetails',
+					name: 'handleShowDetailsPreview',
 					type: 'success',
 					icon: 'icomoon icon-eye',
 					tooltip_text: 'Details',
@@ -401,12 +401,7 @@ const openDetailsModal = ({
 			itemName,
 			hideSubmitButtons: true,
 			hideFooter,
-			settings: {
-				successSubmitOptions: {
-					refetchItemsList: true,
-					closeModal: true,
-				},
-			},
+			settings: {},
 			successSubmitOptions: {
 				refetchItemsList: true,
 				closeModal: true,
@@ -443,7 +438,7 @@ const openDetailsModal = ({
 	});*/
 };
 
-const handleShowDetails = ({ row }) => {
+const handleShowDetailsPreview = ({ row }) => {
 	const headerActions = translate([
 		{
 			name: 'exportLog',
@@ -454,7 +449,14 @@ const handleShowDetails = ({ row }) => {
 	], { key: 'tooltip_text' });
 
 	if (hasAccessToEdit.value) {
-		headerActions.push(...translate([{ ...standardTableOperations.edit, className: 'el-button--transparent' }], { key: 'tooltip_text' }));
+		headerActions.push(...translate([
+			{
+				name: 'editItem',
+				className: 'el-button--transparent',
+				icon: 'icomoon icon-pencil',
+				tooltip_text: 'Edit',
+			},
+		], { key: 'tooltip_text' }));
 	}
 
 	const footerActions = [];
@@ -598,7 +600,7 @@ const { handleEvent } = useEventHandler({
 	editItem,
 	handleDeleteItems,
 	handleCompleteItems,
-	handleShowDetails,
+	handleShowDetailsPreview,
 	handleShowParentWO,
 	togglePreviewModal,
 	openFile,

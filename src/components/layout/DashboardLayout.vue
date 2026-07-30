@@ -332,7 +332,7 @@ const autoLogout = () => {
 
 const setupAutoLogoutTimer = () => {
 	if (
-		// import.meta.env.MODE !== 'development' &&
+		import.meta.env.MODE !== 'development' &&
 		!timer.value &&
 		authUser.value &&
 		authUser.value.id !== 2

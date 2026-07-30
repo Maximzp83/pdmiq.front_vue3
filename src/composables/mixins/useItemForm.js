@@ -307,7 +307,7 @@ export function useItemForm({
 							});
 						}
 						const currentEditModal = resolveEditModal();
-
+						// console.log('currentEditModal', currentEditModal)
 						if (currentEditModal?.successSubmitCallbacks) {
 							currentEditModal.successSubmitCallbacks.forEach((callback) => {
 								callback(answer);

@@ -7,7 +7,7 @@
 					:key="`item-${item.label}`"
 					:class="[{ 'details-row': idx }, item.rowClassName]"
 				>
-					<InfoCell
+					<InfoItem
 						:class="item.cellClassName"
 						tag="div"
 						labelPosition="top"
@@ -27,7 +27,7 @@
 					:key="`item-${item.label}`"
 					class="details-row"
 				>
-					<InfoCell
+					<InfoItem
 						tag="div"
 						labelPosition="top"
 						:valueClassName="item.valueClassName"
@@ -66,7 +66,7 @@ import { useGlobalStore } from '@/stores/GlobalStore';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 
-import InfoCell from '@/components/itemDetails/InfoItem.vue';
+import InfoItem from '@/components/itemDetails/InfoItem.vue';
 import SimpleSpinner from '@/components/common/SimpleSpinner.vue';
 import TaskProcedureInfo from '../WorkOrders/TaskProcedureInfo.vue';
 
