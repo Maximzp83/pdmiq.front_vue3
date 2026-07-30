@@ -1133,6 +1133,7 @@ export default {
 		confirm_phone_number: 'Confirm Phone Number',
 		fft_successfully_unlocked: 'FFT successfully unlocked',
 		unlock_fft: 'Unlock FFT',
+		sample_metadata: 'Sample Metadata',
 		flat_data_anomaly: 'Flat Data Anomaly',
 		personal_favorite: 'Personal Favorite',
 		company_favorite: 'Company Favorite',
@@ -1199,6 +1200,9 @@ export default {
 
 		'humidity': 'Humidity',
 		'temperature': 'Temperature',
+		'velocity': 'Velocity',
+		'high_frequency_acceleration': 'High Frequency Acceleration',
+		'fft': 'FFT',
 
 		'warning': 'Warning',
 		'alarm': 'Alarm',
@@ -1667,5 +1671,6 @@ export default {
 		pressure: 'Pressure',
 		ultrasound_vibration_temperature: 'Ultrasound, Vibration, Temperature',
 		uvt: 'UVT',
+		manual_route: 'Manual Route',
 	}
 };

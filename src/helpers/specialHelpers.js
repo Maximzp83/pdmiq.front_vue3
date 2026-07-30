@@ -553,7 +553,7 @@ const copyToClipboard1 = (string, settings = {}) => {
 };
 
 const setupItemSpeedOptionsList1 = ({rootFilters = {}, sensorData, itemSpeedOptionsList, fftItem}) => {
-	const {rpmSources} = sensorData;
+	const rpmSources = sensorData?.rpmSources || {};
 	let list = [];
 	const setupRpmOptionValues = value => {
 		const rpmValue = value != null ? +value : value;
@@ -603,12 +603,7 @@ const setupItemSpeedOptionsList1 = ({rootFilters = {}, sensorData, itemSpeedOpti
 };
 
 const getCurrentRpmSource1 = ({ rootFilters = {}, sensorData = {}, fftItem = null, rpm_source_item = null }) => {
-	const preparedList = setupItemSpeedOptionsList1({
-		sensorData,
-		rootFilters,
-		itemSpeedOptionsList: itemSpeedOptionsList(),
-	});
-	if (fftItem && fftItem.rpm_value) {
+	if (fftItem && fftItem.rpm_value != null) {
 		return {
 			id: 'fft-rpm',
 			value: fftItem.rpm_value,
@@ -616,10 +611,48 @@ const getCurrentRpmSource1 = ({ rootFilters = {}, sensorData = {}, fftItem = nul
 			draggable: true,
 		};
 	}
+
+	const preparedList = setupItemSpeedOptionsList1({
+		sensorData,
+		rootFilters,
+		itemSpeedOptionsList: itemSpeedOptionsList(),
+	});
 	if (rpm_source_item) {
 		return findItemBy('id', rpm_source_item, preparedList);
 	}
 	return null;
+};
+
+const getSensorPlant1 = (sensor = {}, equipment = {}) => {
+	const plant =
+		getObjectVal(sensor, 'controller.plant') ||
+		getObjectVal(sensor, 'equipment.plant') ||
+		getObjectVal(equipment, 'plant') ||
+		getObjectVal(sensor, 'equipment.asset.machine.productionLine.plant') ||
+		getObjectVal(equipment, 'asset.machine.productionLine.plant');
+
+	if (plant) return plant;
+
+	const name =
+		getObjectVal(sensor, 'equipment.plant_name') ||
+		getObjectVal(equipment, 'plant_name');
+	const id =
+		getObjectVal(sensor, 'equipment.plant_id') ||
+		getObjectVal(equipment, 'plant_id');
+
+	return name || id ? { id, name } : null;
+};
+
+const getSensorMetricSystemType1 = (sensor = {}, equipment = {}) => {
+	const plant = getSensorPlant1(sensor, equipment);
+
+	return (
+		(plant && getObjectVal(plant, 'metric_system_type')) ||
+		getObjectVal(sensor, 'controller.metric_system_type') ||
+		getObjectVal(sensor, 'equipment.metric_system_type') ||
+		getObjectVal(equipment, 'metric_system_type') ||
+		METRIC_SYSTEM_TYPES.METRIC
+	);
 };
 
 export const equipmentCardTitle = (titles, equipmentData) =>
@@ -660,3 +693,7 @@ export const setupTrueFalseCellIcon = val => setupTrueFalseCellIcon1(val);
 export const copyToClipboard = (str, settings) => copyToClipboard1(str, settings);
 export const setupItemSpeedOptionsList = payload => setupItemSpeedOptionsList1(payload);
 export const getCurrentRpmSource = payload => getCurrentRpmSource1(payload);
+export const getSensorPlant = (sensor, equipment) =>
+	getSensorPlant1(sensor, equipment);
+export const getSensorMetricSystemType = (sensor, equipment) =>
+	getSensorMetricSystemType1(sensor, equipment);

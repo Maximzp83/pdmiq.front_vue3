@@ -16,6 +16,13 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest uncommitted `vue2_project` delta was migrated into the already migrated Vue3 scope:
+  - Added Manual Route sensor constants, dataset/class metadata, localization, plant/metric helpers, chart parameter/unit definitions, statistics/FFT chart configs, per-metric FFT flags, metadata/RPM propagation, and Manual Route-aware Statistics/FFT/One Chart behavior.
+  - Added Manual Route list/get/save/delete API functions to `src/composables/useSensors.js`.
+  - Added `src/views/Sensors/sensorForm/ItemFormManualRoute.vue`, wired it into the Sensor form tabs, and routed Equipment sensor deletion to the Manual Route endpoint for type `6`.
+  - Manual Route equipment cards hide the legacy alarms block.
+  - Vue2 API dev URL, Equipment card alert guards, Requisition material prop optionality, and chart controller-timezone guard required no Vue3 change because equivalent behavior was already present or the unsafe access no longer exists.
+  - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24; existing Vite mixed-import/chunk-size warnings remain.
 - Latest `vue2_project/` changes were synced into already migrated Vue3 files:
   - `src/composables/mixins/useSubItemsList.js` now normalizes boolean `setIfEmpty` values to `0` when false, matching the updated legacy sub-items mixin behavior.
   - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` now disables navigator/scrollbar and enables x panning for `oneChartOnly`.
@@ -47,18 +54,27 @@
 
 ## Files Already Modified
 - Current visible dirty working tree:
-  - `src/views/Assets/Details/DetailsPage.vue`
-  - `src/views/Assets/ItemForm.vue`
-  - `src/views/Machines/Details/DetailsPage.vue`
-  - `src/views/Machines/ItemForm.vue`
-  - `src/views/ProductionLines/Details/DetailsPage.vue`
-  - `src/views/ProductionLines/ItemForm.vue`
-  - `src/views/Controllers/DXMCommandsTab.vue`
+  - `src/api/index.js` (pre-existing user debug comment; not changed by the Manual Route sync)
+  - `src/composables/useSensors.js`
+  - `src/constants/global.js`
+  - `src/helpers/specialHelpers.js`
+  - `src/localization/loc_eng.js`
+  - `src/localization/loc_spanish.js`
+  - Manual Route-related files under `src/modules/charts_factory/controllers/Sensor`
+  - `src/views/Equipments/Card/CardSensorItem.vue`
+  - `src/views/Equipments/ItemFormWrapper.vue`
+  - `src/views/Sensors/FFTStatisticsPage.vue`
+  - `src/views/Sensors/OneChartPage.vue`
+  - `src/views/Sensors/StatisticsPage.vue`
+  - `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`
+  - `src/views/Sensors/sensorForm/ItemFormWrapper.vue`
+  - `src/views/Sensors/sensorForm/ItemFormManualRoute.vue` (new)
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-- Do not revert these restored `550d339` migration changes.
+  - The current user-authored delta under `vue2_project/`, including new `vue2_project/src/views/Sensors/sensorForm/ItemFormManualRoute.vue`
+- Do not revert the source delta under `vue2_project/` or the pre-existing `src/api/index.js` change.
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.
@@ -70,4 +86,4 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Continue one confirmed file/step at a time; all statically discovered active WebSocket consumers now use the migrated service wrapper, with runtime validation remaining when explicitly requested.
+- Runtime smoke-test Manual Route sensor create/update/delete from Equipment, Statistics charts, FFT metadata/RPM, and One Chart with real API data when requested.

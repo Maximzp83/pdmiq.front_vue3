@@ -190,6 +190,11 @@ export const BANNER_M25_PARAMETERS_TYPES = {
 	TEMPERATURE: 5,
 };
 
+export const MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES = {
+	VELOCITY: 114,
+	HIGH_FREQUENCY_ACCELERATION: 115
+};
+
 const metricSystemsList1 = [
 	{ id: METRIC_SYSTEM_TYPES.METRIC, name: 'constants.metric' },
 	{ id: METRIC_SYSTEM_TYPES.IMPERIAL, name: 'constants.imperial' }
@@ -472,6 +477,38 @@ const metricKeysTable1 = {
 			[BANNER_M25_PARAMETERS_TYPES.PEAK_VELOCITY_FREQ_COMPONENT]: UNIT_TYPES.CPM,
 			[BANNER_M25_PARAMETERS_TYPES.TEMPERATURE]: UNIT_TYPES.FAHRENHEIT
 		}
+	},
+
+	manual_route: {
+		[METRIC_SYSTEM_TYPES.METRIC]: {
+			[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY]: UNIT_TYPES.MM_SEC,
+			[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION]:
+				UNIT_TYPES.G
+		},
+		[METRIC_SYSTEM_TYPES.IMPERIAL]: {
+			[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY]: UNIT_TYPES.INCHES_SEC,
+			[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION]:
+				UNIT_TYPES.G
+		}
+	}
+};
+
+const manualRouteSensorParametersList1 = {
+	[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY]: {
+		id: MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY,
+		icon: 'icon-velocity',
+		name: 'constants.velocity',
+		type: 'velocity',
+		color: '#059966',
+		metricKeysTableName: 'manual_route'
+	},
+	[MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION]: {
+		id: MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION,
+		icon: 'icon-acceleration',
+		name: 'constants.high_frequency_acceleration',
+		type: 'acceleration',
+		color: '#ffde32',
+		metricKeysTableName: 'manual_route'
 	}
 };
 
@@ -1403,6 +1440,8 @@ export const metricKeysTable = (metricKeysTableName, metric) =>
 export const metricSystemsList = () => Lang.translate(metricSystemsList1);
 
 export const sensorParametersList = key => setupList(sensorParametersList1, key);
+export const manualRouteSensorParametersList = key =>
+	setupList(manualRouteSensorParametersList1, key);
 export const sensorParametersListNCD = key =>
 	setupList(sensorParametersListNCD1, key, { translate: { key: 'name_fft' } });
 export const sensorUltraSoundParametersList = key =>

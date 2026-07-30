@@ -184,7 +184,7 @@ const api = (method, url, payload = {}) => {
 			'Content-Type': 'multipart/form-data',
 		};
 	}
-
+	// console.log('finalMethod', finalMethod)
 	// Prepare request configuration
 	const requestConfig = {
 		method: finalMethod,

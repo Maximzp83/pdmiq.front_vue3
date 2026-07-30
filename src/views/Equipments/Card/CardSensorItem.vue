@@ -52,7 +52,7 @@
 			</div>
 		</div>
 
-		<div class="alarms-block">
+		<div v-if="!currentSensorType.isManualRoute" class="alarms-block">
 			<div>
 				<div v-if="currentFaultsType === 'banner'" class="counters-part">
 					<div class="column">

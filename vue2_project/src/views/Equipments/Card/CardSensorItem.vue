@@ -53,7 +53,7 @@
 			</div>
 		</div>
 
-		<div class="alarms-block">
+		<div class="alarms-block" v-if="!currentSensorType.isManualRoute">
 			<div class="">
 				<div class="counters-part" v-if="currentFaultsType == 'banner'">
 					<div class="column">
@@ -262,7 +262,8 @@ export default {
 
 	computed: {
 		sensorsStatusClass() {
-			const { current_metric_issue_alerts } = this.itemData;
+			const current_metric_issue_alerts =
+				this.itemData.current_metric_issue_alerts || [];
 			const isAlarm = current_metric_issue_alerts.some(
 				ai => ai.alert_type === SENSOR_ALARM_TYPES.ALARM
 			)

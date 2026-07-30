@@ -1051,7 +1051,8 @@ class SensorChart extends SensorChartBase {
 			/*setupAdditionalSeriesData: [
 				{ data_path: 'data_average_value', method: '', skipMaxValues:true }
 			],*/
-			includeProblems: true,
+			includeProblems:
+				this.transformator_settings.specification.includeProblems !== false,
 		};
 
 		if (this.generateSeriesByStatistics) {

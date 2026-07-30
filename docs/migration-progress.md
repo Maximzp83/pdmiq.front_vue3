@@ -829,3 +829,10 @@ await fetchUsers({ page: 1 });
   - Added `/settings/import/*`, `/settings/import/:id`, `/plant-import`, `/plant-import-logs`, `/plant-import-logs/:id`, and `/master-import` routes
   - Enabled Import in Settings navigation and sidebar menu
   - `npm run build`, targeted `git diff --check`, and migration-rule scan passed
+- [x] Manual Route Sensors Vue2 delta sync
+  - Added Manual Route sensor constants, dataset/class metadata, localization, plant/metric helpers, chart parameters and units
+  - Added Manual Route list/get/save/delete API operations and a Vue3 `ItemFormManualRoute.vue` form tab
+  - Updated Equipment sensor removal/card handling for Manual Route
+  - Added statistics/FFT chart configs, per-metric FFT flag filtering, metadata/RPM display, and Manual Route-aware Statistics/FFT/One Chart behavior
+  - Vue2 API URL, Equipment alert guards, Requisition material prop optionality, and chart timezone safety needed no Vue3 code change because equivalent behavior was already present or not applicable
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24

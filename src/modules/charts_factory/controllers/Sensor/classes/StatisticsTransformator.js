@@ -371,17 +371,22 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 					}
 
 					if (enable_fft && fft.length) {
+						const parameterFFT = fft.filter(
+							item =>
+								item.metric_type == null ||
+								Number(item.metric_type) === Number(parameter_item.id)
+						);
 						// statistics_result.flagsData.ncd_fft_statistics = this.setupFlagsFFTStatistics(fft);
 						statistics_result.flagsData.pending_fft_statistics = setupFlagsFFTStatistics(
-							fft,
+							parameterFFT,
 							[BANNER_FFT_STATUSES_TYPES.PENDING, BANNER_FFT_STATUSES_TYPES.APPROVED]
 						);
 						statistics_result.flagsData.failed_fft_statistics = setupFlagsFFTStatistics(
-							fft,
+							parameterFFT,
 							[BANNER_FFT_STATUSES_TYPES.FAILED]
 						);
 						statistics_result.flagsData.completed_fft_statistics = setupFlagsFFTStatistics(
-							fft,
+							parameterFFT,
 							[BANNER_FFT_STATUSES_TYPES.COMPLETED]
 						);
 					}

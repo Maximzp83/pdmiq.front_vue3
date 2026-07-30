@@ -135,7 +135,11 @@ const emit = defineEmits(['submit', 'onCancel', 'event']);
 const authStore = useAuthStore();
 const globalStore = useGlobalStore();
 const { Notify } = useNotify();
-const { fetchDatasetFormulas, detachSensor } = useSensors();
+const {
+	fetchDatasetFormulas,
+	deleteManualRouteSensor,
+	detachSensor,
+} = useSensors();
 const refsMap = ref({});
 const disableTabs = ref(false);
 const formSubmitFinishCount = ref(0);
@@ -283,7 +287,7 @@ const fetchMultiViews = (equipmentId) => {
 		});
 };
 
-const removeSensorItem = ({ sensorId, isNew }) => {
+const removeSensorItem = ({ sensorId, sensorType, isNew }) => {
 	if (isNew) {
 		removeFormItem(sensorId, sensorFormsList);
 		return;
@@ -299,7 +303,15 @@ const removeSensorItem = ({ sensorId, isNew }) => {
 	)
 		.then(() => {
 			emit('event', { eventName: 'toggleSaving', data: true, onward: true });
-			return detachSensor({ sensorId })
+			const deleteRequest =
+				sensorType === SENSOR_TYPES.MANUAL_ROUTE
+					? deleteManualRouteSensor({
+							data: { id: sensorId },
+							itemName: 'Sensor',
+						})
+					: detachSensor({ sensorId });
+
+			return deleteRequest
 				.finally(() => {
 					emit('event', { eventName: 'toggleSaving', data: false, onward: true });
 				});

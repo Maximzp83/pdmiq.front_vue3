@@ -39,7 +39,10 @@
 						</div>
 
 						<div
-							v-if="!currentSensorType.isBannerV2Generic"
+							v-if="
+								!currentSensorType.isBannerV2Generic &&
+								!currentSensorType.isManualRoute
+							"
 							class="mcol-xs-auto legend-container"
 						>
 							<div class="legend-list">
@@ -70,6 +73,7 @@
 
 						<div class="button-item">
 							<el-button
+								v-if="!currentSensorType.isManualRoute"
 								type="primary"
 								native-type="button"
 								:class="[
@@ -284,7 +288,11 @@ import {
 	findItemBy,
 	getDateRange,
 } from '@/helpers';
-import { getSensorTitle } from '@/helpers/specialHelpers';
+import {
+	getSensorMetricSystemType,
+	getSensorPlant,
+	getSensorTitle,
+} from '@/helpers/specialHelpers';
 import {
 	datePickerAdditionalShortcuts,
 	datePickerShortcuts,
@@ -406,6 +414,7 @@ const additionalProps = computed(() => Object.freeze({
 	statsThresholdsActive: statsThresholdsActive.value,
 	accessToThresholds:
 		authStore.hasAccessTo(['edit_dashboard']) &&
+		!currentSensorType.value.isManualRoute &&
 		!Object.values(joinChartsBy.value).some((value) => Boolean(value) && value !== 'split'),
 	hcInstance: Highcharts,
 	higchartInstances: {
@@ -465,6 +474,7 @@ const enableFFT = computed(() => {
 			enableAxisSelector.value ||
 			type.isBannerV2_1 ||
 			type.isBannerM25 ||
+			type.isManualRoute ||
 			(type.isBannerV2Generic && bannerV2Subtype?.is_fft_allowed)
 		),
 	);
@@ -484,7 +494,8 @@ const enableProblemsBlock = computed(() => Boolean(
 	sensorData.value &&
 	!isCompare.value &&
 	!currentSensorType.value.isSDTsensor &&
-	!currentSensorType.value.isHumiditySensor,
+	!currentSensorType.value.isHumiditySensor &&
+	!currentSensorType.value.isManualRoute,
 ));
 const enableAxisSelector = computed(() => {
 	const type = currentSensorType.value || {};
@@ -696,10 +707,11 @@ const navbarSettings = computed(() => {
 		showStandardNavItem: true,
 		pageTitle: '<span><b>PdM</b>Matrix<sup>TM</sup></span>',
 	};
-	if (!isCompare.value && sensorData.value?.controller?.plant) {
-		settings.showPlantName = {
-			name: sensorData.value.controller.plant.name,
-		};
+	if (!isCompare.value) {
+		const plant = getSensorPlant(sensorData.value, equipmentData.value);
+		if (plant) {
+			settings.showPlantName = { name: plant.name };
+		}
 	}
 	return Object.freeze(settings);
 });
@@ -1108,12 +1120,10 @@ watch(overlaySensorId, (id) => {
 });
 
 watch(sensorData, (data) => {
-	if (!data?.controller) return;
+	if (!data) return;
 
 	globalStore.setup_navbar(navbarSettings.value);
-	const newMetric = data.controller.plant
-		? data.controller.plant.metric_system_type
-		: data.controller.metric_system_type;
+	const newMetric = getSensorMetricSystemType(data, equipmentData.value);
 
 	if (filters.value.measurement !== newMetric) {
 		sensorsStore.set_statistics_filters({

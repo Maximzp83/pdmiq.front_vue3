@@ -33,9 +33,12 @@
 
 							<div class="mcol-xs-12 flex">
 								<div class="card filled_4 request-type-block">
-									<span v-if="isUltrasoundFFT">Fmax = </span>
-									<span v-else>{{ requestType }} - </span>
-									<span class="no-margin">{{ requestFMax }}</span>
+									<span v-if="isManualRoute">{{ fftMetricName }}</span>
+									<template v-else>
+										<span v-if="isUltrasoundFFT">Fmax = </span>
+										<span v-else>{{ requestType }} - </span>
+										<span class="no-margin">{{ requestFMax }}</span>
+									</template>
 								</div>
 								
 							</div>
@@ -61,6 +64,29 @@
 							{{ `${tt('rpm')}: ${equipmentRPM}` }}
 						</div>
 
+						<div
+							v-if="metaDataEntries.length"
+							class="card block-item mcol-xs-12 content-row"
+						>
+							<div class="card-header filled_2">
+								<div class="title semi-bold uppercase">
+									{{ tt('phrases.sample_metadata') }}
+								</div>
+							</div>
+							<div class="card-content">
+								<ul class="section-row info-list">
+									<li
+										v-for="entry in metaDataEntries"
+										:key="entry.key"
+										class="info-item"
+									>
+										<span class="key">{{ entry.key }}: </span>
+										<span class="value">{{ entry.value }}</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+
 						<div class="mcol-xs-12 content-row">
 							<AnalysisFFTContainer
 								ref="AnalysisFFTContainer"
@@ -78,6 +104,7 @@
 						class="section-row margin-top-row axis-selection-container flex justify-center"
 					>
 						<RadioButtonsBlock
+							v-if="!isManualRoute"
 							v-show="!splitCharts"
 							@onChange="val => (activeAxis = val)"
 							:settings="axisRadioBlockSettings"
@@ -109,6 +136,7 @@
 						>
 							<div class="button-item">
 								<el-button
+									v-if="!isManualRoute"
 									@click="handleSplitCharts"
 									type="primary"
 									native-type="button"
@@ -196,7 +224,10 @@ import {
 	getRoundedValue,
 	getItemValue
 } from '@/helpers';
-import { getSensorTitle } from '@/helpers/specialHelpers';
+import {
+	getSensorMetricSystemType,
+	getSensorTitle
+} from '@/helpers/specialHelpers';
 // import { timeZonesList } from '@/constants/date_time';
 
 import {
@@ -210,7 +241,8 @@ import {
 	metricSystemsList,
 	METRIC_SYSTEM_TYPES,
 	NCD_SENSOR_PARAMETERS_TYPES,
-	SENSOR_PARAMETERS_TYPES
+	SENSOR_PARAMETERS_TYPES,
+	manualRouteSensorParametersList
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { initPageDataMixin, sensorTypeMixin, fetchItemsHelper, eventHandler } from '@/mixins';
@@ -224,7 +256,7 @@ export default {
 		FFTChartsListWrapper: () => import('./charts/fft/FFTChartsListWrapper.vue'),
 		RadioButtonsBlock: () => import('@/components/form/RadioButtonsBlock.vue'),
 		EquipmentPictureBlock: () => import('./charts/EquipmentPictureBlock.vue'),
-		AnalysisFFTContainer: () => import('./AnalysisFFT/AnalysisFFTContainer.vue'),
+		AnalysisFFTContainer: () => import('./AnalysisFFT/AnalysisFFTContainer.vue')
 	},
 
 	data: () => ({
@@ -356,7 +388,10 @@ export default {
 		},
 
 		equipmentRPM() {
-			const { itemData, measurement } = this;
+			const { currentFFTItem, itemData, measurement } = this;
+			if (currentFFTItem && currentFFTItem.rpm_value != null) {
+				return `${currentFFTItem.rpm_value} RPM`;
+			}
 			if (itemData && itemData.equipment_rpm) {
 				if (measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 					return `${itemData.equipment_rpm} CPM`;
@@ -368,8 +403,14 @@ export default {
 		},
 
 		isUltrasoundFFT: that => that.currentSensorType.isBannerM25,
+		isManualRoute: that => that.currentSensorType.isManualRoute,
 
 		getParamsByIds() {
+			if (this.isManualRoute && this.currentFFTItem) {
+				return this.currentFFTItem.metric_type
+					? [Number(this.currentFFTItem.metric_type)]
+					: [];
+			}
 			if(this.isUltrasoundFFT) {
 				return [
 					NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM,
@@ -383,6 +424,30 @@ export default {
 					NCD_SENSOR_PARAMETERS_TYPES.Z_WAVEFORM,
 					SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY
 				]
+			}
+			return [];
+		},
+
+		fftMetricName() {
+			if (this.currentFFTItem) {
+				const parameter = manualRouteSensorParametersList(
+					this.currentFFTItem.metric_type
+				);
+				return parameter ? parameter.name : this.tt('constants.fft');
+			}
+			return '';
+		},
+
+		metaDataEntries() {
+			if (
+				this.currentFFTItem &&
+				this.currentFFTItem.meta_data &&
+				typeof this.currentFFTItem.meta_data === 'object'
+			) {
+				return Object.keys(this.currentFFTItem.meta_data).map(key => ({
+					key,
+					value: this.currentFFTItem.meta_data[key]
+				}));
 			}
 			return [];
 		},
@@ -427,7 +492,8 @@ export default {
 			return {
 				selectedChildComponents: this.selectedChildComponents,
 				equipmentData: this.equipmentData,
-				isUltrasoundFFT: this.isUltrasoundFFT
+				isUltrasoundFFT: this.isUltrasoundFFT,
+				isManualRoute: this.isManualRoute
 			}
 		},
 
@@ -599,6 +665,12 @@ export default {
 	},
 
 	watch: {
+		equipmentData(equipment) {
+			if (equipment && this.itemData) {
+				this.measurement = getSensorMetricSystemType(this.itemData, equipment);
+			}
+		},
+
 		itemData(sensor) {
 			if (sensor) {
 				// console.log(sensor, this.itemData)
@@ -618,9 +690,7 @@ export default {
 					urlPostfix: `/${this.fftId}/next`
 				});
 
-				this.measurement = sensor.controller.plant
-					? sensor.controller.plant.metric_system_type
-					: sensor.controller.metric_system_type;
+				this.measurement = getSensorMetricSystemType(sensor, this.equipmentData);
 			}
 		},
 

@@ -113,6 +113,25 @@ const actions = {
 		return fetch_items(storeArgs, '/sensors', payload);
 	},
 
+	fetch_manual_route_sensors(storeArgs, payload = {}) {
+		return fetch_items(storeArgs, '/manual-route-sensors', payload);
+	},
+
+	fetch_manual_route_sensor(storeArgs, payload) {
+		const extendedPayload = {
+			...payload,
+			stateProp: 'itemData',
+			method: 'GET',
+			alternateResponseProp: 'data',
+			notNotify: true
+		};
+		return multipurpose_response(
+			storeArgs,
+			`/manual-route-sensors/${extendedPayload.itemId}`,
+			extendedPayload
+		);
+	},
+
 	/*fetch_external_sensors(storeArgs, payload = {}) {
 		const extendedPayload = {
 			...payload,
@@ -310,8 +329,39 @@ const actions = {
 		return save_data(storeArgs, `/sensors`, extendedPayload);
 	},
 
+	save_manual_route_sensor(storeArgs, payload) {
+		const { data = {} } = payload;
+		const itemId = data.id || payload.itemId;
+		const extendedPayload = {
+			...payload,
+			data: {
+				equipment_id: data.equipment_id,
+				location_in_equipment: data.location_in_equipment,
+				data_set: data.data_set
+			},
+			stateProp: 'itemData',
+			method: itemId ? 'PUT' : 'POST',
+			resultMessage:
+				payload.resultMessage || `Sensor ${itemId ? 'updated' : 'created'}`
+		};
+
+		return multipurpose_response(
+			storeArgs,
+			`/manual-route-sensors${itemId ? `/${itemId}` : ''}`,
+			extendedPayload
+		);
+	},
+
 	delete_sensor(storeArgs, payload) {
 		return delete_item(storeArgs, `/sensors`, payload);
+	},
+
+	delete_manual_route_sensor(storeArgs, payload) {
+		return delete_item(storeArgs, `/manual-route-sensors`, {
+			...payload,
+			itemName: payload.itemName || 'Sensor',
+			loading: true
+		});
 	},
 
 	detach_sensor(storeArgs, payload) {

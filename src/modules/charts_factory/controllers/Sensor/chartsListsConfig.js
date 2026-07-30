@@ -6,7 +6,9 @@ import {
 	SENSOR_COLORTECH_VFD_PRESSURE_RPM_AMPS_PARAMETERS_TYPES,
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
 	BANNER_M25_PARAMETERS_TYPES,
+	MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES,
 	sensorParametersList,
+	manualRouteSensorParametersList,
 	sensorParametersListNCD,
 	sensorUltraSoundParametersList,
 	sensorBannerUltraSoundParametersList,
@@ -586,6 +588,58 @@ const getSeriesConfigSettingsForBannerV2_1For = (parameter, settings={}) => {
 
 const chartsListsConfig1 = {
 	'banner': banner_configs,
+	'manual_route': [
+		{
+			chart_id: `chart-${MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY}`,
+			transformator_settings: {
+				specification: {
+					setupPlotlinesData: false,
+					includeProblems: false,
+					setupFlagsData: {
+						enable_notes: false,
+						enable_crashes: false,
+						enable_fft: true,
+						enable_runtime_tracker: false
+					},
+					setupPointsData: {
+						method: 'standard_datetime',
+						enableZones: false
+					}
+				}
+			},
+			seriesConfigIncludes: ['fft_flag'],
+			requestsList: [
+				manualRouteSensorParametersList(
+					MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY
+				)
+			]
+		},
+		{
+			chart_id: `chart-${MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION}`,
+			transformator_settings: {
+				specification: {
+					setupPlotlinesData: false,
+					includeProblems: false,
+					setupFlagsData: {
+						enable_notes: false,
+						enable_crashes: false,
+						enable_fft: true,
+						enable_runtime_tracker: false
+					},
+					setupPointsData: {
+						method: 'standard_datetime',
+						enableZones: false
+					}
+				}
+			},
+			seriesConfigIncludes: ['fft_flag'],
+			requestsList: [
+				manualRouteSensorParametersList(
+					MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION
+				)
+			]
+		}
+	],
 	'banner_CM1L': banner_configs.concat([
 		{
 			chart_id: `chart-${SENSOR_PARAMETERS_TYPES.AMPS}`,
@@ -2326,6 +2380,7 @@ const defaultSeriesConfig1 = {
 
 const getRequestList1 = ({parameter, sensor}) => {
 	const parameterItem = sensorParametersList(parameter) ||
+				manualRouteSensorParametersList(parameter) ||
 				sensorParametersListNCD(parameter) ||
 				sensorUltraSoundParametersList(parameter) ||
 				sensorBannerUltraSoundParametersList(parameter) ||

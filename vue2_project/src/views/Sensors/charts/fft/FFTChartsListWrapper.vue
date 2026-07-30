@@ -166,7 +166,7 @@ export default {
 				});
 			}
 
-			if (!splitCharts && activeAxis) {
+			if (!this.currentSensorType.isManualRoute && !splitCharts && activeAxis) {
 				const {
 					ncd_active_vertical_axis,
 					// ncd_active_axial_axis,

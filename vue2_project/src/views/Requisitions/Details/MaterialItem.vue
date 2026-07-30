@@ -56,7 +56,7 @@ export default {
 
 	props: {
 		isLast: Boolean,
-		targetPropName: { type: String, required: true },
+		// targetPropName: { type: String, required: true },
 		fromModal: Boolean
 	},
 

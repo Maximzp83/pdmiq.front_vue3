@@ -816,9 +816,19 @@ const setupFlagsFFTStatistics1 = (fftData = [], filterBy = []) => {
 	}
 
 	for (let i = 0; i < filteredData.length; i++) {
-		const { created_at, sensor_id, id, /*status,*/ sender, type } = filteredData[i];
+		const {
+			created_at,
+			sensor_id,
+			id,
+			/*status,*/
+			sender,
+			type,
+			metric_type,
+			meta_data,
+			rpm_value
+		} = filteredData[i];
 		const type_item = findItemBy('id', type, fftTypesList()) || {};
-		let text = `${type_item.label} FFT`;
+		let text = `${type_item.label ? `${type_item.label} ` : ''}FFT`;
 
 		if (
 			(type_item.id == FFT_TYPES.MANUAL || type_item.id == FFT_TYPES.SCHEDULED)
@@ -832,7 +842,7 @@ const setupFlagsFFTStatistics1 = (fftData = [], filterBy = []) => {
 			y: 0,
 			title: ' ',
 			text: text,
-			payload: { id, sensor_id }
+			payload: { id, sensor_id, metric_type, meta_data, rpm_value }
 		});
 	}
 

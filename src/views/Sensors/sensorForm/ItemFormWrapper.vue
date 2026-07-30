@@ -100,6 +100,19 @@
 				@submit="emit('submit', $event)"
 			/>
 		</div>
+
+		<div v-if="activeTab?.prop === 'manualRouteTab'" class="tab-container content-row">
+			<ItemFormManualRoute
+				:ref="(el) => setSubItemRef('ItemFormComponent', el, 0)"
+				:class="{ showJustInfo: !hasAccessToCreate }"
+				:fromModal="fromModal"
+				:equipmentData="equipmentData"
+				:itemData="selectedSensorData"
+				:itemsName="itemsName"
+				:isNew="isNew"
+				@event="handleEvent"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -124,6 +137,7 @@ import TabsBar from '@/components/common/TabsBar.vue';
 import ItemForm from './ItemForm.vue';
 import ItemFormUltraSound from './ItemFormUltraSound.vue';
 import ItemFormNCD from './ItemFormNCD.vue';
+import ItemFormManualRoute from './ItemFormManualRoute.vue';
 
 const { tt } = Lang;
 
@@ -174,7 +188,11 @@ const selectedSensorData = computed(() => {
 
 	return props.itemData?.id ? Object.freeze(props.itemData) : undefined;
 });
-const sensorTitle = computed(() => (isNew.value ? tt('New') : props.itemData?.asset_numbers || ''));
+const sensorTitle = computed(() =>
+	isNew.value
+		? tt('New')
+		: props.itemData?.asset_numbers || props.itemData?.location_in_equipment || '',
+);
 const itemsName = computed(() => ({ one: tt('Sensor'), mult: tt('Sensors') }));
 const sensorQueryOptions = computed(() =>
 	Object.freeze({
@@ -193,6 +211,11 @@ const tabsList = computed(() =>
 		{ title: 'banner', prop: 'bannerTab', item_type: SENSOR_TYPES.BANNER },
 		{ title: 'ultraSound', prop: 'ultrasoundTab', item_type: SENSOR_TYPES.ULTRA_SOUND },
 		{ title: `NCD ${tt('Sensor')}`, prop: 'NCDTab', item_type: SENSOR_TYPES.NCD },
+		{
+			title: tt('technology.manual_route'),
+			prop: 'manualRouteTab',
+			item_type: SENSOR_TYPES.MANUAL_ROUTE,
+		},
 	]),
 );
 
@@ -216,7 +239,11 @@ const canRemove = computed(
 );
 
 const removeItem = () => {
-	emit('onRemove', { sensorId: props.itemData?.id, isNew: isNew.value });
+	emit('onRemove', {
+		sensorId: props.itemData?.id,
+		sensorType: props.itemData?.type,
+		isNew: isNew.value,
+	});
 };
 
 const setupSensorLabelMethod = (sensor) => {

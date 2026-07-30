@@ -21,6 +21,25 @@ export function useSensors() {
 			...payload,
 		});
 
+	const fetchManualRouteSensors = (params = {}, payload = {}) =>
+		api_request.get('/manual-route-sensors', {
+			params,
+			storeName,
+			stateProp: 'itemsList',
+			loadingProp: 'isLoading',
+			incudeMeta: true,
+			...payload,
+		});
+
+	const fetchManualRouteSensor = ({ itemId, ...payload } = {}) =>
+		api_request.get(`/manual-route-sensors/${itemId}`, {
+			stateProp: 'itemData',
+			storeName,
+			alternateResponseProp: 'data',
+			notNotify: true,
+			...payload,
+		});
+
 	const saveSensor = (payload = {}) =>
 		api_request('/sensors', {
 			stateProp: 'itemData',
@@ -28,10 +47,40 @@ export function useSensors() {
 			...payload,
 		});
 
+	const saveManualRouteSensor = (payload = {}) => {
+		const { data = {} } = payload;
+		const itemId = data.id || payload.itemId;
+		const method = itemId ? 'put' : 'post';
+
+		return api_request[method](
+			`/manual-route-sensors${itemId ? `/${itemId}` : ''}`,
+			{
+				...payload,
+				data: {
+					equipment_id: data.equipment_id,
+					location_in_equipment: data.location_in_equipment,
+					data_set: data.data_set,
+				},
+				stateProp: 'itemData',
+				storeName,
+				resultMessage:
+					payload.resultMessage || `Sensor ${itemId ? 'updated' : 'created'}`,
+			},
+		);
+	};
+
 	const deleteSensor = (payload = {}) =>
 		api_request.delete('/sensors', {
 			storeName,
 			...payload,
+		});
+
+	const deleteManualRouteSensor = (payload = {}) =>
+		api_request.delete('/manual-route-sensors', {
+			storeName,
+			...payload,
+			itemName: payload.itemName || 'Sensor',
+			loading: true,
 		});
 
 	const detachSensor = ({ sensorId, ...payload } = {}) =>
@@ -232,8 +281,12 @@ export function useSensors() {
 	return {
 		fetchSensors,
 		fetchSensor,
+		fetchManualRouteSensors,
+		fetchManualRouteSensor,
 		saveSensor,
+		saveManualRouteSensor,
 		deleteSensor,
+		deleteManualRouteSensor,
 		detachSensor,
 		sensorRebaseLine,
 		sensorMultipleRebaseline,
