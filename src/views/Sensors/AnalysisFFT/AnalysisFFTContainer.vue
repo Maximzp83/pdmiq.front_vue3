@@ -23,6 +23,30 @@
 					</el-button>
 				</div>
 			</div>
+
+			<div v-if="metaDataEntries.length" class="meta-data-entries">
+				<el-tooltip
+					placement="bottom"
+					popper-class="meta-data-entries-tooltip middle-width"
+				>
+					<span class="tooltip-container">
+						<el-icon class="el-icon-info"><InfoFilled /></el-icon>
+					</span>
+
+					<template #content>
+						<ul>
+							<li
+								v-for="entry in metaDataEntries"
+								:key="entry.key"
+								class="info-item"
+							>
+								<span class="key">{{ entry.key }}: </span>
+								<span class="value">{{ entry.value }}</span>
+							</li>
+						</ul>
+					</template>
+				</el-tooltip>
+			</div>
 		</div>
 
 		<div class="mcol-xs-12 mcol-sm-9 vibration-analysis-options">
@@ -121,7 +145,7 @@
 
 <script setup>
 import { computed, ref, toRef, watch } from 'vue';
-import { Odometer, Setting } from '@element-plus/icons-vue';
+import { InfoFilled, Odometer, Setting } from '@element-plus/icons-vue';
 
 import { api_request } from '@/api/request_provider';
 import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
@@ -153,6 +177,7 @@ const props = defineProps({
 	sensorData: { type: Object, required: true },
 	selectedChildComponentIds: { type: Array, default: () => [] },
 	rootFilters: { type: Object, default: () => ({}) },
+	metaDataEntries: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(['event', 'save']);
@@ -472,3 +497,16 @@ defineExpose({
 
 const { handleEvent } = useEventHandler({}, emit);
 </script>
+
+<style lang="scss">
+.meta-data-entries {
+	.el-icon-info {
+		font-size: 24px;
+		color: #4a90e2;
+	}
+
+	.info-item {
+		font-size: 14px;
+	}
+}
+</style>

@@ -64,29 +64,6 @@
 							{{ `${tt('rpm')}: ${equipmentRPM}` }}
 						</div>
 
-						<div
-							v-if="metaDataEntries.length"
-							class="card block-item mcol-xs-12 content-row"
-						>
-							<div class="card-header filled_2">
-								<div class="title semi-bold uppercase">
-									{{ tt('phrases.sample_metadata') }}
-								</div>
-							</div>
-							<div class="card-content">
-								<ul class="section-row info-list">
-									<li
-										v-for="entry in metaDataEntries"
-										:key="entry.key"
-										class="info-item"
-									>
-										<span class="key">{{ entry.key }}: </span>
-										<span class="value">{{ entry.value }}</span>
-									</li>
-								</ul>
-							</div>
-						</div>
-
 						<div class="mcol-xs-12 content-row">
 							<AnalysisFFTContainer
 								ref="AnalysisFFTContainer"
@@ -96,6 +73,7 @@
 								@event="handleEventNew"
 								:selectedChildComponentIds="selectedChildComponentIds"
 								:rootFilters="{ measurement }"
+								:metaDataEntries="metaDataEntries"
 							/>
 						</div>
 					</div>

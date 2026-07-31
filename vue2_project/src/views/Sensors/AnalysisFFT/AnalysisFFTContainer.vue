@@ -27,6 +27,30 @@
 					/>
 				</div>
 			</div>
+
+			<div class="meta-data-entries" v-if="metaDataEntries.length">
+				<el-tooltip
+					placement="bottom"
+					popper-class="meta-data-entries-tooltip middle-width"
+				>
+					<span class="tooltip-container">
+						<i class="el-icon-info"></i>
+					</span>
+
+					<div	slot="content">
+						<ul>
+							<li
+								v-for="entry in metaDataEntries"
+								:key="entry.key"
+								class="info-item"
+							>
+								<span class="key">{{ entry.key }}: </span>
+								<span class="value">{{ entry.value }}</span>
+							</li>
+						</ul>
+					</div>
+				</el-tooltip>
+			</div>
 		</div>
 
 		<div class="mcol-xs-12 mcol-sm-9 vibration-analysis-options">
@@ -179,6 +203,7 @@ export default {
 		},
 		selectedChildComponentIds: Array,
 		rootFilters: Object,
+		metaDataEntries: Array
 	},
 
 	data() {
@@ -637,3 +662,16 @@ export default {
 	}
 };
 </script>
+
+<style lang="scss">
+	.meta-data-entries {
+		.el-icon-info {
+			font-size: 24px;
+			color: #4A90E2;
+		}
+
+		.info-item {
+			font-size: 14px;
+		}
+	}
+</style>

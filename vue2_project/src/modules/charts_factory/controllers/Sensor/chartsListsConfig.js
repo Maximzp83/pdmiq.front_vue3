@@ -602,11 +602,17 @@ const chartsListsConfig1 = {
 						enable_runtime_tracker: false
 					},
 					setupPointsData: {
-						method: 'standard_datetime',
+						method: 'line_charts_datetime',
 						enableZones: false
 					}
-				}
+				},
 			},
+			inject_options: {
+				chart: { type: 'spline' },
+				navigator: { series: { type: 'spline' } }
+			},
+			// ...settingsForSplineChartsWithSplittedSeries,
+			seriesConfigSettings: getSplineSeriesConfigSettings(),
 			seriesConfigIncludes: ['fft_flag'],
 			requestsList: [
 				manualRouteSensorParametersList(
@@ -627,11 +633,17 @@ const chartsListsConfig1 = {
 						enable_runtime_tracker: false
 					},
 					setupPointsData: {
-						method: 'standard_datetime',
+						method: 'line_charts_datetime',
 						enableZones: false
 					}
-				}
+				},
 			},
+			inject_options: {
+				chart: { type: 'spline' },
+				navigator: { series: { type: 'spline' } }
+			},
+			// ...settingsForSplineChartsWithSplittedSeries,
+			seriesConfigSettings: getSplineSeriesConfigSettings(),
 			seriesConfigIncludes: ['fft_flag'],
 			requestsList: [
 				manualRouteSensorParametersList(

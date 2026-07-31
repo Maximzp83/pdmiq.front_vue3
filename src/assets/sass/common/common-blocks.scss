@@ -3948,6 +3948,14 @@ body {
 		}
 		.el-icon-star-off {font-size: 18px;}
 	}
+
+	.meta-data-entries-tooltip {
+		.info-item {
+			font-size: 14px;
+
+			& + .info-item {margin-top: 5px;}
+		}
+	}
 		
 	.reorder-button {
 		position: absolute;
