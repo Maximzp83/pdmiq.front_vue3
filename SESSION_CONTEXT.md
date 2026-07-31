@@ -16,6 +16,12 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest five-file `vue2_project` FFT delta was migrated into Vue3:
+  - Sensor statistics default base URL now uses the dev graph-points endpoint while Vite env and production-origin overrides remain active.
+  - Manual Route history charts now use the line-datetime transform and spline chart/navigator/series configuration.
+  - FFT sample metadata moved from a separate page card into an Element Plus tooltip in `AnalysisFFTContainer`.
+  - Shared tooltip styles were added to `src/assets/sass/common/common-blocks.scss`.
+  - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24; existing Vite mixed-import/chunk-size warnings remain.
 - Latest uncommitted `vue2_project` delta was migrated into the already migrated Vue3 scope:
   - Added Manual Route sensor constants, dataset/class metadata, localization, plant/metric helpers, chart parameter/unit definitions, statistics/FFT chart configs, per-metric FFT flags, metadata/RPM propagation, and Manual Route-aware Statistics/FFT/One Chart behavior.
   - Added Manual Route list/get/save/delete API functions to `src/composables/useSensors.js`.
@@ -54,27 +60,17 @@
 
 ## Files Already Modified
 - Current visible dirty working tree:
-  - `src/api/index.js` (pre-existing user debug comment; not changed by the Manual Route sync)
-  - `src/composables/useSensors.js`
-  - `src/constants/global.js`
-  - `src/helpers/specialHelpers.js`
-  - `src/localization/loc_eng.js`
-  - `src/localization/loc_spanish.js`
-  - Manual Route-related files under `src/modules/charts_factory/controllers/Sensor`
-  - `src/views/Equipments/Card/CardSensorItem.vue`
-  - `src/views/Equipments/ItemFormWrapper.vue`
+  - `src/assets/sass/common/common-blocks.scss`
+  - `src/modules/charts_factory/controllers/Sensor/api/index.js`
+  - `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`
+  - `src/views/Sensors/AnalysisFFT/AnalysisFFTContainer.vue`
   - `src/views/Sensors/FFTStatisticsPage.vue`
-  - `src/views/Sensors/OneChartPage.vue`
-  - `src/views/Sensors/StatisticsPage.vue`
-  - `src/views/Sensors/charts/fft/FFTChartsListWrapper.vue`
-  - `src/views/Sensors/sensorForm/ItemFormWrapper.vue`
-  - `src/views/Sensors/sensorForm/ItemFormManualRoute.vue` (new)
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-  - The current user-authored delta under `vue2_project/`, including new `vue2_project/src/views/Sensors/sensorForm/ItemFormManualRoute.vue`
-- Do not revert the source delta under `vue2_project/` or the pre-existing `src/api/index.js` change.
+  - The matching current user-authored five-file delta under `vue2_project/`.
+- Do not revert the source delta under `vue2_project/`.
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.

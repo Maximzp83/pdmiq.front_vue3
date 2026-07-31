@@ -836,3 +836,9 @@ await fetchUsers({ page: 1 });
   - Added statistics/FFT chart configs, per-metric FFT flag filtering, metadata/RPM display, and Manual Route-aware Statistics/FFT/One Chart behavior
   - Vue2 API URL, Equipment alert guards, Requisition material prop optionality, and chart timezone safety needed no Vue3 code change because equivalent behavior was already present or not applicable
   - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route FFT Vue2 follow-up sync
+  - Changed the sensor statistics default graph-points endpoint to dev while retaining Vite env and production-origin overrides
+  - Changed Manual Route history charts to line-datetime spline rendering with spline navigator and series settings
+  - Moved FFT sample metadata from a separate page card into an Element Plus tooltip in `AnalysisFFTContainer`
+  - Added the corresponding shared tooltip styles
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24

@@ -71,7 +71,8 @@ const fetch_sensor_statistics1 = payload => {
 				// let baseURL = 'https://bx5ln527mjdqj3ocq3i655uuja0ghpyc.lambda-url.ca-central-1.on.aws' // old;
 
 				// let baseURL = 'https://graph-points.industrialmatrix-stage.tools';
-				let baseURL = 'https://graph-points.industrialmatrix.tools';
+				let baseURL = 'https://graph-points.industrialmatrix-dev.tools';
+				// let baseURL = 'https://graph-points.industrialmatrix.tools';
 
 				if (process.env.VUE_APP_SENSOR_STATISTICS_API_URL) {
 					baseURL = process.env.VUE_APP_SENSOR_STATISTICS_API_URL;

@@ -3908,6 +3908,14 @@
 	.el-icon-star-off {font-size: 18px;}
 }
 
+.meta-data-entries-tooltip {
+	.info-item {
+		font-size: 14px;
+
+		& + .info-item {margin-top: 5px;}
+	}
+}
+
 @keyframes horizontal-move {
 	0% { transform: translateX(0px); }
 	100% { transform: translateX(34px); }
