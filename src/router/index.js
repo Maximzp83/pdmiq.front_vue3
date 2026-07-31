@@ -58,7 +58,7 @@ const routes = [
 		path: '/graph/:sensorId',
 		name: 'OneChartPage',
 		component: () => import('@/views/Sensors/OneChartPage.vue'),
-		meta: { auth: true, permissions: ['view_sensors'] },
+		meta: { auth: true, permissions: ['view_dashboard'] },
 	},
 	{
 		path: '/',
@@ -215,7 +215,7 @@ const routes = [
 			// 	path: 'machines',
 			// 	name: 'MachinesList',
 			// 	component: () => import('@/views/Machines/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_machines'] },
+			// 	meta: { auth: true, permissions: ['view_dashboard'] },
 			// },
 			{
 				path: 'plants',
@@ -239,7 +239,7 @@ const routes = [
 			// 	path: 'sensors',
 			// 	name: 'SensorsList',
 			// 	component: () => import('@/views/Sensors/ItemsList.vue'),
-			// 	meta: { auth: true, permissions: ['view_sensors'] },
+			// 	meta: { auth: true, permissions: ['view_dashboard'] },
 			// },
 			{
 				path: 'maintenance',
@@ -677,37 +677,37 @@ const routes = [
 				path: 'machines/new',
 				name: 'MachineCreate',
 				component: () => import('@/views/Machines/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_machines'] },
+				meta: { auth: true, permissions: ['create_dashboard'] },
 			},
 			{
 				path: 'machines/:id/details',
 				name: 'MachineDetails',
 				component: () => import('@/views/Machines/Details/DetailsPage.vue'),
-				meta: { auth: true, permissions: ['view_machines'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'machines/:id',
 				name: 'MachineEdit',
 				component: () => import('@/views/Machines/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_machines'] },
+				meta: { auth: true, permissions: ['edit_dashboard'] },
 			},
 			{
 				path: 'assets/new',
 				name: 'AssetCreate',
 				component: () => import('@/views/Assets/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_assets'] },
+				meta: { auth: true, permissions: ['create_dashboard'] },
 			},
 			{
 				path: 'assets/:id/details',
 				name: 'AssetDetails',
 				component: () => import('@/views/Assets/Details/DetailsPage.vue'),
-				meta: { auth: true, permissions: ['view_assets'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'assets/:id',
 				name: 'AssetEdit',
 				component: () => import('@/views/Assets/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_assets'] },
+				meta: { auth: true, permissions: ['edit_dashboard'] },
 			},
 			{
 				path: 'plants/new',
@@ -737,61 +737,61 @@ const routes = [
 				path: 'sensors',
 				name: 'SensorsListFull',
 				component: () => import('@/views/Sensors/ItemsList.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'sensors/ncd',
 				name: 'NCDSensorsList',
 				component: () => import('@/views/Sensors/NCDSensorsList.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'sensors/new',
 				name: 'SensorCreate',
 				component: () => import('@/views/Sensors/ItemPage.vue'),
-				meta: { auth: true, permissions: ['create_sensors'] },
+				meta: { auth: true, permissions: ['create_dashboard'] },
 			},
 			{
 				path: 'sensors/:id',
 				name: 'SensorEdit',
 				component: () => import('@/views/Sensors/ItemPage.vue'),
-				meta: { auth: true, permissions: ['edit_sensors'] },
+				meta: { auth: true, permissions: ['edit_dashboard'] },
 			},
 			{
 				path: 'sensors/:id/fft',
 				name: 'SensorFFT',
 				component: () => import('@/views/Sensors/FFTStatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'ncd/:id/fft/:fftId',
 				name: 'SensorNcdFFT',
 				component: () => import('@/views/Sensors/FFTStatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'banner/:id/fft/:fftId',
 				name: 'SensorBannerFFT',
 				component: () => import('@/views/Sensors/FFTStatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'sensors/:id/stats',
 				name: 'SensorStats',
 				component: () => import('@/views/Sensors/StatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'sensors/:id/statistics',
 				name: 'SensorStatistics',
 				component: () => import('@/views/Sensors/StatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'sensors/:id/multiview',
 				name: 'SensorMultiView',
 				component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_sensors'] },
+				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
 				path: 'processes',
@@ -1192,7 +1192,7 @@ const hasRightsToRoute = (to, authStore) => {
 
 	if (meta.permissions) {
 		const method = meta.permissionsMethod || undefined;
-		/*if (to.path == '/roi-calculator') {
+		/*if (to.path == '/machines/11/details') {
 			debugger
 		}*/
 		const hasAccess =
