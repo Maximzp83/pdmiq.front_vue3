@@ -624,33 +624,37 @@ const getCurrentRpmSource1 = ({ rootFilters = {}, sensorData = {}, fftItem = nul
 };
 
 const getSensorPlant1 = (sensor = {}, equipment = {}) => {
+	const sensorData = sensor || {};
+	const equipmentData = equipment || {};
 	const plant =
-		getObjectVal(sensor, 'controller.plant') ||
-		getObjectVal(sensor, 'equipment.plant') ||
-		getObjectVal(equipment, 'plant') ||
-		getObjectVal(sensor, 'equipment.asset.machine.productionLine.plant') ||
-		getObjectVal(equipment, 'asset.machine.productionLine.plant');
+		getObjectVal(sensorData, 'controller.plant') ||
+		getObjectVal(sensorData, 'equipment.plant') ||
+		getObjectVal(equipmentData, 'plant') ||
+		getObjectVal(sensorData, 'equipment.asset.machine.productionLine.plant') ||
+		getObjectVal(equipmentData, 'asset.machine.productionLine.plant');
 
 	if (plant) return plant;
 
 	const name =
-		getObjectVal(sensor, 'equipment.plant_name') ||
-		getObjectVal(equipment, 'plant_name');
+		getObjectVal(sensorData, 'equipment.plant_name') ||
+		getObjectVal(equipmentData, 'plant_name');
 	const id =
-		getObjectVal(sensor, 'equipment.plant_id') ||
-		getObjectVal(equipment, 'plant_id');
+		getObjectVal(sensorData, 'equipment.plant_id') ||
+		getObjectVal(equipmentData, 'plant_id');
 
 	return name || id ? { id, name } : null;
 };
 
 const getSensorMetricSystemType1 = (sensor = {}, equipment = {}) => {
-	const plant = getSensorPlant1(sensor, equipment);
+	const sensorData = sensor || {};
+	const equipmentData = equipment || {};
+	const plant = getSensorPlant1(sensorData, equipmentData);
 
 	return (
 		(plant && getObjectVal(plant, 'metric_system_type')) ||
-		getObjectVal(sensor, 'controller.metric_system_type') ||
-		getObjectVal(sensor, 'equipment.metric_system_type') ||
-		getObjectVal(equipment, 'metric_system_type') ||
+		getObjectVal(sensorData, 'controller.metric_system_type') ||
+		getObjectVal(sensorData, 'equipment.metric_system_type') ||
+		getObjectVal(equipmentData, 'metric_system_type') ||
 		METRIC_SYSTEM_TYPES.METRIC
 	);
 };
