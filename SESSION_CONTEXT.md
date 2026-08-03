@@ -16,6 +16,10 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest two-file `vue2_project` Manual Route chart delta was migrated into Vue3:
+  - Two separate Manual Route history charts were consolidated into one spline chart with both parameters, two configured Y axes, a shared tooltip, and a combined custom series config.
+  - Base Sensor chart Y-axis setup now resolves units/settings per request and applies parameter-specific max/softMax values while retaining the previous fallback for single-axis charts.
+  - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24; existing Vite mixed-import/chunk-size warnings remain.
 - Latest five-file `vue2_project` FFT delta was migrated into Vue3:
   - Sensor statistics default base URL now uses the dev graph-points endpoint while Vite env and production-origin overrides remain active.
   - Manual Route history charts now use the line-datetime transform and spline chart/navigator/series configuration.
@@ -60,16 +64,13 @@
 
 ## Files Already Modified
 - Current visible dirty working tree:
-  - `src/assets/sass/common/common-blocks.scss`
-  - `src/modules/charts_factory/controllers/Sensor/api/index.js`
   - `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`
-  - `src/views/Sensors/AnalysisFFT/AnalysisFFTContainer.vue`
-  - `src/views/Sensors/FFTStatisticsPage.vue`
+  - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-  - The matching current user-authored five-file delta under `vue2_project/`.
+  - The matching current user-authored two-file delta under `vue2_project/`.
 - Do not revert the source delta under `vue2_project/`.
 
 ## Unresolved Issues

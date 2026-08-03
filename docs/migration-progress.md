@@ -842,3 +842,8 @@ await fetchUsers({ page: 1 });
   - Moved FFT sample metadata from a separate page card into an Element Plus tooltip in `AnalysisFFTContainer`
   - Added the corresponding shared tooltip styles
   - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route combined history chart Vue2 sync
+  - Consolidated the velocity and high-frequency acceleration histories into one spline chart with two configured Y axes, one shared tooltip, and combined series/requests
+  - Extended base Sensor chart Y-axis setup to resolve units and settings per request
+  - Extended Y-axis data assignment to use parameter-specific max/softMax values with the existing single-axis fallback
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
