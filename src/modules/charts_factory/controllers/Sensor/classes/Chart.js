@@ -382,14 +382,17 @@ class SensorChartBase extends ChartBase {
 			const yAxisOptions = resources.chart_config.yAxisOptions || {};
 			const { customYAxisTickPositioner } = resources.chart_config;
 			// console.log('localSetupYAxis', requestsList[0])
-			const units = requestsList[0] && requestsList[0].units;
-			const unit_type_name = units || this.setupUnitTypeName({
-				parameterItem: requestsList[0],
-				measurement: this.measurement
-			});
 
 			this.options.yAxis = [];
-			YAxisList.forEach((axisSettings = {}) => {
+			YAxisList.forEach((axisSettings = {}, idx) => {
+				const requestItemIdx = axisSettings.requestItemIdx ?? idx;
+				const parameterItem = requestsList[requestItemIdx];
+				const units = parameterItem?.units;
+				const unit_type_name = units || this.setupUnitTypeName({
+					parameterItem,
+					measurement: this.measurement
+				});
+
 				let axis = {
 					max: -9999999,
 					min: 0,
@@ -436,6 +439,8 @@ class SensorChartBase extends ChartBase {
 					});
 				}
 
+				axis.customSettings = axisSettings;
+
 				if (this.localSetupYAxisHook) axis = this.localSetupYAxisHook(axis);
 				// console.log('1 axis', axis)
 				this.options.yAxis.push(axis);
@@ -449,6 +454,7 @@ class SensorChartBase extends ChartBase {
 		// console.log('assignDataToYAxis',resultData, resultData.chart_all_data_max_value)
 		try {
 			const {
+				statistics_result = {},
 				chart_all_data_max_value,
 				chart_all_data_min_value,
 				chart_points_max_value /*chart_points_min_value*/
@@ -459,50 +465,68 @@ class SensorChartBase extends ChartBase {
 				yAxisOptions
 			} = this.resources.chart_config;
 			const { yAxisMax, yAxisSoftMax } = this.resources.payload_1;
-			let yAxis = cloneDeep(this.options.yAxis[0]);
+			const yAxisCopy = cloneDeep(this.options.yAxis);
 
-			// console.log('localSetupYAxis')
-			if (yAxisMax) {
-				yAxis.max = yAxisMax;
-				// yAxis.startOnTick = false;
-				yAxis.endOnTick = false;
-			} else {
-				yAxis.max = withoutReserveForMax
-					? chart_all_data_max_value
-					: chart_all_data_max_value + chart_all_data_max_value / 9;
-			}
+			yAxisCopy.forEach((yAxis, idx) => {
+				const { requestItemId } = yAxis.customSettings || {};
+				const parameterItemResultData =
+					requestItemId != null
+						? statistics_result[`parameter_${requestItemId}`]
+						: null;
 
-			if (yAxisSoftMax) {
-				yAxis.softMax = yAxisSoftMax;
-			} else {
-				yAxis.softMax = withoutReserveForMax
-				? chart_points_max_value
-				: chart_points_max_value + chart_points_max_value / 9;
-			}
-			
-			// yAxis.title.text = this.unit_type_name || '-';
-			// console.log('assignDataToYAxis', yAxis)
+				if (parameterItemResultData) {
+					const { all_data_max_value, stat_max_value } = parameterItemResultData;
+					yAxis.max = withoutReserveForMax
+						? all_data_max_value
+						: all_data_max_value + all_data_max_value / 9;
+					yAxis.softMax = withoutReserveForMax
+						? stat_max_value
+						: stat_max_value + stat_max_value / 9;
+				} else {
+					if (yAxisMax) {
+						yAxis.max = yAxisMax;
+						// yAxis.startOnTick = false;
+						yAxis.endOnTick = false;
+					} else {
+						yAxis.max = withoutReserveForMax
+							? chart_all_data_max_value
+							: chart_all_data_max_value + chart_all_data_max_value / 9;
+					}
 
-			yAxis.max = yAxis.max || 0.1;
+					if (yAxisSoftMax) {
+						yAxis.softMax = yAxisSoftMax;
+					} else {
+						yAxis.softMax = withoutReserveForMax
+							? chart_points_max_value
+							: chart_points_max_value + chart_points_max_value / 9;
+					}
+				}
 
-			if (!yAxisOptions || !yAxisOptions.min) {
-				yAxis.min =
-					chart_all_data_min_value < 0
-						? // ? chart_all_data_min_value + chart_all_data_min_value / 3
-						  -chart_all_data_max_value
-						: 0;
+				// yAxis.title.text = this.unit_type_name || '-';
+				// console.log('assignDataToYAxis', yAxis)
 
-				yAxis.softMin = withoutReserveForMin
-					? chart_all_data_min_value
-					: chart_all_data_min_value + chart_all_data_min_value / 3;
-				// yAxis.softMin = undefined
-			}
+				yAxis.max = yAxis.max || 0.1;
 
-			// console.log('assignDataToYAxis', yAxis, 	additionalProps)
-			/*if (this.chart_id == 'chart-97') {
-				debugger
-			}*/
-			this.options.yAxis[0] = { ...yAxis, ...additionalProps };
+				if (!yAxisOptions || !yAxisOptions.min) {
+					yAxis.min =
+						chart_all_data_min_value < 0
+							? // ? chart_all_data_min_value + chart_all_data_min_value / 3
+							  -chart_all_data_max_value
+							: 0;
+
+					yAxis.softMin = withoutReserveForMin
+						? chart_all_data_min_value
+						: chart_all_data_min_value + chart_all_data_min_value / 3;
+					// yAxis.softMin = undefined
+				}
+
+				// console.log('assignDataToYAxis', yAxis, 	additionalProps)
+				/*if (this.chart_id == 'chart-97') {
+					debugger
+				}*/
+				this.options.yAxis[idx] = { ...yAxis, ...additionalProps };
+			});
+
 				// console.log('2 axis', this.chart_id, yAxis, this.options.yAxis[0], additionalProps)
 			if (this.isPlotLinesReady !== undefined) {
 				this.isPlotLinesReady = false;

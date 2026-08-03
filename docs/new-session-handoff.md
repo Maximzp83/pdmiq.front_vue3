@@ -50,6 +50,7 @@ Primary rules source:
 - `Sensors` migration is complete for the current Vue3 scope:
   - Latest Manual Route delta is synced: constants/dataset/class/localization, plant/metric helpers, chart parameters/configs, per-metric FFT flags, metadata/RPM rendering, Manual Route API operations, `src/views/Sensors/sensorForm/ItemFormManualRoute.vue`, Equipment form/card behavior, and Statistics/FFT/One Chart adaptations.
   - Latest Manual Route FFT follow-up is synced: dev graph-points default endpoint, line-datetime spline history charts, FFT metadata tooltip in `AnalysisFFTContainer`, and shared tooltip styles.
+  - Latest Manual Route history follow-up is synced: velocity and high-frequency acceleration now share one spline chart with two configured Y axes, while base Sensor chart axis setup/limits support per-request data.
   - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24 for the Manual Route sync.
   - Added `src/composables/useSensors.js` for sensor-specific API requests.
   - Added Pinia filter/state actions to `src/stores/SensorsStore.js`.
