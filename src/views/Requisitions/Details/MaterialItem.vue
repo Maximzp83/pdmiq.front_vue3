@@ -63,7 +63,6 @@ const props = defineProps({
 	itemData: { type: Object, default: () => ({}) },
 	itemIndex: { type: Number, default: 0 },
 	isLast: Boolean,
-	targetPropName: { type: String, default: 'proposed_materials' },
 	fromModal: Boolean,
 });
 const emit = defineEmits(['onCreate', 'onRemove', 'calcActualPrice']);
