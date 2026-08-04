@@ -32,7 +32,7 @@ defineOptions({
 	name: 'ManualRouteChartItemHeader',
 });
 
-defineProps({
+const props = defineProps({
 	ChartInstance: { type: Object, required: true },
 	chartIsInit: Boolean,
 	chartOptionsUpdate: Number,
@@ -41,5 +41,8 @@ defineProps({
 });
 
 const emit = defineEmits(['event']);
-const { handleEvent } = useEventHandler({}, emit);
+const zoomYAxis = (data) => {
+	props.ChartInstance.ChartAPI?.yAxis?.[0]?.setExtremes(...data);
+};
+const { handleEvent } = useEventHandler({ zoomYAxis }, emit);
 </script>

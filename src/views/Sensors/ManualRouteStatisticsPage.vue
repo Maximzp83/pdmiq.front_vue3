@@ -132,6 +132,7 @@ defineOptions({
 const props = defineProps({
 	equipmentData: { type: Object, required: true },
 });
+const emit = defineEmits(['event']);
 
 const { tt } = Lang;
 const route = useRoute();
@@ -243,7 +244,12 @@ const openFFTCharts = ({ point } = {}) => {
 	);
 };
 
-const { handleEvent } = useEventHandler({}, null);
+const handleChartContainerReady = () => {};
+const chartLoadEvent = () => {};
+const { handleEvent } = useEventHandler({
+	handleChartContainerReady,
+	chartLoadEvent,
+}, emit);
 
 onBeforeMount(() => {
 	if (Highcharts && Lang.currentLangId === LANGUAGE_TYPES.SPANISH) {

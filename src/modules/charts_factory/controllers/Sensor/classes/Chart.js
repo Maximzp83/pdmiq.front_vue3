@@ -2734,6 +2734,25 @@ class ManualRouteChart extends ChartBase {
 		);
 	}
 
+	sortItemsByTimestamp(items = [], accessors = []) {
+		const getTimestamp = item => {
+			const value = accessors.reduce(
+				(result, accessor) => result ?? item?.[accessor],
+				undefined
+			);
+			const timestamp = Date.parse(value);
+			return Number.isFinite(timestamp) ? timestamp : null;
+		};
+
+		return [...items].sort((firstItem, secondItem) => {
+			const firstTimestamp = getTimestamp(firstItem);
+			const secondTimestamp = getTimestamp(secondItem);
+
+			if (firstTimestamp == null || secondTimestamp == null) return 0;
+			return firstTimestamp - secondTimestamp;
+		});
+	}
+
 	normalizeStatisticsResponse(response = {}) {
 		const normalizedResponse = {
 			statistics: [],
@@ -2749,9 +2768,15 @@ class ManualRouteChart extends ChartBase {
 			...response
 		};
 
-		normalizedResponse.statistics = response.statistics || [];
+		normalizedResponse.statistics = this.sortItemsByTimestamp(
+			response.statistics || [],
+			['signal_date_at', 't']
+		);
 		normalizedResponse.history = response.history || [];
-		normalizedResponse.fft = response.fft || [];
+		normalizedResponse.fft = this.sortItemsByTimestamp(
+			response.fft || [],
+			['created_at']
+		);
 		normalizedResponse.fft_locks = response.fft_locks || [];
 
 		return normalizedResponse;

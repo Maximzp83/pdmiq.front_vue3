@@ -854,3 +854,8 @@ await fetchUsers({ page: 1 });
   - Added Multiview Alarms notifications/localization, Banner M25 threshold cleanup, and Meeting Tracker PDF plant initialization
   - All changed Vue2 files were in migrated scope; none were skipped
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route chart event/sorting runtime follow-up
+  - Added local handling for chart lifecycle and Y-axis zoom events without changing shared `useEmitter.js`
+  - Preserved Equipment picture event propagation to the parent details page
+  - Sorted Manual Route statistics and FFT flags chronologically before Highcharts rendering
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
