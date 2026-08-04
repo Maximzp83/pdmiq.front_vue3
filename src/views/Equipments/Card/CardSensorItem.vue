@@ -563,7 +563,9 @@ const iconsAndButtonsSettings = computed(() =>
 					},
 					{
 						linkSettings: {
-							linkRoute: `equipments/${props.itemData.equipment_id}/details/pdm/${props.itemData.id}`,
+							linkRoute: currentSensorType.value?.isManualRoute
+								? `equipments/${props.itemData.equipment_id}/details/manual-route`
+								: `equipments/${props.itemData.equipment_id}/details/pdm/${props.itemData.id}`,
 						},
 						tooltip_text: tt('phrases.Sensor_Statistics'),
 						icon: 'icomoon icon-chart3',
@@ -572,6 +574,14 @@ const iconsAndButtonsSettings = computed(() =>
 						name: 'compareClick',
 						tooltip_text: tt('phrases.Add_to_compare_list'),
 						icon: 'icomoon icon-compare',
+						conditionSettings: {
+							conditions: [
+								{
+									data_value: Boolean(currentSensorType.value?.isManualRoute),
+									control_value: false,
+								},
+							],
+						},
 						className: inCompareList.value
 							? 'el-button--primary inverted active'
 							: 'el-button--primary inverted',

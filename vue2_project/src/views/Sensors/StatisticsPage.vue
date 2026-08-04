@@ -1026,6 +1026,18 @@ export default {
 			// console.log('fetchSensorsAction', ids, sensorIdx);
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
 				.then(({ value }) => {
+					if (
+						!this.isCompare &&
+						value.data_set === DATASET.MANUAL_ROUTE_FFT &&
+						value.equipment_id
+					) {
+						this.sensorLoading = false;
+						this.$router.replace(
+							`/equipments/${value.equipment_id}/details/manual-route`
+						);
+						return;
+					}
+
 					const dashboardSensors = this.equipmentData
 						? this.equipmentData.dashboardSensors
 						: [];

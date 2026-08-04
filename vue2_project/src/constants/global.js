@@ -1538,7 +1538,8 @@ export const USER_REAL_TIME_NOTIFICATION_TYPES = {
 	FFT_ALERTS: 16,
 	SENSOR_SUSPECT_DATA: 17,
 	LUBE_MATRIX_ALERTS: 18,
-	OEE_ALERTS: 19
+	OEE_ALERTS: 19,
+	MULTI_VIEW_ALARMS: 27
 };
 export const USER_REQUISITION_NOTIFICATION_TYPES = {
 	REQUISITION_ADDED: 20,
@@ -1607,7 +1608,8 @@ const userRealTimeNotificationTypesList1 = [
 		id: USER_REAL_TIME_NOTIFICATION_TYPES.LUBE_MATRIX_ALERTS,
 		name: 'constants.lube_matrix_alerts'
 	},
-	{ id: USER_REAL_TIME_NOTIFICATION_TYPES.OEE_ALERTS, name: 'constants.oee_alerts' }
+	{ id: USER_REAL_TIME_NOTIFICATION_TYPES.OEE_ALERTS, name: 'constants.oee_alerts' },
+	{ id: USER_REAL_TIME_NOTIFICATION_TYPES.MULTI_VIEW_ALARMS, name: 'constants.multiview_alarms' }
 ];
 const userRequisitionNotificationTypesList1 = [
 	{ id: USER_REQUISITION_NOTIFICATION_TYPES.REQUISITION_ADDED, name: 'constants.new_requisition_added' },

@@ -1616,6 +1616,7 @@ export default {
 		node_offline: 'Node Offline',
 		unconfirmed_fft_request: 'Unconfirmed FFT Request',
 		usg: 'USg',
+		multiview_alarms: 'Multiview Alarms'
 	},
 
 	short_name: {

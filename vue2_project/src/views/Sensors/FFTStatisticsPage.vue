@@ -459,7 +459,9 @@ export default {
 					boldLabels: true,
 					linkSettings: {
 						key: 'location_in_equipment',
-						to: `/equipments/${this.itemData.equipment_id}/details/pdm/${this.itemData.id}`
+						to: this.isManualRoute
+							? `/equipments/${this.itemData.equipment_id}/details/manual-route`
+							: `/equipments/${this.itemData.equipment_id}/details/pdm/${this.itemData.id}`
 					}
 				});
 			}

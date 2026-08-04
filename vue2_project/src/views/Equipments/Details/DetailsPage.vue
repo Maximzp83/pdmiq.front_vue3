@@ -75,7 +75,15 @@
 								/>
 
 								<PdmButton
-									v-for="sensor in dashboardSensors"
+									v-if="manualRouteSensors.length"
+									:itemData="manualRouteSensors[0]"
+									:routeParamsId="routeParamsId"
+									@forceRerender="detailsComponentKey++"
+									isManualRoute
+								/>
+
+								<PdmButton
+									v-for="sensor in standardDashboardSensors"
 									:key="`pdm-${sensor.id}`"
 									:itemData="sensor"
 									isSensor
@@ -178,9 +186,7 @@ import {
 	eventHandler
 } from '@/mixins';
 
-import { 
- EQUIPMENT_IMG_TYPES
-} from '@/constants/global';
+import { DATASET, EQUIPMENT_IMG_TYPES } from '@/constants/global';
 
 export default {
 	mixins: [
@@ -250,7 +256,11 @@ export default {
 
 		enableShareLinkButton() {
 			const { params } = this.$route;
-			return params && (params.sensorId || params.multiViewId);
+			return params && (
+				params.sensorId ||
+				params.multiViewId ||
+				this.$route.name === 'DetailsManualRouteStatPage'
+			);
 		},
 
 		/*pageTitle() {
@@ -386,6 +396,22 @@ export default {
 			}
 
 			return [];
+		},
+
+		manualRouteSensors() {
+			return Object.freeze(
+				this.dashboardSensors.filter(
+					sensor => sensor.data_set === DATASET.MANUAL_ROUTE_FFT
+				)
+			);
+		},
+
+		standardDashboardSensors() {
+			return Object.freeze(
+				this.dashboardSensors.filter(
+					sensor => sensor.data_set !== DATASET.MANUAL_ROUTE_FFT
+				)
+			);
 		},
 
 		routeQuery() {
@@ -682,9 +708,22 @@ export default {
 				if (this.routeParamsId !== id) {
 					const { params } = this.$route;
 
-					if (params.sensorId && dashboardSensors.length) {
-						const newSensorId = dashboardSensors[0].id;
-						this.$router.replace(`/equipments/${id}/details/pdm/${newSensorId}`);
+					if (
+						this.$route.name === 'DetailsManualRouteStatPage' &&
+						dashboardSensors.some(
+							sensor => sensor.data_set === DATASET.MANUAL_ROUTE_FFT
+						)
+					) {
+						this.$router.replace(`/equipments/${id}/details/manual-route`);
+						this.forceRerender();
+					} else if (params.sensorId && dashboardSensors.length) {
+						const standardSensor = dashboardSensors.find(
+							sensor => sensor.data_set !== DATASET.MANUAL_ROUTE_FFT
+						);
+						const path = standardSensor
+							? `/equipments/${id}/details/pdm/${standardSensor.id}`
+							: `/equipments/${id}/details/manual-route`;
+						this.$router.replace(path);
 						this.forceRerender();
 						// console.log(fullPath, params,
 					} else {

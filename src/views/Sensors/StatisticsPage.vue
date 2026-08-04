@@ -812,6 +812,16 @@ const fetchSensorsAction = (ids, sensorIdx) => {
 
 	fetchSensor({ itemId: ids[sensorIdx] })
 		.then(({ value }) => {
+			if (
+				!isCompare.value &&
+				value.data_set === DATASET.MANUAL_ROUTE_FFT &&
+				value.equipment_id
+			) {
+				sensorLoading.value = false;
+				router.replace(`/equipments/${value.equipment_id}/details/manual-route`);
+				return;
+			}
+
 			const dashboardSensors = equipmentData.value?.dashboardSensors || [];
 			const sensorFromEquipment = cloneDeep(findItemBy('id', ids[sensorIdx], dashboardSensors)) || {};
 			sensors.value.push({ ...sensorFromEquipment, ...value });

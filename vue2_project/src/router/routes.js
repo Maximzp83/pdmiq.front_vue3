@@ -1356,6 +1356,17 @@ const routes = [
 							)
 					},
 					{
+						path: 'manual-route',
+						name: 'DetailsManualRouteStatPage',
+						meta: {
+							auth: true
+						},
+						component: () =>
+							import(
+								/* webpackChunkName: "ManualRouteStatPage" */ '@/views/Sensors/ManualRouteStatisticsPage.vue'
+							)
+					},
+					{
 						path: 'multi-view/:multiViewId',
 						name: 'DetailsMultiViewPage',
 						meta: {

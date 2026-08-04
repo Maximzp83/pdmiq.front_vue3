@@ -16,6 +16,12 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest 18-file/untracked `vue2_project` delta was migrated into Vue3 without confirmation stops, as explicitly requested:
+  - Added the dedicated equipment-level Manual Route statistics route/page with two metric charts and one series/FFT flag set per Manual Route sensor.
+  - Added `ManualRouteChartFactoryContainer` / `ManualRouteChart`, per-sensor FFT flag transformation, custom chart header, equipment/card/PdM/FFT navigation, and direct single-sensor statistics redirect.
+  - Added Multiview Alarms notification constants/localization, narrowed Banner M25 running thresholds, filtered unsupported saved thresholds, and initialized Meeting Tracker PDF `plant_id` from props.
+  - All changed Vue2 files belonged to an already migrated scope; no file was skipped.
+  - Targeted ESLint, `git diff --check`, and the production Vite build pass on Node 24; only existing mixed-import/chunk-size warnings remain.
 - Latest two-file `vue2_project` Manual Route chart delta was migrated into Vue3:
   - Two separate Manual Route history charts were consolidated into one spline chart with both parameters, two configured Y axes, a shared tooltip, and a combined custom series config.
   - Base Sensor chart Y-axis setup now resolves units/settings per request and applies parameter-specific max/softMax values while retaining the previous fallback for single-axis charts.
@@ -64,13 +70,26 @@
 
 ## Files Already Modified
 - Current visible dirty working tree:
-  - `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`
+  - `src/constants/global.js`
+  - `src/localization/loc_eng.js`
+  - `src/localization/loc_spanish.js`
   - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
-  - `SESSION_CONTEXT.md`
-  - `docs/migration-progress.md`
-  - `docs/migration-todos.md`
-  - `docs/new-session-handoff.md`
-  - The matching current user-authored two-file delta under `vue2_project/`.
+  - `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`
+  - `src/modules/charts_factory/controllers/Sensor/classes/StatisticsTransformator.js`
+  - `src/modules/charts_factory/dispatchers/chartFactoryDispatcher.js`
+  - `src/modules/charts_factory/index.js`
+  - `src/router/index.js`
+  - `src/views/Equipments/Card/CardSensorItem.vue`
+  - `src/views/Equipments/Details/DetailsPage.vue`
+  - `src/views/Equipments/Details/PdmButton.vue`
+  - `src/views/Sensors/FFTStatisticsPage.vue`
+  - `src/views/Sensors/ManualRouteStatisticsPage.vue` (new)
+  - `src/views/Sensors/StatisticsPage.vue`
+  - `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue` (new)
+  - `src/views/Sensors/sensorForm/ItemForm.vue`
+  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue`
+  - `SESSION_CONTEXT.md`, `docs/migration-progress.md`, `docs/migration-todos.md`, `docs/new-session-handoff.md`
+  - The matching current user-authored delta under `vue2_project/`.
 - Do not revert the source delta under `vue2_project/`.
 
 ## Unresolved Issues
@@ -83,4 +102,4 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Runtime smoke-test Manual Route sensor create/update/delete from Equipment, Statistics charts, FFT metadata/RPM, and One Chart with real API data when requested.
+- Runtime smoke-test the equipment-level Manual Route page with several sensors, both metric systems, date shortcuts, FFT flags/links, and equipment-tab switching using real API data when requested.

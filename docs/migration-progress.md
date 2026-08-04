@@ -847,3 +847,10 @@ await fetchUsers({ page: 1 });
   - Extended base Sensor chart Y-axis setup to resolve units and settings per request
   - Extended Y-axis data assignment to use parameter-specific max/softMax values with the existing single-axis fallback
   - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route aggregate equipment page Vue2 sync
+  - Added the dedicated `/equipments/:id/details/manual-route` child route and Vue3 statistics page
+  - Added separate velocity/high-frequency charts with per-sensor series and per-sensor FFT flags, plus the custom chart header
+  - Updated Equipment card/details/PdM, Statistics, and FFT navigation for Manual Route sensors
+  - Added Multiview Alarms notifications/localization, Banner M25 threshold cleanup, and Meeting Tracker PDF plant initialization
+  - All changed Vue2 files were in migrated scope; none were skipped
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
