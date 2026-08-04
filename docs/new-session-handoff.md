@@ -52,6 +52,7 @@ Primary rules source:
   - Latest Manual Route FFT follow-up is synced: dev graph-points default endpoint, line-datetime spline history charts, FFT metadata tooltip in `AnalysisFFTContainer`, and shared tooltip styles.
   - Latest Manual Route history follow-up is synced: velocity and high-frequency acceleration now share one spline chart with two configured Y axes, while base Sensor chart axis setup/limits support per-request data.
   - Latest Manual Route aggregate-page follow-up is synced: equipment details now expose a dedicated Manual Route route/page with separate velocity and high-frequency charts, one series and FFT flags per Manual Route sensor, and Manual Route-aware card/PdM/Statistics/FFT navigation.
+  - Manual Route runtime event warnings were fixed locally: page-level chart lifecycle events are consumed, Y-axis zoom is handled by the custom header, unrelated events still propagate, and statistics/FFT points are sorted chronologically to prevent Highcharts error #15.
   - The same Vue2 delta also adds Multiview Alarms notification labels, restricts Banner M25 running thresholds to the supported pair (including loaded-data cleanup), and initializes Meeting Tracker PDF `plant_id` from props.
   - Targeted ESLint, `git diff --check`, and production Vite build pass on Node 24; only existing mixed-import/chunk-size warnings remain.
   - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24 for the Manual Route sync.

@@ -16,6 +16,7 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Manual Route runtime follow-up completed: the page consumes `handleChartContainerReady` / `chartLoadEvent`, forwards unrelated events, the custom header handles `zoomYAxis`, and Manual Route statistics/FFT items are sorted chronologically before Highcharts rendering. Targeted ESLint, `git diff --check`, and production Vite build pass; existing build warnings remain.
 - Latest 18-file/untracked `vue2_project` delta was migrated into Vue3 without confirmation stops, as explicitly requested:
   - Added the dedicated equipment-level Manual Route statistics route/page with two metric charts and one series/FFT flag set per Manual Route sensor.
   - Added `ManualRouteChartFactoryContainer` / `ManualRouteChart`, per-sensor FFT flag transformation, custom chart header, equipment/card/PdM/FFT navigation, and direct single-sensor statistics redirect.
