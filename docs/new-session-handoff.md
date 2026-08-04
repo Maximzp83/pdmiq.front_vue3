@@ -112,6 +112,7 @@ Primary rules source:
   - `src/views/Sensors/sensorForm/ItemForm.vue` limits Banner M25 selectable and loaded running thresholds to Ultrasound RMS and High Frequency RMS Acceleration.
   - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue` initializes `plant_id` from `plantId`.
   - Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass; existing Vite mixed-import/chunk-size warnings remain.
+- Asset/Machine/Production Line Details runtime fix: their `chartLegendEvents` placeholders are now arrays, matching the `ItemPDMsStatisticBlock` prop and chart factory API. This removes the invalid-prop warning and `eventsList.forEach` error; targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
   - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now returns `USg` for Banner M25 FFT X waveform / transformed acceleration / X acceleration.

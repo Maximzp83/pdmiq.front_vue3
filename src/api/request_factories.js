@@ -18,6 +18,11 @@ export const createGetByIdRequest = (baseUrl, itemIdParam = 'itemId', defaultPay
 	const nextPayload = { ...payload };
 	delete nextPayload[itemIdParam];
 
+	// console.log('createGetRequest', baseUrl, defaultPayload, payload);	
+	if (baseUrl === '/equipments') {
+		defaultPayload = { ...defaultPayload, prepareData: 'prepareEquipmentsList' };
+	}
+
 	return api_request.get(`${baseUrl}/${itemId}`, {
 		notNotify: true,
 		...defaultPayload,

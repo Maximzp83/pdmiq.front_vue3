@@ -30,7 +30,7 @@
 						/>
 					</el-form-item>
 
-					<div class="el-form-item">
+					<div class="mt-20">
 						<div class="flex mrow">
 							<el-form-item :label="tt('Attachments')" prop="attachments" class="mcol-xs-6">
 								<FileUploadBlock
@@ -60,7 +60,7 @@
 						</div>
 					</div>
 
-					<el-form-item :label="tt('Work_Order_Type')" prop="category_id">
+					<el-form-item :label="tt('Work_Order_Type')" prop="category_id" class="mt-20">
 						<div class="flex align-center">
 							<div class="relative mcol-xs-11 fluid span-block">
 								<CustomSelectV2
