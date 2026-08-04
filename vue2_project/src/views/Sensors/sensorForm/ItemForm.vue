@@ -1113,10 +1113,10 @@ export default {
 						const paramsList = [
 							BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
 							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
-							BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
-							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
-							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
-							BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
+							// BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+							// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+							// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+							// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
 						];
 						result = result.filter(pi => paramsList.some(paramId => paramId === pi.id));
 						resultWithThresholdsOnly = resultWithThresholdsOnly.filter(pi => paramsList.some(paramId => paramId === pi.id));
@@ -1235,6 +1235,13 @@ export default {
 				}
 				
 				this.runningThresholdItemsList = this.setupFormSubItemsList(item.running_thresholds, 'rt_i');
+
+				if (this.formData.data_set === DATASET.BANNER_M25) {
+					this.runningThresholdItemsList = this.runningThresholdItemsList.filter(
+						ri => ri.node_parameter === BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS ||
+									ri.node_parameter === BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION 
+					)
+				}
 
 				// this.sensor_item_lube_version = ;
 			}

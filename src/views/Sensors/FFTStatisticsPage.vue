@@ -389,7 +389,9 @@ const sensorTitle = computed(() => {
 		boldLabels: true,
 		linkSettings: {
 			key: 'location_in_equipment',
-			to: `/equipments/${sensorData.value.equipment_id}/details/pdm/${sensorData.value.id}`,
+			to: isManualRoute.value
+				? `/equipments/${sensorData.value.equipment_id}/details/manual-route`
+				: `/equipments/${sensorData.value.equipment_id}/details/pdm/${sensorData.value.id}`,
 		},
 	});
 });

@@ -51,6 +51,9 @@ Primary rules source:
   - Latest Manual Route delta is synced: constants/dataset/class/localization, plant/metric helpers, chart parameters/configs, per-metric FFT flags, metadata/RPM rendering, Manual Route API operations, `src/views/Sensors/sensorForm/ItemFormManualRoute.vue`, Equipment form/card behavior, and Statistics/FFT/One Chart adaptations.
   - Latest Manual Route FFT follow-up is synced: dev graph-points default endpoint, line-datetime spline history charts, FFT metadata tooltip in `AnalysisFFTContainer`, and shared tooltip styles.
   - Latest Manual Route history follow-up is synced: velocity and high-frequency acceleration now share one spline chart with two configured Y axes, while base Sensor chart axis setup/limits support per-request data.
+  - Latest Manual Route aggregate-page follow-up is synced: equipment details now expose a dedicated Manual Route route/page with separate velocity and high-frequency charts, one series and FFT flags per Manual Route sensor, and Manual Route-aware card/PdM/Statistics/FFT navigation.
+  - The same Vue2 delta also adds Multiview Alarms notification labels, restricts Banner M25 running thresholds to the supported pair (including loaded-data cleanup), and initializes Meeting Tracker PDF `plant_id` from props.
+  - Targeted ESLint, `git diff --check`, and production Vite build pass on Node 24; only existing mixed-import/chunk-size warnings remain.
   - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24 for the Manual Route sync.
   - Added `src/composables/useSensors.js` for sensor-specific API requests.
   - Added Pinia filter/state actions to `src/stores/SensorsStore.js`.
@@ -269,6 +272,7 @@ Primary rules source:
 ## Build Status
 - `npm run build` passes after follow-up compile fixes.
 - Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
+- Latest Manual Route aggregate-page Vue2 sync passes targeted ESLint, `git diff --check`, and production Vite build on Node 24.
 
 ## Files Already Modified In This Migration Batch
 - `src/router/index.js`
@@ -289,6 +293,8 @@ Primary rules source:
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue`
 - `src/views/Sensors/StatisticsPage.vue`
 - `src/views/Sensors/FFTStatisticsPage.vue`
+- `src/views/Sensors/ManualRouteStatisticsPage.vue`
+- `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`
 - `src/views/Sensors/MultiViewStatisticsPage.vue`
 - `src/views/Sensors/OneChartPage.vue`
 - `src/views/Sensors/ChartMessageForm.vue`

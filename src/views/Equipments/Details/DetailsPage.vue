@@ -55,7 +55,15 @@
 								/>
 
 								<PdmButton
-									v-for="sensor in dashboardSensors"
+									v-if="manualRouteSensors.length"
+									:itemData="manualRouteSensors[0]"
+									:routeParamsId="routeParamsId"
+									isManualRoute
+									@forceRerender="forceRerender"
+								/>
+
+								<PdmButton
+									v-for="sensor in standardDashboardSensors"
 									:key="`pdm-${sensor.id}`"
 									:itemData="sensor"
 									:routeParamsId="routeParamsId"
@@ -131,6 +139,7 @@ import { api_request } from '@/api/request_provider';
 import { copyToClipboard } from '@/helpers/specialHelpers';
 import { findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
+import { DATASET } from '@/constants/global';
 import { useAuthStore } from '@/stores/AuthStore';
 import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -175,7 +184,11 @@ const multiViewsLoading = ref(false);
 const itemsName = computed(() => Object.freeze({ one: tt('Item'), mult: tt('Items') }));
 const routeParamsId = computed(() => +route.params.id);
 const canEditDashboard = computed(() => authStore.hasAccessTo(['edit_dashboard']));
-const enableShareLinkButton = computed(() => !!(route.params?.sensorId || route.params?.multiViewId));
+const enableShareLinkButton = computed(() => !!(
+	route.params?.sensorId ||
+	route.params?.multiViewId ||
+	route.name === 'DetailsManualRouteStatPage'
+));
 const navbarList = computed(() =>
 	Object.freeze(
 		translate([
@@ -235,6 +248,12 @@ const crossoverList = computed(() => {
 const dashboardSensors = computed(() =>
 	Object.freeze([...(activeTab.value?.equipmentData?.dashboardSensors || [])]),
 );
+const manualRouteSensors = computed(() => Object.freeze(
+	dashboardSensors.value.filter((sensor) => sensor.data_set === DATASET.MANUAL_ROUTE_FFT),
+));
+const standardDashboardSensors = computed(() => Object.freeze(
+	dashboardSensors.value.filter((sensor) => sensor.data_set !== DATASET.MANUAL_ROUTE_FFT),
+));
 
 const forceRerender = () => {
 	detailsComponentKey.value++;
@@ -452,8 +471,20 @@ watch(activeTab, (tab) => {
 
 	const { id, dashboardSensors: sensors = [], equipmentSubType } = equipmentData;
 	if (routeParamsId.value !== id) {
-		if (route.params.sensorId && sensors.length) {
-			router.replace(`/equipments/${id}/details/pdm/${sensors[0].id}`);
+		if (
+			route.name === 'DetailsManualRouteStatPage' &&
+			sensors.some((sensor) => sensor.data_set === DATASET.MANUAL_ROUTE_FFT)
+		) {
+			router.replace(`/equipments/${id}/details/manual-route`);
+			forceRerender();
+		} else if (route.params.sensorId && sensors.length) {
+			const standardSensor = sensors.find(
+				(sensor) => sensor.data_set !== DATASET.MANUAL_ROUTE_FFT,
+			);
+			const path = standardSensor
+				? `/equipments/${id}/details/pdm/${standardSensor.id}`
+				: `/equipments/${id}/details/manual-route`;
+			router.replace(path);
 			forceRerender();
 		} else {
 			router.replace(`/equipments/${id}/details/main`);

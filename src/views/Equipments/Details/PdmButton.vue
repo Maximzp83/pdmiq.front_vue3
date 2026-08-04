@@ -8,7 +8,7 @@
 			]"
 			@click.prevent="linkClick"
 		>
-			<span v-if="isSensor" class="icons-list">
+			<span v-if="isSensor || isManualRoute" class="icons-list">
 				<i
 					v-for="icon in currentSensorType.icons"
 					:key="`icon-${icon}`"
@@ -16,7 +16,7 @@
 				></i>
 			</span>
 
-			<b v-if="isSensor">{{ tt('PDM') }}</b>
+			<b v-if="isSensor || isManualRoute">{{ tt('PDM') }}</b>
 			<b v-else-if="isMultiView">{{ tt('Multi_view') }}</b>
 		</a>
 
@@ -42,19 +42,28 @@ const props = defineProps({
 	isSensor: Boolean,
 	buttonTextKey: { type: String, default: '' },
 	isMultiView: Boolean,
+	isManualRoute: Boolean,
 });
 const emit = defineEmits(['forceRerender']);
 
 const route = useRoute();
 const { changeRoute } = useNavigation();
-const currentSensorTypeData = computed(() => (props.isSensor ? props.itemData : null));
+const currentSensorTypeData = computed(() =>
+	props.isSensor || props.isManualRoute ? props.itemData : null,
+);
 const { currentSensorType } = useSensorType({ currentSensorTypeData });
 
-const locationInEquipment = computed(() =>
-	props.isSensor ? props.itemData.location_in_equipment : props.itemData[props.buttonTextKey],
-);
+const locationInEquipment = computed(() => {
+	if (props.isManualRoute) return tt('technology.manual_route');
+	return props.isSensor
+		? props.itemData.location_in_equipment
+		: props.itemData[props.buttonTextKey];
+});
 const currentPath = computed(() => route.fullPath);
 const buttonPath = computed(() => {
+	if (props.isManualRoute) {
+		return `/equipments/${props.routeParamsId}/details/manual-route`;
+	}
 	if (props.isSensor) {
 		return `/equipments/${props.routeParamsId}/details/pdm/${props.itemData.id}`;
 	}

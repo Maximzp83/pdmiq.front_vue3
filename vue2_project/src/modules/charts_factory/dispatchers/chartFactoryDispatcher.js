@@ -10,6 +10,7 @@ export const executeChartFactory = (name, resources) => {
 		case 'SensorChart':
 		case 'SensorAlarmsChart':
 		case 'SensorOverlayChart':
+		case 'ManualRouteChart':
 		case 'MultiViewChart':
 			return executeSensorChartFactory(name, resources);
 		case 'FFTChart':

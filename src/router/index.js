@@ -654,6 +654,12 @@ const routes = [
 						meta: { auth: true, permissions: ['view_dashboard'] },
 					},
 					{
+						path: 'manual-route',
+						name: 'DetailsManualRouteStatPage',
+						component: () => import('@/views/Sensors/ManualRouteStatisticsPage.vue'),
+						meta: { auth: true, permissions: ['view_dashboard'] },
+					},
+					{
 						path: 'multi-view/:multiViewId',
 						name: 'DetailsMultiViewPage',
 						component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),

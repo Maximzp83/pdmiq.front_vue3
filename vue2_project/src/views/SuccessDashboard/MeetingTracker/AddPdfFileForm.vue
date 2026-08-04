@@ -70,7 +70,7 @@ export default {
 			processing: false,
 
 			formData: {
-				plant_id: null,
+				plant_id: this.plantId,
 				pdf_file: null,
 				last_tracker_created_at: '',
 				current_created_at: ''

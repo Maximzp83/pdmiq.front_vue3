@@ -751,7 +751,9 @@ export default {
 
 							{
 								linkSettings: {
-									linkRoute: `equipments/${itemData.equipment_id}/details/pdm/${itemData.id}`
+									linkRoute: currentSensorType.isManualRoute
+										? `equipments/${itemData.equipment_id}/details/manual-route`
+										: `equipments/${itemData.equipment_id}/details/pdm/${itemData.id}`
 								},
 								// name: 'openSensorStatistics',
 								tooltip_text: this.$t('phrases.Sensor_Statistics'),
@@ -761,6 +763,14 @@ export default {
 								name: 'compareClick',
 								tooltip_text: this.$t('phrases.Add_to_compare_list'),
 								icon: 'icomoon icon-compare',
+								conditionSettings: {
+									conditions: [
+										{
+											data_value: currentSensorType.isManualRoute,
+											control_value: false
+										}
+									]
+								},
 								className: inCompareList
 									? 'el-button--primary inverted active'
 									: 'el-button--primary inverted'

@@ -330,6 +330,7 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 						enable_crashes,
 						enable_adjustments,
 						enable_fft,
+						split_fft_by_sensor,
 						enable_runtime_tracker,
 						enable_issue_alerts
 					} = actualSpecification.setupFlagsData;
@@ -373,22 +374,30 @@ class statisticsTransformator extends StatisticsTransformatorBase {
 					if (enable_fft && fft.length) {
 						const parameterFFT = fft.filter(
 							item =>
-								item.metric_type == null ||
-								Number(item.metric_type) === Number(parameter_item.id)
+								(item.metric_type == null ||
+									Number(item.metric_type) === Number(parameter_item.id)) &&
+								(!split_fft_by_sensor ||
+									Number(item.sensor_id) === Number(parameter_item.sensor_id))
 						);
-						// statistics_result.flagsData.ncd_fft_statistics = this.setupFlagsFFTStatistics(fft);
-						statistics_result.flagsData.pending_fft_statistics = setupFlagsFFTStatistics(
-							parameterFFT,
-							[BANNER_FFT_STATUSES_TYPES.PENDING, BANNER_FFT_STATUSES_TYPES.APPROVED]
-						);
-						statistics_result.flagsData.failed_fft_statistics = setupFlagsFFTStatistics(
-							parameterFFT,
-							[BANNER_FFT_STATUSES_TYPES.FAILED]
-						);
-						statistics_result.flagsData.completed_fft_statistics = setupFlagsFFTStatistics(
-							parameterFFT,
-							[BANNER_FFT_STATUSES_TYPES.COMPLETED]
-						);
+
+						if (split_fft_by_sensor) {
+							statistics_result.flagsData.fft_statistics = setupFlagsFFTStatistics(
+								parameterFFT
+							);
+						} else {
+							statistics_result.flagsData.pending_fft_statistics = setupFlagsFFTStatistics(
+								parameterFFT,
+								[BANNER_FFT_STATUSES_TYPES.PENDING, BANNER_FFT_STATUSES_TYPES.APPROVED]
+							);
+							statistics_result.flagsData.failed_fft_statistics = setupFlagsFFTStatistics(
+								parameterFFT,
+								[BANNER_FFT_STATUSES_TYPES.FAILED]
+							);
+							statistics_result.flagsData.completed_fft_statistics = setupFlagsFFTStatistics(
+								parameterFFT,
+								[BANNER_FFT_STATUSES_TYPES.COMPLETED]
+							);
+						}
 					}
 
 					if (enable_fft && fft_locks.length) {

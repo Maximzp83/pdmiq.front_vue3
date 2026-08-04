@@ -854,10 +854,10 @@ const runningThresholdParametersList = computed(() => {
 		const paramsList = [
 			BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
 			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
-			BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
-			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
-			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
-			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
+			// BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
 		];
 		result = result.filter((item) => paramsList.some((paramId) => paramId === item.id));
 		resultWithThresholdsOnly = resultWithThresholdsOnly.filter((item) =>
@@ -944,6 +944,13 @@ const localSetupPageActions = (item) => {
 	}
 
 	runningThresholdItemsList.value = setupFormSubItemsList(item?.running_thresholds, 'rt_i');
+	if (formData.value.data_set === DATASET.BANNER_M25) {
+		runningThresholdItemsList.value = runningThresholdItemsList.value.filter(
+			(item) =>
+				item.node_parameter === BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS ||
+				item.node_parameter === BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
+		);
+	}
 
 	if (props.equipmentData?.id) {
 		formData.value.equipment_id = props.equipmentData.id;
