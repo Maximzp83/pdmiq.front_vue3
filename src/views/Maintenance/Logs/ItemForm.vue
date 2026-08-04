@@ -98,7 +98,7 @@
 						</div>
 					</el-form-item>
 
-					<div class="el-form-item">
+					<div class="mt-20">
 						<div class="flex mrow">
 							<el-form-item :label="tt('Attachments')" prop="attachments" class="mcol-xs-6">
 								<FileUploadBlock
@@ -128,7 +128,7 @@
 						</div>
 					</div>
 
-					<div :class="['el-form-item', { showJustInfo }]">
+					<div :class="['mt-20', { showJustInfo }]">
 						<div
 							v-if="!showJustInfo"
 							class="flex mrow wrap inline-form-items-list inline-labels"
@@ -171,7 +171,7 @@
 					<el-form-item
 						:label="`${tt('Supervisor')} ${tt('notes')}`"
 						prop="supervisor_notes"
-						:class="{ showJustInfo }"
+						:class="[{ showJustInfo }, 'mt-10']"
 					>
 						<CustomInput v-model="formData.supervisor_notes" placeholder="-" />
 					</el-form-item>

@@ -183,7 +183,7 @@ const countersSettings = computed(() =>
 	}),
 );
 const createWOButtonFormSetup = Object.freeze([{ formKey: 'production_line_id', valKey: 'id' }]);
-const chartLegendEvents = Object.freeze({});
+const chartLegendEvents = Object.freeze([]);
 
 const setFilters = (range) => {
 	productionLinesStore.set_value('statistics_filters', {

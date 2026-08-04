@@ -28,6 +28,7 @@
   - `src/views/Sensors/sensorForm/ItemForm.vue` restricts Banner M25 running-threshold choices and loaded threshold rows to Ultrasound RMS and High Frequency RMS Acceleration.
   - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue` initializes `plant_id` from `plantId` before its visibility watcher runs.
   - Targeted ESLint and `git diff --check` for the Vue3 delta pass; the Node 24 production build passes with the existing mixed-import/chunk-size warnings.
+- Asset, Machine, and Production Line Details chart-event runtime fix completed: their local `chartLegendEvents` placeholders are frozen arrays rather than objects, matching the `ItemPDMsStatisticBlock` prop and chart factory `assignSpecificOptionsEvents` contract. This removes the invalid-prop warning and `eventsList.forEach` crash; targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - WebSocket transport was re-migrated from `vue2_project/src/services/WebSocketService.js` into `src/services/WebSocketService.js`; the service keeps channel authorization, private/presence subscriptions, reconnect/resubscribe, heartbeat, and event handling, with only Vue CLI environment access adapted to Vite.
 - `src/composables/mixins/useWebSocket.js` is now the Vue Composition API wrapper around `WebSocketService`, while preserving the existing Vue3 `setupWebSocket` / `closeWebSocket` / `webSocketSend` consumer API.
 - Incoming channel events in `useWebSocket` are normalized to the legacy/current consumer contract `{ type, data }`; all existing Vue3 `onMessage` handlers were audited against this shape.
@@ -52,18 +53,18 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
-- Current Vue3 sync files:
-  - `src/constants/global.js`
-  - `src/localization/loc_eng.js`
-  - `src/localization/loc_spanish.js`
-  - `src/views/Requisitions/Details/MaterialItem.vue`
-  - `src/views/Sensors/sensorForm/ItemForm.vue`
-  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue`
+- Current Details runtime-fix files:
+  - `src/views/Assets/Details/DetailsPage.vue`
+  - `src/views/Machines/Details/DetailsPage.vue`
+  - `src/views/ProductionLines/Details/DetailsPage.vue`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-- The matching six modified files under `vue2_project/src/` are user-owned source changes; do not revert or reformat them.
+- Unrelated user-owned dirty files present and left untouched:
+  - `src/api/request_factories.js`
+  - `src/views/Maintenance/Logs/ItemForm.vue`
+  - `src/views/Maintenance/WorkOrders/ItemForm.vue`
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.
