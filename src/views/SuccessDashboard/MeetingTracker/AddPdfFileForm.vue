@@ -66,7 +66,7 @@ const { saveMeetingTracker } = useSuccessDashboard();
 const fileUploadBlockRef = ref(null);
 const processing = ref(false);
 const initialFormData = {
-	plant_id: null,
+	plant_id: props.plantId || null,
 	pdf_file: null,
 	last_tracker_created_at: '',
 	current_created_at: '',
@@ -80,7 +80,7 @@ const handleSelectFile = ({ raw }) => {
 const resetForm = () => {
 	fileUploadBlockRef.value?.resetFilesList?.();
 	processing.value = false;
-	formData.value = { ...initialFormData };
+	formData.value = { ...initialFormData, plant_id: null };
 };
 
 const handleSubmit = async () => {

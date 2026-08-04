@@ -1650,6 +1650,7 @@ export default {
 		node_offline: 'Nodo fuera de línea',
 		unconfirmed_fft_request: 'Petición de FFT no confirmada',
 		usg: 'USg',
+		multiview_alarms: 'Alarmas multivista'
 	},
 
 	short_name: {

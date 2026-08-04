@@ -98,6 +98,12 @@ Primary rules source:
   - `src/components/pages/NewPasswordForm.vue` now safely extracts Axios status for expired reset-token handling and uses `tt` instead of the nonexistent `Lang.t`, so a 422 response shows the intended warning and redirect rather than an uncaught TypeError.
   - The migrated legacy delta from commit `550d339` was restored after a later `src/` overwrite: Assets/Machines/ProductionLines navbar/form changes and the Controllers `CMD0200` WebSocket bypass are present again. Plants already retained the `is_blocked` removal, localization values already matched, and Utilities details remains skipped because no Vue3 counterpart exists.
   - `npm run build` and targeted `git diff --check` pass after this sync.
+- Latest Vue2 sync completed on 2026-08-04:
+  - `src/constants/global.js`, `src/localization/loc_eng.js`, and `src/localization/loc_spanish.js` now include real-time notification type `MULTI_VIEW_ALARMS` (`27`) and its labels.
+  - `src/views/Requisitions/Details/MaterialItem.vue` no longer declares unused `targetPropName`.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` limits Banner M25 selectable and loaded running thresholds to Ultrasound RMS and High Frequency RMS Acceleration.
+  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue` initializes `plant_id` from `plantId`.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass; existing Vite mixed-import/chunk-size warnings remain.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
   - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now returns `USg` for Banner M25 FFT X waveform / transformed acceleration / X acceleration.

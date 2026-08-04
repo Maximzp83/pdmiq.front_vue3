@@ -22,6 +22,12 @@
   - `src/views/Sensors/charts/ChartsListWrapper.vue` now passes per-chart computed `additionalProps`, hides chart headers for single one-chart results, and guards `getParamsByIds` with an array fallback.
   - `src/views/Sensors/sensorForm/ItemForm.vue` now limits Banner M25 running-threshold parameter choices to the updated legacy parameter subset.
 - `vue2_project/src/modules/charts_factory/controllers/Sensor/methods.js` had only whitespace change; no Vue3 functional change was needed.
+- Latest Vue2 delta sync completed on 2026-08-04:
+  - `src/constants/global.js` and English/Spanish localization now include real-time notification type `MULTI_VIEW_ALARMS` (`27`) / Multiview Alarms.
+  - `src/views/Requisitions/Details/MaterialItem.vue` no longer declares the unused `targetPropName` prop.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` restricts Banner M25 running-threshold choices and loaded threshold rows to Ultrasound RMS and High Frequency RMS Acceleration.
+  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue` initializes `plant_id` from `plantId` before its visibility watcher runs.
+  - Targeted ESLint and `git diff --check` for the Vue3 delta pass; the Node 24 production build passes with the existing mixed-import/chunk-size warnings.
 - WebSocket transport was re-migrated from `vue2_project/src/services/WebSocketService.js` into `src/services/WebSocketService.js`; the service keeps channel authorization, private/presence subscriptions, reconnect/resubscribe, heartbeat, and event handling, with only Vue CLI environment access adapted to Vite.
 - `src/composables/mixins/useWebSocket.js` is now the Vue Composition API wrapper around `WebSocketService`, while preserving the existing Vue3 `setupWebSocket` / `closeWebSocket` / `webSocketSend` consumer API.
 - Incoming channel events in `useWebSocket` are normalized to the legacy/current consumer contract `{ type, data }`; all existing Vue3 `onMessage` handlers were audited against this shape.
@@ -46,19 +52,18 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
-- Current visible dirty working tree:
-  - `src/views/Assets/Details/DetailsPage.vue`
-  - `src/views/Assets/ItemForm.vue`
-  - `src/views/Machines/Details/DetailsPage.vue`
-  - `src/views/Machines/ItemForm.vue`
-  - `src/views/ProductionLines/Details/DetailsPage.vue`
-  - `src/views/ProductionLines/ItemForm.vue`
-  - `src/views/Controllers/DXMCommandsTab.vue`
+- Current Vue3 sync files:
+  - `src/constants/global.js`
+  - `src/localization/loc_eng.js`
+  - `src/localization/loc_spanish.js`
+  - `src/views/Requisitions/Details/MaterialItem.vue`
+  - `src/views/Sensors/sensorForm/ItemForm.vue`
+  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue`
   - `SESSION_CONTEXT.md`
   - `docs/migration-progress.md`
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
-- Do not revert these restored `550d339` migration changes.
+- The matching six modified files under `vue2_project/src/` are user-owned source changes; do not revert or reformat them.
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.
