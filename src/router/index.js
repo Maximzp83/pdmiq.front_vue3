@@ -389,6 +389,12 @@ const routes = [
 				],
 			},
 			{
+				path: 'library',
+				name: 'Library',
+				component: () => import('@/views/Library/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_library'] },
+			},
+			{
 				path: 'brands',
 				name: 'Brands',
 				component: () => import('@/views/Brands/ItemsList.vue'),
