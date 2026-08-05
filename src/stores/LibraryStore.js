@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { commonStoreMixin } from './mixins/commonStoreMixin';
 
-const localStorageFilters = JSON.parse(localStorage.getItem('library_filters'));
+const localStorageFilters = JSON.parse(localStorage.getItem('libraries_filters'));
 
 export const useLibraryStore = defineStore('libraryStore', {
 	state: () => ({

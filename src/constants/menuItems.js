@@ -438,15 +438,15 @@ const menuItems1 = [
 		name: 'sidebar_menu.asset_management',
 		category_label: 'asset_management'
 	},
-	// {
-	// 	name: 'sidebar_menu.Library',
-	// 	belongs_to_label: 'asset_management',
-	// 	id: MENU_TYPES.LIBRARY,
-	// 	icon: 'icon-brands',
-	// 	path: '/library',
-	// 	meta: { permissions: ['view_library'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'sidebar_menu.library',
+		belongs_to_label: 'asset_management',
+		id: MENU_TYPES.LIBRARY,
+		icon: 'icon-brands',
+		path: '/library',
+		meta: { permissions: ['view_library'] },
+		enableInCompanyMenuForm: true
+	},
 	{
 		name: 'Brands',
 		belongs_to_label: 'asset_management',

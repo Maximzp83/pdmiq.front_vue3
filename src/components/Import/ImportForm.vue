@@ -74,6 +74,7 @@ const props = defineProps({
 	isProcessingRevert: Boolean,
 	isUploading: Boolean,
 	isImporting: Boolean,
+	submitAction: Function,
 	submitActionProp: String,
 	disableStart: Boolean,
 });
@@ -112,7 +113,10 @@ const validateForm = () => {
 	itemFormRef.value?.validate?.((valid) => {
 		if (!valid) return;
 
-		const action = testingStore[props.submitActionProp] || testingStore.import_settings;
+		const action =
+			props.submitAction ||
+			testingStore[props.submitActionProp] ||
+			testingStore.import_settings;
 		emit('event', { eventName: 'toggleSaving', data: true });
 		action({
 			data: { ...formData.value },

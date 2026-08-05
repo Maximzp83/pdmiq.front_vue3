@@ -14,10 +14,12 @@
 - `Controllers` views have been added in Vue3 style and routes/menu are enabled.
 - `Controllers` devices tab is now wired to the migrated Banner sensors list.
 - `Maintenance` section is migrated for the current Vue3 compile scope and routes/menu are enabled.
+- `Maintenance/WorkOrdersImport` was re-migrated toward Vue2 parity: the page again requires a selected plant, uses the shared import container, supports upload/start/revert/progress, and renders the original drag-and-drop work-order column mapping. The shared import form/container now accept a composable upload action without coupling maintenance requests to `TestingStore`. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `Maintenance` Work Orders list has been hardened toward legacy behavior with advanced filters, closer table columns, create/export plant guard, and detail/preview actions.
 - `Maintenance` Logs list has been hardened toward legacy behavior with advanced filters, closer table columns, file/parent actions, preview modals, and export guard.
 - `WorkOrderRequests` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `StoreRooms` section is migrated for the current Vue3 compile scope and route/menu are enabled.
+- `Library` section is migrated for the current Vue3 compile scope: added the resource list with file links and equipment/resource labels, a `useLibrary` domain wrapper over `useItemsData`, entity configuration, corrected `libraries_filters` persistence, `/library` route, and Asset Management menu entry. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `Requisitions` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `Requisitions/Details` section was re-migrated toward Vue2 parity: `WorkOrderDetails.vue` owns the details action modal with `componentFileLoader`; Complete/Approve flows use existing composables, Vue3 subitem forms, attachments/multipart handling, technical-process rendering, DetailsItem array/attachment rendering, and restored print report structure. `npm run build`, targeted `git diff --check`, and migration-rule scan pass.
 - `RFQS` section is migrated for the current Vue3 compile scope and route/menu are enabled.

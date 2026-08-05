@@ -166,7 +166,8 @@ Primary rules source:
   - `src/composables/mixins/useMainInstanceDetailsPage.js` now opens Maintenance Work Order modals with `formComponentFileLoader` instead of legacy `componentPath`.
   - `npm run build` and targeted `git diff --check` pass after the re-migration.
 - `Maintenance` section is migrated for the current Vue3 compile scope:
-  - Added `src/composables/useMaintenance.js`.
+	- `src/views/Maintenance/WorkOrdersImport/ItemPage.vue` and `ImportOptionsContainer.vue` were re-migrated toward Vue2 parity with selected-plant gating, shared upload/start/revert/progress handling, and drag-and-drop column mapping; shared Import components accept the maintenance upload action as a function. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
+	- Added `src/composables/useMaintenance.js`.
   - Added `src/views/Maintenance/MaintenanceDashboard.vue` and `MaintenanceFormWrapper.vue`.
   - Added logs list/form/details and support cells/previews under `src/views/Maintenance/Logs`.
   - Added work-orders list/form/details/import and support files under `src/views/Maintenance/WorkOrders`.
@@ -188,7 +189,11 @@ Primary rules source:
   - Migrated `vue2_project/src/views/Assets` into Vue3 with list/grid, form, item page, details page, attachment/composed subitems, `useAssets`, Assets store statistics filters, dashboard assets route, and asset create/edit/details routes.
   - Migrated `vue2_project/src/views/Settings` into Vue3 except `Settings/Import`, with Settings shell navigation, Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and Settings sidebar menu entry.
   - Migrated `vue2_project/src/views/SuccessDashboard` into Vue3 with Success Dashboard container, MainDashboard, MeetingTracker, ROIOnePager, ROIAnalysis placeholder files, shared common components, `useSuccessDashboard`, entity configs, routes, and Customer Success sidebar menu entry.
-  - `npm run build` and `git diff --check` pass.
+	- `npm run build` and `git diff --check` pass.
+- `Library` section is migrated for the current Vue3 compile scope:
+	- Added `src/views/Library/ItemsList.vue` with the legacy list columns, file links, and resource-type display.
+	- Added `src/composables/useLibrary.js`, `ENTITIES.Library`, corrected `libraries_filters` persistence, `/library` routing, and the Asset Management menu entry.
+	- Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `ProductionLines` list/card runtime alignment was refreshed against the Vue2 original:
   - `src/views/ProductionLines/ItemsList.vue` now restores the legacy `View` table/card actions, sets child filters for Machines/Assets/Equipments from the selected production line, and navigates through Vue Router instead of direct `pushState`.
   - `src/views/ProductionLines/ItemCard.vue` resets child list pages through Pinia stores instead of the old Vuex `setFiltersViaList` path.

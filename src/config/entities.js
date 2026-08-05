@@ -173,6 +173,20 @@ export const ENTITIES = Object.freeze({
 			instanceName: 'equipments',
 		}),
 	}),
+	Library: Object.freeze({
+		key: 'libraries',
+		apiBase: '/libraries',
+		routeBase: '/library',
+		filtersStorageKey: 'libraries_filters',
+		itemsName: Object.freeze({
+			one: 'sidebar_menu.library',
+			mult: 'libraries',
+			instanceName: 'library',
+		}),
+		permissions: Object.freeze({
+			view: 'view_library',
+		}),
+	}),
 	Machines: Object.freeze({
 		key: 'machines',
 		apiBase: '/machines',
