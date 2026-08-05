@@ -31,6 +31,17 @@ http://localhost:5173
 6. Если такой вкладки нет, создай ровно одну новую вкладку. Для безопасной первоначальной загрузки сначала открой `about:blank`, установи описанный ниже read-only guard, затем перейди на `http://localhost:5173`.
 7. Не закрывай вкладку и не выходи из существующей авторизованной сессии после теста.
 
+## Обязательный исполняемый сценарий
+
+Для полного запуска используй гибридный orchestrator; он сам выполняет `browser-use skill show`, запускает ровно один browser worker и два параллельных static worker:
+
+```bash
+python3 qa/test-plans/hybrid-read-only-run.py \
+  --publish-report qa/reports/full-project-read-only-test.md
+```
+
+Подробности artifact contract и static-only dry-run: `qa/test-plans/hybrid-read-only-browser-test.md`. Напрямую `browser-use < ...` запускай только для диагностики самого browser worker, не для канонического полного теста.
+
 ## Безусловные ограничения
 
 - Не изменяй исходный код проекта.
@@ -38,11 +49,13 @@ http://localhost:5173
 - Не создавай, не обновляй и не удаляй серверные данные.
 - Запрещено отправлять API-запросы с методами `POST`, `PUT`, `PATCH` и `DELETE`.
 - Не отправляй формы, способные изменить данные.
-- Не нажимай `SAVE`, `SUBMIT`, `CREATE`, `ADD`, `DELETE`, `REMOVE`, `IMPORT`, `UPLOAD`, `APPROVE`, `DENY`, `COMPLETE`, `CLOSE`, `OPEN`, `RESET`, `REBASELINE`, `DETACH`, `SEND COMMAND` и аналогичные изменяющие действия.
+- Не нажимай `SAVE`, `SUBMIT`, `DELETE`, `REMOVE`, `IMPORT`, `UPLOAD`, `START`, `APPROVE`, `DENY`, `REJECT`, `COMPLETE`, `CHANGE STATUS`, `RESET`, `REBASELINE`, `DETACH`, `SEND COMMAND` и аналогичные изменяющие действия.
+- `ADD`, `CREATE`, `NEW` и `EDIT` разрешены только когда действие открывает локальную форму/модальное окно и само по себе не отправляет изменяющий запрос. Открытую форму нужно протестировать и закрыть/перезагрузить без сохранения.
+- `Close`/иконка `×` разрешена только как закрытие диалога или drawer. `Close Work Order`, `Open Work Order` и любые изменения статуса запрещены.
 - Не выполняй drag-and-drop/reorder.
 - Не загружай файлы и не запускай импорт.
 - Не запускай экспорт или генерацию отчёта, если заранее не доказано, что это чистый `GET`; при сомнении пометь действие `not tested`.
-- Не меняй профиль, MFA, телефон, пароль, права, настройки или API credentials.
+- Не сохраняй изменения профиля, MFA, телефона, пароля, прав, настроек или API credentials. Password/MFA/credentials не заполняй даже локально.
 - Не выходи из сессии.
 - Не открывай production UI или production API.
 - Не читай и не сохраняй cookies, значения `localStorage`/`sessionStorage`, заголовки `Authorization`, request/response bodies, токены, пароли или MFA-коды.
@@ -51,12 +64,12 @@ http://localhost:5173
 
 ## Обязательный read-only guard
 
-До любых кликов, кроме выбора существующей вкладки, установи guard одновременно:
+Единственный актуальный и исполняемый источник guard — `qa/test-plans/browser-read-only-guard.js`. Hybrid manifest сохраняет его SHA-256. До любых кликов, кроме выбора существующей вкладки, browser worker устанавливает этот файл одновременно:
 
 - в текущий document через `js(READ_ONLY_GUARD_JS)`;
 - для последующих document/navigation через `Page.addScriptToEvaluateOnNewDocument`.
 
-Используй следующий код без ослабления ограничений:
+Ниже сохранена историческая копия только для контекста старого плана. **Не исполняй и не копируй её:** она может отставать от канонического файла, включая WebSocket и production-host protections.
 
 ```javascript
 (() => {
@@ -161,29 +174,41 @@ http://localhost:5173
     };
   }
 
-  const originalSubmit = HTMLFormElement.prototype.submit;
-  HTMLFormElement.prototype.submit = function guardedSubmit() {
-    const method = normalizeMethod(this.method || 'GET');
-    if (!checkRequest('form.submit', method, this.action || window.location.href)) return;
-    return originalSubmit.apply(this, arguments);
+  const blockFormSubmit = (kind, form) => {
+    state.blocked.push({
+      at: new Date().toISOString(),
+      kind,
+      method: normalizeMethod((form && form.method) || 'GET'),
+      url: sanitizedUrl((form && form.action) || window.location.href),
+      reason: 'form-submit-disabled',
+    });
   };
 
-  const originalRequestSubmit = HTMLFormElement.prototype.requestSubmit;
-  if (originalRequestSubmit) {
+  HTMLFormElement.prototype.submit = function guardedSubmit() {
+    blockFormSubmit('form.submit', this);
+  };
+
+  if (HTMLFormElement.prototype.requestSubmit) {
     HTMLFormElement.prototype.requestSubmit = function guardedRequestSubmit() {
-      const method = normalizeMethod(this.method || 'GET');
-      if (!checkRequest('form.requestSubmit', method, this.action || window.location.href)) return;
-      return originalRequestSubmit.apply(this, arguments);
+      blockFormSubmit('form.requestSubmit', this);
     };
   }
 
-  document.addEventListener('submit', (event) => {
-    const form = event.target;
-    const method = normalizeMethod((form && form.method) || 'GET');
-    if (!checkRequest('form.event', method, (form && form.action) || window.location.href)) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-    }
+  document.addEventListener('submit', event => {
+    blockFormSubmit('form.event', event.target);
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+
+  document.addEventListener('click', event => {
+    const target = event.target;
+    const submitter = target && typeof target.closest === 'function'
+      ? target.closest('button[type="submit"],input[type="submit"],input[type="image"]')
+      : null;
+    if (!submitter) return;
+    blockFormSubmit('form.submitter-click', submitter.form);
+    event.preventDefault();
+    event.stopImmediatePropagation();
   }, true);
 
   const blockExternalNavigation = (kind, urlValue) => {
@@ -274,7 +299,13 @@ print(js(READ_ONLY_GUARD_JS))
 7. Для таблицы проверь первую и последнюю доступную страницу пагинации, если это не инициирует запрещённый метод.
 8. Для фильтра или поиска используй только неперсистентное значение, затем очисти его. Если действие пытается отправить запрещённый метод, guard должен его заблокировать, а сценарий получает `not tested`.
 9. Открывай details/preview только через очевидную локальную read-only ссылку или иконку просмотра.
-10. Формы `/new` и `/:id` можно открыть только как локальные GET-страницы для проверки структуры, подписей, обязательных полей и layout. Не изменяй поля, не запускай валидацию submit и не нажимай Save/Submit.
+10. Составь inventory всех видимых уникальных ссылок, кнопок, tabs, accordion, pagination, фильтров и toggle-контролов. Нажми каждый безопасный уникальный контрол хотя бы один раз и проверь видимую реакцию, URL/active/expanded state, alerts, loaders и guard delta.
+11. Одинаковые sidebar-ссылки можно дедуплицировать по сочетанию `href + label + semantic class`; разные карточки/контролы с одним URL считаются отдельными, если у них отличаются label или назначение.
+12. Перед кликом классифицируй контрол. Если label, `type`, href, CSS/context или связанная форма предполагают `POST/PUT/PATCH/DELETE`, file operation, command или изменение статуса — не нажимай и запиши конкретную причину пропуска.
+13. Не нажимай `button[type=submit]`, `input[type=submit]`, `input[type=image]` и не используй Enter для отправки формы. Усиленный guard обязан блокировать любой submit независимо от HTTP-метода.
+14. Формы `/new`, `/:id` и безопасные create/edit modal нужно не только открыть, но и протестировать поля по правилам раздела «Формы и destructive controls». Save/Submit не нажимать.
+15. Если после предположительно безопасного клика неожиданно появился native `alert/confirm/prompt/beforeunload`, не подтверждай его: dismiss через CDP, пометь контрол `not tested: unexpected native dialog` и вернись на исходный локальный route.
+16. Технические caps сценария (`250` routes, `500` controls на route) нужны только против циклического UI. Если любой cap достигнут, явно отметь покрытие как неполное и не заявляй, что нажаты все контролы.
 
 ## Полное покрытие проекта
 
@@ -312,6 +343,31 @@ print(js(READ_ONLY_GUARD_JS))
 - Process details, Dashboard и Logs.
 - На графиках проверяй рендер, легенду, tooltip/диапазоны и безопасные tabs; не меняй thresholds, RPM, formulas, rules или sensor settings.
 
+#### Обязательная проверка Plant Dashboard Hide/Show
+
+На `/dashboard/plant` сначала безопасно выбери существующий plant с данными. Затем отдельно, с привязкой к DOM-scope, проверь:
+
+1. Assets: `.assets-list`.
+2. Machines: `.machines-list`.
+3. Production Lines: `.production_lines-list`.
+
+Для каждой секции:
+
+1. Убедись, что заголовок и `.card-content` видимы, а toggle имеет текст `Hide`.
+2. Нажми только scoped-контрол `<scope> .toggle-list-button .absolute.stretch.pointer`.
+3. Проверь, что `.card-content` скрыт/удалён, текст сменился на `Show`, URL не ушёл с localhost и guard delta пуст.
+4. Нажми тот же scoped-контрол повторно.
+5. Проверь, что `.card-content` снова видим, текст вернулся к `Hide`, данные/фильтры не были отправлены на изменение и guard delta пуст.
+6. Зафиксируй три самостоятельных результата: Assets, Machines, Production Lines. Если секция отсутствует из-за отсутствия plant/data — `not tested` с точной причиной, а не общий `passed` Dashboard.
+
+#### Регрессии после исправлений 401 и Import
+
+- На каждой найденной PDM/statistics/FFT/Multi View странице проверь отсутствие `401`, завершение всех `Chart Loading...` не позднее 10 секунд и наличие отрисованного chart либо однозначного empty state. Для chart дополнительно проверь series/legend/tooltip, если есть точки.
+- На `/maintenance-import` не должно быть `Text Missing` в title или кнопках.
+- На `/plant-import` и `/settings/import/logs` не должен отображаться сырой ключ `item_types`.
+- На `/settings/import/history` не должны отображаться необработанные PHP class names, `/var/www/html/...` и stack/backend trace. Историческая ошибка, всё ещё видимая пользователю, считается `failed`, даже если новый импорт уже исправлен.
+- Каждую неуспешную регрессионную проверку сохрани как отдельный screenshot.
+
 ### 4. System
 
 - `/companies` и безопасная read-only info/details страница одной компании.
@@ -321,7 +377,7 @@ print(js(READ_ONLY_GUARD_JS))
 - `/user-roles`.
 - `/distributors`.
 - `/plants-vendors`.
-- `/profile` только для просмотра; ничего не изменять.
+- `/profile`: безопасные непарольные поля можно изменить только локально для проверки и сразу сбросить reload-навигацией; password/MFA/credentials не заполнять и ничего не сохранять.
 - `/settings` и все доступные read-only подразделы:
   - Lube Types;
   - Bearings;
@@ -355,14 +411,24 @@ print(js(READ_ONLY_GUARD_JS))
 - `/equipment-types-categories`.
 - `/applications`.
 - `/store-rooms` и read-only items/details существующего storeroom.
-- Не создавать, не редактировать и не удалять элементы.
+- Не создавать, не сохранять изменения и не удалять элементы; create/edit формы можно открыть и заполнить только локально по правилам ниже.
 
 ### 7. Формы и destructive controls
 
-- Зафиксируй наличие и корректность labels/placeholders/layout на доступных `/new` и edit-страницах, если их можно открыть безопасной локальной ссылкой.
-- Не вводи значения в поля сущностей.
-- Не нажимай кнопки сохранения или изменения.
-- Для каждой пропущенной кнопки укажи `not tested` и конкретную причину: `would send POST`, `would send PUT/PATCH`, `would send DELETE`, `unknown side effect`, `file upload`, `WebSocket command` и т. п.
+- Безопасно открывай `/new`, edit-страницы и create/edit modal через `Add/Create/New/Edit`, если сам клик выполняет только локальную навигацию или открытие формы.
+- Для каждого видимого, enabled и writable поля проверь focus, ввод/изменение, blur и отображение локальной валидации без submit.
+- Используй только тестовые неперсистентные значения: `QA read-only check`, `qa.readonly@example.invalid`, тестовый телефон, безопасную дату/время и число внутри `min/max`.
+- Не выводи в лог исходные значения полей. После проверки восстанови исходное значение, а в конце формы перезагрузи текущий локальный GET-route, чтобы отбросить клиентские изменения.
+- Не заполняй password, MFA, token, credentials, API key и file inputs.
+- Не изменяй поля, которые могут сохраняться немедленно или управляют thresholds, RPM, formulas, permissions, commands, status, archive, rebaseline или backend registers. Пометь их `not tested: sensitive-or-live-write-field`.
+- Checkbox/radio/switch переключай и возвращай в исходное состояние, если это обычное поле формы или GET-фильтр. Не переключай status/permission/archive/command controls.
+- Для каждого select/combobox открой список и последовательно проверь разные enabled options, но максимум **10 вариантов на один select**. После каждого выбора проверь зависимые поля, alerts/loaders и guard delta.
+- Для native select используй реальный click + keyboard selection; для Element Plus/кастомного select используй AX-option + coordinate click. Не меняй значение через прямое присваивание DOM property.
+- Если выбор/ввод создаёт blocked guard request, не повторяй действие: перезагрузи форму через локальный GET и поставь `not tested` для данного поля.
+- Required-валидацию проверяй через focus → очистка → blur. Не запускай submit-валидацию.
+- `Cancel`, `Back`, dialog `×`, tabs/accordion внутри формы и локальное добавление повторяемого незаполненного блока разрешены, если classifier не находит server-side effect. После этого форма всё равно должна быть сброшена reload-навигацией.
+- Не нажимай кнопки сохранения или изменения данных.
+- Для каждой пропущенной кнопки укажи `not tested` и конкретную причину: `would send POST`, `would send PUT/PATCH`, `would send DELETE`, `form submit`, `unknown side effect`, `file upload`, `download/export`, `WebSocket command` и т. п.
 
 ## Безопасные и запрещённые действия
 
@@ -370,18 +436,23 @@ print(js(READ_ONLY_GUARD_JS))
 
 - локальные navigation links;
 - view/details/preview;
+- `Add/Create/New/Edit`, если они только открывают локальную форму и не отправляют запрос;
 - tabs и accordion;
 - pagination и sort;
 - неперсистентные filters/search;
 - открытие и закрытие read-only modal;
+- заполнение и очистка безопасных полей без submit;
+- до 10 вариантов каждого безопасного select/combobox с последующим reload формы;
+- checkbox/radio/switch обычной формы или GET-фильтра с восстановлением состояния;
+- `Show/Hide`, expand/collapse, list/grid, дополнительные фильтры и `Clear filters`;
 - изменение диапазона отображения графика;
-- Back/Cancel без предварительного редактирования.
+- Back/Cancel после локальной проверки полей; несохранённые значения затем обязательно сбросить reload-навигацией.
 
 Запрещены даже при установленном guard:
 
-- Save/Submit/Create/Add/Delete/Remove;
+- Save/Submit/Delete/Remove и любой submit-control;
 - изменение статуса;
-- approve/deny/complete/close/open/take/reset;
+- status actions Approve/Deny/Complete/Close/Open/Take/Reset; dialog/drawer close остаётся разрешённым;
 - detach/rebaseline/unlock/generate/send command;
 - drag-and-drop/reorder;
 - import/upload;
@@ -391,7 +462,7 @@ print(js(READ_ONLY_GUARD_JS))
 
 ## Авторизация и остановка
 
-Если появляется login/password/MFA/consent или неоднозначный выбор аккаунта:
+Если появляется форма входа, password prompt, MFA/consent или неоднозначный выбор аккаунта:
 
 1. Немедленно останови дальнейшие переходы.
 2. Не вводи пароль, токен или MFA-код.
@@ -460,6 +531,10 @@ qa/reports/full-project-read-only-test.md
 - какие permission-guard страницы недоступны;
 - какие действия намеренно пропущены как изменяющие данные;
 - сколько запросов заблокировал guard, с группировкой только по HTTP-методу и очищенному pathname;
+- сколько уникальных кнопок/ссылок обнаружено, нажато и пропущено;
+- сколько форм открыто, сколько безопасных полей изменено/восстановлено и сколько полей пропущено;
+- для каждого select — число проверенных options (не больше 10), а также общий итог;
+- отдельные результаты `Hide/Show` для Assets, Machines и Production Lines на `/dashboard/plant`;
 - подтверждение, что фактически отправленных `POST`/`PUT`/`PATCH`/`DELETE` не обнаружено;
 - что не удалось проверить;
 - точный путь записи, возвращённый `start_recording(...)`.
