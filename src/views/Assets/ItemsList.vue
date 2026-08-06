@@ -288,10 +288,9 @@ const {
 		preventSetNavbar: props.preventSetNavbar,
 		successSubmitOptions: {
 			refetchItemsList: true,
-			closeModal: true,
+			// closeModal: true,
 		},
 		additionalModalSettings: {
-			editModalProp: 'editModalClassic',
 			instanceName: 'Assets',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),

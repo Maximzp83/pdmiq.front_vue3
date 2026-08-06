@@ -759,23 +759,26 @@ def test_dashboard_hide_show():
         before_guard = guard_snapshot()
         hide_click = click_selector(f'{scope} .toggle-list-button .absolute.stretch.pointer')
         wait(0.4)
-        hidden_state = dashboard_section_state(scope)
+        toggled_state = dashboard_section_state(scope)
         _, hide_delta = blocked_delta(before_guard)
 
         show_guard = guard_snapshot()
         show_click = click_selector(f'{scope} .toggle-list-button .absolute.stretch.pointer')
         wait(0.4)
-        shown_state = dashboard_section_state(scope)
+        restored_state = dashboard_section_state(scope)
         _, show_delta = blocked_delta(show_guard)
 
         passed = (
             hide_click.get('ok') and show_click.get('ok')
-            and hidden_state and not hidden_state['contentVisible'] and re.search(r'show', hidden_state['label'], re.I)
-            and shown_state and shown_state['contentVisible'] and re.search(r'hide', shown_state['label'], re.I)
+            and toggled_state and restored_state
+            and toggled_state['contentVisible'] != before_state['contentVisible']
+            and toggled_state['label'] != before_state['label']
+            and restored_state['contentVisible'] == before_state['contentVisible']
+            and restored_state['label'] == before_state['label']
             and not hide_delta and not show_delta
         )
         emit('dashboard-toggle', section=label, route='/dashboard/plant', status='passed' if passed else 'failed',
-             before=before_state, hidden=hidden_state, restored=shown_state, blocked=hide_delta + show_delta)
+             before=before_state, toggled=toggled_state, restored=restored_state, blocked=hide_delta + show_delta)
         if not passed:
             capture_problem(f'dashboard-{label}-hide-show-failed')
 

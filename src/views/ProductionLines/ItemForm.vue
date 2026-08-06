@@ -56,6 +56,7 @@
 
 			<el-form-item :label="tt('image')" prop="file_name" class="upload-form-item">
 				<FileUploadBlock
+					:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
 					ref="fileUploadBlockRef"
 					rotate
 					deleteFileId
@@ -171,7 +172,7 @@ const { globalFilters } = storeToRefs(globalStore);
 const { reorderProductionLine, fetchProductionLineRpmNodes } = useProductionLines();
 
 const itemFormRef = ref(null);
-const fileUploadBlockRef = ref(null);
+// const fileUploadBlockRef = ref(null);
 const locationsList = shallowRef([]);
 const locationsLoading = ref(false);
 const productionLinesList = shallowRef([]);
@@ -184,7 +185,7 @@ const desiredId = ref(null);
 const refsMap = ref({
 	CharacterItem: [],
 	AttachmentItem: [],
-	FileUploadBlock: [fileUploadBlockRef],
+	FileUploadBlock: [],
 });
 
 const initialFormData = {

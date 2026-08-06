@@ -234,6 +234,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 	const updateDataByRef = ({ Instance, settingsItem, collectedData }) => {
 		const { conditionSettings, callback, destructure, setIfEmpty, cleanIfEmpty, removeFilePropIfNull } =
 			settingsItem;
+
 		const context = {
 			collectedValue: Instance.getFormData(),
 			settings: settingsItem,
