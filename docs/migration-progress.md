@@ -16,6 +16,7 @@
 - `Maintenance` section is migrated for the current Vue3 compile scope and routes/menu are enabled.
 - `Maintenance/WorkOrdersImport` was re-migrated toward Vue2 parity: the page again requires a selected plant, uses the shared import container, supports upload/start/revert/progress, and renders the original drag-and-drop work-order column mapping. The shared import form/container now accept a composable upload action without coupling maintenance requests to `TestingStore`. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `Maintenance` Work Orders list has been hardened toward legacy behavior with advanced filters, closer table columns, create/export plant guard, and detail/preview actions.
+- Latest seven-file Sensor/chart Vue2 delta is synced into all matching Vue3 files: Manual Route FFT neighbour requests retain `metric_type`; selected FFT changes reload both neighbours; chart headers render per-sensor color legends; one-point Manual Route series show markers; the obsolete static Manual Route chart config is removed; and the FFT dev endpoint/shared legend styles are aligned. No changed legacy file was skipped. Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production build pass with existing warnings only.
 - `Maintenance` Logs list has been hardened toward legacy behavior with advanced filters, closer table columns, file/parent actions, preview modals, and export guard.
 - `WorkOrderRequests` section is migrated for the current Vue3 compile scope and route/menu are enabled.
 - `StoreRooms` section is migrated for the current Vue3 compile scope and route/menu are enabled.
@@ -863,3 +864,9 @@ await fetchUsers({ page: 1 });
   - Preserved Equipment picture event propagation to the parent details page
   - Sorted Manual Route statistics and FFT flags chronologically before Highcharts rendering
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Sensor/chart seven-file Vue2 delta sync (2026-08-06)
+  - Preserved Manual Route `metric_type` in previous/next FFT requests and reloaded both neighbours around the selected FFT
+  - Generated Manual Route/MultiView HTML titles with sensor-color legends and enabled one-point series markers
+  - Removed the obsolete static Manual Route config and aligned the FFT dev endpoint/shared legend styles
+  - All changed legacy files had migrated Vue3 counterparts; none were skipped
+  - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24

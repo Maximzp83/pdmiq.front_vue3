@@ -16,6 +16,16 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest seven-file uncommitted `vue2_project` Sensor/chart delta was migrated into all matching Vue3 counterparts without confirmation stops, as requested:
+  - FFT neighbour URLs now retain Manual Route `metric_type`, and initial/previous/next navigation reloads both neighbours from the selected FFT item.
+  - The default FFT graph-points URL is aligned to the dev endpoint without the stray query suffix.
+  - Manual Route and MultiView chart headers now render per-sensor color legends; Manual Route chart titles are generated from their request list and the custom header renders the HTML title.
+  - Manual Route charts enable markers for one-point series, and the obsolete static `manual_route` chart-list config was removed in favor of the dedicated factory flow.
+  - Shared legend styles were added under `.chart-container-wrapper`.
+  - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
+  - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- Library is migrated and wired in Vue3: the list, file links, resource labels, `useLibrary` wrapper, entity config, filter persistence, `/library` route, and menu entry are present. Targeted ESLint and the Node 24 production build pass.
+- Maintenance Work Orders Import was re-migrated toward Vue2 parity: the page again uses the selected plant and shared import workflow; column mapping, progress, and revert behavior are restored; shared Import components accept the maintenance upload action directly. Targeted ESLint and the Node 24 production build pass.
 - Manual Route runtime follow-up completed: the page consumes `handleChartContainerReady` / `chartLoadEvent`, forwards unrelated events, the custom header handles `zoomYAxis`, and Manual Route statistics/FFT items are sorted chronologically before Highcharts rendering. Targeted ESLint, `git diff --check`, and production Vite build pass; existing build warnings remain.
 - Latest 18-file/untracked `vue2_project` delta was migrated into Vue3 without confirmation stops, as explicitly requested:
   - Added the dedicated equipment-level Manual Route statistics route/page with two metric charts and one series/FFT flag set per Manual Route sensor.
@@ -40,8 +50,6 @@
   - Manual Route equipment cards hide the legacy alarms block.
   - Vue2 API dev URL, Equipment card alert guards, Requisition material prop optionality, and chart controller-timezone guard required no Vue3 change because equivalent behavior was already present or the unsafe access no longer exists.
   - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24; existing Vite mixed-import/chunk-size warnings remain.
-- Library is migrated and wired in Vue3: the list, file links, resource labels, `useLibrary` wrapper, entity config, filter persistence, `/library` route, and menu entry are present. Targeted ESLint and the Node 24 production build pass.
-- Maintenance Work Orders Import was re-migrated toward Vue2 parity: the page again uses the selected plant and shared import workflow; column mapping, progress, and revert behavior are restored; shared Import components accept the maintenance upload action directly. Targeted ESLint and the Node 24 production build pass.
 - Latest `vue2_project/` changes were synced into already migrated Vue3 files:
   - `src/composables/mixins/useSubItemsList.js` now normalizes boolean `setIfEmpty` values to `0` when false, matching the updated legacy sub-items mixin behavior.
   - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js` now disables navigator/scrollbar and enables x panning for `oneChartOnly`.
@@ -79,19 +87,16 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
+- Current seven-file Vue2 delta sync:
+  - `src/assets/sass/common/common-blocks.scss`
+  - `src/modules/charts_factory/controllers/Sensor/api/index.js`
+  - `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`
 - Current visible dirty working tree:
   - `src/constants/global.js`
   - `src/localization/loc_eng.js`
   - `src/localization/loc_spanish.js`
   - `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`
   - `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`
-  - `src/modules/charts_factory/controllers/Sensor/classes/StatisticsTransformator.js`
-  - `src/modules/charts_factory/dispatchers/chartFactoryDispatcher.js`
-  - `src/modules/charts_factory/index.js`
-  - `src/router/index.js`
-  - `src/views/Equipments/Card/CardSensorItem.vue`
-  - `src/views/Equipments/Details/DetailsPage.vue`
-  - `src/views/Equipments/Details/PdmButton.vue`
   - `src/views/Sensors/FFTStatisticsPage.vue`
   - `src/views/Sensors/ManualRouteStatisticsPage.vue` (new)
   - `src/views/Sensors/StatisticsPage.vue`
@@ -112,4 +117,4 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Runtime smoke-test the equipment-level Manual Route page with several sensors, both metric systems, date shortcuts, FFT flags/links, and equipment-tab switching using real API data when requested.
+- Runtime smoke-test Manual Route previous/next FFT navigation across metrics, one-point history series, and Manual Route/MultiView legend rendering with real API data when requested.

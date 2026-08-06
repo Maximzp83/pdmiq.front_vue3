@@ -53,6 +53,33 @@ import {
 } from '../chartsListsConfig';
 import { createDraggablePlotline } from './DraggablePlotline';
 
+const bindFlagsTooltip = chart => {
+	chart.series.forEach(series => {
+		if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
+
+		series.points.forEach(point => {
+			if (!point.graphic || point._customTooltipBound) return;
+
+			point._customTooltipBound = true;
+			point.graphic.css({
+				cursor: 'pointer',
+				pointerEvents: 'auto'
+			});
+
+			point.graphic.on('mouseover', () => {
+				chart.tooltip.refresh(point);
+				chart.hoverPoint = point;
+				point.setState('hover');
+			});
+
+			point.graphic.on('mouseout', () => {
+				point.setState('');
+				chart.tooltip?.hide(0);
+			});
+		});
+	});
+};
+
 class SensorChartBase extends ChartBase {
 	constructor() {
 		super();
@@ -945,35 +972,7 @@ class SensorChartBase extends ChartBase {
 	}
 
 	bindFlagsTooltip(chart) {
-	  chart.series.forEach(series => {
-	    if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
-
-	    series.points.forEach(point => {
-	      if (!point.graphic || point._customTooltipBound) return;
-
-	      point._customTooltipBound = true;
-
-	      point.graphic.css({
-	        cursor: 'pointer',
-	        pointerEvents: 'auto'
-	      });
-
-	      point.graphic.on('mouseover', function () {
-	        chart.tooltip.refresh(point);
-
-	        chart.hoverPoint = point;
-	        point.setState('hover');
-	      });
-
-	      point.graphic.on('mouseout', function () {
-	        point.setState('');
-
-	        if (chart.tooltip) {
-	          chart.tooltip.hide(0);
-	        }
-	      });
-	    });
-	  });
+		bindFlagsTooltip(chart);
 	}
 }
 
@@ -2604,14 +2603,38 @@ class ManualRouteChart extends ChartBase {
 		this.finalSetup(resources);
 	}
 
+	handleChartRenderEvent({ target }) {
+		bindFlagsTooltip(target);
+	}
+
 	handleChartInitiatedEvent({ target }) {
 		this.ChartAPI = target;
 		setTimeout(() => this.ChartAPI.redraw(false), 100);
 	}
 
 	setupChartTitle() {
-		const parameterItem = this.requestsList[0];
-		return parameterItem ? parameterItem.name : '';
+		try {
+			const { requestsList } = this;
+			let result = '';
+
+			if (requestsList && requestsList.length) {
+				requestsList.forEach((requestItem, idx) => {
+					const { name, sensor_location, sensor_color } = requestItem;
+
+					if (idx === 0) {
+						result += `${name} </br>`;
+					}
+					result += `<span class="chart-header-legend-item" style="background-color: ${sensor_color}"></span><span>Location - ${sensor_location}</span>, </br>`;
+				});
+
+				result = result.slice(0, -7);
+			}
+
+			return result;
+		} catch (e) {
+			console.warn(e);
+			return '';
+		}
 	}
 
 	setupUnitTypeName(payload) {
@@ -2718,6 +2741,8 @@ class ManualRouteChart extends ChartBase {
 					// onSeries: baseSerieId,
 					color: sensor_color,
 					shape: setupManualRouteFFTIconShape(sensor_color),
+					enableMouseTracking: true,
+					cursor: 'pointer',
 					showInLegend: false,
 					showInNavigator: false,
 					customSettings: { metric_type: id, sensor_id }
@@ -2815,6 +2840,21 @@ class ManualRouteChart extends ChartBase {
 					this.checkStatisticsResponses();
 				});
 		});
+	}
+
+	checkSeriesForOnePointData() {
+		this.options.series.forEach(serie => {
+			serie.marker = {
+				enabled: Boolean(serie.data.length && serie.data.length === 1)
+			};
+		});
+	}
+
+	localHandleStatisticsTransformUpdated(resultData) {
+		this.assignDataToYAxis(resultData);
+		this.assignDataToSeries(resultData);
+		this.checkSeriesForOnePointData();
+		this.emitChartOptionsReady();
 	}
 }
 
@@ -2926,10 +2966,9 @@ class MultiViewChart extends ChartBase {
 			let result = '';
 
 			if (requestsList && requestsList.length) {
-				requestsList.forEach(ri => {
+				requestsList.forEach((ri, idx) => {
 					const { sensor_name, name, sensor_location } = ri;
-					// console.log('setupChartTitle', sensor_name, name)
-					result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
+					result += `<span class="chart-header-legend-item" style="background-color: ${colorsList2[idx]}"></span><span>Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </span>, </br>`;
 				});
 
 				result = result.slice(0, -7); // remove last comma

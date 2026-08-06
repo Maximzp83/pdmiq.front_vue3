@@ -6,7 +6,7 @@ import {
 	SENSOR_COLORTECH_VFD_PRESSURE_RPM_AMPS_PARAMETERS_TYPES,
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
 	BANNER_M25_PARAMETERS_TYPES,
-	MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES,
+	// MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES,
 	sensorParametersList,
 	manualRouteSensorParametersList,
 	sensorParametersListNCD,
@@ -588,7 +588,7 @@ const getSeriesConfigSettingsForBannerV2_1For = (parameter, settings={}) => {
 
 const chartsListsConfig1 = {
 	'banner': banner_configs,
-	'manual_route': [
+	/*'manual_route': [
 		{
 			chart_id: 'manual_route',
 			YAxisList: [
@@ -649,38 +649,7 @@ const chartsListsConfig1 = {
 				manualRouteSensorParametersList(MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION),
 			]
 		},
-		/*{
-			chart_id: `chart-${MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY}`,
-			transformator_settings: {
-				specification: {
-					setupPlotlinesData: false,
-					includeProblems: false,
-					setupFlagsData: {
-						enable_notes: false,
-						enable_crashes: false,
-						enable_fft: true,
-						enable_runtime_tracker: false
-					},
-					setupPointsData: {
-						method: 'line_charts_datetime',
-						enableZones: false
-					}
-				},
-			},
-			inject_options: {
-				chart: { type: 'spline' },
-				navigator: { series: { type: 'spline' } }
-			},
-			// ...settingsForSplineChartsWithSplittedSeries,
-			seriesConfigSettings: getSplineSeriesConfigSettings(),
-			seriesConfigIncludes: ['fft_flag'],
-			requestsList: [
-				manualRouteSensorParametersList(
-					MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY
-				)
-			]
-		},*/
-	],
+	],*/
 	'banner_CM1L': banner_configs.concat([
 		{
 			chart_id: `chart-${SENSOR_PARAMETERS_TYPES.AMPS}`,

@@ -460,37 +460,66 @@ const fetchFFT = ({ urlPostfix = '', target, settings = {} } = {}) => {
 		...requestPayload,
 	})
 		.then(({ value }) => {
-			target.value = normalizeFftResponse(value);
+			const normalizedValue = normalizeFftResponse(value);
+			target.value = normalizedValue;
+			return normalizedValue;
 		})
 		.catch(() => {
 			target.value = Array.isArray(target.value) ? [] : null;
 			fftReady.value = true;
+			return null;
 		})
 		.finally(() => {
 			fftLoading.value = false;
 		});
+};
+const getFFTNavigationUrl = ({
+	fftId: selectedFftId,
+	direction,
+	max,
+	fftItem = currentFFTItem.value,
+} = {}) => {
+	const params = new URLSearchParams();
+	if (max != null) params.set('max', max);
+	if (isManualRoute.value && fftItem?.metric_type != null) {
+		params.set('metric_type', fftItem.metric_type);
+	}
+
+	const query = params.toString();
+	return `/${selectedFftId}/${direction}${query ? `?${query}` : ''}`;
+};
+const loadFFTNeighbours = (fftItem, prevMax = 9) => {
+	if (!fftItem) return;
+
+	fetchFFT({
+		target: prevFFTItems,
+		urlPostfix: getFFTNavigationUrl({
+			fftId: fftItem.id,
+			direction: 'prev',
+			max: prevMax,
+			fftItem,
+		}),
+	});
+	fetchFFT({
+		target: nextFFTItem,
+		urlPostfix: getFFTNavigationUrl({
+			fftId: fftItem.id,
+			direction: 'next',
+			fftItem,
+		}),
+	});
 };
 const fetchFFTBundle = () => {
 	const selectedFftId = fftId.value;
 	if (!sensorData.value?.id) return;
 
 	fftReady.value = false;
-	fetchFFT({
+	const currentFFTRequest = fetchFFT({
 		target: currentFFTItem,
 		urlPostfix: selectedFftId ? `/${selectedFftId}` : '',
 	});
 	if (selectedFftId) {
-		fetchFFT({
-			target: prevFFTItems,
-			urlPostfix: `/${selectedFftId}/prev?max=9`,
-		});
-		fetchFFT({
-			target: nextFFTItem,
-			urlPostfix: `/${selectedFftId}/next`,
-			settings: {
-				requestPayload: { notNotify: true }
-			}
-		});
+		currentFFTRequest.then(fftItem => loadFFTNeighbours(fftItem));
 	}
 };
 const setupMeasurement = (sensor) => {
@@ -559,24 +588,13 @@ const handleFFT = ({ prev, next } = {}) => {
 	if (prev && prevFFTItem.value) {
 		fftReady.value = false;
 		router.replace(`/${urlType}/${sensorData.value.id}/fft/${prevFFTItem.value.id}`);
-		nextFFTItem.value = cloneDeep(currentFFTItem.value);
 		currentFFTItem.value = cloneDeep(prevFFTItem.value);
-		fetchFFT({
-			target: prevFFTItems,
-			urlPostfix: `/${prevFFTItem.value.id}/prev?max=9`,
-		});
+		loadFFTNeighbours(currentFFTItem.value);
 	} else if (next && nextFFTItem.value) {
 		fftReady.value = false;
 		router.replace(`/${urlType}/${sensorData.value.id}/fft/${nextFFTItem.value.id}`);
 		currentFFTItem.value = cloneDeep(nextFFTItem.value);
-		fetchFFT({
-			target: prevFFTItems,
-			urlPostfix: `/${nextFFTItem.value.id}/prev?max=11`,
-		});
-		fetchFFT({
-			target: nextFFTItem,
-			urlPostfix: `/${nextFFTItem.value.id}/next`,
-		});
+		loadFFTNeighbours(currentFFTItem.value, 11);
 	}
 };
 const handleSplitCharts = () => {
