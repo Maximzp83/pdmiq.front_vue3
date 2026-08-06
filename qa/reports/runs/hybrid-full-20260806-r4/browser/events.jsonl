@@ -1708,3 +1708,66 @@
 {"kind": "form-field", "route": "/sensors/new", "fieldType": "text", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
 {"kind": "form-select", "route": "/sensors/new", "status": "not tested", "optionsTested": 10, "optionLimit": 10, "blocked": [{"at": "2026-08-06T09:50:05.093Z", "kind": "websocket.send", "method": "WEBSOCKET", "url": "ws://localhost:5173/", "reason": "websocket-send-disabled"}]}
 {"kind": "form-stopped", "route": "/sensors/new", "reason": "blocked-request-from-field"}
+{"kind": "form-finish", "route": "/sensors/new", "fieldsTested": 2, "fieldsSkipped": 1, "submitted": false, "resetByReload": true}
+{"kind": "control-skipped", "route": "/sensors", "label": "Delete", "reason": "mutation-label"}
+{"kind": "control-skipped", "route": "/sensors", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors", "label": "", "reason": "mutation-context"}
+{"kind": "control-skipped", "route": "/sensors", "label": "Go to previous page Go to previous page", "reason": "disabled"}
+{"kind": "control-click", "route": "/sensors", "label": "Go to next page", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/sensors", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/sensors/ncd", "status": "passed", "alerts": [], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "form-start", "route": "/sensors/ncd", "reason": "route-form", "fieldsDiscovered": 2}
+{"kind": "form-field", "route": "/sensors/ncd", "fieldType": "text", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
+{"kind": "form-field-skipped", "route": "/sensors/ncd", "fieldType": "text", "reason": "disabled-or-readonly"}
+{"kind": "form-finish", "route": "/sensors/ncd", "fieldsTested": 1, "fieldsSkipped": 1, "submitted": false, "resetByReload": true}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Predictive Maintenance", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/sensors/ncd", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0154-control-no-reaction--sensors-ncd-1.png"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Dashboard", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/sensors/ncd", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0155-control-no-reaction--sensors-ncd-7.png"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Settings", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "CMMS", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/sensors/ncd", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0156-control-no-reaction--sensors-ncd-16.png"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Work Orders & Maintenance Logs", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Work Order Requests", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Task Procedures", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Work Order Type", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Misc Parts", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "Import", "reason": "mutation-label"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Asset Management", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/sensors/ncd", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0157-control-no-reaction--sensors-ncd-22.png"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Library", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Brands", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Part Numbers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Item Types", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Item Types Item Types Categories", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Applications", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Storerooms", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "Export", "reason": "mutation-label"}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/sensors/ncd", "label": "Go to previous page", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "Go to next page Go to next page", "reason": "disabled"}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/sensors/ncd", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/roi-calculator", "status": "passed", "alerts": [], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Predictive Maintenance", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0158-control-no-reaction--roi-calculator-1.png"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Dashboard", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
