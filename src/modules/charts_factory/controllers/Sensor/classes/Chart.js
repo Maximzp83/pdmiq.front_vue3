@@ -53,6 +53,33 @@ import {
 } from '../chartsListsConfig';
 import { createDraggablePlotline } from './DraggablePlotline';
 
+const bindFlagsTooltip = chart => {
+	chart.series.forEach(series => {
+		if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
+
+		series.points.forEach(point => {
+			if (!point.graphic || point._customTooltipBound) return;
+
+			point._customTooltipBound = true;
+			point.graphic.css({
+				cursor: 'pointer',
+				pointerEvents: 'auto'
+			});
+
+			point.graphic.on('mouseover', () => {
+				chart.tooltip.refresh(point);
+				chart.hoverPoint = point;
+				point.setState('hover');
+			});
+
+			point.graphic.on('mouseout', () => {
+				point.setState('');
+				chart.tooltip?.hide(0);
+			});
+		});
+	});
+};
+
 class SensorChartBase extends ChartBase {
 	constructor() {
 		super();
@@ -945,35 +972,7 @@ class SensorChartBase extends ChartBase {
 	}
 
 	bindFlagsTooltip(chart) {
-	  chart.series.forEach(series => {
-	    if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
-
-	    series.points.forEach(point => {
-	      if (!point.graphic || point._customTooltipBound) return;
-
-	      point._customTooltipBound = true;
-
-	      point.graphic.css({
-	        cursor: 'pointer',
-	        pointerEvents: 'auto'
-	      });
-
-	      point.graphic.on('mouseover', function () {
-	        chart.tooltip.refresh(point);
-
-	        chart.hoverPoint = point;
-	        point.setState('hover');
-	      });
-
-	      point.graphic.on('mouseout', function () {
-	        point.setState('');
-
-	        if (chart.tooltip) {
-	          chart.tooltip.hide(0);
-	        }
-	      });
-	    });
-	  });
+		bindFlagsTooltip(chart);
 	}
 }
 
@@ -2604,6 +2603,10 @@ class ManualRouteChart extends ChartBase {
 		this.finalSetup(resources);
 	}
 
+	handleChartRenderEvent({ target }) {
+		bindFlagsTooltip(target);
+	}
+
 	handleChartInitiatedEvent({ target }) {
 		this.ChartAPI = target;
 		setTimeout(() => this.ChartAPI.redraw(false), 100);
@@ -2718,6 +2721,8 @@ class ManualRouteChart extends ChartBase {
 					// onSeries: baseSerieId,
 					color: sensor_color,
 					shape: setupManualRouteFFTIconShape(sensor_color),
+					enableMouseTracking: true,
+					cursor: 'pointer',
 					showInLegend: false,
 					showInNavigator: false,
 					customSettings: { metric_type: id, sensor_id }

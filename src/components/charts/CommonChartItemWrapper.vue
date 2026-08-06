@@ -139,6 +139,10 @@ const buildChart = ({ settings, payload } = {}) => {
 	}
 
 	updateChartInstance.value += 1;
+
+	if (window.location.origin === 'http://localhost:5173') {
+		window[`ChartInstanceContainer_${props.chartsContainerIdx || 0}`] = ChartInstanceContainer;
+	}
 };
 
 const callChartMethod = (methodName, data) => ChartInstance.value?.callChartMethod(methodName, data);
