@@ -1,6 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
+- Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
@@ -277,8 +278,10 @@ Primary rules source:
 ## Build Status
 - `npm run build` passes after follow-up compile fixes.
 - Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
+- Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 
 ## Files Already Modified In This Migration Batch
+- Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/composables/useSensors.js`

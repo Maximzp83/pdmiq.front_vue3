@@ -103,7 +103,7 @@
 
 			<el-form-item :label="`${tt('Machine')} ${tt('image')}`" prop="pictures" class="upload-form-item">
 				<FileUploadBlock
-					ref="fileUploadBlockRef"
+					:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
 					multiple
 					rotate
 					:pictures="itemPictures"
@@ -186,7 +186,6 @@ const { globalFilters } = storeToRefs(globalStore);
 const { reorderMachine } = useMachines();
 
 const itemFormRef = ref(null);
-const fileUploadBlockRef = ref(null);
 const applicationsLoading = ref(false);
 const applicationsList = shallowRef([]);
 const productionLinesLoading = ref(false);
@@ -201,7 +200,7 @@ const desiredId = ref(null);
 const refsMap = ref({
 	CharacterItem: [],
 	AttachmentItem: [],
-	FileUploadBlock: [fileUploadBlockRef],
+	FileUploadBlock: [],
 });
 
 const initialFormData = {

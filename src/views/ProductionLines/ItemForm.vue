@@ -57,7 +57,6 @@
 			<el-form-item :label="tt('image')" prop="file_name" class="upload-form-item">
 				<FileUploadBlock
 					:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
-					ref="fileUploadBlockRef"
 					rotate
 					deleteFileId
 					showDeleteButton

@@ -9,6 +9,7 @@
 
 ## Current Focus
 
+- Machine and ROI One Pager FileUploadBlock refs now use `setSubItemRef` wherever those forms already use `useSubItemsList`; the project-wide scan confirms no old `ref="fileUploadBlockRef"` remains in such a component. This fixes the Machine submit-time `Instance.getFormData is not a function` error. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
 - Current selected migration target `vue2_project/src/views/Assets` is migrated for the current Vue3 compile scope.
 - `Controllers` views have been added in Vue3 style and routes/menu are enabled.
@@ -833,3 +834,8 @@ await fetchUsers({ page: 1 });
   - Added `/settings/import/*`, `/settings/import/:id`, `/plant-import`, `/plant-import-logs`, `/plant-import-logs/:id`, and `/master-import` routes
   - Enabled Import in Settings navigation and sidebar menu
   - `npm run build`, targeted `git diff --check`, and migration-rule scan passed
+- [x] FileUploadBlock/useSubItemsList template-ref runtime fix
+  - Registered Machine image upload and ROI One Pager file upload through `setSubItemRef`
+  - Removed nested/manual `fileUploadBlockRef` handling from both matching forms
+  - Project-wide scan confirms no remaining component combines `setSubItemRef` with `ref="fileUploadBlockRef"`
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

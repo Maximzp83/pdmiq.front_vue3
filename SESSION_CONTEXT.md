@@ -16,6 +16,11 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- FileUploadBlock refs were aligned with the active `useSubItemsList` registration pattern:
+  - `src/views/Machines/ItemForm.vue` now registers the upload component through `setSubItemRef`, matching Production Lines and preventing a nested Vue ref object from reaching `Instance.getFormData()`.
+  - The project-wide scan found one additional matching case in `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`; its file upload now also uses `setSubItemRef` and reads the registered instance from the shared refs map.
+  - No component combining `setSubItemRef` with the old `ref="fileUploadBlockRef"` pattern remains.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - Library is migrated and wired in Vue3: the list, file links, resource labels, `useLibrary` wrapper, entity config, filter persistence, `/library` route, and menu entry are present. Targeted ESLint and the Node 24 production build pass.
 - Maintenance Work Orders Import was re-migrated toward Vue2 parity: the page again uses the selected plant and shared import workflow; column mapping, progress, and revert behavior are restored; shared Import components accept the maintenance upload action directly. Targeted ESLint and the Node 24 production build pass.
 - Latest `vue2_project/` changes were synced into already migrated Vue3 files:
@@ -55,6 +60,9 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
+- Current FileUploadBlock ref fix:
+  - `src/views/Machines/ItemForm.vue`
+  - `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
 - Current Details runtime-fix files:
   - `src/views/Assets/Details/DetailsPage.vue`
   - `src/views/Machines/Details/DetailsPage.vue`
@@ -64,6 +72,7 @@
   - `docs/migration-todos.md`
   - `docs/new-session-handoff.md`
 - Unrelated user-owned dirty files present and left untouched:
+  - `src/views/ProductionLines/ItemForm.vue`
   - `src/api/request_factories.js`
   - `src/views/Maintenance/Logs/ItemForm.vue`
   - `src/views/Maintenance/WorkOrders/ItemForm.vue`
@@ -78,4 +87,4 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Continue one confirmed file/step at a time; all statically discovered active WebSocket consumers now use the migrated service wrapper, with runtime validation remaining when explicitly requested.
+- Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.
