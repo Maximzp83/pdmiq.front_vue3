@@ -1783,3 +1783,194 @@
 {"kind": "control-click", "route": "/roi-calculator", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Settings", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "CMMS", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0160-control-no-reaction--roi-calculator-16.png"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Work Orders & Maintenance Logs", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Work Order Requests", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Task Procedures", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Work Order Type", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Misc Parts", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "Import", "reason": "mutation-label"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Asset Management", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0161-control-no-reaction--roi-calculator-22.png"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Library", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Brands", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Part Numbers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Item Types", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Item Types Item Types Categories", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Applications", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Storerooms", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/roi-calculator", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/dashboard/plant", "status": "failed", "alerts": ["Limited access\n\nYou do not have permissions to view this page"], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Predictive Maintenance", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0162-control-no-reaction--dashboard-plant-2.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0163-control-no-reaction--dashboard-plant-3.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0164-control-no-reaction--dashboard-plant-8.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Settings", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "CMMS", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0165-control-no-reaction--dashboard-plant-17.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Orders & Maintenance Logs", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Order Requests", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Task Procedures", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Order Type", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Misc Parts", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "Import", "reason": "mutation-label"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Asset Management", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0166-control-no-reaction--dashboard-plant-23.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Library", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Brands", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Part Numbers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Item Types", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Item Types Item Types Categories", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Applications", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Storerooms", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/dashboard/plant", "status": "failed", "alerts": ["Limited access\n\nYou do not have permissions to view this page"], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Predictive Maintenance", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0167-control-no-reaction--dashboard-plant-2.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0168-control-no-reaction--dashboard-plant-3.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0169-control-no-reaction--dashboard-plant-8.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Settings", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "CMMS", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0170-control-no-reaction--dashboard-plant-17.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Orders & Maintenance Logs", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Order Requests", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Task Procedures", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Work Order Type", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Misc Parts", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "Import", "reason": "mutation-label"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Asset Management", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0171-control-no-reaction--dashboard-plant-23.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Library", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Brands", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Part Numbers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Item Types", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Item Types Item Types Categories", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Applications", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Storerooms", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/profile", "status": "passed", "alerts": [], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "form-start", "route": "/profile", "reason": "route-form", "fieldsDiscovered": 11}
+{"kind": "form-field", "route": "/profile", "fieldType": "text", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
+{"kind": "form-field", "route": "/profile", "fieldType": "text", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "text", "reason": "disabled-or-readonly"}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "text", "reason": "disabled-or-readonly"}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "text", "reason": "disabled-or-readonly"}
+{"kind": "form-field", "route": "/profile", "fieldType": "email", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
+{"kind": "form-field", "route": "/profile", "fieldType": "text", "required": false, "status": "passed", "blocked": [], "validationErrors": [], "requiredValidationErrors": []}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "password", "reason": "field-type-password"}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "password", "reason": "field-type-password"}
+{"kind": "form-field-skipped", "route": "/profile", "fieldType": "password", "reason": "field-type-password"}
+{"kind": "form-select", "route": "/profile", "status": "not tested", "optionsTested": 10, "optionLimit": 10, "blocked": [{"at": "2026-08-06T10:01:45.929Z", "kind": "websocket.send", "method": "WEBSOCKET", "url": "ws://localhost:5173/", "reason": "websocket-send-disabled"}]}
+{"kind": "form-stopped", "route": "/profile", "reason": "blocked-request-from-field"}
+{"kind": "form-finish", "route": "/profile", "fieldsTested": 5, "fieldsSkipped": 6, "submitted": false, "resetByReload": true}
+{"kind": "control-skipped", "route": "/profile", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/profile", "label": "Predictive Maintenance", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0172-control-no-reaction--profile-1.png"}
+{"kind": "control-click", "route": "/profile", "label": "Dashboard", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0173-control-no-reaction--profile-7.png"}
+{"kind": "control-click", "route": "/profile", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Settings", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "CMMS", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0174-control-no-reaction--profile-16.png"}
+{"kind": "control-click", "route": "/profile", "label": "Work Orders & Maintenance Logs", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Work Order Requests", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Task Procedures", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Work Order Type", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Misc Parts", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/profile", "label": "Import", "reason": "mutation-label"}
+{"kind": "control-click", "route": "/profile", "label": "Asset Management", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0175-control-no-reaction--profile-22.png"}
+{"kind": "control-click", "route": "/profile", "label": "Library", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Brands", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Part Numbers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Item Types", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Item Types Item Types Categories", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Applications", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Storerooms", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-skipped", "route": "/profile", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/profile", "label": "Personal", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0176-control-no-reaction--profile-30.png"}
+{"kind": "control-click", "route": "/profile", "label": "Notifications", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Personal", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Reports", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "Reports", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0177-control-no-reaction--profile-34.png"}
+{"kind": "control-click", "route": "/profile", "label": "API", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/profile", "label": "API", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/profile", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0178-control-no-reaction--profile-36.png"}
+{"kind": "control-click", "route": "/profile", "label": "Add", "status": "failed", "reason": "RuntimeError"}
+{"kind": "control-skipped", "route": "/profile", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-skipped", "route": "/profile", "label": "SAVE", "reason": "mutation-label"}
+{"kind": "route-check", "label": "route", "route": "/dashboard/plant", "status": "passed", "alerts": [], "loaders": 0, "title": "🐴 Vite App", "blocked": []}
+{"kind": "control-skipped", "route": "/dashboard/plant", "label": "", "reason": "unlabeled-unknown-side-effect"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Predictive Maintenance", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0179-control-no-reaction--dashboard-plant-1.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0180-control-no-reaction--dashboard-plant-2.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Dashboard", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0181-control-no-reaction--dashboard-plant-3.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/dashboard/plant", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0182-control-no-reaction--dashboard-plant-8.png"}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/dashboard/plant", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
