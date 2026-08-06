@@ -1771,3 +1771,9 @@
 {"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0158-control-no-reaction--roi-calculator-1.png"}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Dashboard", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Customer Success", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Corporate View", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Controllers", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "OEE", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
+{"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0159-control-no-reaction--roi-calculator-7.png"}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
