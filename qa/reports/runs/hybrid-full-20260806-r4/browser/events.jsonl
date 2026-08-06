@@ -1777,3 +1777,5 @@
 {"kind": "control-click", "route": "/roi-calculator", "label": "System", "status": "failed", "classification": "safe-ui-control", "navigated": false, "observableChange": false, "blocked": []}
 {"kind": "screenshot", "route": "/roi-calculator", "path": "qa/reports/runs/hybrid-full-20260806-r4/browser/screenshots/0159-control-no-reaction--roi-calculator-7.png"}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
