@@ -237,7 +237,7 @@ const {
 			refetchItemsList: true,
 		},
 		additionalModalSettings: {
-			editModalProp: 'editModalClassic',
+			// editModalProp: 'editModalClassic',
 			instanceName: isProdLine.value ? 'ProductionLines' : 'Utilities',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),

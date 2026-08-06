@@ -250,6 +250,7 @@ export function useItemsData({
 	 */
 	const refetchItemsList = () => {
 		const filters = filtersRef?.value || {};
+
 		return fetchItems({
 			...globalFilters.value,
 			...filters,
@@ -522,7 +523,7 @@ export function useItemsData({
 			api_request.delete(resolvedApiRoute, {
 					data: { ids },
 					itemName: resolvedItemsName.value.one,
-				}).then(() => fetchItems({ ...(filtersRef?.value || {}) }))
+				}).then(() => refetchItemsList())
 		)
 	};
 

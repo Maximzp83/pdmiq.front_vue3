@@ -36,9 +36,11 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { ElMessageBox } from 'element-plus';
 
 import { api_request } from '@/api/request_provider';
 import { cleanDateString } from '@/helpers';
+import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useUsersStore } from '@/stores/UsersStore';
@@ -49,6 +51,8 @@ import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 defineOptions({
 	name: 'UsersClientApiCredentialsList',
 });
+
+const { tt } = Lang;
 
 const props = defineProps({
 	userId: Number,
@@ -79,19 +83,17 @@ const { itemsList, itemsLoading, createItem, refetchItemsList } = useItemsData({
 		tableRef: itemsTableRef,
 		editInModal: true,
 		formComponentFileLoader: () => import('./ClientApiCredentialItemForm.vue'),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			// closeModal: true,
+		},
 		additionalModalSettings: {
 			hideFooter: true,
-			successSubmitCallback: () => {
+			/*successSubmitCallback: () => {
 				refetchItemsList();
 				// globalStore.show_edit_modal({ show: false });
-			},
+			},*/
 		},
-		localDeleteItem: ({ ids }) =>
-			api_request
-				.delete('/client-api-credentials', {
-					data: { id: ids?.[0] },
-				})
-				.then(() => refetchItemsList()),
 	},
 });
 
@@ -136,12 +138,23 @@ const tableSettings = computed(() => {
 
 const methodsMap = {
 	createItem,
-	handleDeleteItems: ({ row }) =>
-		api_request
-			.delete('/client-api-credentials', {
-				data: { id: row?.id },
-			})
-			.then(() => refetchItemsList()),
+	handleDeleteItems: ({ row }) => {
+		if (!row?.id) return Promise.resolve();
+
+		return ElMessageBox.confirm(
+			`${tt('phrases.this_will_permanently_delete_selected')} ${itemsName.one}. ${tt('Continue')}?`,
+			tt('Warning'),
+			{
+				confirmButtonText: tt('Delete'),
+				cancelButtonText: tt('CANCEL'),
+				type: 'warning',
+			},
+		).then(() =>
+			api_request
+				.delete(`/client-api-credentials/${row.id}`)
+				.then(() => refetchItemsList()),
+		);
+	},
 };
 
 const { handleEvent } = useEventHandler(methodsMap);

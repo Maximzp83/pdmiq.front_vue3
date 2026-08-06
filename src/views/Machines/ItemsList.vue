@@ -288,7 +288,6 @@ const {
 			refetchItemsList: true,
 		},
 		additionalModalSettings: {
-			editModalProp: 'editModalClassic',
 			instanceName: 'Machines',
 			multiform: true,
 			componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
