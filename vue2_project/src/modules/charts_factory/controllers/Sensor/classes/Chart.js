@@ -2568,7 +2568,7 @@ class ManualRouteChart extends ChartBase {
 				series: { marker: { enabled: false } }
 			}
 		});
-
+		// console.log('final setup', resources)
 		this.finalSetup(resources);
 	}
 
@@ -2578,8 +2578,28 @@ class ManualRouteChart extends ChartBase {
 	}
 
 	setupChartTitle() {
-		const parameterItem = this.requestsList[0];
-		return parameterItem ? parameterItem.name : '';
+		try {
+			const { requestsList } = this;
+			let result = '';
+
+			if (requestsList && requestsList.length) {
+				requestsList.forEach((ri, idx) => {
+					const { name, sensor_location, sensor_color } = ri;
+
+					if (idx == 0) {
+						result += `${name} </br>`
+					}
+					// console.log('setupChartTitle', sensor_name, name)
+					result += `<span class="chart-header-legend-item" style="background-color: ${sensor_color}"></span><span>Location - ${sensor_location}</span>, </br>`;
+				});
+
+				result = result.slice(0, -7); // remove last comma
+			}
+			// console.log(result)
+			return result;
+		} catch (e) {
+			console.warn(e);
+		}
 	}
 
 	setupUnitTypeName(payload) {
@@ -2759,6 +2779,22 @@ class ManualRouteChart extends ChartBase {
 				});
 		});
 	}
+
+	checkSeriesForOnePointData() {
+		this.options.series.forEach(serie => {
+			serie.marker = {enabled: serie.data.length && serie.data.length == 1}
+		})
+	}
+
+	localHandleStatisticsTransformUpdated(resultData) {
+		this.assignDataToYAxis(resultData);
+		this.assignDataToSeries(resultData);
+
+		this.checkSeriesForOnePointData();
+
+		this.emitChartOptionsReady();
+	}
+
 }
 
 // --------------------
@@ -2871,10 +2907,13 @@ class MultiViewChart extends ChartBase {
 			let result = '';
 
 			if (requestsList && requestsList.length) {
-				requestsList.forEach(ri => {
+				requestsList.forEach((ri, idx) => {
 					const { sensor_name, name, sensor_location } = ri;
 					// console.log('setupChartTitle', sensor_name, name)
-					result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
+					result += `<span class="chart-header-legend-item" style="background-color: ${colorsList2[idx]}"></span>
+										 <span>Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </span>, </br>`;
+					
+					// result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
 				});
 
 				result = result.slice(0, -7); // remove last comma

@@ -558,21 +558,56 @@ export default {
 			};
 			this.fftLoading = true;
 
-			this.fetch_ncd_fft(payload)
+			return this.fetch_ncd_fft(payload)
 				.then(({ value }) => {
 					this[FFTItemKey] = value;
 					this.fftLoading = false;
+					return value;
 				})
 				.catch(() => {
 					this[FFTItemKey] = null;
 					this.fftLoading = false;
 					this.fftReady = true;
+					return null;
 				});
+		},
+
+		getFFTNavigationUrl({ fftId, direction, max, fftItem = this.currentFFTItem }) {
+			const params = new URLSearchParams();
+			if (max != null) params.set('max', max);
+			if (this.isManualRoute && fftItem?.metric_type != null) {
+				params.set('metric_type', fftItem.metric_type);
+			}
+
+			const query = params.toString();
+			return `/${fftId}/${direction}${query ? `?${query}` : ''}`;
+		},
+
+		loadFFTNeighbours(fftItem, prevMax = 9) {
+			if (!fftItem) return;
+
+			this.fetchFFT({
+				FFTItemKey: 'prevFFTItems',
+				urlPostfix: this.getFFTNavigationUrl({
+					fftId: fftItem.id,
+					direction: 'prev',
+					max: prevMax,
+					fftItem,
+				}),
+			});
+			this.fetchFFT({
+				FFTItemKey: 'nextFFTItem',
+				urlPostfix: this.getFFTNavigationUrl({
+					fftId: fftItem.id,
+					direction: 'next',
+					fftItem,
+				}),
+			});
 		},
 
 		handleFFT({ prev, next }) {
 			// console.log(prev, next, this.$route)
-			const { currentFFTItem, prevFFTItem, nextFFTItem, itemData } = this;
+			const { prevFFTItem, nextFFTItem, itemData } = this;
 			const {isBannerTempVibe2, isBannerV2_1, isBannerV2Generic } = this.currentSensorType;
 			const url_type = (isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic) ? 'banner' : 'ncd';
 
@@ -580,28 +615,16 @@ export default {
 				if (prevFFTItem) {
 					this.fftReady = false;
 					this.$router.replace(`/${url_type}/${itemData.id}/fft/${prevFFTItem.id}`);
-					this.nextFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(prevFFTItem);
-					this.fetchFFT({
-						FFTItemKey: 'prevFFTItems',
-						urlPostfix: `/${prevFFTItem.id}/prev?max=9`
-					});
+					this.loadFFTNeighbours(this.currentFFTItem);
 				}
 			} else if (next) {
 				if (nextFFTItem) {
 					this.fftReady = false;
 
 					this.$router.replace(`/${url_type}/${itemData.id}/fft/${nextFFTItem.id}`);
-					// this.prevFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(nextFFTItem);
-					this.fetchFFT({
-						FFTItemKey: 'prevFFTItems',
-						urlPostfix: `/${nextFFTItem.id}/prev?max=11`
-					});
-					this.fetchFFT({
-						FFTItemKey: 'nextFFTItem',
-						urlPostfix: `/${nextFFTItem.id}/next`
-					});
+					this.loadFFTNeighbours(this.currentFFTItem, 11);
 				}
 			}
 		},
@@ -660,15 +683,7 @@ export default {
 				this.fetchFFT({
 					FFTItemKey: 'currentFFTItem',
 					urlPostfix: `/${this.fftId}`
-				});
-				this.fetchFFT({
-					FFTItemKey: 'prevFFTItems',
-					urlPostfix: `/${this.fftId}/prev?max=9`
-				});
-				this.fetchFFT({
-					FFTItemKey: 'nextFFTItem',
-					urlPostfix: `/${this.fftId}/next`
-				});
+				}).then(fftItem => this.loadFFTNeighbours(fftItem));
 
 				this.measurement = getSensorMetricSystemType(sensor, this.equipmentData);
 			}

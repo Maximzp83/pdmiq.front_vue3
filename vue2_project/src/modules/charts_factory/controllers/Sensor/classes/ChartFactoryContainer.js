@@ -29,7 +29,7 @@ class ManualRouteChartFactoryContainer extends ChartFactoryContainerBase {
 
 		return {
 			chart_id: `manual-route-chart-${metricId}`,
-			chartTitle: parameterItem ? parameterItem.name : '',
+			// chartTitle: parameterItem ? parameterItem.name : '',
 			parameter_id: metricId,
 			requestsList: parameterItem
 				? manualRouteSensors.map((sensor, idx) => ({

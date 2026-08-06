@@ -3,7 +3,7 @@
 		<div class="flex mrow wrap align-center left-part">
 			<div
 				class="title-block mcol-xs-12 mcol-sm-auto"
-				v-text="ChartInstance.chartTitle"
+				v-html="ChartInstance.chartTitle"
 			></div>
 
 			<div class="zoom-block-container mcol-xs-9 mcol-sm-auto">

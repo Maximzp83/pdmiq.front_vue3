@@ -1,6 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
+- The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
@@ -52,6 +53,7 @@ Primary rules source:
   - Latest Manual Route FFT follow-up is synced: dev graph-points default endpoint, line-datetime spline history charts, FFT metadata tooltip in `AnalysisFFTContainer`, and shared tooltip styles.
   - Latest Manual Route history follow-up is synced: velocity and high-frequency acceleration now share one spline chart with two configured Y axes, while base Sensor chart axis setup/limits support per-request data.
   - Latest Manual Route aggregate-page follow-up is synced: equipment details now expose a dedicated Manual Route route/page with separate velocity and high-frequency charts, one series and FFT flags per Manual Route sensor, and Manual Route-aware card/PdM/Statistics/FFT navigation.
+  - Latest 2026-08-06 follow-up is synced: FFT neighbour requests preserve Manual Route `metric_type` and reload around the selected FFT; Manual Route/MultiView titles render color legends; one-point Manual Route series show markers; the obsolete static config is removed; and the FFT dev endpoint/shared legend styles are aligned.
   - Manual Route runtime event warnings were fixed locally: page-level chart lifecycle events are consumed, Y-axis zoom is handled by the custom header, unrelated events still propagate, and statistics/FFT points are sorted chronologically to prevent Highcharts error #15.
   - The same Vue2 delta also adds Multiview Alarms notification labels, restricts Banner M25 running thresholds to the supported pair (including loaded-data cleanup), and initializes Meeting Tracker PDF `plant_id` from props.
   - Targeted ESLint, `git diff --check`, and production Vite build pass on Node 24; only existing mixed-import/chunk-size warnings remain.
@@ -286,8 +288,10 @@ Primary rules source:
 - `npm run build` passes after follow-up compile fixes.
 - Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
 - Latest Manual Route aggregate-page Vue2 sync passes targeted ESLint, `git diff --check`, and production Vite build on Node 24.
+- Latest seven-file Sensor/chart Vue2 sync passes targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build on Node 24; only existing Vite warnings remain.
 
 ## Files Already Modified In This Migration Batch
+- Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/composables/useSensors.js`
