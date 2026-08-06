@@ -24,6 +24,11 @@
   - Shared legend styles were added under `.chart-container-wrapper`.
   - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
   - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- FileUploadBlock refs were aligned with the active `useSubItemsList` registration pattern:
+  - `src/views/Machines/ItemForm.vue` now registers the upload component through `setSubItemRef`, matching Production Lines and preventing a nested Vue ref object from reaching `Instance.getFormData()`.
+  - The project-wide scan found one additional matching case in `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`; its file upload now also uses `setSubItemRef` and reads the registered instance from the shared refs map.
+  - No component combining `setSubItemRef` with the old `ref="fileUploadBlockRef"` pattern remains.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - Library is migrated and wired in Vue3: the list, file links, resource labels, `useLibrary` wrapper, entity config, filter persistence, `/library` route, and menu entry are present. Targeted ESLint and the Node 24 production build pass.
 - Maintenance Work Orders Import was re-migrated toward Vue2 parity: the page again uses the selected plant and shared import workflow; column mapping, progress, and revert behavior are restored; shared Import components accept the maintenance upload action directly. Targeted ESLint and the Node 24 production build pass.
 - Manual Route runtime follow-up completed: the page consumes `handleChartContainerReady` / `chartLoadEvent`, forwards unrelated events, the custom header handles `zoomYAxis`, and Manual Route statistics/FFT items are sorted chronologically before Highcharts rendering. Targeted ESLint, `git diff --check`, and production Vite build pass; existing build warnings remain.
@@ -106,6 +111,22 @@
   - `SESSION_CONTEXT.md`, `docs/migration-progress.md`, `docs/migration-todos.md`, `docs/new-session-handoff.md`
   - The matching current user-authored delta under `vue2_project/`.
 - Do not revert the source delta under `vue2_project/`.
+- Current FileUploadBlock ref fix:
+  - `src/views/Machines/ItemForm.vue`
+  - `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
+- Current Details runtime-fix files:
+  - `src/views/Assets/Details/DetailsPage.vue`
+  - `src/views/Machines/Details/DetailsPage.vue`
+  - `src/views/ProductionLines/Details/DetailsPage.vue`
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
+- Unrelated user-owned dirty files present and left untouched:
+  - `src/views/ProductionLines/ItemForm.vue`
+  - `src/api/request_factories.js`
+  - `src/views/Maintenance/Logs/ItemForm.vue`
+  - `src/views/Maintenance/WorkOrders/ItemForm.vue`
 
 ## Unresolved Issues
 - No more code-level pending note for `Equipments` advanced tabs; runtime smoke-test was explicitly not requested.
@@ -118,3 +139,4 @@
 
 ## Next Actionable Step
 - Runtime smoke-test Manual Route previous/next FFT navigation across metrics, one-point history series, and Manual Route/MultiView legend rendering with real API data when requested.
+- Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.

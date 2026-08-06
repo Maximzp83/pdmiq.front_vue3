@@ -110,9 +110,9 @@
 													prop="file"
 													class="upload-form-item"
 												>
-													<FileUploadBlock
-														ref="fileUploadBlockRef"
-														injectDataToRoot
+											<FileUploadBlock
+												:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
+												injectDataToRoot
 														uploadBlockType="files-list"
 														accept=" "
 														enableLinkToFile
@@ -310,7 +310,6 @@ const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
 const imgUploadBlockRef = ref(null);
-const fileUploadBlockRef = ref(null);
 const sensorsAlarmsContainerRef = ref(null);
 const showHistory = ref(false);
 const imgUploadUpdated = ref(0);
@@ -473,7 +472,7 @@ const localPrepareSubmitData = (data) => {
 	}
 
 	const pictures = imgUploadBlockRef.value?.getFormData?.() || [];
-	const files = fileUploadBlockRef.value?.getFormData?.() || [];
+	const files = subItemRefs.value.FileUploadBlock?.[0]?.getFormData?.() || [];
 	const preparedData = {
 		...data,
 		final_roi: finalRoi,

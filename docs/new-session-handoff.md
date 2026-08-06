@@ -2,6 +2,7 @@
 
 ## Current Objective
 - The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
+- Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
@@ -292,6 +293,8 @@ Primary rules source:
 
 ## Files Already Modified In This Migration Batch
 - Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
+- Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
+- Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/composables/useSensors.js`
