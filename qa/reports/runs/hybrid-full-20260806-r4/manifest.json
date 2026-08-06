@@ -25,14 +25,24 @@
       "finishedAt": "2026-08-06T08:05:19.490696+00:00"
     },
     "browser-worker": {
-      "state": "running",
-      "startedAt": "2026-08-06T08:05:17.960869+00:00"
+      "state": "completed",
+      "exitCode": 0,
+      "log": "qa/reports/runs/hybrid-full-20260806-r4/browser/worker.log",
+      "finishedAt": "2026-08-06T10:20:31.827999+00:00"
+    },
+    "aggregator": {
+      "state": "completed",
+      "exitCode": 0,
+      "log": "qa/reports/runs/hybrid-full-20260806-r4/aggregator.log",
+      "finishedAt": "2026-08-06T10:20:31.905521+00:00"
     }
   },
-  "completed": false,
+  "completed": true,
   "browserUseSkill": {
     "exitCode": 0,
     "sha256": "0f3ca9aab1dec2c66ae849004a02f2b4ff24a97e6c1be6ebefed8ce4dc26f4d4",
     "log": "qa/reports/runs/hybrid-full-20260806-r4/browser-use-skill.log"
-  }
+  },
+  "finishedAt": "2026-08-06T10:20:31.905542+00:00",
+  "report": "qa/reports/runs/hybrid-full-20260806-r4/report.md"
 }
