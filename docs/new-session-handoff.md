@@ -106,6 +106,13 @@ Primary rules source:
   - `src/components/pages/NewPasswordForm.vue` now safely extracts Axios status for expired reset-token handling and uses `tt` instead of the nonexistent `Lang.t`, so a 422 response shows the intended warning and redirect rather than an uncaught TypeError.
   - The migrated legacy delta from commit `550d339` was restored after a later `src/` overwrite: Assets/Machines/ProductionLines navbar/form changes and the Controllers `CMD0200` WebSocket bypass are present again. Plants already retained the `is_blocked` removal, localization values already matched, and Utilities details remains skipped because no Vue3 counterpart exists.
   - `npm run build` and targeted `git diff --check` pass after this sync.
+- Latest Vue2 sync completed on 2026-08-04:
+  - `src/constants/global.js`, `src/localization/loc_eng.js`, and `src/localization/loc_spanish.js` now include real-time notification type `MULTI_VIEW_ALARMS` (`27`) and its labels.
+  - `src/views/Requisitions/Details/MaterialItem.vue` no longer declares unused `targetPropName`.
+  - `src/views/Sensors/sensorForm/ItemForm.vue` limits Banner M25 selectable and loaded running thresholds to Ultrasound RMS and High Frequency RMS Acceleration.
+  - `src/views/SuccessDashboard/MeetingTracker/AddPdfFileForm.vue` initializes `plant_id` from `plantId`.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass; existing Vite mixed-import/chunk-size warnings remain.
+- Asset/Machine/Production Line Details runtime fix: their `chartLegendEvents` placeholders are now arrays, matching the `ItemPDMsStatisticBlock` prop and chart factory API. This removes the invalid-prop warning and `eventsList.forEach` error; targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - Follow-up charts_factory parity fix applied:
   - `src/modules/charts_factory/controllers/Sensor/enums.js` now matches Vue2 for `UNIT_TYPES.ULTRASONIC_G`, `constants.usg`, Banner M25 ultrasound RMS/peak unit mapping, and Banner V2.1 localized short names.
   - `src/modules/charts_factory/controllers/Sensor/classes/FFTChart.js` now returns `USg` for Banner M25 FFT X waveform / transformed acceleration / X acceleration.
@@ -159,7 +166,8 @@ Primary rules source:
   - `src/composables/mixins/useMainInstanceDetailsPage.js` now opens Maintenance Work Order modals with `formComponentFileLoader` instead of legacy `componentPath`.
   - `npm run build` and targeted `git diff --check` pass after the re-migration.
 - `Maintenance` section is migrated for the current Vue3 compile scope:
-  - Added `src/composables/useMaintenance.js`.
+	- `src/views/Maintenance/WorkOrdersImport/ItemPage.vue` and `ImportOptionsContainer.vue` were re-migrated toward Vue2 parity with selected-plant gating, shared upload/start/revert/progress handling, and drag-and-drop column mapping; shared Import components accept the maintenance upload action as a function. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
+	- Added `src/composables/useMaintenance.js`.
   - Added `src/views/Maintenance/MaintenanceDashboard.vue` and `MaintenanceFormWrapper.vue`.
   - Added logs list/form/details and support cells/previews under `src/views/Maintenance/Logs`.
   - Added work-orders list/form/details/import and support files under `src/views/Maintenance/WorkOrders`.
@@ -181,7 +189,11 @@ Primary rules source:
   - Migrated `vue2_project/src/views/Assets` into Vue3 with list/grid, form, item page, details page, attachment/composed subitems, `useAssets`, Assets store statistics filters, dashboard assets route, and asset create/edit/details routes.
   - Migrated `vue2_project/src/views/Settings` into Vue3 except `Settings/Import`, with Settings shell navigation, Faults/NCD Faults, Custom Formulas, Back-End Register Writing, Bearings, Lube Types, Industrial Services, Statistics export, Banner V2 Subtypes, `useSettings`, entity configs, routes, and Settings sidebar menu entry.
   - Migrated `vue2_project/src/views/SuccessDashboard` into Vue3 with Success Dashboard container, MainDashboard, MeetingTracker, ROIOnePager, ROIAnalysis placeholder files, shared common components, `useSuccessDashboard`, entity configs, routes, and Customer Success sidebar menu entry.
-  - `npm run build` and `git diff --check` pass.
+	- `npm run build` and `git diff --check` pass.
+- `Library` section is migrated for the current Vue3 compile scope:
+	- Added `src/views/Library/ItemsList.vue` with the legacy list columns, file links, and resource-type display.
+	- Added `src/composables/useLibrary.js`, `ENTITIES.Library`, corrected `libraries_filters` persistence, `/library` routing, and the Asset Management menu entry.
+	- Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `ProductionLines` list/card runtime alignment was refreshed against the Vue2 original:
   - `src/views/ProductionLines/ItemsList.vue` now restores the legacy `View` table/card actions, sets child filters for Machines/Assets/Equipments from the selected production line, and navigates through Vue Router instead of direct `pushState`.
   - `src/views/ProductionLines/ItemCard.vue` resets child list pages through Pinia stores instead of the old Vuex `setFiltersViaList` path.

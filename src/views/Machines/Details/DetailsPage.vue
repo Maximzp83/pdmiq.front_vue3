@@ -182,7 +182,7 @@ const createWOButtonFormSetup = Object.freeze([
 	{ formKey: 'production_line_id', valKey: 'production_line_id' },
 	{ formKey: 'machine_id', valKey: 'id' },
 ]);
-const chartLegendEvents = Object.freeze({});
+const chartLegendEvents = Object.freeze([]);
 const creationWOModalSettings = computed(() => Object.freeze({
 	itemName: tt('Work_Order'),
 	editModalProp: 'editModalClassic',

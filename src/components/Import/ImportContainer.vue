@@ -19,6 +19,7 @@
 							showStart
 							:showRevert="showRevert && isImportSuccess"
 							:isProcessingRevert="isProcessingRevert"
+							:submitAction="uploadSubmitAction"
 							:submitActionProp="uploadSubmitActionProp"
 							:isUploading="isUploading"
 							:isImporting="isImporting"
@@ -114,6 +115,7 @@ const props = defineProps({
 	componentFileLoader: Function,
 	showRevert: Boolean,
 	revertAction: Function,
+	uploadSubmitAction: Function,
 	uploadSubmitActionProp: { type: String, default: 'upload_masterDB' },
 	plantId: null,
 	enableProgressbar: Boolean,

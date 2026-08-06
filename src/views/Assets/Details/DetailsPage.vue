@@ -180,7 +180,7 @@ const createWOButtonFormSetup = Object.freeze([
 	{ formKey: 'machine_id', valKey: 'machine_id' },
 	{ formKey: 'asset_id', valKey: 'id' },
 ]);
-const chartLegendEvents = Object.freeze({});
+const chartLegendEvents = Object.freeze([]);
 const creationWOModalSettings = computed(() =>
 	Object.freeze({
 		itemName: tt('Work_Order'),

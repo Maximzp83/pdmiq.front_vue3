@@ -94,11 +94,12 @@ export const useGlobalStore = defineStore('globalStore', {
 			disposableHistoryButton: false,
 			updateCounters: false,
 
-			callMethod: null,
+				callMethod: null,
 
-			beforeEachHook: null,
-			printHTMLWindowIsOpen: false,
-		};
+				beforeEachHook: null,
+				redirectTo: null,
+				printHTMLWindowIsOpen: false,
+			};
 	},
 
 	actions: {

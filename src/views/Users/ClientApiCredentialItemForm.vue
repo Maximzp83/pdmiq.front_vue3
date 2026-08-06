@@ -39,9 +39,11 @@
 				</el-form-item>
 
 				<div class="el-form-item">
-					<div class="warning-block el-form-item__content flex align-center">
-						<i class="icomoon icon-warning warning-color section-title span-block" />
-						<span class="span-block primary-color">{{ tt('aliases.api_secret_warn') }}</span>
+					<div class="warning-block el-form-item__content">
+						<div class="flex align-center">
+							<i class="icomoon icon-warning warning-color section-title span-block" />
+							<span class="span-block primary-color">{{ tt('aliases.api_secret_warn') }}</span>							
+						</div>
 					</div>
 				</div>
 			</div>
@@ -74,7 +76,6 @@
 <script setup>
 import { ref } from 'vue';
 
-import { api_request } from '@/api/request_provider';
 import { required } from '@/constants/validation';
 import { copyToClipboard } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
@@ -105,24 +106,19 @@ const closeModal = () => {
 	globalStore.show_edit_modal({ show: false });
 };
 
-const localSubmit = (preparedData) =>
-	api_request
-		.post('/client-api-credentials', {
-			data: preparedData,
-			notNotify: true,
-		})
-		.then((answer) => {
-			generatedCredential.value = answer?.data?.data || null;
-			return answer;
-		});
+const successSubmitCallback = (answer) => {
+	// console.log(answer?.value?.api_key, answer)
+	generatedCredential.value = answer?.value || null;
+	props.editModal?.successSubmitCallback?.(answer);
+};
 
 const { isMobile, validateForm } = useItemForm({
 	formData,
 	formRef: itemFormRef,
 	fromModal: props.fromModal,
 	editModal: props.editModal,
-	localSubmit,
-	ignoreLocalSubmit: false,
+	apiRoute: '/client-api-credentials',
+	successSubmitCallback,
 });
 
 defineExpose({

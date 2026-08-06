@@ -454,7 +454,7 @@ const formData = ref({
 	mfa_type: null,
 	timezone: null,
 	is_im_csm: 0,
-	is_monitoring_all_notifiable_plants: false,
+	is_monitoring_all_notifiable_plants: 0,
 	notifiable_production_lines: [],
 });
 
@@ -726,7 +726,20 @@ const handlePasswordConfirmationBlur = () => {
 	itemFormRef.value?.validateField?.('password_confirmation');
 };
 
+const normalizeSwitchValue = (value) =>
+	value === true || value === 1 || value === '1' ? 1 : 0;
+
+const normalizeSwitchFields = () => {
+	['is_monitoring_all_notifiable_plants', 'is_im_csm', 'is_mfa_enabled'].forEach(
+		(field) => {
+			formData.value[field] = normalizeSwitchValue(formData.value[field]);
+		},
+	);
+};
+
 const localSetupPage = (currentItemData) => {
+	normalizeSwitchFields();
+
 	if (currentItemData) {
 		confirmedPhoneNumber.value = currentItemData.phone_number;
 		handlePlantsChange(currentItemData.plants_ids);

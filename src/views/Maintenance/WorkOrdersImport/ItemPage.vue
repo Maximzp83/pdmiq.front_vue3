@@ -1,32 +1,48 @@
 <template>
 	<div class="view-wrapper item-page-wrapper">
-		<div class="mcontainer">
-			<div class="view-content-card card">
-				<div class="card-content">
-					<ImportOptionsContainer />
-				</div>
+		<div v-if="globalFilters.plantId" class="mcontainer">
+			<div class="form-wrapper card-content">
+				<ImportContainer
+					showRevert
+					enableProgressbar
+					:revertAction="revertImportWorkOrder"
+					:uploadSubmitAction="uploadWorkOrder"
+					:componentFileLoader="() => import('./ImportOptionsContainer.vue')"
+					:plantId="globalFilters.plantId"
+				/>
 			</div>
+		</div>
+
+		<div v-else class="mcontainer">
+			<PageMockImg />
 		</div>
 	</div>
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted } from 'vue';
+import { onBeforeMount, onBeforeUnmount } from 'vue';
+import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
+import { useMaintenance } from '@/composables/useMaintenance';
 
-import ImportOptionsContainer from './ImportOptionsContainer.vue';
+import ImportContainer from '@/components/Import/ImportContainer.vue';
+import PageMockImg from '@/components/common/PageMockImg.vue';
+
+const { tt } = Lang;
 
 defineOptions({
-	name: 'WorkOrdersImportPage',
+	name: 'WOImportPage',
 });
 
 const globalStore = useGlobalStore();
+const { globalFilters } = storeToRefs(globalStore);
+const { uploadWorkOrder, revertImportWorkOrder } = useMaintenance();
 
-onMounted(() => {
+onBeforeMount(() => {
 	globalStore.setup_navbar({
-		pageTitle: Lang.tt('Import'),
+		pageTitle: tt('sidebar_menu.work_order_import'),
 		showFilter: true,
 	});
 });

@@ -286,7 +286,7 @@ export function useItemForm({
 						emit,
 						itemId: preparedData.id || 'new',
 						apiRoute: resolvedApiRoute,
-						successSubmitCallback: resolvedSuccessSubmitCallback.value,
+						// successSubmitCallback: resolvedSuccessSubmitCallback.value,
 						propsSuccessSubmitCallback,
 						options
 					}).then((answer) => {
@@ -313,6 +313,11 @@ export function useItemForm({
 								callback(answer);
 							});
 						}
+
+						if (typeof resolvedSuccessSubmitCallback.value == 'function') {
+							resolvedSuccessSubmitCallback.value(answer);
+						}
+
 
 						if (currentEditModal?.successSubmitOptions) {
 							if (typeof currentEditModal.successSubmitOptions.refetchItemsList === 'function') {

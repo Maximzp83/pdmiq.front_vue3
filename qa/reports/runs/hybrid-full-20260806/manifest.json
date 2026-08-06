@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "runId": "hybrid-full-20260806",
+  "startedAt": "2026-08-06T07:33:38.237186+00:00",
+  "mode": "hybrid",
+  "baseUrl": "http://localhost:5173",
+  "browserWorkers": 1,
+  "staticWorkers": 2,
+  "guard": {
+    "path": "qa/test-plans/browser-read-only-guard.js",
+    "version": "2.0.0",
+    "sha256": "93673e2058e23e11991ff8b91dfc8e8075b663cdea6fee4a740cca60569a99fb"
+  },
+  "tasks": {
+    "static-routes-forms": {
+      "state": "completed",
+      "exitCode": 0,
+      "log": "qa/reports/runs/hybrid-full-20260806/static-routes/worker.log",
+      "finishedAt": "2026-08-06T07:33:39.012688+00:00"
+    },
+    "static-api-risks": {
+      "state": "completed",
+      "exitCode": 0,
+      "log": "qa/reports/runs/hybrid-full-20260806/static-risks/worker.log",
+      "finishedAt": "2026-08-06T07:33:40.333348+00:00"
+    },
+    "browser-worker": {
+      "state": "failed",
+      "exitCode": 1,
+      "log": "qa/reports/runs/hybrid-full-20260806/browser/worker.log",
+      "finishedAt": "2026-08-06T07:33:39.187809+00:00"
+    },
+    "aggregator": {
+      "state": "failed",
+      "exitCode": 2,
+      "log": "qa/reports/runs/hybrid-full-20260806/aggregator.log",
+      "finishedAt": "2026-08-06T07:33:40.372137+00:00"
+    }
+  },
+  "completed": false,
+  "browserUseSkill": {
+    "exitCode": 0,
+    "sha256": "0f3ca9aab1dec2c66ae849004a02f2b4ff24a97e6c1be6ebefed8ce4dc26f4d4",
+    "log": "qa/reports/runs/hybrid-full-20260806/browser-use-skill.log"
+  },
+  "finishedAt": "2026-08-06T07:33:40.372153+00:00",
+  "report": "qa/reports/runs/hybrid-full-20260806/report.md"
+}

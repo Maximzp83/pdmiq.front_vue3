@@ -80,7 +80,7 @@ const handleSelectFile = ({ raw }) => {
 const resetForm = () => {
 	fileUploadBlockRef.value?.resetFilesList?.();
 	processing.value = false;
-	formData.value = { ...initialFormData };
+	formData.value = { ...initialFormData, plant_id: null };
 };
 
 const handleSubmit = async () => {

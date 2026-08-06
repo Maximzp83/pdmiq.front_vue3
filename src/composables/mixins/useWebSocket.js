@@ -11,10 +11,12 @@ const getDefaultSocketEndpoint = () => {
 		return env.VITE_WEB_SOCKET_ENDPOINT || env.VUE_APP_WEB_SOCKET_ENDPOINT
 	}
 
-	const host = typeof window !== 'undefined' ? window.location.hostname : ''
+	return 'wss://ws.industrialmatrix-dev.tools/';
+
+	/*const host = typeof window !== 'undefined' ? window.location.hostname : ''
 	return host.includes('stage')
 		? 'wss://ws.industrialmatrix-stage.tools/'
-		: 'wss://ws.industrialmatrix.tools/'
+		: 'wss://ws.industrialmatrix.tools/'*/
 }
 
 const parseSocketData = (data) => {

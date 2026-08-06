@@ -196,6 +196,7 @@ const plantSensorsList = computed(() => {
 });
 
 const normalizeData = (data = {}) => ({
+	_id: data._id,
 	description: data.description || '',
 	users_name: data.users_name || '',
 	users_ids: data.users_ids || [],
@@ -203,6 +204,7 @@ const normalizeData = (data = {}) => ({
 	sensor_ids: data.sensor_ids || (data.sensor_id ? [data.sensor_id] : []),
 	id: data.id,
 });
+const hasSameData = (left, right) => JSON.stringify(left) === JSON.stringify(right);
 const getFormData = () => {
 	const newData = { ...formData.value };
 
@@ -217,7 +219,11 @@ const getFormData = () => {
 	return newData;
 };
 const syncToParent = () => {
-	emit('update:modelValue', getFormData());
+	const nextData = getFormData();
+
+	if (!hasSameData(nextData, normalizeData(sourceData.value))) {
+		emit('update:modelValue', nextData);
+	}
 };
 const addItem = () => emit('onCreate');
 const removeItem = () => {
@@ -236,7 +242,11 @@ const focusField = (field) => {
 watch(
 	sourceData,
 	(data) => {
-		formData.value = normalizeData(data);
+		const nextData = normalizeData(data);
+
+		if (!hasSameData(formData.value, nextData)) {
+			formData.value = nextData;
+		}
 	},
 	{ immediate: true, deep: true },
 );
