@@ -1779,3 +1779,7 @@
 {"kind": "control-click", "route": "/roi-calculator", "label": "Companies", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Plants", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
 {"kind": "control-click", "route": "/roi-calculator", "label": "Users", "status": "passed", "classification": "safe-ui-control", "navigated": false, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Users Users Teams", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "User Roles", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Distributors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
+{"kind": "control-click", "route": "/roi-calculator", "label": "Vendors", "status": "passed", "classification": "safe-ui-control", "navigated": true, "observableChange": true, "blocked": []}
