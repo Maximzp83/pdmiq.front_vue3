@@ -36,7 +36,7 @@
 			</el-form-item>
 
 			<el-form-item :label="tt('Application')" prop="application_id" class="half-width">
-				<div class="flex">
+				<div class="flex align-center">
 					<div class="relative mcol-xs-10 fluid span-block">
 						<CustomSelectV2
 							v-model="formData.application_id"
@@ -50,7 +50,6 @@
 					<el-button
 						v-if="!fromAnotherInstance"
 						:class="'create-button span-block'"
-						size="small"
 						type="danger"
 						@click="createApplication"
 					>
@@ -333,6 +332,7 @@ const createApplication = () => {
 		editModalProp: 'editModalSecond',
 		show: true,
 		instanceName: 'Applications',
+		formComponentFileLoader: () => import('@/views/Applications/ItemForm.vue'),
 		instanceData: { plant_id: globalFilters.value?.plantId },
 		settings: {
 			fromAnotherInstance: true,
@@ -342,9 +342,11 @@ const createApplication = () => {
 		successSubmitCallback: applicationCreated,
 	});
 };
-const applicationCreated = ({ data } = {}) => {
-	if (data?.data?.id) {
-		formData.value.application_id = data.data.id;
+const applicationCreated = ({ value } = {}) => {
+	if (value?.id) {
+		const newList = applicationsList.value.concat([value]);
+		applicationsList.value = newList;
+		formData.value.application_id = value.id;
 	}
 	globalStore.show_edit_modal({ show: false, editModalProp: 'editModalSecond' });
 };

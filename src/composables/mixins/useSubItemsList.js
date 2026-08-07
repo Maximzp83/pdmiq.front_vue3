@@ -204,6 +204,7 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 
 	const applyFlags = (context) => {
 		const { setIfEmpty, cleanIfEmpty, targetProp } = context.settings;
+
 		const target = targetProp
 			? context.collectedData[targetProp]
 			: context.collectedValue;

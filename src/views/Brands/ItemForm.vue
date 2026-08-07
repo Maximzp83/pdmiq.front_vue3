@@ -17,7 +17,7 @@
 				prop="is_crossover_excluded"
 				class="half-width switcher"
 			>
-				<el-switch v-model="formData.is_crossover_excluded" />
+				<el-switch v-model="formData.is_crossover_excluded" :active-value="1" :inactive-value="0"/>
 			</el-form-item>
 
 			<FormOperationsButtons v-if="!fromModal" @onCancel="handleCancel" @onSave="validateForm" />
