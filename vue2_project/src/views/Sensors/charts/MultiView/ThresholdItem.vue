@@ -93,7 +93,7 @@
 						</el-form-item>
 					</div>
 
-					<div class="mcol-xs-12 mcol-sm-6" v-if="!isCompareType">
+					<div class="mcol-xs-12 mcol-sm-6">
 						<el-form-item
 							:label="`${tt('phrases.acute_samples')}`"
 							prop="acute_samples"
@@ -115,7 +115,8 @@
 						</el-form-item>
 
 						<el-form-item
-						class="label_padding_top-0"
+							v-if="!isCompareType"
+							class="label_padding_top-0"
 							:label="`${tt('phrases.re_trigger_samples')}`"
 							prop="re_trigger_samples"
 						>
@@ -247,8 +248,8 @@ export default {
 				delete formData.time_delta_unit;
 			}
 			if (this.isCompareType) {
-				delete formData.acute_samples;
-				delete formData.stable_samples;
+				// delete formData.acute_samples;
+				// delete formData.stable_samples;
 				delete formData.re_trigger_samples;
 			}
 

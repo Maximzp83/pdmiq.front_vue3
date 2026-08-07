@@ -2,6 +2,7 @@
 
 ## Current Objective
 - The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
+- The latest one-file `vue2_project` MultiView threshold delta is fully synced into Vue3: Compare thresholds retain acute/stable samples and omit only re-trigger samples. Nothing was skipped.
 - Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
@@ -294,6 +295,11 @@ Primary rules source:
 ## Files Already Modified In This Migration Batch
 - Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
 - Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
+- Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
+- Latest MultiView threshold sync passes targeted ESLint, migration-rule scan, targeted `git diff --check`, and production Vite build on Node 24.
+
+## Files Already Modified In This Migration Batch
+- Latest MultiView threshold sync: `src/views/Sensors/charts/MultiView/ThresholdItem.vue`.
 - Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
@@ -393,3 +399,11 @@ Primary rules source:
 - `docs/migration-todos.md`
 - `docs/session-collaboration-rules.md` (if process changes again)
 - `SESSION_CONTEXT.md`
+
+## Latest EquipmentsLayout Fix (2026-08-07)
+- `src/views/Equipments/EquipmentsLayout.vue` now preserves the Vue2 Asset/Storeroom create split; Storeroom creation opens the Equipment multiform with list refetch and modal close callbacks.
+- `src/views/BrandModels/ItemsList.vue` exposes create/delete/refetch and has a valid ItemForm modal loader/success flow.
+- `src/views/Equipments/SpecialFilterItem.vue` was migrated and reconnected through the secondary-filter slot, including combined predefined/raw option IDs and cleanup.
+- Asset/Brand/Part Number selectors again use `FetchByQuerySelect` with server search, fetch-by-id, and load-more; their duplicate request-list loaders were removed.
+- Duplicate RadioButtonsBlock/Datepicker listeners were removed.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing warnings remain.

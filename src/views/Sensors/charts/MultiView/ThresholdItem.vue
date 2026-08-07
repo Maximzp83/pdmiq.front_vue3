@@ -87,7 +87,7 @@
 						</el-form-item>
 					</div>
 
-					<div v-if="!isCompareType" class="mcol-xs-12 mcol-sm-6">
+					<div class="mcol-xs-12 mcol-sm-6">
 						<el-form-item :label="tt('phrases.acute_samples')" prop="acute_samples">
 							<el-input-number v-model="formData.acute_samples" :min="1" />
 						</el-form-item>
@@ -97,6 +97,7 @@
 						</el-form-item>
 
 						<el-form-item
+							v-if="!isCompareType"
 							class="label_padding_top-0"
 							:label="tt('phrases.re_trigger_samples')"
 							prop="re_trigger_samples"
@@ -207,8 +208,6 @@ const { validateItemForm, getFormData, removeItem } = useSubItem({
 			delete nextData.time_delta_unit;
 		}
 		if (isCompareType.value) {
-			delete nextData.acute_samples;
-			delete nextData.stable_samples;
 			delete nextData.re_trigger_samples;
 		}
 		return nextData;

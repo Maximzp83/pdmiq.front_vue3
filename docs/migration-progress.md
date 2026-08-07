@@ -9,6 +9,7 @@
 
 ## Current Focus
 
+- Latest one-file MultiView threshold Vue2 delta is synced: Compare thresholds retain visible/submitted acute and stable sample counts while re-trigger samples remain excluded. Nothing was skipped; targeted ESLint, migration-rule scan, targeted `git diff --check`, and the Node 24 production build pass.
 - Machine and ROI One Pager FileUploadBlock refs now use `setSubItemRef` wherever those forms already use `useSubItemsList`; the project-wide scan confirms no old `ref="fileUploadBlockRef"` remains in such a component. This fixes the Machine submit-time `Instance.getFormData is not a function` error. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
 - Current selected migration target `vue2_project/src/views/Assets` is migrated for the current Vue3 compile scope.
@@ -875,4 +876,15 @@ await fetchUsers({ page: 1 });
   - Registered Machine image upload and ROI One Pager file upload through `setSubItemRef`
   - Removed nested/manual `fileUploadBlockRef` handling from both matching forms
   - Project-wide scan confirms no remaining component combines `setSubItemRef` with `ref="fileUploadBlockRef"`
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] MultiView Compare threshold Vue2 delta sync (2026-08-07)
+  - Compare thresholds now render and submit `acute_samples` and `stable_samples`
+  - `re_trigger_samples` remains hidden and omitted for Compare thresholds
+  - The only changed legacy file had an existing Vue3 counterpart; nothing was skipped
+  - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24
+- [x] EquipmentsLayout Vue2 parity follow-up (2026-08-07)
+  - Restored Storeroom Equipment multiform creation and BrandModels child create/delete/refetch exposure
+  - Migrated and connected `src/views/Equipments/SpecialFilterItem.vue` with predefined/raw option filtering and cleanup
+  - Restored async Asset/Brand/Part Number selectors through `FetchByQuerySelect` and removed duplicate request-list loading
+  - Removed duplicate RadioButtonsBlock and Datepicker event handling
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

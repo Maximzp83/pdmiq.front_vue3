@@ -19,6 +19,7 @@
 				:showCreateActions="hasAccessToCreate || hasAccessToDelete"
 				:hideCreate="!hasAccessToCreate"
 				:hideDelete="!hasAccessToDelete"
+				:secondaryFilters="specialFiltersList.length > 0"
 				filterbarDropdownId="equipmentsDropdownFilterbar"
 				@event="handleEvent"
 			>
@@ -30,7 +31,6 @@
 								:settings="radioBlockOptions"
 								:optionsList="filterButtonsList"
 								@update:model-value="handleRadioFilters"
-								@onChange="handleRadioFilters"
 							/>
 
 							<div v-if="showStoreRoomFilter" class="filter-item">
@@ -73,7 +73,7 @@
 									:optionsLoading="equipmentTypesLoading"
 									:optionsList="equipmentTypesList"
 									:placeholder="tt('Item_type')"
-									@update:model-value="(id) => setFilters({ typeId: id })"
+									@update:model-value="handleEquipmentTypeFilter"
 									prefixIcon="icomoon icon-item-types2"
 								/>
 							</div>
@@ -135,41 +135,65 @@
 					</div>
 
 					<div class="filter-item">
-						<CustomSelectV2
+						<FetchByQuerySelect
 							:model-value="filters.assetId"
-							filterable
 							clearable
+							enableLoadmore
+							:loadmoreIsActive="assetsLoadmoreIsActive"
 							:optionsLoading="assetsLoading"
 							:optionsList="assetsList"
+							:settings="assetQueryOptions"
 							:placeholder="tt('Asset')"
 							@update:model-value="(id) => setFilters({ assetId: id }, ['brandId', 'brandModelId'])"
+							@update:optionsLoading="(value) => (assetsLoading = value)"
+							@update:optionsList="(value) => (assetsList = value)"
 						/>
 					</div>
 
 					<div class="filter-item">
-						<CustomSelectV2
+						<FetchByQuerySelect
 							:model-value="filters.brandId"
-							filterable
 							clearable
+							enableLoadmore
 							:optionsLoading="brandsLoading"
 							:optionsList="brandsList"
+							:settings="brandQueryOptions"
 							:placeholder="tt('Brand')"
 							@update:model-value="(id) => setFilters({ brandId: id }, ['brandModelId'])"
+							@update:optionsLoading="(value) => (brandsLoading = value)"
+							@update:optionsList="(value) => (brandsList = value)"
 						/>
 					</div>
 
 					<div class="filter-item">
-						<CustomSelectV2
+						<FetchByQuerySelect
 							:model-value="filters.brandModelId"
-							filterable
 							clearable
+							enableLoadmore
+							:loadmoreIsActive="brandModelsLoadmoreIsActive"
 							:optionsLoading="brandModelsLoading"
 							:optionsList="brandModelsList"
+							:settings="brandModelsQueryOptions"
 							:placeholder="tt('Part_number')"
 							@update:model-value="(id) => setFilters({ brandModelId: id })"
+							@update:optionsLoading="(value) => (brandModelsLoading = value)"
+							@update:optionsList="(value) => (brandModelsList = value)"
 						/>
 					</div>
 				</div>
+
+				<template #secondaryFilters>
+					<div
+						v-for="item in specialFiltersList"
+						:key="`spec-filter-${item.id}`"
+						class="filter-item"
+					>
+						<SpecialFilterItem
+							:typeOption="item"
+							@change="handleSpecialFilterChange"
+						/>
+					</div>
+				</template>
 			</DropdownFilterbar>
 
 			<Filterbar
@@ -250,7 +274,6 @@
 							:model-value="filters.daterange"
 							type="daterange"
 							@update:model-value="handleDateRange"
-							@input="handleDateRange"
 						/>
 					</div>
 				</template>
@@ -262,7 +285,6 @@
 							:settings="gridSwitcherOptions"
 							:optionsList="gridTypesList"
 							@update:model-value="toggleItemsGrid"
-							@onChange="toggleItemsGrid"
 						/>
 
 						<span v-if="!disableDraggingFeature">
@@ -305,7 +327,6 @@
 							:settings="radioSensorTypeSettings"
 							:optionsList="sensorTypesButtonsList"
 							@update:model-value="handleSensorTypeFilter"
-							@onChange="handleSensorTypeFilter"
 						/>
 					</div>
 				</template>
@@ -363,10 +384,10 @@
 </template>
 
 <script setup>
-import { computed, defineAsyncComponent, onBeforeMount, ref, shallowRef, watch } from 'vue';
+import { computed, defineAsyncComponent, onBeforeMount, onBeforeUnmount, ref, shallowRef, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { createGetRequest } from '@/api/request_factories';
+import { createGetByIdRequest, createGetRequest } from '@/api/request_factories';
 import { ALERT_TYPES, alertTypesList as getAlertTypesList, sensorClassesList } from '@/constants/global';
 import { getDateRange, getYmdDateString, removeObjProps } from '@/helpers';
 import { Lang } from '@/localization';
@@ -382,10 +403,12 @@ import { ENTITIES } from '@/config/entities';
 
 import Datepicker from '@/components/common/Datepicker.vue';
 import DropdownFilterbar from '@/components/common/DropdownFilterbar.vue';
+import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
 import Filterbar from '@/components/common/Filterbar.vue';
 import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
 import EquipmentsList from './ItemsList.vue';
 import BrandModelsList from '@/views/BrandModels/ItemsList.vue';
+import SpecialFilterItem from './SpecialFilterItem.vue';
 
 const ExportChartsToPdfContent = defineAsyncComponent(() => import('./ExportChartsToPdfContent.vue'));
 
@@ -441,13 +464,17 @@ const equipmentTypesList = shallowRef([]);
 const equipmentTypesLoading = ref(false);
 const storeRoomsList = shallowRef([]);
 const storeRoomsLoading = ref(false);
+const specialFiltersValues = ref({});
 
 const fetchLocationsRequest = createGetRequest(ENTITIES.Locations.apiBase);
 const fetchProductionLinesRequest = createGetRequest(ENTITIES.ProductionLines.apiBase);
 const fetchMachinesRequest = createGetRequest(ENTITIES.Machines.apiBase);
 const fetchAssetsRequest = createGetRequest(ENTITIES.Assets.apiBase);
+const fetchAssetRequest = createGetByIdRequest(ENTITIES.Assets.apiBase);
 const fetchBrandsRequest = createGetRequest(ENTITIES.Brands.apiBase);
+const fetchBrandRequest = createGetByIdRequest(ENTITIES.Brands.apiBase);
 const fetchBrandModelsRequest = createGetRequest(ENTITIES.BrandModels.apiBase);
+const fetchBrandModelRequest = createGetByIdRequest(ENTITIES.BrandModels.apiBase);
 const fetchEquipmentTypesRequest = createGetRequest(ENTITIES.EquipmentTypes.apiBase);
 const fetchStoreRoomsRequest = createGetRequest(ENTITIES.StoreRooms.apiBase);
 
@@ -514,6 +541,58 @@ const filterButtonsList = computed(() =>
 );
 const selectedStoreroom = computed(() => storeRoomsList.value.find((item) => item.id === filters.value?.storeroomId) || null);
 const storeRoomLocationsList = computed(() => selectedStoreroom.value?.locations || []);
+const selectedEquipmentType = computed(() =>
+	equipmentTypesList.value.find((item) => item.id === filters.value?.typeId) || null,
+);
+const specialFiltersList = computed(() =>
+	(selectedEquipmentType.value?.type_options || []).filter((item) => item.is_in_dashboard_view),
+);
+const assetsLoadmoreIsActive = computed(() => !filters.value?.machineId);
+const brandModelsLoadmoreIsActive = computed(() => !filters.value?.brandId);
+const assetQueryOptions = computed(() =>
+	Object.freeze({
+		fetchAction: fetchAssetsRequest,
+		fetchByIdAction: fetchAssetRequest,
+		params: {
+			plantId: props.plantId || globalFilters.value?.plantId,
+			orderByColumn: 'name',
+			orderByMethod: 'asc',
+		},
+		bindTo: [
+			{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' },
+			{ getValue: () => filters.value?.locationId, param: 'locationId' },
+			{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
+			{ getValue: () => filters.value?.machineId, param: 'machineId' },
+		],
+	}),
+);
+const brandQueryOptions = computed(() =>
+	Object.freeze({
+		fetchAction: fetchBrandsRequest,
+		fetchByIdAction: fetchBrandRequest,
+		params: { orderByColumn: 'name', orderByMethod: 'asc' },
+		bindTo: [
+			{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' },
+			{ getValue: () => filters.value?.locationId, param: 'locationId' },
+			{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
+			{ getValue: () => filters.value?.machineId, param: 'machineId' },
+		],
+	}),
+);
+const brandModelsQueryOptions = computed(() =>
+	Object.freeze({
+		fetchAction: fetchBrandModelsRequest,
+		fetchByIdAction: fetchBrandModelRequest,
+		params: { orderByColumn: 'name', orderByMethod: 'asc' },
+		bindTo: [
+			{ getValue: () => props.plantId || globalFilters.value?.plantId, param: 'plantId' },
+			{ getValue: () => filters.value?.locationId, param: 'locationId' },
+			{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
+			{ getValue: () => filters.value?.machineId, param: 'machineId' },
+			{ getValue: () => filters.value?.brandId, param: 'brandId' },
+		],
+	}),
+);
 const requestsToDoList = computed(() =>
 	Object.freeze([
 		{
@@ -543,43 +622,6 @@ const requestsToDoList = computed(() =>
 			],
 			localProp: machinesList,
 			localLoadProp: machinesLoading,
-		},
-		{
-			action: fetchAssetsRequest,
-			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
-			bindTo: [
-				{ getValue: () => globalFilters.value?.plantId, param: 'plantId', noFetch: true },
-				{ getValue: () => filters.value?.locationId, param: 'locationId' },
-				{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
-				{ getValue: () => filters.value?.machineId, param: 'machineId' },
-			],
-			localProp: assetsList,
-			localLoadProp: assetsLoading,
-		},
-		{
-			action: fetchBrandsRequest,
-			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
-			bindTo: [
-				{ getValue: () => globalFilters.value?.plantId, param: 'plantId', noFetch: true },
-				{ getValue: () => filters.value?.locationId, param: 'locationId' },
-				{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
-				{ getValue: () => filters.value?.machineId, param: 'machineId' },
-			],
-			localProp: brandsList,
-			localLoadProp: brandsLoading,
-		},
-		{
-			action: fetchBrandModelsRequest,
-			payload: { params: { orderByColumn: 'name', orderByMethod: 'asc' } },
-			bindTo: [
-				{ getValue: () => globalFilters.value?.plantId, param: 'plantId', noFetch: true },
-				{ getValue: () => filters.value?.locationId, param: 'locationId' },
-				{ getValue: () => filters.value?.productionLineId, param: 'productionLineId' },
-				{ getValue: () => filters.value?.machineId, param: 'machineId' },
-				{ getValue: () => filters.value?.brandId, param: 'brandId' },
-			],
-			localProp: brandModelsList,
-			localLoadProp: brandModelsLoading,
 		},
 	]),
 );
@@ -675,6 +717,39 @@ const toggleFilterbar = (event) => {
 	initiateRequestsToDoList.value = true;
 	showFilterbar.value = !showFilterbar.value;
 };
+const handleEquipmentTypeFilter = (id) => {
+	specialFiltersValues.value = {};
+	setFilters({
+		typeId: id,
+		predefinedOptionsValuesIDs: [],
+		rawOptionsValuesIDs: [],
+	});
+};
+const handleSpecialFilterChange = ({
+	typeOptionId,
+	predefinedOptionsValuesIDs = [],
+	rawOptionsValuesIDs = [],
+} = {}) => {
+	if (!typeOptionId) return;
+
+	specialFiltersValues.value = {
+		...specialFiltersValues.value,
+		[typeOptionId]: {
+			predefinedOptionsValuesIDs,
+			rawOptionsValuesIDs,
+		},
+	};
+
+	const values = Object.values(specialFiltersValues.value);
+	setFilters({
+		predefinedOptionsValuesIDs: [
+			...new Set(values.flatMap((item) => item.predefinedOptionsValuesIDs || [])),
+		],
+		rawOptionsValuesIDs: [
+			...new Set(values.flatMap((item) => item.rawOptionsValuesIDs || [])),
+		],
+	});
+};
 const handleClearFilters = () => {
 	alertTypesFilters.value = [];
 	setFilters({}, clearableFiltersList);
@@ -709,8 +784,27 @@ const handleDateRange = (range) => {
 		daterange_setted_at: Date.now(),
 	});
 };
-const createItem = (payload) => {
-	itemsListContainerRef.value?.createItem?.(payload);
+const createItem = (payload = {}) => {
+	if (activeRadioFilter.value === 'isAsset') {
+		return itemsListContainerRef.value?.createItem?.(payload);
+	}
+
+	const modalSettings = {
+		show: true,
+		itemName: itemsName.value.one,
+		instanceName: itemsName.value.instanceName,
+		multiform: true,
+		componentFileLoader: () => import('@/views/Dashboard/MultiFormWrapper.vue'),
+		successSubmitCallbacks: [
+			() => itemsListContainerRef.value?.refetchItemsList?.(),
+			() => globalStore.show_edit_modal({ show: false }),
+		],
+		...(props.additionalModalSettings || {}),
+		...(payload.modal_settings || {}),
+	};
+
+	globalStore.show_edit_modal(modalSettings);
+	return payload;
 };
 const handleDeleteItems = (payload) => {
 	itemsListContainerRef.value?.handleDeleteItems?.(payload);
@@ -778,6 +872,13 @@ onBeforeMount(() => {
 	if (!props.fromDashboard || filters.value.isShowList) {
 		fetchEquipmentTypes();
 	}
+});
+
+onBeforeUnmount(() => {
+	setFilters({
+		predefinedOptionsValuesIDs: [],
+		rawOptionsValuesIDs: [],
+	}, [], { preventResetPage: true });
 });
 
 defineExpose({

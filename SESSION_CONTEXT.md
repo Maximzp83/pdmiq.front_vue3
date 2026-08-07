@@ -24,6 +24,11 @@
   - Shared legend styles were added under `.chart-container-wrapper`.
   - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
   - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- Latest one-file `vue2_project` MultiView threshold delta was migrated into its existing Vue3 counterpart without confirmation stops:
+  - Compare thresholds now display and submit `acute_samples` and `stable_samples`.
+  - `re_trigger_samples` remains hidden for Compare thresholds and is removed from their payload.
+  - The only changed legacy file was already migrated; nothing was skipped.
+  - Targeted ESLint, migration-rule scan, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - FileUploadBlock refs were aligned with the active `useSubItemsList` registration pattern:
   - `src/views/Machines/ItemForm.vue` now registers the upload component through `setSubItemRef`, matching Production Lines and preventing a nested Vue ref object from reaching `Instance.getFormData()`.
   - The project-wide scan found one additional matching case in `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`; its file upload now also uses `setSubItemRef` and reads the registered instance from the shared refs map.
@@ -111,6 +116,12 @@
   - `SESSION_CONTEXT.md`, `docs/migration-progress.md`, `docs/migration-todos.md`, `docs/new-session-handoff.md`
   - The matching current user-authored delta under `vue2_project/`.
 - Do not revert the source delta under `vue2_project/`.
+- Current MultiView threshold sync:
+  - `src/views/Sensors/charts/MultiView/ThresholdItem.vue`
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
 - Current FileUploadBlock ref fix:
   - `src/views/Machines/ItemForm.vue`
   - `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
@@ -140,3 +151,12 @@
 ## Next Actionable Step
 - Runtime smoke-test Manual Route previous/next FFT navigation across metrics, one-point history series, and Manual Route/MultiView legend rendering with real API data when requested.
 - Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.
+- Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
+
+## EquipmentsLayout Parity Fix (2026-08-07)
+- Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.
+- `src/views/BrandModels/ItemsList.vue` now configures its form modal and exposes create/delete/refetch methods to parent refs.
+- Migrated `src/views/Equipments/SpecialFilterItem.vue` and restored equipment-type secondary filters, merged predefined/raw value IDs, and unmount cleanup.
+- Restored `FetchByQuerySelect` server search, fetch-by-id, and load-more behavior for Assets, Brands, and Part Numbers without duplicate `useRequestsList` loaders.
+- Removed duplicate RadioButtonsBlock and Datepicker event subscriptions.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
