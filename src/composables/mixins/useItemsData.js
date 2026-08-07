@@ -32,6 +32,7 @@ import { useNavigation } from '@/composables/mixins/useNavigation';
 export function useItemsData({
 	entityKey,
 	apiRoute,
+	fetchItemsApiRoute,
 	itemRoute,
 	filters,
 	options = {},
@@ -230,7 +231,7 @@ export function useItemsData({
 		};
 
 		return api_request
-			.get(resolvedApiRoute, payload)
+			.get(fetchItemsApiRoute || resolvedApiRoute, payload)
 			.then(({ value, fetchedMeta }) => {
 				itemsList.value = value;
 				if (fetchedMeta) meta.value = fetchedMeta;

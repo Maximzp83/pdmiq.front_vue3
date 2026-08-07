@@ -54,6 +54,7 @@ const refsMap = computed(() => ({ FileUploadBlock: fileUploadRef.value }));
 const formData = ref({
 	name: '',
 	file: null,
+	full_file_name: ''
 });
 
 const rules = {
@@ -65,7 +66,7 @@ const itemPictures = computed(() => (props.itemData?.file ? [{ file: props.itemD
 const subItemsSettings = computed(() => [
 	{
 		ref: 'FileUploadBlock',
-		destructure: true,
+		// destructure: true,
 		setIfEmpty: { prop: 'delete_file', val: 1 },
 		cleanIfEmpty: { prop: 'file', val: null },
 	},
@@ -102,6 +103,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 	validateSubItemsForm,
 	collectDataFromSubItems,
 	localPreSubmitHook,
+	// debug: true
 });
 
 defineExpose({ validateForm });

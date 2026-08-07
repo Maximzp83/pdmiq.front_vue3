@@ -96,6 +96,7 @@ export function useAsyncSelect({
 
 		return {
 			incudeMeta: true,
+			notNotify: true,
 			...(setToStore ? { setToStore } : {}),
 			...extraPayload,
 			params: {

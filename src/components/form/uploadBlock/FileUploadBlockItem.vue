@@ -215,7 +215,7 @@ const localGetFormDataCallback = (data) => {
 	if (props.additionalFormData) {
 		result = { ...result, ...props.additionalFormData };
 	}
-
+	// console.log(data, result)
 	return result;
 };
 

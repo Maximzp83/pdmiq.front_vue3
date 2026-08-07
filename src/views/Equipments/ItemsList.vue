@@ -127,7 +127,7 @@ const {
 	refetchItemsList,
 } = useItemsData({
 	entityKey: 'Equipments',
-	apiRoute: '/equipments/dashboard',
+	fetchItemsApiRoute: '/equipments/dashboard',
 	itemStore: equipmentsStore,
 	options: {
 		tableRef: itemsTableRef,
