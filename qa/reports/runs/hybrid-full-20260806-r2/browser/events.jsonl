@@ -1,5 +1,0 @@
-{"kind": "recording-started", "path": "/Users/maczone/.config/browser-harness/agent-workspace/recordings/full-project-read-only-hybrid-full-20260806-r2"}
-{"kind": "guard-metadata", "version": "2.0.0", "sha256": "93673e2058e23e11991ff8b91dfc8e8075b663cdea6fee4a740cca60569a99fb"}
-{"kind": "guard-restored", "route": "blank", "installed": true, "version": "2.0.0"}
-{"kind": "auth-required", "route": "/login/sign-in", "reason": "login-form"}
-{"kind": "recording-stopped", "path": "/Users/maczone/.config/browser-harness/agent-workspace/recordings/full-project-read-only-hybrid-full-20260806-r2"}
