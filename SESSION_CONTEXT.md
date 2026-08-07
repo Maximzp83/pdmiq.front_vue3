@@ -16,6 +16,11 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- Latest one-file `vue2_project` MultiView threshold delta was migrated into its existing Vue3 counterpart without confirmation stops:
+  - Compare thresholds now display and submit `acute_samples` and `stable_samples`.
+  - `re_trigger_samples` remains hidden for Compare thresholds and is removed from their payload.
+  - The only changed legacy file was already migrated; nothing was skipped.
+  - Targeted ESLint, migration-rule scan, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - FileUploadBlock refs were aligned with the active `useSubItemsList` registration pattern:
   - `src/views/Machines/ItemForm.vue` now registers the upload component through `setSubItemRef`, matching Production Lines and preventing a nested Vue ref object from reaching `Instance.getFormData()`.
   - The project-wide scan found one additional matching case in `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`; its file upload now also uses `setSubItemRef` and reads the registered instance from the shared refs map.
@@ -60,6 +65,12 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
+- Current MultiView threshold sync:
+  - `src/views/Sensors/charts/MultiView/ThresholdItem.vue`
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
 - Current FileUploadBlock ref fix:
   - `src/views/Machines/ItemForm.vue`
   - `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`
@@ -87,4 +98,4 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.
+- Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
