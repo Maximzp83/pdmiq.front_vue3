@@ -381,3 +381,11 @@ Primary rules source:
 - `docs/migration-todos.md`
 - `docs/session-collaboration-rules.md` (if process changes again)
 - `SESSION_CONTEXT.md`
+
+## Latest EquipmentsLayout Fix (2026-08-07)
+- `src/views/Equipments/EquipmentsLayout.vue` now preserves the Vue2 Asset/Storeroom create split; Storeroom creation opens the Equipment multiform with list refetch and modal close callbacks.
+- `src/views/BrandModels/ItemsList.vue` exposes create/delete/refetch and has a valid ItemForm modal loader/success flow.
+- `src/views/Equipments/SpecialFilterItem.vue` was migrated and reconnected through the secondary-filter slot, including combined predefined/raw option IDs and cleanup.
+- Asset/Brand/Part Number selectors again use `FetchByQuerySelect` with server search, fetch-by-id, and load-more; their duplicate request-list loaders were removed.
+- Duplicate RadioButtonsBlock/Datepicker listeners were removed.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing warnings remain.

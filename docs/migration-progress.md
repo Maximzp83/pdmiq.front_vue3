@@ -845,3 +845,9 @@ await fetchUsers({ page: 1 });
   - `re_trigger_samples` remains hidden and omitted for Compare thresholds
   - The only changed legacy file had an existing Vue3 counterpart; nothing was skipped
   - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24
+- [x] EquipmentsLayout Vue2 parity follow-up (2026-08-07)
+  - Restored Storeroom Equipment multiform creation and BrandModels child create/delete/refetch exposure
+  - Migrated and connected `src/views/Equipments/SpecialFilterItem.vue` with predefined/raw option filtering and cleanup
+  - Restored async Asset/Brand/Part Number selectors through `FetchByQuerySelect` and removed duplicate request-list loading
+  - Removed duplicate RadioButtonsBlock and Datepicker event handling
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

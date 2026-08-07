@@ -209,7 +209,17 @@ const brandQueryOptions = computed(() =>
 	}),
 );
 
-const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editItem, handleDeleteItems } = useItemsData({
+const {
+	itemsList,
+	itemsLoading,
+	itemsName,
+	meta,
+	setFilters,
+	createItem,
+	editItem,
+	handleDeleteItems,
+	refetchItemsList,
+} = useItemsData({
 	entityKey: 'BrandModels',
 	itemStore: brandModelsStore,
 	options: {
@@ -218,6 +228,14 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 		watchPropsFiltersOnly: props.watchPropsFiltersOnly,
 		fromDashboard: props.fromDashboard,
 		preventSetNavbar: props.preventSetNavbar,
+		formComponentFileLoader: () => import('./ItemForm.vue'),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
+		additionalModalSettings: {
+			single: true,
+		},
 	},
 });
 
@@ -369,4 +387,10 @@ useRequestsList({
 });
 
 const { handleEvent } = useEventHandler(methodsMap);
+
+defineExpose({
+	createItem,
+	handleDeleteItems,
+	refetchItemsList,
+});
 </script>

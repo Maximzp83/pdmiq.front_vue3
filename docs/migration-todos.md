@@ -223,3 +223,4 @@
 - useInitPageData: pass fetchItem function, itemsName, and optional additionalNavbarSettings; itemData/loadContent/itemLoading refs if you need control.
 - Consider optional wrapper: `useItemPageWithInit` that composes useItemPage + useInitPageData after migration.
 - useItemCard: pass cardData, changeRoute, titleLinkRoute, resetPageFiltersList, emit.
+- DONE (EquipmentsLayout parity, 2026-08-07): restored Storeroom Equipment creation, BrandModels child public actions/modal config, migrated equipment special filters with cleanup, restored FetchByQuerySelect behavior for Asset/Brand/Part Number filters, and removed duplicate RadioButtonsBlock/Datepicker handlers; targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

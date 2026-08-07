@@ -99,3 +99,11 @@
 
 ## Next Actionable Step
 - Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
+
+## EquipmentsLayout Parity Fix (2026-08-07)
+- Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.
+- `src/views/BrandModels/ItemsList.vue` now configures its form modal and exposes create/delete/refetch methods to parent refs.
+- Migrated `src/views/Equipments/SpecialFilterItem.vue` and restored equipment-type secondary filters, merged predefined/raw value IDs, and unmount cleanup.
+- Restored `FetchByQuerySelect` server search, fetch-by-id, and load-more behavior for Assets, Brands, and Part Numbers without duplicate `useRequestsList` loaders.
+- Removed duplicate RadioButtonsBlock and Datepicker event subscriptions.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
