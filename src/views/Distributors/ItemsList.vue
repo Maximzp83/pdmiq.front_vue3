@@ -51,7 +51,7 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
-const { translate } = Lang;
+const { translate, tt } = Lang;
 
 defineOptions({
 	name: 'DistributorsList',
@@ -105,7 +105,8 @@ const tableSettings = computed(() => {
 			},
 			{
 				prop: 'locations',
-				label: 'locations  (Cities)',
+				label: `${tt('locations')}  (${tt('Cities')})`,
+				skipTranslate: true,
 				min_width: 110,
 				meta: {
 					fromArray: { subProp: 'city', delimeter: ', ', inline: true },

@@ -25,12 +25,9 @@ import { computed, ref } from 'vue';
 import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useItemPage } from '@/composables/mixins/useItemPage';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ItemForm from './ItemForm.vue';
-
-const { changeRoute } = useNavigation();
 
 const itemFormRef = ref(null);
 const equipmentTypesCategoriesEntity = ENTITIES.EquipmentTypesCategories;
@@ -52,6 +49,6 @@ const {
 	entityKey: 'EquipmentTypesCategories',
 	itemsName: itemsName.value,
 	itemFormRef,
-	changeRoute,
+	goToListAfterSave: true,
 });
 </script>
