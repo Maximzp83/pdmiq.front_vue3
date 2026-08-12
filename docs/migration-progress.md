@@ -904,3 +904,21 @@ await fetchUsers({ page: 1 });
   - Restored the dynamic table-cell `propsData` / `additionalProps` contract in `src/views/Sensors/SensorTypeTableCell.vue`
   - Restored dataset labels, MAC values, and mismatch warning color/popover behavior
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] NCDSensorsList full Vue2 parity fix (2026-08-12)
+  - Restored the AdditionalDetailsNCD classic modal, Save/Cancel actions, and success refetch
+  - Restored authenticated filtered export, correct item names, and Plant/query/controller filter cleanup
+  - Restored `/ncd-sensors/:id` and added modal close-event handling in `DynamicFormContainer.vue`
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] NCD Additional Details Connection Strength Trend fix (2026-08-12)
+  - Restored the missing CommonChartItemWrapper/RSSIChart block in `src/views/Sensors/sensorForm/AdditionalDetailsNCD.vue`
+  - Restored the Vue2 chart payload with the current sensor id
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] MultiViewStatisticsPage full Vue2 parity fix (2026-08-12)
+  - Replaced the incorrect sensor Compare implementation with per-`multi_view_graph` MultiViewChart rendering
+  - Restored equipment/title header, dates/live mode, measurement switcher, locale/navbar setup, custom chart headers, no-data state, and threshold editing
+  - Restored parent `fetchMultiViews` handling and removed the invalid standalone MultiView route
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] MultiView initial measurement and flags tooltip runtime fix (2026-08-12)
+  - Normalized the persisted Metric/Imperial value to a numeric enum id before initial rendering
+  - Moved reusable out-of-plot flag hover binding to the chart base and enabled it for MultiViewChart render events
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

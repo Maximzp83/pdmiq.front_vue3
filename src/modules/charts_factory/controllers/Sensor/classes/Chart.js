@@ -2987,6 +2987,10 @@ class MultiViewChart extends ChartBase {
 		}, 100);
 	}
 
+	handleChartRenderEvent({ target }) {
+		this.bindFlagsTooltip(target);
+	}
+
 	setupUnitTypeName(payload) {
 		// console.log('setupUnitTypeName', payload)
 		return getUnitType(payload);
