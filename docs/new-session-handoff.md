@@ -389,3 +389,8 @@ Primary rules source:
 - Asset/Brand/Part Number selectors again use `FetchByQuerySelect` with server search, fetch-by-id, and load-more; their duplicate request-list loaders were removed.
 - Duplicate RadioButtonsBlock/Datepicker listeners were removed.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing warnings remain.
+
+## Latest Production Line Runtime Fix (2026-08-12)
+- Fixed nested attachment upload ref registration in `src/views/ProductionLines/AttachmentItem.vue`.
+- The attachment now stores the exposed `FileUploadBlock` instance in `refsMap`, so nested `useSubItemsList` collection can call `getFormData()` in the dashboard multiform flow.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

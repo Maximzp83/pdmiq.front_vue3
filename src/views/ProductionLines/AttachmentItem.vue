@@ -6,7 +6,7 @@
 
 		<el-form-item prop="file" class="mcol-xs-5 upload-form-item">
 			<FileUploadBlock
-				ref="fileUploadBlockRef"
+				:ref="(el) => setSubItemRef('FileUploadBlock', el, 0)"
 				deleteFileId
 				hidePreview
 				accept="all"
@@ -50,8 +50,7 @@ const props = defineProps({
 const emit = defineEmits(['onRemove']);
 
 const itemFormRef = ref(null);
-const fileUploadBlockRef = ref(null);
-const refsMap = ref({ FileUploadBlock: [fileUploadBlockRef] });
+const refsMap = ref({ FileUploadBlock: [] });
 const formData = ref({
 	id: null,
 	name: '',
@@ -62,7 +61,7 @@ const files = computed(() =>
 	props.itemData?.full_file_name ? [{ full_file_name: props.itemData.full_file_name }] : [],
 );
 const subItemsSettings = Object.freeze([{ ref: 'FileUploadBlock' }]);
-const { validateSubItemsForm, collectDataFromSubItems } = useSubItemsList({
+const { setSubItemRef, validateSubItemsForm, collectDataFromSubItems } = useSubItemsList({
 	formData,
 	refsMap,
 });

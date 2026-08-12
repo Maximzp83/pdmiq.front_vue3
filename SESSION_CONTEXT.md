@@ -107,3 +107,8 @@
 - Restored `FetchByQuerySelect` server search, fetch-by-id, and load-more behavior for Assets, Brands, and Part Numbers without duplicate `useRequestsList` loaders.
 - Removed duplicate RadioButtonsBlock and Datepicker event subscriptions.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
+
+## Production Line Attachment Ref Fix (2026-08-12)
+- `src/views/ProductionLines/AttachmentItem.vue` now registers its nested `FileUploadBlock` through `setSubItemRef` instead of storing a Vue ref object inside the `refsMap` array.
+- This fixes `Instance.getFormData is not a function` when saving a Production Line with attachments from `Dashboard/MultiFormWrapper.vue`.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
