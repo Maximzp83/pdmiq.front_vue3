@@ -417,26 +417,10 @@ const iconsAndButtonsSettings = computed(() =>
 		},
 		{
 			conditionSettings: {
-				checkMethod: 'some',
 				conditions: [
-					{
-						data_value: isNCDSensor.value,
-						control_value: true,
-						next_conditions: [
-							{ data_value: props.itemData.is_archived, control_value: false },
-							{ prop: 'controller.is_inactive', control_value: true },
-							{ prop: 'is_inactive', control_value: false },
-						],
-					},
-					{
-						data_value: isNCDSensor.value,
-						control_value: true,
-						next_conditions: [
-							{ data_value: props.itemData.is_archived, control_value: false },
-							{ prop: 'controller.is_inactive', control_value: true },
-							{ prop: 'is_inactive', control_value: true },
-						],
-					},
+					{ data_value: isNCDSensor.value, control_value: true },
+					{ data_value: props.itemData.is_archived, control_value: false },
+					{ data_value: props.itemData.controller?.is_inactive, control_value: true },
 				],
 			},
 			meta: { img: { src: controller_offline_icon }, cell_class: 'no-signal-icon' },

@@ -855,3 +855,7 @@ await fetchUsers({ page: 1 });
   - Replaced the nested manual FileUploadBlock ref array entry with `setSubItemRef` in `src/views/ProductionLines/AttachmentItem.vue`
   - Fixes attachment data collection from `Dashboard/MultiFormWrapper.vue`
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Equipment card controller-offline icon runtime fix (2026-08-12)
+  - Replaced the failing nested boolean property lookup in `src/views/Equipments/Card/CardSensorItem.vue` with a direct reactive value condition
+  - Simplified the duplicate sensor inactive-state branches to the effective NCD/not-archived/controller-inactive rule
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
