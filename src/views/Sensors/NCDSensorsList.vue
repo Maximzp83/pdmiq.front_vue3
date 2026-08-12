@@ -37,10 +37,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useRoute, useRouter } from 'vue-router';
 
-import { ENTITIES } from '@/config/entities';
 import { SENSOR_TYPES, dataSetsList } from '@/constants/global';
 import { standardTableOperations } from '@/constants/table';
 import { findItemBy } from '@/helpers';
@@ -49,10 +49,12 @@ import {
 	setupConnectionStrengthCell,
 } from '@/helpers/specialHelpers';
 import { Lang } from '@/localization';
+import { useExportListToFile } from '@/composables/mixins/useExportListToFile';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
 import { useSensorsStore } from '@/stores/SensorsStore';
 
 import Filterbar from '@/components/common/Filterbar.vue';
@@ -66,9 +68,13 @@ defineOptions({
 });
 
 const itemsTableRef = ref(null);
+const route = useRoute();
+const router = useRouter();
 const sensorsStore = useSensorsStore();
 const authStore = useAuthStore();
+const globalStore = useGlobalStore();
 const { filters } = storeToRefs(sensorsStore);
+const { globalFilters } = storeToRefs(globalStore);
 const { changeRoute } = useNavigation();
 
 const predefinedFilters = Object.freeze({
@@ -82,7 +88,10 @@ const {
 	itemsLoading,
 	itemsName,
 	meta,
+	preventFetch,
+	prepareFilters,
 	setFilters,
+	refetchItemsList,
 	editItem,
 } = useItemsData({
 	entityKey: 'Sensors',
@@ -90,8 +99,18 @@ const {
 	options: {
 		tableRef: itemsTableRef,
 		predefinedFilters,
+		localEditItem: ({ row }) => {
+			changeRoute({ path: `/ncd-sensors/${row.id}` });
+		},
 	},
+	itemsName: computed(() => ({
+		one: tt('Sensor'),
+		mult: tt('Sensors'),
+		instanceName: 'sensors',
+	})),
 });
+
+const { handleExportItem } = useExportListToFile({ prepareFilters });
 
 const actionButtons = computed(() =>
 	Object.freeze([
@@ -180,7 +199,32 @@ const tableSettings = computed(() => {
 });
 
 const handleShowAdditionalDetails = ({ row }) => {
-	changeRoute({ path: `${ENTITIES.Sensors.routeBase}/${row.id}` });
+	globalStore.show_edit_modal({
+		show: true,
+		instanceData: row,
+		title: `${tt('phrases.Additional_Details')}:`,
+		editModalProp: 'editModalClassic',
+		modalClassName: 'fixed-header-footer small-header small-footer moderate-paddings',
+		formComponentFileLoader: () => import('./sensorForm/AdditionalDetailsNCD.vue'),
+		hideSubmitButtons: true,
+		footerActions: [
+			{
+				name: 'submitForm',
+				button_text: tt('SAVE'),
+				disablePopover: true,
+				type: 'primary',
+				className: 'item-action-button',
+			},
+			{
+				name: 'handleCloseEditModal',
+				button_text: tt('CANCEL'),
+				disablePopover: true,
+				callInRoot: true,
+				className: 'item-action-button',
+			},
+		],
+		successSubmitCallback: refetchItemsList,
+	});
 };
 
 const handleShowStatistics = ({ row }) => {
@@ -188,7 +232,15 @@ const handleShowStatistics = ({ row }) => {
 };
 
 const handleExportToExel = () => {
-	window.open('/sensors/export', '_blank');
+	handleExportItem({
+		url: 'sensors/export',
+		skipDaterange: true,
+		filters: {
+			...globalFilters.value,
+			...filters.value,
+			...predefinedFilters,
+		},
+	});
 };
 
 const { handleEvent } = useEventHandler({
@@ -197,4 +249,16 @@ const { handleEvent } = useEventHandler({
 	handleShowStatistics,
 	handleExportToExel,
 });
+
+watch(
+	() => globalFilters.value?.plantId,
+	() => {
+		preventFetch.value = true;
+		setFilters({ controllerId: null });
+
+		if (Object.keys(route.query || {}).length) {
+			router.replace({ path: route.path });
+		}
+	},
+);
 </script>

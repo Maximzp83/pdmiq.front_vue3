@@ -409,3 +409,25 @@ Primary rules source:
 - Corrected `src/views/Sensors/SensorTypeTableCell.vue` to use the dynamic component row/column prop contract.
 - Restored localized dataset labels, MAC values, and the alarm-color tooltip when live NCD configuration differs from the saved sensor configuration.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest NCD Sensors List Parity Fix (2026-08-12)
+- Fully audited `src/views/Sensors/NCDSensorsList.vue` against Vue2 and restored the AdditionalDetailsNCD modal with Save/Cancel and success refetch.
+- Restored authenticated filtered export, correct item names, Plant-change removal of the controller filter/query, and `/ncd-sensors/:id` editing.
+- `DynamicFormContainer.vue` now consumes the modal close event emitted by AdditionalDetailsNCD.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest NCD Additional Details Chart Fix (2026-08-12)
+- Restored Connection Strength Trend in `src/views/Sensors/sensorForm/AdditionalDetailsNCD.vue`.
+- The migrated CommonChartItemWrapper now creates the existing RSSIChart with the current sensor id, matching the Vue2 modal.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest MultiView Statistics Page Fix (2026-08-12)
+- Rebuilt `src/views/Sensors/MultiViewStatisticsPage.vue` to render the configured `multi_view_graphs` through MultiViewChart, replacing the incorrect sensor Compare implementation.
+- Restored the equipment/title header, date/live filters, metric-system switcher, Spanish Highcharts locale, navbar, custom headers, no-data mock, and thresholds dialog.
+- Equipment Details now refetches MultiViews after threshold saves; the invalid standalone `/sensors/:id/multiview` route was removed.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest MultiView Runtime Follow-up (2026-08-12)
+- Normalized the persisted measurement value before `MultiViewStatisticsPage` first renders, fixing the initial Metric/Imperial active state when localStorage contains a string value.
+- Promoted the existing below-axis flag tooltip binding into the shared chart base and invoked it from `MultiViewChart` render handling.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

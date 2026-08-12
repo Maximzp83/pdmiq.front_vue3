@@ -814,6 +814,31 @@ export default class ChartBase {
 		}
 	}*/
 
+	bindFlagsTooltip(chart) {
+		chart?.series?.forEach((series) => {
+			if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
+
+			series.points.forEach((point) => {
+				if (!point.graphic || point._customTooltipBound) return;
+
+				point._customTooltipBound = true;
+				point.graphic.css({
+					cursor: 'pointer',
+					pointerEvents: 'auto'
+				});
+				point.graphic.on('mouseover', () => {
+					chart.tooltip?.refresh(point);
+					chart.hoverPoint = point;
+					point.setState('hover');
+				});
+				point.graphic.on('mouseout', () => {
+					point.setState('');
+					chart.tooltip?.hide(0);
+				});
+			});
+		});
+	}
+
 	emitChartLoadEvent(e) {
 		if (this.handleChartInitiatedEvent) {
 			this.handleChartInitiatedEvent(e);

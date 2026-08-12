@@ -1,6 +1,20 @@
 <template>
 	<div class="ncd-additional-details-container">
 		<div class="flex mrow wrap">
+			<div class="mcol-xs-12 mcol-sm-6 relative chart-height-auto">
+				<div class="title semi-bold">
+					{{ `${tt('phrases.connection_strength_trend')}:` }}
+				</div>
+
+				<CommonChartItemWrapper
+					chartFactoryContainerName="MaintenanceChartFactoryContainer"
+					chartFactoryName="RSSIChart"
+					configsKey="maintenanceChartListsConfig"
+					chartKey="main"
+					:additionalProps="chartProps"
+				/>
+			</div>
+
 			<div class="mcol-xs-12 mcol-sm-3">
 				<div class="label">{{ `${tt('phrases.connection_strength_average')}:` }}</div>
 				<div class="value semi-bold common-title">
@@ -185,6 +199,8 @@ import { useSensors } from '@/composables/useSensors';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useAuthStore } from '@/stores/AuthStore';
 
+import CommonChartItemWrapper from '@/components/charts/CommonChartItemWrapper.vue';
+
 const { tt } = Lang;
 
 defineOptions({
@@ -217,6 +233,16 @@ const formData = ref({
 	fft_acceleration_low_cut_filter: 0,
 	fft_acceleration_high_cut_filter: 0,
 });
+
+const chartProps = computed(() =>
+	Object.freeze({
+		useSimpleSpinnerAsPreloader: true,
+		nodataMock: true,
+		chartInstanceContainerPayload: {
+			sensorId: props.itemData.id,
+		},
+	}),
+);
 
 const isTempVibeSensor = computed(() => {
 	const type = currentSensorType.value || {};

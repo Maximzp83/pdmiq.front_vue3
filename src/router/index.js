@@ -753,6 +753,16 @@ const routes = [
 				meta: { auth: true, permissions: ['view_controllers'] },
 			},
 			{
+				path: 'ncd-sensors/:id',
+				name: 'NCDSensorEdit',
+				component: () => import('@/views/Sensors/ItemPage.vue'),
+				meta: {
+					auth: true,
+					permissionsMethod: 'some',
+					permissions: ['edit_dashboard', 'create_dashboard'],
+				},
+			},
+			{
 				path: 'sensors/new',
 				name: 'SensorCreate',
 				component: () => import('@/views/Sensors/ItemPage.vue'),
@@ -792,12 +802,6 @@ const routes = [
 				path: 'sensors/:id/statistics',
 				name: 'SensorStatistics',
 				component: () => import('@/views/Sensors/StatisticsPage.vue'),
-				meta: { auth: true, permissions: ['view_dashboard'] },
-			},
-			{
-				path: 'sensors/:id/multiview',
-				name: 'SensorMultiView',
-				component: () => import('@/views/Sensors/MultiViewStatisticsPage.vue'),
 				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{

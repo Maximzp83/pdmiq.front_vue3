@@ -920,37 +920,6 @@ class SensorChartBase extends ChartBase {
 		}
 	}
 
-	bindFlagsTooltip(chart) {
-	  chart.series.forEach(series => {
-	    if (series.type !== 'flags' || series.userOptions?.skipTooltipBinding) return;
-
-	    series.points.forEach(point => {
-	      if (!point.graphic || point._customTooltipBound) return;
-
-	      point._customTooltipBound = true;
-
-	      point.graphic.css({
-	        cursor: 'pointer',
-	        pointerEvents: 'auto'
-	      });
-
-	      point.graphic.on('mouseover', function () {
-	        chart.tooltip.refresh(point);
-
-	        chart.hoverPoint = point;
-	        point.setState('hover');
-	      });
-
-	      point.graphic.on('mouseout', function () {
-	        point.setState('');
-
-	        if (chart.tooltip) {
-	          chart.tooltip.hide(0);
-	        }
-	      });
-	    });
-	  });
-	}
 }
 
 class SensorChart extends SensorChartBase {
@@ -2628,6 +2597,10 @@ class MultiViewChart extends ChartBase {
 		setTimeout(() => {
 			this.ChartAPI.redraw(false);			
 		}, 100);
+	}
+
+	handleChartRenderEvent({ target }) {
+		this.bindFlagsTooltip(target);
 	}
 
 	setupUnitTypeName(payload) {

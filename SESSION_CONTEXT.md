@@ -128,3 +128,27 @@
 - `src/views/Sensors/SensorTypeTableCell.vue` now consumes the `propsData` row and `additionalProps` column contract provided by `DynamicComponentWrapper`.
 - Restored dataset-label and MAC rendering plus the alarm color/popover when `ncd_data_set` or `ncd_mac_address` differs from the configured sensor value.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## NCD Sensors List Full Parity Fix (2026-08-12)
+- `src/views/Sensors/NCDSensorsList.vue` now opens `AdditionalDetailsNCD.vue` in the classic modal with Save/Cancel actions and list refetch after success.
+- Restored filtered authenticated export, singular/plural item names, Plant-change cleanup of `controllerId` and route query, and the legacy NCD edit path.
+- `src/components/form/DynamicFormContainer.vue` now handles child/root `handleCloseEditModal` events used by the restored modal flow.
+- `src/router/index.js` now includes `/ncd-sensors/:id` with the legacy edit/create permission contract.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## NCD Additional Details RSSI Chart Fix (2026-08-12)
+- Restored the missing Connection Strength Trend block in `src/views/Sensors/sensorForm/AdditionalDetailsNCD.vue`.
+- The modal again builds `RSSIChart` through `MaintenanceChartFactoryContainer` and `maintenanceChartListsConfig/main`, passing the current sensor id in the chart payload.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## MultiView Statistics Page Full Parity Fix (2026-08-12)
+- Rebuilt `src/views/Sensors/MultiViewStatisticsPage.vue` around the legacy MultiView graph model instead of the incorrectly migrated sensor Compare/ChartsListWrapper flow.
+- Restored equipment header, MultiView title, date shortcuts/live state/query range setup, metric-system switcher, Spanish Highcharts locale, navbar, per-graph `MultiViewChart`, custom chart headers, no-data mock, and thresholds dialog.
+- `src/views/Equipments/Details/DetailsPage.vue` now handles `fetchMultiViews` emitted after threshold saves.
+- Removed the invalid standalone `/sensors/:id/multiview` route; MultiView remains under the legacy equipment-details route where its required equipment and MultiView data are supplied.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## MultiView Initial Measurement And Flags Tooltip Fix (2026-08-12)
+- `src/views/Sensors/MultiViewStatisticsPage.vue` now normalizes a persisted measurement value to the numeric metric-system id before the first render, so the Metric/Imperial active state is correct after startup.
+- The reusable flag hover binding now lives in `src/modules/charts_factory/classes/Chart.js`; `MultiViewChart` invokes it on render, restoring tooltips for flag points drawn below the x-axis while preserving the existing Sensor chart behavior.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

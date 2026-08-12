@@ -567,8 +567,8 @@ export const ENTITIES = Object.freeze({
 		routeBase: '/sensors',
 		filtersStorageKey: 'sensors_filters',
 		itemsName: Object.freeze({
-			one: 'sidebar_menu.sensors',
-			mult: 'sidebar_menu.sensors',
+			one: 'sensors',
+			mult: 'sensors',
 			instanceName: 'sensors',
 		}),
 		permissions: Object.freeze({

@@ -197,7 +197,9 @@ const saveModalItem = () => {
 const handleAction = ({ data }) => {
 	const { name, callInRoot } = data;
 
-	if (callInRoot) {
+	if (name === 'handleCloseEditModal') {
+		handleCloseEditModal();
+	} else if (callInRoot) {
 		if (typeof window[name] === 'function') {
 			window[name](data);
 		}
@@ -220,6 +222,7 @@ const successModalSubmit = (answer) => {
 const { handleEvent } = useEventHandler({
 	toggleSaving,
 	successModalSubmit,
+	handleCloseEditModal,
 }, emit);
 
 watch(

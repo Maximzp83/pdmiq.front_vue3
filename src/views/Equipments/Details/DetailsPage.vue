@@ -419,6 +419,7 @@ const { handleEvent } = useEventHandler({
 	togglePreviewModal,
 	updateEquipment,
 	handleCreateWorkOrderButton,
+	fetchMultiViews,
 }, null);
 
 watch(navbarSettings, (settings) => globalStore.setup_navbar(settings), { immediate: true });
