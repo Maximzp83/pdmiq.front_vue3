@@ -230,3 +230,4 @@
 - Consider optional wrapper: `useItemPageWithInit` that composes useItemPage + useInitPageData after migration.
 - useItemCard: pass cardData, changeRoute, titleLinkRoute, resetPageFiltersList, emit.
 - DONE (EquipmentsLayout parity, 2026-08-07): restored Storeroom Equipment creation, BrandModels child public actions/modal config, migrated equipment special filters with cleanup, restored FetchByQuerySelect behavior for Asset/Brand/Part Number filters, and removed duplicate RadioButtonsBlock/Datepicker handlers; targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+- DONE (Production Line attachment runtime fix, 2026-08-12): registered the nested `FileUploadBlock` in `src/views/ProductionLines/AttachmentItem.vue` through `setSubItemRef`, fixing `Instance.getFormData is not a function` during dashboard multiform save with attachments; targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

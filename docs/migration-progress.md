@@ -888,3 +888,7 @@ await fetchUsers({ page: 1 });
   - Restored async Asset/Brand/Part Number selectors through `FetchByQuerySelect` and removed duplicate request-list loading
   - Removed duplicate RadioButtonsBlock and Datepicker event handling
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Production Line attachment nested-ref runtime fix (2026-08-12)
+  - Replaced the nested manual FileUploadBlock ref array entry with `setSubItemRef` in `src/views/ProductionLines/AttachmentItem.vue`
+  - Fixes attachment data collection from `Dashboard/MultiFormWrapper.vue`
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
