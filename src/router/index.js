@@ -752,10 +752,11 @@ const routes = [
 				meta: { auth: true, permissions: ['view_dashboard'] },
 			},
 			{
-				path: 'sensors/ncd',
+				path: 'ncd-sensors',
+				alias: 'sensors/ncd',
 				name: 'NCDSensorsList',
 				component: () => import('@/views/Sensors/NCDSensorsList.vue'),
-				meta: { auth: true, permissions: ['view_dashboard'] },
+				meta: { auth: true, permissions: ['view_controllers'] },
 			},
 			{
 				path: 'sensors/new',

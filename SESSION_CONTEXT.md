@@ -171,3 +171,13 @@
 - The shared nested-property resolver treats boolean `true` as empty and returned `null`, so the previous `prop: 'controller.is_inactive'` condition could not pass.
 - The two redundant branches for sensor `is_inactive` were reduced to the actual rule: NCD sensor, not archived, inactive controller.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## NCD Sensors Route Fix (2026-08-12)
+- `src/router/index.js` again exposes the legacy `/ncd-sensors` list route used by Controllers and keeps `/sensors/ncd` as an alias.
+- Restored the legacy `view_controllers` permission; `controllerId` query values continue to initialize list filters through `useItemsData`.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Sensor Type Table Cell Migration Fix (2026-08-12)
+- `src/views/Sensors/SensorTypeTableCell.vue` now consumes the `propsData` row and `additionalProps` column contract provided by `DynamicComponentWrapper`.
+- Restored dataset-label and MAC rendering plus the alarm color/popover when `ncd_data_set` or `ncd_mac_address` differs from the configured sensor value.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
