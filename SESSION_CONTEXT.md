@@ -165,3 +165,9 @@
 - `src/views/ProductionLines/AttachmentItem.vue` now registers its nested `FileUploadBlock` through `setSubItemRef` instead of storing a Vue ref object inside the `refsMap` array.
 - This fixes `Instance.getFormData is not a function` when saving a Production Line with attachments from `Dashboard/MultiFormWrapper.vue`.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Equipment Card Controller Offline Icon Fix (2026-08-12)
+- `src/views/Equipments/Card/CardSensorItem.vue` now checks `controller.is_inactive` through a direct reactive value when deciding whether to render `controller_offline_icon`.
+- The shared nested-property resolver treats boolean `true` as empty and returned `null`, so the previous `prop: 'controller.is_inactive'` condition could not pass.
+- The two redundant branches for sensor `is_inactive` were reduced to the actual rule: NCD sensor, not archived, inactive controller.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

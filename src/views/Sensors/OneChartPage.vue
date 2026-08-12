@@ -137,7 +137,7 @@ const injectToChartOptions = computed(() => {
 	const pageHeight = window.innerHeight;
 	const fullHeight = Boolean(chartsToDisplay.value.length);
 	const height = fullHeight ? pageHeight : 250;
-	const marginBottom = fullHeight ? 20 : 40;
+	const marginBottom = fullHeight ? 50 : 40;
 	const animation = !fullHeight;
 
 	return Object.freeze({

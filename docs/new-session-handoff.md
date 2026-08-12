@@ -412,3 +412,8 @@ Primary rules source:
 - Fixed nested attachment upload ref registration in `src/views/ProductionLines/AttachmentItem.vue`.
 - The attachment now stores the exposed `FileUploadBlock` instance in `refsMap`, so nested `useSubItemsList` collection can call `getFormData()` in the dashboard multiform flow.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Equipment Card Runtime Fix (2026-08-12)
+- Fixed `controller_offline_icon` visibility in `src/views/Equipments/Card/CardSensorItem.vue` by using the direct reactive `controller.is_inactive` value.
+- The shared nested-property resolver converted boolean `true` to `null`; the local condition now expresses the effective NCD/not-archived/controller-inactive rule without redundant sensor inactive-state branches.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
