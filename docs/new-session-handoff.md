@@ -399,3 +399,13 @@ Primary rules source:
 - Fixed `controller_offline_icon` visibility in `src/views/Equipments/Card/CardSensorItem.vue` by using the direct reactive `controller.is_inactive` value.
 - The shared nested-property resolver converted boolean `true` to `null`; the local condition now expresses the effective NCD/not-archived/controller-inactive rule without redundant sensor inactive-state branches.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest NCD Sensors Route Fix (2026-08-12)
+- Restored the Controller-list target `/ncd-sensors?controllerId={id}` in `src/router/index.js`; `/sensors/ncd` remains available as an alias.
+- Restored the Vue2 `view_controllers` route permission, and confirmed that `useItemsData` applies `controllerId` from the route query to the list filters.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Sensor Type Table Cell Fix (2026-08-12)
+- Corrected `src/views/Sensors/SensorTypeTableCell.vue` to use the dynamic component row/column prop contract.
+- Restored localized dataset labels, MAC values, and the alarm-color tooltip when live NCD configuration differs from the saved sensor configuration.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

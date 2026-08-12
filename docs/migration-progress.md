@@ -859,3 +859,11 @@ await fetchUsers({ page: 1 });
   - Replaced the failing nested boolean property lookup in `src/views/Equipments/Card/CardSensorItem.vue` with a direct reactive value condition
   - Simplified the duplicate sensor inactive-state branches to the effective NCD/not-archived/controller-inactive rule
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] NCD Sensors legacy route runtime fix (2026-08-12)
+  - Restored `/ncd-sensors?controllerId={id}` in `src/router/index.js` and retained `/sensors/ncd` as an alias
+  - Restored the legacy `view_controllers` permission; query filters remain handled by `useItemsData`
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] SensorTypeTableCell Vue2 parity fix (2026-08-12)
+  - Restored the dynamic table-cell `propsData` / `additionalProps` contract in `src/views/Sensors/SensorTypeTableCell.vue`
+  - Restored dataset labels, MAC values, and mismatch warning color/popover behavior
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
