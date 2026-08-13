@@ -26,10 +26,9 @@
 
 <script setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 import { Lang } from '@/localization';
-import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useSensorType } from '@/composables/mixins/useSensorType';
 
 const { tt } = Lang;
@@ -46,7 +45,7 @@ const props = defineProps({
 const emit = defineEmits(['forceRerender']);
 
 const route = useRoute();
-const { changeRoute } = useNavigation();
+const router = useRouter();
 const currentSensorTypeData = computed(() => (props.isSensor ? props.itemData : null));
 const { currentSensorType } = useSensorType({ currentSensorTypeData });
 
@@ -64,8 +63,10 @@ const buttonPath = computed(() => {
 	return '';
 });
 
-const linkClick = () => {
-	changeRoute({ path: buttonPath.value });
+const linkClick = async () => {
+	if (currentPath.value !== buttonPath.value) {
+		await router.push(buttonPath.value);
+	}
 	emit('forceRerender');
 };
 </script>

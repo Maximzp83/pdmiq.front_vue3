@@ -784,6 +784,8 @@ body {
 	.el-dialog {
 		padding: 0;
 		margin-bottom: 0;
+		min-width: 310px;
+		width: 70%;
 
 		&:not(.vertical-margin) {
 			margin-top: 0;			
@@ -799,9 +801,9 @@ body {
 		&.small {
 			max-width: 620px;
 		}
-
-		min-width: 310px;
-		width: 70%;
+		&.standard {
+			max-width: 730px;			
+		}
 
 		&.big {
 			max-width: 1200px;

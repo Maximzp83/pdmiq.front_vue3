@@ -17,7 +17,7 @@
 				/>
 			</div>
 
-			<div class="margin-top-row flex">
+			<div class="mt-20 flex">
 				<el-button
 					class="div-block create-button with-text inverted small"
 					type="primary"

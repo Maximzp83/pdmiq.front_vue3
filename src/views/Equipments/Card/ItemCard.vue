@@ -256,6 +256,7 @@ const reorderHandler = (event) => {
 			nextTick(setupDraggable);
 		});
 };
+
 const { togglePreviewModal, handleTitleClick } = useItemCard({
 	cardData: computed(() => props.cardData),
 	titleLinkRoute,

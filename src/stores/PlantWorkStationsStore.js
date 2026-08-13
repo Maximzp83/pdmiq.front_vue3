@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { commonStoreMixin } from './mixins/commonStoreMixin';
 
-const localStorageFilters = JSON.parse(localStorage.getItem('plant-work-stations_filters'));
+const localStorageFilters = JSON.parse(localStorage.getItem('work_stations_filters'));
 
 export const usePlantWorkStationsStore = defineStore('plantworkstationsStore', {
 	state: () => ({

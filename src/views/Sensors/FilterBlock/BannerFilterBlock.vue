@@ -66,7 +66,7 @@
 				:disabled="sensorData.is_re_baseline_process"
 				:loading="levelZonesSaving"
 				:class="['inverted report-button primary-color bolded capitalize', { active: hasOffAlarm }]"
-				@click="event('toggleOffAlarm')"
+				@click="toggleOffAlarm"
 			>
 				{{ `${hasOffAlarm ? tt('Disable') : tt('Enable')} ${tt('constants.OFF_ALARM')}` }}
 			</el-button>
@@ -152,6 +152,7 @@ import {
 	sensorParametersList as getSensorParametersList,
 	metricSystemsList as getMetricSystemsList,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useSensorsStore } from '@/stores/SensorsStore';
 
@@ -184,6 +185,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['event']);
+const { confirmHelper } = useActionButtons({ emit });
 const sensorsStore = useSensorsStore();
 const { statistics_filters: filters } = storeToRefs(sensorsStore);
 const pdfAndFftRequestsBlockRef = ref(null);
@@ -208,6 +210,10 @@ const isNCDSensor = computed(() =>
 	props.currentSensorType.isNCDWiredTempVibe ||
 	props.currentSensorType.isNCDTempVibeCurr,
 );
+const offAlarmParameterIds = Object.freeze([
+	SENSOR_PARAMETERS_TYPES.Z_AXIS_ACCELERATION,
+	SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION,
+]);
 
 const event = (name, data) => {
 	emit('event', {
@@ -218,6 +224,19 @@ const event = (name, data) => {
 };
 const switchMetricSystem = ({ id }) => {
 	sensorsStore.set_statistics_filters({ ...filters.value, measurement: id });
+};
+const toggleOffAlarm = () => {
+	if (!props.hasOffAlarm) {
+		event('toggleOffAlarm', offAlarmParameterIds);
+		return;
+	}
+
+	confirmHelper({
+		message: `${tt('phrases.Do_you_really_want_to')} ${tt('phrases.disable_off_alarm')}? ${tt('Continue')}?`,
+		confirmButtonText: tt('Confirm'),
+	})
+		.then(() => event('toggleOffAlarm', false))
+		.catch(() => {});
 };
 const handleUnlockFFT = (payload) => {
 	pdfAndFftRequestsBlockRef.value?.handleUnlockFFT?.(payload);

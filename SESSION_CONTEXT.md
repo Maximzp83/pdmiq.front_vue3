@@ -152,3 +152,31 @@
 - `src/views/Sensors/MultiViewStatisticsPage.vue` now normalizes a persisted measurement value to the numeric metric-system id before the first render, so the Metric/Imperial active state is correct after startup.
 - The reusable flag hover binding now lives in `src/modules/charts_factory/classes/Chart.js`; `MultiViewChart` invokes it on render, restoring tooltips for flag points drawn below the x-axis while preserving the existing Sensor chart behavior.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Sensors Destructive Actions Confirm Parity Fix (2026-08-13)
+- Restored the Vue2 confirmation before `handleResetFrequencySettings` sends the ultrasound frequency reset command.
+- The active Sensors confirm audit also restored confirmation before resetting a lube cycle, increasing/decreasing ultrasound gain, and disabling OFF ALARM; enabling OFF ALARM remains immediate as in Vue2.
+- Confirm cancellation no longer reaches the corresponding API action. Existing FFT unlock, sensor reset, rebaseline, and manual lubrication confirmations were already present.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+- Unrelated user-owned dirty file left untouched: `src/views/Equipments/Card/ItemCard.vue`.
+
+## Equipment Statistics Remount Race Fix (2026-08-13)
+- `DetailsPage.vue` and `PdmButton.vue` now await equipment/sensor route navigation before changing `detailsComponentKey`, so a remounted `StatisticsPage` starts with the new route params.
+- `StatisticsPage.vue` now has one immediate route-param watcher instead of competing mounted/full-route initializers, and sensor loads use a generation token so responses from an obsolete route or unmounted instance cannot mutate current readiness state.
+- This prevents overlapping requests from pushing `sensorsReadyCount` past the expected count and collapsing `sensorData` plus its dependent computed state to empty values.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+- Unrelated user-owned dirty files left untouched: `src/constants/global.js`, `src/views/Equipments/Card/ItemCard.vue`.
+
+## Work Stations Section Migration (2026-08-13)
+- Migrated the missing Vue2 Work Stations section into `src/views/WorkStations`: list, modal create/edit form, and a valid standalone item page component.
+- Added the `WorkStations` entity contract with `/plants/work-stations` API paths and the dedicated view/create/edit/delete Work Stations permissions.
+- Corrected `PlantWorkStationsStore` to retain the Vue2 `work_stations_filters` localStorage key.
+- The existing `/work-stations` router entry and sidebar item now resolve to the migrated section; create/edit remains modal-based, matching Vue2.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+- Unrelated user-owned dirty files left untouched: `src/constants/global.js`, `src/views/Equipments/Card/ItemCard.vue`.
+
+## MultiView Chart Event Handling Fix (2026-08-13)
+- `src/views/Sensors/MultiViewStatisticsPage.vue` now consumes the informational `handleChartContainerReady` and `chartLoadEvent` events emitted by its chart wrappers.
+- These events have no page-level operation in the Vue2 implementation; handling them locally prevents them from reaching `Equipments/Details/DetailsPage.vue`, whose non-forwarding event handler correctly warned about unknown methods.
+- Other MultiView events continue to be processed locally or forwarded to the parent as before.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

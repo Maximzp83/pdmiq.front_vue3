@@ -79,7 +79,8 @@
 			color: $info-color
 		}
 		.label-margin-0 .el-form-item__label {margin: 0 !important;}
-		.label-margin-0 .el-form-item__content {margin-left: 0 !important; }
+		.label-margin-0 .el-form-item__content,
+		&.label-margin-0 .el-form-item__content {margin-left: 0 !important; }
 		.label-margin-bottom-0 .el-form-item__label {margin-bottom: 0 !important;}
 
 		&.center-label,

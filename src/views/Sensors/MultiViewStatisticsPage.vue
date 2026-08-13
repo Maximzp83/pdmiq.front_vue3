@@ -287,8 +287,14 @@ const toggleThresholdsDialog = (payload) => {
 	thresholdsSetupData.value = payload;
 	showThresholdsDialog.value = !showThresholdsDialog.value;
 };
+const handleChartContainerReady = () => {};
+const chartLoadEvent = () => {};
 
-const { handleEvent } = useEventHandler({ toggleThresholdsDialog }, emit);
+const { handleEvent } = useEventHandler({
+	toggleThresholdsDialog,
+	handleChartContainerReady,
+	chartLoadEvent,
+}, emit);
 
 onBeforeMount(() => {
 	if (Highcharts && Lang.currentLangId === LANGUAGE_TYPES.SPANISH) {

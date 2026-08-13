@@ -444,7 +444,7 @@ watch(
 		prevRouteName.value = name;
 	},
 );
-watch(activeTab, (tab) => {
+watch(activeTab, async (tab) => {
 	const equipmentData = tab?.equipmentData;
 	if (!equipmentData) return;
 
@@ -454,10 +454,10 @@ watch(activeTab, (tab) => {
 	const { id, dashboardSensors: sensors = [], equipmentSubType } = equipmentData;
 	if (routeParamsId.value !== id) {
 		if (route.params.sensorId && sensors.length) {
-			router.replace(`/equipments/${id}/details/pdm/${sensors[0].id}`);
+			await router.replace(`/equipments/${id}/details/pdm/${sensors[0].id}`);
 			forceRerender();
 		} else {
-			router.replace(`/equipments/${id}/details/main`);
+			await router.replace(`/equipments/${id}/details/main`);
 		}
 	}
 
