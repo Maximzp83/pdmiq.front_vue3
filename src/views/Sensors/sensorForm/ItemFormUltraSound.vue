@@ -693,6 +693,7 @@ import {
 	METRIC_SYSTEM_TYPES,
 	SENSOR_SPECIFIC_PARAMETERS_TYPES,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useSubItem } from '@/composables/mixins/useSubItem';
 import { useSensors } from '@/composables/useSensors';
 import { useNotify } from '@/composables/useNotify';
@@ -731,6 +732,7 @@ const props = defineProps({
 
 const emit = defineEmits(['submit', 'onCancel', 'event']);
 
+const { confirmHelper } = useActionButtons({ emit });
 const { fetchDatasetFormulas } = useSensors();
 const { Notify } = useNotify();
 const globalStore = useGlobalStore();
@@ -1084,7 +1086,12 @@ const resetFrequencySettings = ({ resetFormDataFields } = {}) => {
 };
 
 const handleResetFrequencySettings = () => {
-	resetFrequencySettings({ resetFormDataFields: true });
+	confirmHelper({
+		insertToMessage: tt('phrases.reset_frequency_settings'),
+		confirmButtonText: tt('Reset'),
+	})
+		.then(() => resetFrequencySettings({ resetFormDataFields: true }))
+		.catch(() => {});
 };
 
 const handleResetValidate = () => {

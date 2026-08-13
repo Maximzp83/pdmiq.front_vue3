@@ -622,6 +622,12 @@ const routes = [
 				component: () => import('@/views/EquipmentTypesCategories/ItemPage.vue'),
 				meta: { auth: true, permissions: ['edit_equipment_types_categories'] },
 			},
+			{
+				path: 'work-stations',
+				name: 'WorkStations',
+				component: () => import('@/views/WorkStations/ItemsList.vue'),
+				meta: { auth: true, permissions: ['view_work_stations'] },
+			},
 			// {
 			// 	path: 'brand-models',
 			// 	name: 'BrandModels',

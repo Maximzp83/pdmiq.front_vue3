@@ -30,7 +30,11 @@ export const api = (method, url, payload) => {
 	/*if (payload && payload.baseURL) {
 		console.log(payload.baseURL)
 	}*/
-	// console.log(axios.defaults.baseURL)
+	/*if (url == '/ultrasound/commands/10773/reset/setup') {
+		console.log(axios.defaults.baseURL)
+		return
+	}*/
+	// console.log(url, axios.defaults.baseURL)
 	return axios({
 		method: newMethod || method,
 		url: url,

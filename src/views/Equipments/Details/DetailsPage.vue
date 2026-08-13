@@ -463,7 +463,7 @@ watch(
 		prevRouteName.value = name;
 	},
 );
-watch(activeTab, (tab) => {
+watch(activeTab, async (tab) => {
 	const equipmentData = tab?.equipmentData;
 	if (!equipmentData) return;
 
@@ -476,7 +476,7 @@ watch(activeTab, (tab) => {
 			route.name === 'DetailsManualRouteStatPage' &&
 			sensors.some((sensor) => sensor.data_set === DATASET.MANUAL_ROUTE_FFT)
 		) {
-			router.replace(`/equipments/${id}/details/manual-route`);
+			await router.replace(`/equipments/${id}/details/manual-route`);
 			forceRerender();
 		} else if (route.params.sensorId && sensors.length) {
 			const standardSensor = sensors.find(
@@ -485,10 +485,10 @@ watch(activeTab, (tab) => {
 			const path = standardSensor
 				? `/equipments/${id}/details/pdm/${standardSensor.id}`
 				: `/equipments/${id}/details/manual-route`;
-			router.replace(path);
+			await router.replace(path);
 			forceRerender();
 		} else {
-			router.replace(`/equipments/${id}/details/main`);
+			await router.replace(`/equipments/${id}/details/main`);
 		}
 	}
 

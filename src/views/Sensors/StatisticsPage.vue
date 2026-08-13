@@ -263,7 +263,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeMount, onMounted, ref, watch, defineAsyncComponent } from 'vue';
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch, defineAsyncComponent } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import Highcharts from '@/config/highcharts';
@@ -273,6 +273,7 @@ import boost from 'highcharts/modules/boost';
 import { initHighchartsModule } from '@/helpers/charts';
 import { Lang } from '@/localization';
 import { useSensors } from '@/composables/useSensors';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useSensorType } from '@/composables/mixins/useSensorType';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
 import { useNotify } from '@/composables/useNotify';
@@ -342,6 +343,7 @@ const emit = defineEmits(['event']);
 const { statistics_filters: filters } = storeToRefs(sensorsStore);
 const { compareList } = storeToRefs(globalStore);
 const { fetchSensor, toggleUltrasoundCommand } = useSensors();
+const { confirmHelper } = useActionButtons({ emit });
 
 const localToUtcYmdHis = (dateString) => {
 	const normalized = `${dateString || ''}`.replace(/Z$/, '');
@@ -355,6 +357,11 @@ const localToUtcYmdHis = (dateString) => {
 
 defineOptions({
 	name: 'StatisticsPage',
+});
+
+const props = defineProps({
+	sensorDataFromProps: Object,
+	equipmentData: null,
 });
 
 const dropdownFilterbarRef = ref(null);
@@ -389,6 +396,7 @@ const chartsListWrappersReadyCount = ref(0);
 const rpmOverlaySensorData = ref(null);
 const overlaySensorLoading = ref(false);
 const isOverlaySensorReady = ref(false);
+let sensorsLoadGeneration = 0;
 
 const sensorData = computed(() => {
 	if (allSensorsReady.value && dropdownFilterbarUpdated.value) {
@@ -402,7 +410,7 @@ const { Notify } = useNotify();
 
 const sensorId = computed(() => route.params.sensorId || route.params.id);
 const isCompare = computed(() => Boolean(route.query.compare) || sensorId.value === 'compare');
-const equipmentData = computed(() => sensorData.value?.equipment || {});
+const equipmentData = computed(() => props.equipmentData || sensorData.value?.equipment || {});
 const itemsName = computed(() => ({
 	one: tt('PDM_Item'),
 	mult: tt('PDM_Items'),
@@ -789,22 +797,26 @@ const updateEquipment = (equipment) => {
 };
 
 const initSensors = (items) => {
+	const loadGeneration = ++sensorsLoadGeneration;
+
 	if (items?.length) {
 		sensors.value = cloneDeep(items);
 		return;
 	}
 	sensors.value = [];
 	loadingQueue.value = [];
-	fetchSensors(currentSensorIds.value, 0);
+	fetchSensors(currentSensorIds.value, 0, loadGeneration);
 };
 
-const fetchSensors = (ids, sensorIdx = 0) => {
+const fetchSensors = (ids, sensorIdx = 0, loadGeneration = sensorsLoadGeneration) => {
 	sensorsReadyCount.value = 0;
 	sensorLoading.value = true;
-	fetchSensorsAction(ids, sensorIdx);
+	fetchSensorsAction(ids, sensorIdx, loadGeneration);
 };
 
-const fetchSensorsAction = (ids, sensorIdx) => {
+const fetchSensorsAction = (ids, sensorIdx, loadGeneration) => {
+	if (loadGeneration !== sensorsLoadGeneration) return;
+
 	if (!ids.length) {
 		sensorLoading.value = false;
 		return;
@@ -812,6 +824,8 @@ const fetchSensorsAction = (ids, sensorIdx) => {
 
 	fetchSensor({ itemId: ids[sensorIdx] })
 		.then(({ value }) => {
+			if (loadGeneration !== sensorsLoadGeneration) return;
+			
 			if (
 				!isCompare.value &&
 				value.data_set === DATASET.MANUAL_ROUTE_FFT &&
@@ -829,13 +843,15 @@ const fetchSensorsAction = (ids, sensorIdx) => {
 			sensorsReadyCount.value += 1;
 
 			if (sensorIdx < ids.length - 1) {
-				fetchSensorsAction(ids, sensorIdx + 1);
+				fetchSensorsAction(ids, sensorIdx + 1, loadGeneration);
 			} else {
 				loadingQueue.value.push(1);
 				sensorLoading.value = false;
 			}
 		})
 		.catch((error) => {
+			if (loadGeneration !== sensorsLoadGeneration) return;
+
 			console.warn(error);
 			if (error?.response?.status === 404) {
 				changeRoute({ history: true, steps: -1 });
@@ -1053,14 +1069,17 @@ const closeLevelZoneSetup = () => {
 
 const handleUnlockLube = ({ sensorId: lubeSensorId }) => {
 	if (!lubeSensorId) return;
-	sensorLoading.value = true;
-	toggleUltrasoundCommand({
-		url: `/ultrasound/commands/${lubeSensorId}/reset/cycle?resetLubeCycle=1`,
-		resultMessage: { text: tt('phrases.lube_cycle_was_reset') },
+	confirmHelper({
+		insertToMessage: `<b>${tt('phrases.reset_cycle')}</b>`,
 	})
 		.then(() => {
-			initSensors();
+			sensorLoading.value = true;
+			return toggleUltrasoundCommand({
+				url: `/ultrasound/commands/${lubeSensorId}/reset/cycle?resetLubeCycle=1`,
+				resultMessage: { text: tt('phrases.lube_cycle_was_reset') },
+			});
 		})
+		.then(() => initSensors())
 		.catch(() => {
 			sensorLoading.value = false;
 		});
@@ -1147,13 +1166,6 @@ watch(sensorData, (data) => {
 	}
 });
 
-watch(
-	() => route.fullPath,
-	() => {
-		setupPage();
-	},
-);
-
 const setupPage = () => {
 	chartsListWrapperRefs.value = [];
 	chartsListWrappersReadyCount.value = 0;
@@ -1186,7 +1198,17 @@ onBeforeMount(() => {
 	}
 });
 
-onMounted(() => {
-	nextTick(setupPage);
+watch(
+	[
+		() => route.params.id,
+		() => route.params.sensorId,
+		() => route.query.compare,
+	],
+	setupPage,
+	{ immediate: true },
+);
+
+onBeforeUnmount(() => {
+	sensorsLoadGeneration++;
 });
 </script>

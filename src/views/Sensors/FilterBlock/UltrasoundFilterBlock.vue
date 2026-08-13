@@ -92,9 +92,11 @@ import { storeToRefs } from 'pinia';
 import { Lang } from '@/localization';
 import { ADJUSTMENT_ACTIONS_TYPES, ULTRASOUND_SENSOR_TYPES } from '@/constants/ultrasound';
 import { DXM_COMMANDS_REQUEST_STATUSES } from '@/constants/global';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useCallMethod } from '@/composables/mixins/useEmitter';
 import { useWebSocket } from '@/composables/mixins/useWebSocket';
 import { useSensors } from '@/composables/useSensors';
+import { useNotify } from '@/composables/useNotify';
 import { useSensorsStore } from '@/stores/SensorsStore';
 import { useAuthStore } from '@/stores/AuthStore';
 
@@ -118,6 +120,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['event']);
+const { confirmHelper } = useActionButtons({ emit });
+const { Notify } = useNotify();
 const sensorsStore = useSensorsStore();
 const authStore = useAuthStore();
 const { gainAdjustmentInProcess } = storeToRefs(sensorsStore);
@@ -186,11 +190,30 @@ const event = (name, data) => {
 
 const toggleGainAdjustment = (action) => {
 	if (!sensorId.value) return;
-	sensorsStore.set_sensor_state({ stateProp: 'gainAdjustmentInProcess', value: true });
-	gainAdjustment({
-		sensorId: sensorId.value,
-		data: { action },
+	if (props.sensorData.is_inactive) {
+		Notify({
+			type: 'warning',
+			title: tt('Error'),
+			message: `${tt('Sensor')} ${tt('Offline')}`,
+		});
+		return;
+	}
+
+	const gainText = action === ADJUSTMENT_ACTIONS_TYPES.INCREASE
+		? tt('Increase')
+		: tt('Decrease');
+
+	confirmHelper({
+		message: `${tt('phrases.do_you_really_want_to')} <b>${gainText}</b> ${tt('phrases.the_Sensor_Gain')}?`,
 	})
+		.then(() => {
+			sensorsStore.set_sensor_state({ stateProp: 'gainAdjustmentInProcess', value: true });
+			return gainAdjustment({
+				sensorId: sensorId.value,
+				data: { action },
+			});
+		})
+		.catch(() => {})
 		.finally(() => {
 			sensorsStore.set_sensor_state({ stateProp: 'gainAdjustmentInProcess', value: false });
 		});

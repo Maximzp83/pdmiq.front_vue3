@@ -453,6 +453,23 @@ export const ENTITIES = Object.freeze({
 			delete: 'delete_plants',
 		}),
 	}),
+	WorkStations: Object.freeze({
+		key: 'plant_work_stations',
+		apiBase: '/plants/work-stations',
+		routeBase: '/work-stations',
+		filtersStorageKey: 'work_stations_filters',
+		itemsName: Object.freeze({
+			one: 'Work_Station',
+			mult: 'Work_Stations',
+			instanceName: 'plant_work_stations',
+		}),
+		permissions: Object.freeze({
+			view: 'view_work_stations',
+			create: 'create_work_stations',
+			edit: 'edit_work_stations',
+			delete: 'delete_work_stations',
+		}),
+	}),
 	Locations: Object.freeze({
 		key: 'locations',
 		apiBase: '/locations',

@@ -378,15 +378,15 @@ const menuItems1 = [
 		meta: { permissions: ['view_misc_parts'] },
 		enableInCompanyMenuForm: true
 	},
-	// {
-	// 	name: 'Work_Stations',
-	// 	belongs_to_label: 'cmms',
-	// 	id: MENU_TYPES.WORK_STATIONS,
-	// 	icon: 'icon-work_stations',
-	// 	path: '/work-stations',
-	// 	meta: { permissions: ['view_work_stations'] },
-	// 	enableInCompanyMenuForm: true
-	// },
+	{
+		name: 'Work_Stations',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.WORK_STATIONS,
+		icon: 'icon-work_stations',
+		path: '/work-stations',
+		meta: { permissions: ['view_work_stations'] },
+		enableInCompanyMenuForm: true
+	},
 	/*{
 		// name: 'Work Order Import',
 		name: 'sidebar_menu.work_order_import',

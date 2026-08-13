@@ -7,9 +7,9 @@
 		label-position="left"
 	>
 		<div class="text-center bold title article-title">{{ title }}</div>
-		<div class="flex mrow">
+		<div class="flex mrow mt-20">
 			<div class="mcol-xs-11">
-				<div class="el-form-item content-row">
+				<div class="content-row">
 					<div class="flex mrow wrap align-center">
 						<el-form-item
 							:label="tt('constants.metric')"
@@ -47,7 +47,7 @@
 					</div>
 				</div>
 
-				<div v-if="isCompareType" class="el-form-item content-row">
+				<div v-if="isCompareType" class="content-row">
 					<div class="flex mrow wrap align-center">
 						<el-form-item
 							required

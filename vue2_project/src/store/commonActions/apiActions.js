@@ -220,7 +220,7 @@ const multipurpose_response1 = ({ commit, dispatch }, url, payload = {}) => {
 			commit('SET_STATUS_LOADING', true);
 		}
 	}
-
+	// console.log(url)
 	return new Promise((resolve, reject) => {
 		api(method, url, payload)
 			.then(response => {

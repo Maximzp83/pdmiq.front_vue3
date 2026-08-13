@@ -449,3 +449,33 @@ Primary rules source:
 - Normalized the persisted measurement value before `MultiViewStatisticsPage` first renders, fixing the initial Metric/Imperial active state when localStorage contains a string value.
 - Promoted the existing below-axis flag tooltip binding into the shared chart base and invoked it from `MultiViewChart` render handling.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Sensors Confirm Parity Fix (2026-08-13)
+- Restored the original confirmation flow for explicit ultrasound frequency reset in `ItemFormUltraSound.vue`.
+- Also restored missing confirmation gates for lube-cycle reset in `StatisticsPage.vue`, ultrasound gain adjustment in `UltrasoundFilterBlock.vue`, and OFF ALARM disable in `BannerFilterBlock.vue`.
+- Enabling OFF ALARM remains immediate; cancelling any restored confirmation does not issue the command.
+- Existing FFT unlock, sensor reset, rebaseline, and manual lubrication confirmations were already present.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Equipment Statistics Remount Fix (2026-08-13)
+- Fixed the route/remount race when changing an Equipment tab or PDM button: navigation now resolves before `detailsComponentKey` is incremented.
+- Replaced competing Statistics page initializers with a single immediate watcher over the relevant route params.
+- Sensor requests carry a load generation; late responses from the old route or an unmounted instance are discarded and cannot corrupt `sensorsReadyCount`/`sensorData`.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Work Stations Section Migration (2026-08-13)
+- Added the missing Vue3 Work Stations list, modal create/edit form, and standalone item page component.
+- Registered the `WorkStations` entity contract for `/plants/work-stations` with its dedicated permissions and restored the Vue2 `work_stations_filters` key in the Pinia store.
+- The existing `/work-stations` route and sidebar entry now resolve; the CRUD interaction remains modal-based to match Vue2.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest MultiView Chart Event Handling Fix (2026-08-13)
+- `MultiViewStatisticsPage.vue` now terminates its informational chart-ready and chart-load events locally.
+- This removes the `handleChartContainerReady` / `chartLoadEvent` missing-method warnings from the parent Equipment Details event handler while keeping thresholds, preview, and other event forwarding intact.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Vue2 Authentication/API/OneChart Delta Sync (2026-08-13)
+- Audited the five current `vue2_project` changes and migrated every functional delta relevant to Vue3.
+- Login now uses the new dev/prod SSO endpoints, and the shared Axios setup maps the new frontend origins to their API origins while still prioritizing `VITE_API_BASE_URL`.
+- OAuth URL changes and the OneChart `50` bottom margin were already present; commented diagnostic logging was intentionally not copied.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

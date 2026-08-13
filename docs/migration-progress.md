@@ -922,3 +922,26 @@ await fetchUsers({ page: 1 });
   - Normalized the persisted Metric/Imperial value to a numeric enum id before initial rendering
   - Moved reusable out-of-plot flag hover binding to the chart base and enabled it for MultiViewChart render events
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Sensors destructive-action confirm parity fix (2026-08-13)
+  - Restored confirmation for ultrasound frequency reset, lube-cycle reset, gain adjustment, and OFF ALARM disable
+  - Preserved the Vue2 behavior where OFF ALARM enable is immediate and confirmation cancellation performs no action
+  - Confirmed existing FFT unlock, sensor reset, rebaseline, and manual lubrication confirmation flows
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Equipment Statistics remount race fix (2026-08-13)
+  - Awaited route navigation before forced RouterView remount for equipment tabs and PDM buttons
+  - Consolidated Statistics initialization and ignored stale sensor responses with a load-generation guard
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Work Stations section migration (2026-08-13)
+  - Migrated Work Stations list, modal create/edit form, and standalone item page component
+  - Added the `WorkStations` entity contract and restored the legacy `work_stations_filters` storage key
+  - The existing `/work-stations` route/sidebar entry now resolves and CRUD uses `/plants/work-stations` with dedicated Work Stations permissions
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] MultiView chart event handling fix (2026-08-13)
+  - Consumed the informational `handleChartContainerReady` and `chartLoadEvent` events inside `MultiViewStatisticsPage.vue`
+  - Prevented false missing-method warnings in Equipment Details while preserving all other event forwarding
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Vue2 authentication/API/OneChart delta sync (2026-08-13)
+  - Migrated the new Login SSO endpoints and shared origin-to-API mapping
+  - Confirmed that OAuth endpoints and the OneChart full-height bottom margin were already synchronized
+  - Skipped only commented diagnostic logging; no functional or unmigrated-file delta was skipped
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

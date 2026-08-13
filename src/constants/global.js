@@ -734,6 +734,9 @@ const sensorTypesList1 = {
 			// icons: ['ultrasound'],
 			// isUltrasound: true,
 			// chartSettingsKey: 'banner_sdt_decibell',
+			isUltrasound: true,
+			isUltrasoundFullSpectrum: true,
+			chartSettingsKey: 'ultrasound',
 			filters_group: 'ultrasound',
 			group_technology: 'constants.ultrasound'
 		},
@@ -814,6 +817,9 @@ const sensorTypesList1 = {
 			// icons: ['ultrasound'],
 			// isUltrasound: true,
 			// chartSettingsKey: 'banner_sdt_decibell',
+			isUltrasound: true,
+			isUltrasoundFullSpectrum: true,
+			chartSettingsKey: 'ultrasound',
 			filters_group: 'ultrasound',
 			group_technology: 'constants.ultrasound'
 		},
