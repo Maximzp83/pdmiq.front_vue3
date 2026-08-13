@@ -46,6 +46,7 @@ const props = defineProps({
 const emit = defineEmits(['forceRerender']);
 
 const route = useRoute();
+const router = useRouter();
 
 const currentSensorTypeData = computed(
 	() => (props.isSensor || props.isManualRoute ? props.itemData : null)
