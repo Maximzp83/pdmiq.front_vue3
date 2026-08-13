@@ -123,14 +123,17 @@ export const useAuthStore = defineStore('authStore', {
 		 */
 		sign_in(data) {
 			this.isLoading = true;
+			const { Notify } = useNotify();
 
 			return api_request.post('/auth/login', {
 				data,
-				resultMessage: Lang.tt('phrases.Successfully_logged_in'),
+				notNotify: true,
+				// resultMessage: Lang.tt('phrases.Successfully_logged_in'),
 			}).then(({value}) => {
 				// console.log(value)
 				// Handle MFA verification status
 				if (value.status === 'verification') {
+					this.isLoading = false;					
 					return value;
 				}
 
@@ -144,6 +147,14 @@ export const useAuthStore = defineStore('authStore', {
 					}
 				}
 				this.isLoading = false;
+
+				Notify({
+					type: 'success',
+					title: '',
+					message: Lang.tt('phrases.Successfully_logged_in'),
+					duration: 2000,
+				});
+
 				return value;
 			}).catch(error => {
 				this.isLoading = false;
