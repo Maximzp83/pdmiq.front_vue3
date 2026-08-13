@@ -180,3 +180,11 @@
 - These events have no page-level operation in the Vue2 implementation; handling them locally prevents them from reaching `Equipments/Details/DetailsPage.vue`, whose non-forwarding event handler correctly warned about unknown methods.
 - Other MultiView events continue to be processed locally or forwarded to the parent as before.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Vue2 Authentication/API/OneChart Delta Sync (2026-08-13)
+- Audited all five current dirty files under `vue2_project`; every functional change targets an already migrated Vue3 component or shared API infrastructure.
+- Updated `src/components/pages/Login.vue` to use the new Industrial Matrix dev/prod SSO endpoints; its OAuth API endpoints were already synchronized.
+- Updated `src/api/index.js` with the new origin-to-API mapping while preserving `VITE_API_BASE_URL` priority and the existing Vue3 fallback.
+- `src/views/Sensors/OneChartPage.vue` already used the new full-height chart bottom margin of `50`; no duplicate edit was needed.
+- Skipped only commented diagnostic `console.log` changes in the legacy API wrapper/actions; no functional change or unmigrated file was skipped.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

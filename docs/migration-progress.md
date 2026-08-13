@@ -903,3 +903,8 @@ await fetchUsers({ page: 1 });
   - Consumed the informational `handleChartContainerReady` and `chartLoadEvent` events inside `MultiViewStatisticsPage.vue`
   - Prevented false missing-method warnings in Equipment Details while preserving all other event forwarding
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Vue2 authentication/API/OneChart delta sync (2026-08-13)
+  - Migrated the new Login SSO endpoints and shared origin-to-API mapping
+  - Confirmed that OAuth endpoints and the OneChart full-height bottom margin were already synchronized
+  - Skipped only commented diagnostic logging; no functional or unmigrated-file delta was skipped
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

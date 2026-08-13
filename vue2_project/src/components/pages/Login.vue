@@ -200,10 +200,10 @@ export default {
 			}
 
 			if (window.location.origin === 'https://app.industrialmatrix.com') {
-				return 'https://api.pdmmatrix.assetmatrix.com/api';
+				return 'https://api.industrialmatrix.tools/api';
 			} 
 
-			return 'https://api.testmatrix.assetmatrix.com/api';
+			return 'https://api.industrialmatrix-dev.tools/api';
 		},
 
 		googleAuthUrl() {
@@ -216,9 +216,9 @@ export default {
 
 		ssoLink() {
 			if (window.location.origin === 'https://testmatrix.assetmatrix.com') {
-				return 'https://api.testmatrix.assetmatrix.com/api/saml2/eeb51ba5-9f56-4ff2-9c46-2ea7e23b40b5/login';
+				return 'https://api.industrialmatrix-dev.tools/api/saml2/eeb51ba5-9f56-4ff2-9c46-2ea7e23b40b5/login';
 			} else if (window.location.origin === 'https://app.industrialmatrix.com') {
-				return 'https://api.pdmmatrix.assetmatrix.com/api/saml2/6eebf9df-d90c-460a-9a4c-5cdc3e36bb38/login';
+				return 'https://api.industrialmatrix.tools/api/saml2/6eebf9df-d90c-460a-9a4c-5cdc3e36bb38/login';
 			}
 
 			return '';

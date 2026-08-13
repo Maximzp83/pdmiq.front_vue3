@@ -136,7 +136,7 @@ export default {
 			const pageHeight = window.innerHeight;
 			// console.log(pageHeight)
 			const height = this.chartsToDisplay ? pageHeight : 250;
-			const marginBottom = this.chartsToDisplay ? 20 : 40;
+			const marginBottom = this.chartsToDisplay ? 50 : 40;
 			const animation = !this.chartsToDisplay;
 
 			return  Object.freeze({

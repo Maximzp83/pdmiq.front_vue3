@@ -455,3 +455,9 @@ Primary rules source:
 - `MultiViewStatisticsPage.vue` now terminates its informational chart-ready and chart-load events locally.
 - This removes the `handleChartContainerReady` / `chartLoadEvent` missing-method warnings from the parent Equipment Details event handler while keeping thresholds, preview, and other event forwarding intact.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Vue2 Authentication/API/OneChart Delta Sync (2026-08-13)
+- Audited the five current `vue2_project` changes and migrated every functional delta relevant to Vue3.
+- Login now uses the new dev/prod SSO endpoints, and the shared Axios setup maps the new frontend origins to their API origins while still prioritizing `VITE_API_BASE_URL`.
+- OAuth URL changes and the OneChart `50` bottom margin were already present; commented diagnostic logging was intentionally not copied.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

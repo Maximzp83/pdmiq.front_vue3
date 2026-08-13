@@ -7,8 +7,8 @@ import axios from 'axios';
 const DEFAULT_DEV_API_URL = 'https://api.industrialmatrix.tools/api';
 
 const HOST_API_URL_MAP = {
-	'https://testmatrix.assetmatrix.com': 'https://api.testmatrix.assetmatrix.com/api',
-	'https://app.industrialmatrix.com': 'https://api.pdmmatrix.assetmatrix.com/api',
+	'https://industrialmatrix-dev.tools': 'https://api.industrialmatrix-dev.tools/api',
+	'https://app.industrialmatrix.com': 'https://api.industrialmatrix.tools/api',
 	'https://newcharts.industrialmatrix.com':	'https://api.pdmmatrix.assetmatrix.com/api'
 };
 

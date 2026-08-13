@@ -4,6 +4,14 @@ import { useAuthStore } from '@/stores/AuthStore';
 import { useNotify } from '@/composables/useNotify';
 import { Lang } from '@/localization';
 
+const DEFAULT_API_URL = 'https://api.industrialmatrix.tools/api';
+
+const HOST_API_URL_MAP = {
+	'https://industrialmatrix-dev.tools': 'https://api.industrialmatrix-dev.tools/api',
+	'https://app.industrialmatrix.com': 'https://api.industrialmatrix.tools/api',
+	'https://newcharts.industrialmatrix.com': 'https://api.pdmmatrix.assetmatrix.com/api',
+};
+
 /**
  * Get base API URL from environment or use default
  */
@@ -11,9 +19,12 @@ export const getBaseURL = () => {
 	if (import.meta.env.VITE_API_BASE_URL) {
 		return import.meta.env.VITE_API_BASE_URL;
 	}
-	// return 'https://api.industrialmatrix-dev.tools/api';
-	// return 'https://api.industrialmatrix-stage.tools/api';
-	return 'https://api.industrialmatrix.tools/api';
+
+	if (typeof window !== 'undefined' && HOST_API_URL_MAP[window.location.origin]) {
+		return HOST_API_URL_MAP[window.location.origin];
+	}
+
+	return DEFAULT_API_URL;
 };
 
 /**
