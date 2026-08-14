@@ -767,6 +767,11 @@ const updateSensor = ({ id, sensor }) => {
 		dropdownFilterbarUpdated.value += 1;
 	}
 };
+const handleUltrasoundWebSocketSuccess = (lubeShotData) => {
+	chartsListWrapperRefs.value.filter(Boolean).forEach((ref) => {
+		ref.handleUltrasoundWebSocketSuccess?.(lubeShotData);
+	});
+};
 const updateEquipment = (equipment) => {
 	if (!equipment?.id) return;
 
@@ -1102,6 +1107,8 @@ const { handleEvent } = useEventHandler({
 	handleDaterange,
 	toggleFilterbar,
 	updateSensor,
+	update_sensor: updateSensor,
+	handleUltrasoundWebSocketSuccess,
 	updateEquipment,
 	togglePreviewModal,
 	initSensors,

@@ -858,7 +858,7 @@ const routes = [
 					conditionSettings: {
 						checkMethod: 'some',
 						conditions: [
-							{ array_method: 'some', prop: 'role.type', control_value: [1] },
+							{ array_method: 'some', prop: 'type', control_value: [1] }, // 1 - USER_ROLES_TYPES.INDUSTRIAL_MATRIX
 							{ prop: 'role.is_requisitioner', control_value: true },
 							{ prop: 'role.is_fab_shop_manager', control_value: true },
 							{ prop: 'role.is_technic', control_value: true },

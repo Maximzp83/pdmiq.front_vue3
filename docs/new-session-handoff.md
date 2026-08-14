@@ -461,3 +461,15 @@ Primary rules source:
 - Login now uses the new dev/prod SSO endpoints, and the shared Axios setup maps the new frontend origins to their API origins while still prioritizing `VITE_API_BASE_URL`.
 - OAuth URL changes and the OneChart `50` bottom margin were already present; commented diagnostic logging was intentionally not copied.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Equipment Card Sensor Actions Migration (2026-08-14)
+- Restored the Vue2 CardSensorItem action ownership in `Equipments/ItemsList.vue`: lube/grease reset, FFT unlock, shots counter, and runtime reset now have working handlers with confirmations and refetch/update behavior.
+- Added the missing Vue3 `ShotsCounterForm.vue` and reconnected its Element Plus dialog and PUT endpoint.
+- The existing Compare handler remains active, and a static audit found no unresolved actionable names in CardSensorItem configs.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Ultrasound Filter Action Chains Fix (2026-08-14)
+- Restored full Vue2 parity for Gain, History, High Speed, Purge Mode, and Trigger Lube Cycle in `UltrasoundFilterBlock.vue`.
+- Fixed the lube-cycle id and WebSocket sequence, preserved command metadata, normalized lube-shot payloads, and restored the original confirmation/retry behavior.
+- `StatisticsPage.vue` now owns the emitted sensor refresh and live chart-update events, completing both previously broken parent chains.
+- Targeted ESLint, static action/event audit, `git diff --check`, and the Node 24 production Vite build pass.
