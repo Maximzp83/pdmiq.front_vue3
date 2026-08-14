@@ -945,3 +945,13 @@ await fetchUsers({ page: 1 });
   - Confirmed that OAuth endpoints and the OneChart full-height bottom margin were already synchronized
   - Skipped only commented diagnostic logging; no functional or unmigrated-file delta was skipped
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Equipment card sensor actions migration (2026-08-14)
+  - Restored `unblockLube`, `handleUnlockFFT`, `handleChangeShotsCount`, and `resetSensorRuntime` in the owning Equipment ItemsList event handler
+  - Migrated `ShotsCounterForm.vue` and its modal/update flow; retained the existing Compare handler
+  - Confirmed every actionable CardSensorItem config resolves through the nested event chain
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Ultrasound filter action-chain parity fix (2026-08-14)
+  - Restored the complete Gain, History, High Speed, Purge Mode, and Trigger Lube Cycle flows from Vue2
+  - Corrected lube-cycle WebSocket setup, command metadata, result handling, shot-data normalization, retry behavior, and cleanup
+  - Connected `update_sensor` and live lube-shot chart updates at the owning Statistics page
+  - Targeted ESLint, static action/event audit, `git diff --check`, and production Vite build passed on Node 24

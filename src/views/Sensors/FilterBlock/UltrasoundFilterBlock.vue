@@ -42,7 +42,7 @@
 				<div class="article-title content-row">
 					{{ tt('phrases.Do_you_really_want_to') }}
 					<b>{{ `${tt('start')} ${tt('lubrication')} ${tt('cycle')}` }}</b>
-					?
+					{{ lubeCycleConfirmPostfix }}
 				</div>
 			</div>
 
@@ -90,6 +90,7 @@ import { computed, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
+import { LANGUAGE_TYPES } from '@/localization/utils';
 import { ADJUSTMENT_ACTIONS_TYPES, ULTRASOUND_SENSOR_TYPES } from '@/constants/ultrasound';
 import { DXM_COMMANDS_REQUEST_STATUSES } from '@/constants/global';
 import { useActionButtons } from '@/composables/mixins/useActionButtons';
@@ -143,36 +144,85 @@ const socketChannelDXMCommandRequest = computed(() =>
 	authStore.authUser?.uuid ? `user.${authStore.authUser.uuid}` : '',
 );
 const isSensorOnly = computed(() => props.sensorData.functionality_type === ULTRASOUND_SENSOR_TYPES.SENSOR_ONLY);
+const lubeCycleConfirmPostfix = computed(() =>
+	Lang.currentLangId === LANGUAGE_TYPES.ENGLISH ? ' Action? Continue?' : '?',
+);
 const actionButtons = computed(() => {
 	const buttons = [];
 
 	if (!props.enableLubeTriggerButtonOnly) {
+		if (authStore.hasAccessTo(['edit_dashboard'])) {
+			buttons.push(
+				{
+					id: 13,
+					text: `${tt('Gain')} +`,
+					method: 'toggleGainAdjustment',
+					args: ADJUSTMENT_ACTIONS_TYPES.INCREASE,
+					loadingProp: 'adjustmentLoading',
+					className: 'inverted report-button',
+				},
+				{
+					id: 14,
+					text: `${tt('Gain')} -`,
+					method: 'toggleGainAdjustment',
+					args: ADJUSTMENT_ACTIONS_TYPES.DECREASE,
+					loadingProp: 'adjustmentLoading',
+					className: 'inverted report-button',
+				},
+			);
+		}
+
 		buttons.push(
 			{
-				id: 13,
-				text: `${tt('Gain')} +`,
-				method: 'toggleGainAdjustment',
-				args: ADJUSTMENT_ACTIONS_TYPES.INCREASE,
-				loadingProp: 'adjustmentLoading',
-				className: 'inverted report-button',
+				id: 3,
+				text: `${tt('Toggle')} ${tt('History')}`,
+				event: 'toggleHistory',
 			},
 			{
-				id: 14,
-				text: `${tt('Gain')} -`,
-				method: 'toggleGainAdjustment',
-				args: ADJUSTMENT_ACTIONS_TYPES.DECREASE,
-				loadingProp: 'adjustmentLoading',
-				className: 'inverted report-button',
+				id: 4,
+				text: `${tt('High_speed')} ${tt('On')}`,
+				method: 'toggleHighSpeed',
+				args: true,
+			},
+			{
+				id: 5,
+				text: `${tt('High_speed')} ${tt('Off')}`,
+				method: 'toggleHighSpeed',
+				args: false,
 			},
 		);
-	}
 
-	if (!isSensorOnly.value || props.enableLubeTriggerButtonOnly) {
+		if (
+			(props.currentSensorType.isUltrasound || props.isLubeMatrixV3) &&
+			!isSensorOnly.value
+		) {
+			buttons.push(
+				{
+					id: 1,
+					text: `${tt('Purge_Mode')} ${tt('On')}`,
+					method: 'togglePurgeMode',
+					args: true,
+					loadingProp: 'purgeLoading',
+				},
+				{
+					id: 2,
+					text: `${tt('Purge_Mode')} ${tt('Off')}`,
+					method: 'togglePurgeMode',
+					args: false,
+				},
+				{
+					id: 6,
+					text: `${tt('Trigger')} ${tt('Lube_Cycle')}`,
+					method: 'handleLubeCycle',
+					loadingProp: 'purgeLoading',
+				},
+			);
+		}
+	} else {
 		buttons.push({
-			id: 15,
+			id: 6,
 			text: `${tt('Trigger')} ${tt('Lube_Cycle')}`,
-			method: 'openLubeCycleDialog',
-			className: 'report-button',
+			method: 'handleLubeCycle',
 			loadingProp: 'purgeLoading',
 		});
 	}
@@ -219,7 +269,31 @@ const toggleGainAdjustment = (action) => {
 		});
 };
 
-const openLubeCycleDialog = () => {
+const toggleHighSpeed = (enabled) => {
+	if (!sensorId.value) return;
+	const action = enabled ? 'start' : 'stop';
+
+	confirmHelper({
+		insertToMessage: `<b>${tt(action)} ${tt('High_speed')}</b>`,
+	})
+		.then(() => toggleUltrasoundCommand({
+			url: `/ultrasound/commands/${sensorId.value}/${action}/high-speed`,
+			resultMessage: {
+				text: `${tt('High_speed')} ${tt('has')} ${
+					enabled ? tt('started') : tt('stopped')
+				}`,
+			},
+		}))
+		.then(() => {
+			event('update_sensor', {
+				id: sensorId.value,
+				sensor: { ...props.sensorData, lube_cycle_high_speed: enabled },
+			});
+		})
+		.catch(() => {});
+};
+
+const handleLubeCycle = () => {
 	initiatedLubeCycleDialog.value = true;
 	lubeCycleRequestDialogOpen.value = true;
 	lubeCycleRequestResult.value = null;
@@ -235,29 +309,27 @@ const handleLubeCycleSocketFinish = (result) => {
 const dxmCommandSocketCallback = (payload, eventType) => {
 	const socketMessage = eventType ? { type: eventType, data: payload } : payload || {};
 	const { type, data = {} } = socketMessage;
+	const safeData = data.data || data || {};
 
 	if (type === 'LUBRICATION.SHOT') {
-		if (data.id !== undefined && data.id !== null) {
-			lubeShotDataFromSocket.value = {
-				...lubeShotDataFromSocket.value,
-				[data.id]: data,
-			};
+		if (
+			safeData.id !== undefined &&
+			safeData.id !== null &&
+			String(safeData.id) === String(lubeShotId.value)
+		) {
+			lubeShotDataFromSocket.value = safeData;
 		}
 		return;
 	}
 
-	const safeData = data.data || data || {};
 	const shotMatches = String(safeData.lube_shot_id) === String(lubeShotId.value);
 	const status = String(safeData.status);
 
 	if (type === 'DXM.COMMAND' && safeData.controller_id === props.sensorData.controller_id) {
-		if (
-			status === String(DXM_COMMANDS_REQUEST_STATUSES.SUCCESS) &&
-			shotMatches &&
-			safeData.type === 3
-		) {
-			const lubeShotData = lubeShotDataFromSocket.value[safeData.lube_shot_id];
-			event('handleUltrasoundWebSocketSuccess', lubeShotData);
+		if (status === String(DXM_COMMANDS_REQUEST_STATUSES.SUCCESS)) {
+			if (shotMatches && safeData.type === 3) {
+				event('handleUltrasoundWebSocketSuccess', lubeShotDataFromSocket.value);
+			}
 			handleLubeCycleSocketFinish({
 				isSuccess: true,
 				message: `DXM ${tt('requesting')} ${tt('Successfull')}`,
@@ -271,7 +343,7 @@ const dxmCommandSocketCallback = (payload, eventType) => {
 		return;
 	}
 
-	if (type === 3 && String(data.lube_shot_id) === String(lubeShotId.value)) {
+	if (String(type) === '3' && String(data.lube_shot_id) === String(lubeShotId.value)) {
 		event('handleUltrasoundWebSocketSuccess', data);
 		handleLubeCycleSocketFinish({
 			isSuccess: true,
@@ -280,27 +352,36 @@ const dxmCommandSocketCallback = (payload, eventType) => {
 	}
 };
 
-const sendRequestDXMCommand = ({ url }) => {
+const sendRequestDXMCommand = (payload, settings = {}) => {
 	sendingDXMCommandRequest.value = true;
 	processingDXMCommandRequest.value = true;
 
-	return toggleUltrasoundCommand({ url })
+	return toggleUltrasoundCommand(payload)
 		.then((response) => {
 			const responseData = response?.data || response || {};
 			const value = responseData.value || response?.value || responseData.data || {};
 
-			lubeShotId.value = value?.id ?? responseData.id ?? null;
-			lubeShotDataFromSocket.value =
-				value && typeof value === 'object' ? value : {};
+			if (settings.isLubeShotRequest) {
+				lubeShotId.value = value?.id ?? responseData.id ?? null;
+				lubeShotDataFromSocket.value =
+					value && typeof value === 'object' ? value : {};
+			}
 
 			if (responseData.status === false) {
 				throw new Error(responseData.message || tt('Error'));
 			}
 		})
 		.catch((error) => {
+			const responseData = error?.response?.data || error?.data || error || {};
+			const message = responseData.status || responseData.message || error?.message || tt('Error');
+			Notify({
+				type: 'error',
+				title: tt('Error'),
+				message,
+			});
 			handleLubeCycleSocketFinish({
 				isSuccess: false,
-				message: error?.message || tt('Error'),
+				message,
 			});
 		})
 		.finally(() => {
@@ -308,7 +389,7 @@ const sendRequestDXMCommand = ({ url }) => {
 		});
 };
 
-const initiateSetupWebSocket = (payload) => {
+const initiateSetupWebSocket = (payload, settings = {}) => {
 	processingDXMCommandRequest.value = true;
 
 	const socket = setupWebSocket({
@@ -316,7 +397,7 @@ const initiateSetupWebSocket = (payload) => {
 		socketReadyRef: dxmCommandSocketReady,
 		socketChannel: socketChannelDXMCommandRequest.value,
 		onMessage: dxmCommandSocketCallback,
-		subscriptionSuccededCallback: () => sendRequestDXMCommand(payload),
+		subscriptionSuccededCallback: () => sendRequestDXMCommand(payload, settings),
 	});
 
 	if (!socket) {
@@ -328,24 +409,52 @@ const initiateSetupWebSocket = (payload) => {
 };
 
 const triggerLubeCycle = () => {
-	if (!props.sensorData.trigger_lube_cycle_url) return;
-
 	lubeShotId.value = null;
 	lubeShotDataFromSocket.value = {};
 	lubeCycleRequestResult.value = null;
-	initiateSetupWebSocket({ url: props.sensorData.trigger_lube_cycle_url });
+
+	const payload = {
+		url: `/ultrasound/commands/${sensorId.value}/start/lubrication`,
+		resultMessage: { text: tt(`phrases.manual_lubrication_command_sent`) },
+	};
+
+	initiateSetupWebSocket(payload, { isLubeShotRequest: true });
 };
 
-const handleLubeCycleResult = (result) => {
-	if (result.isSuccess) {
+const togglePurgeMode = (enabled) => {
+	if (!sensorId.value) return;
+	const action = enabled ? 'start' : 'stop';
+	lubeShotId.value = null;
+
+	confirmHelper({
+		insertToMessage: `<b>${tt(action)} ${tt('lubrication')}</b>`,
+	})
+		.then(() => {
+			initiateSetupWebSocket({
+				url: `/ultrasound/commands/${sensorId.value}/${action}/lubrication${
+					enabled ? '?autoStop=0' : ''
+				}`,
+				resultMessage: {
+					text: `${tt('phrases.Purge_Mode_is')} ${enabled ? tt('On') : tt('Off')}`,
+				},
+			});
+		})
+		.catch(() => {});
+};
+
+const handleLubeCycleResult = ({ isSuccess }) => {
+	if (isSuccess) {
 		lubeCycleRequestDialogOpen.value = false;
-	} else {
-		triggerLubeCycle();
 	}
+	setTimeout(() => {
+		lubeCycleRequestResult.value = null;
+	}, 200);
 };
 
 const { callMethod } = useCallMethod({
 	toggleGainAdjustment,
-	openLubeCycleDialog,
+	toggleHighSpeed,
+	togglePurgeMode,
+	handleLubeCycle,
 });
 </script>

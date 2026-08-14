@@ -205,6 +205,39 @@ const menuItems1 = [
 			}
 		]*/
 	},
+
+	{
+		name: 'Requisition',
+		belongs_to_label: 'cmms',
+		id: MENU_TYPES.REQUISITIONS,
+		icon: 'icon-requisitions',
+		path: '/requisitions',
+		meta: {
+			permissions: ['view_requisitions'],
+			conditionSettings: {
+				checkMethod: 'some',
+				conditions: [
+					{
+						array_method: 'some',
+						checkMethod_next: 'some',
+						prop: 'role.type',
+						control_value: [USER_ROLES_TYPES.CUSTOMER],
+						next_conditions: [
+							{
+								prop: 'role.is_technic',
+								control_value: true
+							},
+							{
+								prop: 'role.is_requisitioner',
+								control_value: true
+							}
+							// { prop: 'work_order_role', control_value: WORK_ORDER_ROLES.REQUISITIONER }
+						]
+					}
+				]
+			}
+		}
+	},
 	{
 		name: 'Requisitions',
 		belongs_to_label: 'cmms',

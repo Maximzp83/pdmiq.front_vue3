@@ -45,6 +45,22 @@
 				/>
 			</div>
 		</div>
+
+		<el-dialog
+			v-model="showShotsCounterDialog"
+			center
+			:title="tt('phrases.cycles_counter')"
+			:append-to-body="true"
+			class="small report-item-dialog"
+		>
+			<ShotsCounterForm
+				v-if="showShotsCounterDialog && shotsCounterData"
+				:shotsCounterData="shotsCounterData"
+				:visible="showShotsCounterDialog"
+				@closeDialog="showShotsCounterDialog = false"
+				@success="shotsCounterUpdated"
+			/>
+		</el-dialog>
 	</div>
 </template>
 
@@ -53,7 +69,11 @@ import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
-import { SUBJECT_TYPES } from '@/constants/global';
+import { FFT_LOCK_STATUSES, SUBJECT_TYPES } from '@/constants/global';
+import {
+	LUBE_CYCLE_STATUSES,
+	LUBE_PROCESSING_STATUSES,
+} from '@/constants/ultrasound';
 import { ITEMS_GRID_TYPES, standardTableOperations } from '@/constants/table';
 import { Lang } from '@/localization';
 import { getValues } from '@/helpers';
@@ -62,15 +82,19 @@ import { useEquipmentsStore } from '@/stores/EquipmentsStore';
 import { useGlobalStore } from '@/stores/GlobalStore';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useDashboardListsReorder } from '@/composables/mixins/useDashboardListsReorder';
 import { useDragNdropSortable } from '@/composables/mixins/useDragNdropSortable';
 import { useWebSocket } from '@/composables/mixins/useWebSocket';
+import { useNotify } from '@/composables/useNotify';
+import { useSensors } from '@/composables/useSensors';
 
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import ItemsGridContainer from '@/components/gridTable/ItemsGridContainer.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
+import ShotsCounterForm from './ShotsCounterForm.vue';
 
 const { tt, translate } = Lang;
 
@@ -104,6 +128,8 @@ const { changeRoute } = useNavigation();
 const itemsTableRef = ref(null);
 const isLoadingCards = ref(false);
 const stateSocketReady = ref(false);
+const showShotsCounterDialog = ref(false);
+const shotsCounterData = ref(null);
 const equipmentItemCardLoader = () => import('./Card/ItemCard.vue');
 const additionalDataForCards = computed(() =>
 	Object.freeze({
@@ -114,6 +140,13 @@ const socketChannel = computed(() =>
 	authStore.authUser ? `user.${authStore.authUser.uuid}` : null,
 );
 const { setupWebSocket, closeWebSocket, webSocketSend } = useWebSocket();
+const { confirmHelper } = useActionButtons({ emit });
+const { Notify } = useNotify();
+const {
+	resetSensorRuntime: resetSensorRuntimeAction,
+	toggleUltrasoundCommand,
+	unlockFft,
+} = useSensors();
 
 const {
 	itemsList,
@@ -394,6 +427,94 @@ const compareClick = ({ row }) => {
 
 	globalStore.set_compare_list(newList);
 };
+const unblockLube = ({ row } = {}) => {
+	if (!row?.id) return;
+
+	return confirmHelper({
+		insertToMessage: `<b>${tt('phrases.reset_cycle')}</b>`,
+	})
+		.then(() => {
+			const payload = {
+				url: `/ultrasound/commands/${row.id}/reset/cycle`,
+				resultMessage: { text: '' },
+			};
+
+			if (
+				row.lube_cycle_status === LUBE_CYCLE_STATUSES.BLOCKED ||
+				row.lube_shot_status === LUBE_PROCESSING_STATUSES.UNSUCCESSFUL ||
+				row.lube_shot_status === LUBE_PROCESSING_STATUSES.BLOCKED
+			) {
+				payload.url += '?resetLubeCycle=1';
+				payload.resultMessage.text = tt('phrases.lube_cycle_was_reset');
+			} else if (row.is_lubricator_empty) {
+				payload.url += '?resetSpentShots=1&resetLubeCycle=0';
+				payload.resultMessage.text = tt('phrases.spent_shots_was_reset');
+			} else {
+				payload.url += '?resetLubeCycle=0&resetSpentShots=1';
+				payload.resultMessage.text = tt('phrases.grease_pack_was_reset');
+			}
+
+			return toggleUltrasoundCommand(payload);
+		})
+		.then(() => refetchItemsList())
+		.catch(() => {});
+};
+
+const handleUnlockFFT = ({ row } = {}) => {
+	if (!row?.id) return;
+
+	return confirmHelper({
+		insertToMessage: `<b>${tt('unlock')} FFT</b>`,
+	})
+		.then(() => unlockFft({ sensorId: row.id, notNotify: true }))
+		.then(({ value }) => {
+			if (value?.status !== FFT_LOCK_STATUSES.UNLOCKED) return;
+
+			Notify({
+				type: 'success',
+				title: tt('constants.Success'),
+				message: tt('phrases.FFT_successfully_unlocked'),
+			});
+			return refetchItemsList();
+		})
+		.catch(() => {});
+};
+
+const handleChangeShotsCount = ({ row } = {}) => {
+	if (!row?.id) return;
+	shotsCounterData.value = row;
+	showShotsCounterDialog.value = true;
+};
+
+const shotsCounterUpdated = (sensor) => {
+	if (!sensor?.id) return;
+
+	itemsList.value = itemsList.value.map((equipment) => {
+		const sensors = equipment.dashboardSensors || [];
+		if (!sensors.some((item) => item.id === sensor.id)) return equipment;
+
+		return {
+			...equipment,
+			dashboardSensors: sensors.map((item) =>
+				item.id === sensor.id ? { ...item, ...sensor } : item,
+			),
+		};
+	});
+};
+
+const resetSensorRuntime = (sensorId) => {
+	if (!sensorId) return;
+
+	return confirmHelper({
+		insertToMessage: `<b>${tt('reset')} ${tt('runtime')}</b>`,
+	})
+		.then(() => resetSensorRuntimeAction({
+			sensorId,
+			resultMessage: { text: tt('phrases.runtime_was_reset') },
+		}))
+		.then(() => refetchItemsList())
+		.catch(() => {});
+};
 
 const { handleEvent } = useEventHandler({
 	setFilters,
@@ -403,7 +524,11 @@ const { handleEvent } = useEventHandler({
 	handleCreateWorkOrderButton,
 	handleShowDetails,
 	handleAddToFavorites,
+	unblockLube,
+	handleUnlockFFT,
 	compareClick,
+	handleChangeShotsCount,
+	resetSensorRuntime,
 }, emit, 'itemsList');
 
 watch(

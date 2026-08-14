@@ -241,3 +241,16 @@
 - `src/views/Sensors/OneChartPage.vue` already used the new full-height chart bottom margin of `50`; no duplicate edit was needed.
 - Skipped only commented diagnostic `console.log` changes in the legacy API wrapper/actions; no functional change or unmigrated file was skipped.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Equipment Card Sensor Actions Migration (2026-08-14)
+- Restored the Vue2 event ownership contract: `CardSensorItem` button events continue through `ItemCard`, and `src/views/Equipments/ItemsList.vue` now implements their terminal handlers.
+- Migrated confirmation/API/refetch flows for lube-cycle/grease-pack reset, FFT unlock, and runtime reset; the existing Compare action remains intact.
+- Migrated `src/views/Equipments/ShotsCounterForm.vue` and restored its dialog, PUT submit, and reactive sensor-card update flow.
+- Static event-name audit confirms every actionable `CardSensorItem` config now resolves to a handler; link-only and indicator-only configs require none.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Ultrasound Filter Action Chains Parity Fix (2026-08-14)
+- Fully restored the Vue2 action chains in `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue`: Gain, History, High Speed, Purge Mode, and Trigger Lube Cycle now have the original permissions, confirmations, requests, and state transitions.
+- Corrected the lube-cycle sensor id, WebSocket request settings/payload propagation, controller/status completion handling, lube-shot identification, nested message normalization, retry behavior, and socket cleanup.
+- `src/views/Sensors/StatisticsPage.vue` now consumes `update_sensor` and forwards live ultrasound WebSocket data to every mounted `ChartsListWrapper` instance.
+- Targeted ESLint, static action/event audit, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

@@ -114,13 +114,13 @@
 				</div>
 
 				<div class="mcol-xs-12">
-					<div class="mrow flex wrap">
+					<div class="mrow flex wrap bottom">
 						<div class="mcol-xs-12 mcol-sm-3">
 							<div class="el-form-item">
 								<div class="label">
 									{{ `${tt('phrases.Contractor_hourly_rate')} ($/${tt('hour')})` }}
 								</div>
-								<div class="el-form-item__content flex">
+								<div class="flex">
 									<el-input-number
 										v-model.number="contractorHourlyRateInput"
 										:controls="false"
@@ -135,7 +135,7 @@
 						<div class="mcol-xs-12 mcol-sm-3">
 							<div class="el-form-item">
 								<div class="label">{{ tt('phrases.Contractor_Markup') }} (%)</div>
-								<div class="el-form-item__content flex">
+								<div class="flex">
 									<el-input-number
 										v-model.number="contractorMarkupPercent"
 										:controls="false"

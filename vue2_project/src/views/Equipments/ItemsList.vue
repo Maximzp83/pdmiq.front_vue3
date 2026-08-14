@@ -554,7 +554,7 @@ export default {
 		},
 
 		unblockLube({ row }) {
-			// console.log(row)
+			console.log(row)
 			this.confirmHelper({
 				insertToMessage: `<b>${this.$t('phrases.reset_cycle')}</b>`
 			})
