@@ -201,3 +201,9 @@
 - Corrected the lube-cycle sensor id, WebSocket request settings/payload propagation, controller/status completion handling, lube-shot identification, nested message normalization, retry behavior, and socket cleanup.
 - `src/views/Sensors/StatisticsPage.vue` now consumes `update_sensor` and forwards live ultrasound WebSocket data to every mounted `ChartsListWrapper` instance.
 - Targeted ESLint, static action/event audit, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Sensor Live-Point Tooltip Fix And Highcharts 12 Follow-up (2026-08-17)
+- Live statistics transformations now preserve a `syncLiveChartSeries` setting through the shared chart transform callbacks.
+- After Vue applies the updated chart options, `ChartItemContainer.vue` synchronizes each real Highcharts series with the transformed factory data through `series.setData(..., updatePoints=false)` and performs one redraw.
+- A follow-up runtime reproduction showed that data synchronization alone was insufficient: Sensor charts combine a shared tooltip with the legacy `stickyTracking: false`, so a newly created Highcharts 12 point can miss the direct-touch tracker path. `SensorChartBase` now overrides `stickyTracking: true`, enabling series/KD-tree hover lookup for both existing and live points without changing non-Sensor chart families.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

@@ -918,3 +918,9 @@ await fetchUsers({ page: 1 });
   - Corrected lube-cycle WebSocket setup, command metadata, result handling, shot-data normalization, retry behavior, and cleanup
   - Connected `update_sensor` and live lube-shot chart updates at the owning Statistics page
   - Targeted ESLint, static action/event audit, `git diff --check`, and production Vite build passed on Node 24
+- [x] Sensor live-point tooltip runtime fix and Highcharts 12 follow-up (2026-08-17)
+  - Propagated the live-update marker through the shared chart transformation callbacks
+  - Synchronized transformed series with the rendered Highcharts instance after Vue updates, forcing fresh Point/tracker/KD-tree state
+  - Follow-up after runtime retest: enabled `stickyTracking` specifically for Sensor charts because Highcharts 12 shared-tooltip lookup could miss a newly created direct-touch point while the inherited legacy option remained `false`
+  - Preserved the existing zone-series classification, normal initial/refetch update path, and non-Sensor chart behavior
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

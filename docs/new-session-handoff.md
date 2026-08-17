@@ -473,3 +473,9 @@ Primary rules source:
 - Fixed the lube-cycle id and WebSocket sequence, preserved command metadata, normalized lube-shot payloads, and restored the original confirmation/retry behavior.
 - `StatisticsPage.vue` now owns the emitted sensor refresh and live chart-update events, completing both previously broken parent chains.
 - Targeted ESLint, static action/event audit, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Sensor Live-Point Tooltip Fix And Highcharts 12 Follow-up (2026-08-17)
+- The live-statistics path now carries a dedicated synchronization flag from `SensorChartsListFactory` through the shared transform callbacks.
+- `ChartItemContainer.vue` waits for Vue's chart-options update, then `SensorChart` replaces rendered series data through the Highcharts API and redraws once.
+- The first synchronization-only fix did not restore hover in the application. A follow-up isolated Highcharts 12 audit identified the remaining legacy combination of shared tooltip plus `stickyTracking: false`; Sensor charts now override it to `true`, so newly rendered live points are found through series/KD-tree hover lookup instead of depending only on direct point trackers.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

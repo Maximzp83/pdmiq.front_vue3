@@ -11,7 +11,8 @@ const getDefaultSocketEndpoint = () => {
 		return env.VITE_WEB_SOCKET_ENDPOINT || env.VUE_APP_WEB_SOCKET_ENDPOINT
 	}
 
-	return 'wss://ws.industrialmatrix-dev.tools/';
+	// return 'wss://ws.industrialmatrix-dev.tools/';
+	return 'wss://ws.industrialmatrix.tools/'
 
 	/*const host = typeof window !== 'undefined' ? window.location.hostname : ''
 	return host.includes('stage')

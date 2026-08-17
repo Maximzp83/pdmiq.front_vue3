@@ -51,9 +51,9 @@ if (import.meta.env.VITE_API_BASE_URL) {
 	) {
 		channelAuthEndpoint = 'https://api.industrialmatrix-dev.tools/api/broadcasting/auth';
 	} else {
-		channelAuthEndpoint = 'https://api.industrialmatrix-dev.tools/api/broadcasting/auth';
+		// channelAuthEndpoint = 'https://api.industrialmatrix-dev.tools/api/broadcasting/auth';
 		// channelAuthEndpoint = 'https://api.industrialmatrix-stage.tools/api/broadcasting/auth';
-		// channelAuthEndpoint = 'https://api.industrialmatrix.tools/api/broadcasting/auth';
+		channelAuthEndpoint = 'https://api.industrialmatrix.tools/api/broadcasting/auth';
 	}
 }
 // console.log('1 channelAuthEndpoint', '.env = ', `${(import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)}/broadcasting/`, 'result = ', channelAuthEndpoint);

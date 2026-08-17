@@ -99,6 +99,9 @@ class SensorChartBase extends ChartBase {
 			],
 			yAxis: [],
 			plotOptions: {
+			  series: {
+			    stickyTracking: true
+			  },
 			  column: {
 			    // pointPlacement: 'on'
 			    grouping: false,
@@ -1108,7 +1111,7 @@ class SensorChart extends SensorChartBase {
 		this.bindFlagsTooltip(target);
 	}
 
-	localHandleStatisticsTransformUpdated(resultData) {
+	localHandleStatisticsTransformUpdated(resultData, settings = {}) {
 		if (this.generateSeriesByStatistics) {
 			let updatedSeriesConfig = this.seriesConfig;
 
@@ -1156,8 +1159,27 @@ class SensorChart extends SensorChartBase {
 			// console.log('this.options.series', this.options.series[2])
 		// this.options.series = this.options.series.filter(si => si.data && si.data.length);
 		// --------------
-		this.emitChartOptionsReady();
+		this.emitChartOptionsReady(settings);
 		this.mainSeriesReady = true;
+	}
+
+	syncLiveChartSeries() {
+		if (!this.ChartAPI || !this.ChartAPI.series) return;
+
+		let shouldRedraw = false;
+		this.options.series.forEach(serieOptions => {
+			if (!serieOptions.id || !Array.isArray(serieOptions.data)) return;
+
+			const chartSerie = this.ChartAPI.get(serieOptions.id);
+			if (!chartSerie || typeof chartSerie.setData !== 'function') return;
+
+			chartSerie.setData(cloneDeep(serieOptions.data), false, false, false);
+			shouldRedraw = true;
+		});
+
+		if (shouldRedraw) {
+			this.ChartAPI.redraw(false);
+		}
 	}
 
 	modifySeriesConfigByHistory({ statistics, seriesConfig }) {

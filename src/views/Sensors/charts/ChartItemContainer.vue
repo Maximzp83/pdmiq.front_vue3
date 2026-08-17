@@ -192,7 +192,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { Lang } from '@/localization';
@@ -491,6 +491,9 @@ const chartInstanceEventsList = computed(() => {
 	const handleChartOptionsUpdate = (options, settings = {}) => {
 		chartOptionsUpdateSettings.value = settings || {};
 		chartOptionsUpdate.value += 1;
+		if (settings.syncLiveChartSeries) {
+			nextTick(() => props.ChartInstance.syncLiveChartSeries?.());
+		}
 	};
 	const list = {
 		chartIsHidden: () => { chartToggled.value += 1; },
