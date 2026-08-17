@@ -37,8 +37,8 @@
 
 let channelAuthEndpoint = '';
 
-if ((import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)) {
-	channelAuthEndpoint = `${(import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)}/broadcasting/auth`;
+if (import.meta.env.VITE_API_BASE_URL) {
+	channelAuthEndpoint = `${import.meta.env.VITE_API_BASE_URL}/broadcasting/auth`;
 } else {
 	if (
 		window.location.origin === 'https://testmatrix.assetmatrix.com'

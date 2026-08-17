@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, ref, watch, onBeforeMount } from 'vue';
 import { storeToRefs } from 'pinia';
 
 import { api_request } from '@/api/request_provider';
@@ -122,6 +122,10 @@ import RadioButtonsBlock from '@/components/form/RadioButtonsBlock.vue';
 import CardSensorItem from './CardSensorItem.vue';
 import CardMultiViewItem from './CardMultiViewItem.vue';
 import TypeOptionBlock from './TypeOptionBlock.vue';
+
+import { useSensorType } from '@/composables/mixins/useSensorType';
+
+const { getType } = useSensorType();
 
 const { translate } = Lang;
 
@@ -288,5 +292,38 @@ watch(
 	},
 	{ immediate: true, flush: 'post' },
 );
+
+onBeforeMount(() => {
+	if (dashboardSensors.value.length) {
+		/*if (dashboardSensors.value.some(sensor=>{
+			const type = getType(sensor);
+			return type.isBannerM25
+		})) {
+			console.log('isBannerM25', props.cardData.machine_name, props.cardData.asset_name);
+		}*/
+
+		/*if (dashboardSensors.value.some(sensor=>{
+			const type = getType(sensor);
+			return type.isBannerV2Generic
+		})) {
+			console.log('isBannerV2Generic', props.cardData.machine_name, props.cardData.asset_name);
+		}*/
+
+		/*if (dashboardSensors.value.some(sensor=>{
+			const type = getType(sensor);
+			return type.isBannerTempVibe2;
+		})) {
+			console.log('isBannerTempVibe2', props.cardData.machine_name, props.cardData.asset_name);
+		}*/
+
+		/*if (dashboardSensors.value.some(sensor=>{
+			// const type = getType(sensor);
+			return sensor.lube_version === 3
+		})) {
+			console.log('isLubeMatrixV3', props.cardData.machine_name, props.cardData.asset_name);
+		}*/
+	}
+
+});
 
 </script>
