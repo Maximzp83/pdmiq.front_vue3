@@ -1555,7 +1555,7 @@ const standard_datetime1 = payload => {
 		// console.log(anomalyRanges)
 		for (let i = 0; i < filteredStatistics.length; i++) {
 			// if (i % 2 === 0) {
-				const { t } = filteredStatistics[i];
+				const { t, signal_date_at } = filteredStatistics[i];
 				const x = getPointX_ms(
 					filteredStatistics[i][xKey] || getStatisticsItemParams(filteredStatistics[i]).x
 				);
@@ -1624,7 +1624,7 @@ const standard_datetime1 = payload => {
 				}
 
 				if (!presentInSomeZone) {
-					newData.base.push([x, y, t]);
+					newData.base.push([x, y, t || signal_date_at]);
 				}
 
 				// pointsSum += y;

@@ -1,5 +1,6 @@
 <template>
 	<div>
+		<button @click="testLiveUpdate">test</button>
 		<div class="charts-data-container">
 			<ChartsPreloader
 				:showMock="!chartsListWrapperLoading && chartsListWrapperReady && !hasStatistics"
@@ -446,11 +447,33 @@ const setupSocket = () => {
 	}
 };
 
+const testLiveUpdate = () => {
+	statisticsSocketCallback({ // test mock data
+		type: 'live.statistic',
+		data: {
+			data: {
+				id: "6f4f1621-9b3e-4c3e-8729-e34dc4500dfg",
+				imperial_unit_value: 0.071,
+				metric_unit_value: 1.803,
+				parameter_type: 1,
+				register_value: 1.803,
+				signal_date_at: "2026-08-17T12:37:59.000Z",
+				unit: 1.803,
+			},
+			type: 'job' 
+		} 
+	})
+};
+
 const statisticsSocketCallback = (response = {}) => {
-	const { data, type } = response;
+	// console.log('statisticsSocketCallback', response)
+	const { data } = response;
 	const safeData = data?.data || data || {};
+	const type = data?.type;
+
 	const normalizedType = `${type || ''}`.toLowerCase();
 	try {
+		// console.log('normalizedType', normalizedType, safeData)
 		if (normalizedType === 'job') {
 			chartsListInstance.value.callMethod('handlePointsLiveUpdate', safeData);
 		} else if (normalizedType === 'sensor') {
@@ -547,7 +570,7 @@ onMounted(() => {
 		buildOverlayCharts();
 	}
 	buildCharts({ settings: buildChartsSettings.value });
-	setupSocket();
+	// setupSocket();
 
 	if (!props.oneChartOnly && editThresholdsByStagesEnabled.value) {
 		globalStore.set_global_state({

@@ -131,6 +131,7 @@ class SensorChartsListFactory extends ChartsListFactoryBase {
 					],
 					transformatorSettings: {
 						useCurrentResultData: true,
+						syncLiveChartSeries: true,
 						specification: ChartInstance.transformator_settings.specification
 						// updateSeries: [{ serie_id: 'count' }]
 					}

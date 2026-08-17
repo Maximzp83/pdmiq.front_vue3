@@ -745,7 +745,7 @@ export default class ChartBase {
 
 	handleStatisticsTransformReady(resultData, settings = {}) {
 		// console.log('handleStatisticsTransformReady', this.chart_id, settings, this.events)
-		this.handleStatisticsTransformUpdated(resultData);
+		this.handleStatisticsTransformUpdated(resultData, settings);
 
 		if (settings.updateChartsReadyCounter && this.events.changeChartsReadyCounter) {
 			this.events.changeChartsReadyCounter(1, {
@@ -762,18 +762,18 @@ export default class ChartBase {
 		// this.events.handleChartDataReady();
 	}
 
-	handleStatisticsTransformUpdated(resultData) {
+	handleStatisticsTransformUpdated(resultData, settings = {}) {
 		// console.log('handleStatisticsTransformUpdated', this.chart_id, resultData.statistics_result)
 		if (this.statisticsPostTransform) {
 			resultData = this.statisticsPostTransform(resultData);
 		}
 
 		if (this.localHandleStatisticsTransformUpdated) {
-			this.localHandleStatisticsTransformUpdated(resultData);
+			this.localHandleStatisticsTransformUpdated(resultData, settings);
 		} else {
 			this.assignDataToYAxis(resultData);
 			this.assignDataToSeries(resultData);
-			this.emitChartOptionsReady();
+			this.emitChartOptionsReady(settings);
 		}
 
 		if (this.chartDataReadyCallback) this.chartDataReadyCallback();
