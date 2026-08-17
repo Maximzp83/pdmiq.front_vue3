@@ -21,8 +21,8 @@
 				</div>
 
 				<div v-if="!isBannerM25" class="content-row flex align-center">
-					<div class="div-block">{{ tt('phrases.request_type') }}</div>
-					<div class="div-block">
+					<div class=" mcol-xs-4">{{ tt('phrases.request_type') }}</div>
+					<div class="mcol-xs-8">
 						<el-select
 							v-model="bannerRequestType"
 							:placeholder="`${tt('Select')} ${tt('type')}`"
@@ -42,10 +42,10 @@
 				</div>
 
 				<div class="content-row flex align-center">
-					<div class="div-block">{{ tt('phrases.request_fmax') }}</div>
+					<div class=" mcol-xs-4">{{ tt('phrases.request_fmax') }}</div>
 					<CustomSelectV2
 						v-model="bannerRequestFmax"
-						class="div-block"
+						class="mcol-xs-8"
 						:optionsList="bannerRequestFmaxTypes"
 						:placeholder="`${tt('Select')} ${tt('fmax')}`"
 					/>
