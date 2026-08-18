@@ -958,9 +958,10 @@ await fetchUsers({ page: 1 });
 - [x] Sensor live-point tooltip runtime fix and Highcharts 12 follow-up (2026-08-17)
   - Propagated the live-update marker through the shared chart transformation callbacks
   - Synchronized transformed series with the rendered Highcharts instance after Vue updates, forcing fresh Point/tracker/KD-tree state
-  - Follow-up after runtime retest: enabled `stickyTracking` specifically for Sensor charts because Highcharts 12 shared-tooltip lookup could miss a newly created direct-touch point while the inherited legacy option remained `false`
+  - Follow-up after runtime retest: enabled `stickyTracking` for ordinary Sensor series because Highcharts 12 shared-tooltip lookup could miss a newly created direct-touch point while the inherited legacy option remained `false`
+  - Flags regression follow-up: restored `plotOptions.flags.stickyTracking: false` because the generic series option broke below-axis flag tooltip/click tracking, while line/spline live points still inherit `true`
   - Preserved the existing zone-series classification, normal initial/refetch update path, and non-Sensor chart behavior
-  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+  - Generated Highcharts options assertion, targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
 - [x] Sensor FFT flag click runtime fix (2026-08-18)
   - Extended the existing shared manual flag binding to forward configured clicks through Highcharts `Point.firePointEvent`
   - Preserved the point payload expected by `handleOpenFFTCharts` and stopped DOM propagation to prevent duplicate window opens

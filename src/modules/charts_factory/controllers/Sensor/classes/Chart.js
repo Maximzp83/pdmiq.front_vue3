@@ -137,7 +137,8 @@ class SensorChartBase extends ChartBase {
 			    // groupPadding: 0.2,
 			  },
 			  flags: {
-			  	y: -10
+				y: -10,
+				stickyTracking: false
 			  }
 			}
 		};

@@ -258,8 +258,9 @@
 ## Sensor Live-Point Tooltip Fix And Highcharts 12 Follow-up (2026-08-17)
 - Live statistics transformations now preserve a `syncLiveChartSeries` setting through the shared chart transform callbacks.
 - After Vue applies the updated chart options, `ChartItemContainer.vue` synchronizes each real Highcharts series with the transformed factory data through `series.setData(..., updatePoints=false)` and performs one redraw.
-- A follow-up runtime reproduction showed that data synchronization alone was insufficient: Sensor charts combine a shared tooltip with the legacy `stickyTracking: false`, so a newly created Highcharts 12 point can miss the direct-touch tracker path. `SensorChartBase` now overrides `stickyTracking: true`, enabling series/KD-tree hover lookup for both existing and live points without changing non-Sensor chart families.
-- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+- A follow-up runtime reproduction showed that data synchronization alone was insufficient: Sensor charts combine a shared tooltip with the legacy `stickyTracking: false`, so a newly created Highcharts 12 point can miss the direct-touch tracker path. `SensorChartBase` keeps `plotOptions.series.stickyTracking: true` for ordinary Sensor series, enabling series/KD-tree hover lookup for both existing and live points without changing non-Sensor chart families.
+- Runtime regression follow-up (2026-08-18): the generic series option also reached Highcharts `flags` series and disabled their below-axis hover/click behavior. `plotOptions.flags.stickyTracking: false` now overrides only flags while line/spline live-point tracking remains enabled.
+- A generated Highcharts options assertion confirms live line `true` and flags `false`; targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass. Existing Vite mixed-import/chunk-size warnings remain.
 
 ## Sensor FFT Flag Click Fix (2026-08-18)
 - Highcharts 12 flags rendered outside the plot area already used the shared manual hover binding, but their configured point-click event could still be skipped by the container tracker.
