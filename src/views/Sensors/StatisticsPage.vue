@@ -284,6 +284,9 @@ import {
 	convertMsToHours,
 	findItemBy,
 	getDateRange,
+	getTimeDifference,
+	getYmdDateString,
+	validateRouteParams,
 } from '@/helpers';
 import { getSensorTitle } from '@/helpers/specialHelpers';
 import {
@@ -304,6 +307,7 @@ import { LUBE_VERSIONS } from '@/constants/ultrasound';
 import {
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
 	ncdAxisList,
+	sensorParametersListNCD,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 import { LANGUAGE_TYPES } from '@/localization/utils';
 
@@ -345,6 +349,15 @@ const localToUtcYmdHis = (dateString) => {
 	if (Number.isNaN(date.getTime())) return dateString;
 
 	return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
+};
+
+const routeDateToFilterValue = (value, isRangeEnd = false) => {
+	const normalizedValue = `${value || ''}`;
+	if (/^\d{4}-\d{2}-\d{2}$/.test(normalizedValue)) {
+		return `${normalizedValue} ${isRangeEnd ? '23:59:59' : '00:00:00'}`;
+	}
+
+	return getYmdDateString({ ms: value, withTime: true });
 };
 
 defineOptions({
@@ -1158,6 +1171,7 @@ const setupPage = () => {
 	chartsListWrappersReadyCount.value = 0;
 	chartsWithOffAlarm.value = [];
 	sensorParamsForSetupProblems.value = [];
+	if (!validateRouteParams(sensorId.value)) return;
 
 	const queryCompareList = route.query.compare
 		? `${route.query.compare}`.split(',').filter(Boolean)
@@ -1166,7 +1180,11 @@ const setupPage = () => {
 	currentSensorIds.value = isCompare.value
 		? (queryCompareList.length ? queryCompareList : compareList.value)
 		: [sensorId.value].filter(Boolean);
+	if (overlaySensorId.value) {
+		fetchOverlaySensor(overlaySensorId.value);
+	}
 	initSensors();
+	globalStore.setup_navbar(navbarSettings.value);
 };
 
 onBeforeMount(() => {
@@ -1183,6 +1201,49 @@ onBeforeMount(() => {
 			},
 		});
 	}
+
+	if (filters.value.daterange?.length && !authStore.isIndustrialMatrix) {
+		const { days } = getTimeDifference({
+			from: filters.value.daterange[0],
+			to: filters.value.daterange[1],
+		});
+
+		if (days > 30) {
+			sensorsStore.set_statistics_filters({
+				...filters.value,
+				daterange: getDateRange('last_7_days', {
+					getDateString: true,
+					withTime: true,
+				}),
+				isLiveEnabled: false,
+			});
+		}
+	}
+
+	const { dateStart, dateFinish, parameter, source } = route.query;
+	if (source === 'report') {
+		statsThresholdsActive.value = true;
+	}
+
+	if (dateStart && dateFinish) {
+		sensorsStore.set_statistics_filters({
+			...filters.value,
+			daterange: [
+				routeDateToFilterValue(dateStart),
+				routeDateToFilterValue(dateFinish, true),
+			],
+			isLiveEnabled: false,
+		});
+	}
+
+	if (parameter) {
+		const parameterType = findItemBy('id', Number(parameter), sensorParametersListNCD());
+		if (parameterType) {
+			activeAxis.value = parameterType.axis_id || 1;
+		}
+	}
+
+	setupPage();
 });
 
 watch(
@@ -1192,7 +1253,6 @@ watch(
 		() => route.query.compare,
 	],
 	setupPage,
-	{ immediate: true },
 );
 
 onBeforeUnmount(() => {

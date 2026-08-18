@@ -924,3 +924,19 @@ await fetchUsers({ page: 1 });
   - Follow-up after runtime retest: enabled `stickyTracking` specifically for Sensor charts because Highcharts 12 shared-tooltip lookup could miss a newly created direct-touch point while the inherited legacy option remained `false`
   - Preserved the existing zone-series classification, normal initial/refetch update path, and non-Sensor chart behavior
   - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Sensor FFT flag click runtime fix (2026-08-18)
+  - Extended the existing shared manual flag binding to forward configured clicks through Highcharts `Point.firePointEvent`
+  - Preserved the point payload expected by `handleOpenFFTCharts` and stopped DOM propagation to prevent duplicate window opens
+  - Isolated Highcharts flags click assertion, targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Highcharts datetime x-axis and tooltip 24-hour formatting (2026-08-18)
+  - Added explicit `%H` time formats for millisecond, second, minute, and hour datetime ticks and tooltips in the shared Highcharts configuration
+  - Applied the same 24-hour format to `flagsData` tooltips while preserving day/month/year axis behavior and non-datetime axes
+  - Isolated x-axis and Highstock flags-tooltip assertions, targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] StatisticsPage complete before-mount migration (2026-08-18)
+  - Restored the legacy customer daterange limit and report/date/NCD-parameter query initialization before sensor loading
+  - Restored route validation, initial compare/split setup, RPM overlay loading, and navbar setup without duplicating the first sensor request
+  - Preserved reactive reloads for later route changes; targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] StatisticsPage date-only query boundaries (2026-08-18)
+  - Prevented `YYYY-MM-DD` query values from being parsed as UTC midnight and shifted by the browser timezone
+  - Mapped date-only starts to local `00:00:00` and finishes to local `23:59:59`, preserving the existing path for explicit times and timestamps
+  - Direct boundary assertions, targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
