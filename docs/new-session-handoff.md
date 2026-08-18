@@ -477,8 +477,9 @@ Primary rules source:
 ## Latest Sensor Live-Point Tooltip Fix And Highcharts 12 Follow-up (2026-08-17)
 - The live-statistics path now carries a dedicated synchronization flag from `SensorChartsListFactory` through the shared transform callbacks.
 - `ChartItemContainer.vue` waits for Vue's chart-options update, then `SensorChart` replaces rendered series data through the Highcharts API and redraws once.
-- The first synchronization-only fix did not restore hover in the application. A follow-up isolated Highcharts 12 audit identified the remaining legacy combination of shared tooltip plus `stickyTracking: false`; Sensor charts now override it to `true`, so newly rendered live points are found through series/KD-tree hover lookup instead of depending only on direct point trackers.
-- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+- The first synchronization-only fix did not restore hover in the application. A follow-up isolated Highcharts 12 audit identified the remaining legacy combination of shared tooltip plus `stickyTracking: false`; ordinary Sensor series keep it `true`, so newly rendered live points are found through series/KD-tree hover lookup instead of depending only on direct point trackers.
+- Follow-up on 2026-08-18: applying that generic option to `flags` caused their below-axis tooltip/click regression. `plotOptions.flags.stickyTracking: false` now scopes flags back to direct tracking without reverting the live-series fix.
+- Generated Highcharts options verification, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
 
 ## Latest Sensor FFT Flag Click Fix (2026-08-18)
 - The shared out-of-plot flag binding in `src/modules/charts_factory/classes/Chart.js` now handles configured point clicks as well as hover.
