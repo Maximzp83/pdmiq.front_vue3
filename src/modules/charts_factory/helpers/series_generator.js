@@ -73,7 +73,7 @@ const assignEventsForSerie1 = ({ serieItem, eventsList, chart_id }) => {
 	if (serieItem) {
 		const event_keys =
 			(serieItem.customSettings && serieItem.customSettings.event_keys) || [];
-
+		
 		event_keys.forEach((eventKey, idx) => {
 			if (eventKey && hasOwnProperty1(eventsList, eventKey)) {
 				const eventItem = eventsList[eventKey];

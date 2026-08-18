@@ -123,9 +123,9 @@ import CardSensorItem from './CardSensorItem.vue';
 import CardMultiViewItem from './CardMultiViewItem.vue';
 import TypeOptionBlock from './TypeOptionBlock.vue';
 
-import { useSensorType } from '@/composables/mixins/useSensorType';
+// import { useSensorType } from '@/composables/mixins/useSensorType';
 
-const { getType } = useSensorType();
+// const { getType } = useSensorType();
 
 const { translate } = Lang;
 

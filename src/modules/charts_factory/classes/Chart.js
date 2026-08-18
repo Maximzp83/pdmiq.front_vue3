@@ -822,6 +822,9 @@ export default class ChartBase {
 				if (!point.graphic || point._customTooltipBound) return;
 
 				point._customTooltipBound = true;
+				const hasClickHandler =
+					typeof series.options.point?.events?.click === 'function' ||
+					typeof point.options?.events?.click === 'function';
 				point.graphic.css({
 					cursor: 'pointer',
 					pointerEvents: 'auto'
@@ -835,6 +838,12 @@ export default class ChartBase {
 					point.setState('');
 					chart.tooltip?.hide(0);
 				});
+				if (hasClickHandler) {
+					point.graphic.on('click', event => {
+						event.stopPropagation?.();
+						point.firePointEvent('click', { originalEvent: event, point });
+					});
+				}
 			});
 		});
 	}

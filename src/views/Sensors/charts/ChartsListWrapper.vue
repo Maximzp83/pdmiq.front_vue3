@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<button @click="testLiveUpdate">test</button>
+		<!-- <button @click="testLiveUpdate">test</button> -->
 		<div class="charts-data-container">
 			<ChartsPreloader
 				:showMock="!chartsListWrapperLoading && chartsListWrapperReady && !hasStatistics"

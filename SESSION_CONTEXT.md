@@ -260,3 +260,25 @@
 - After Vue applies the updated chart options, `ChartItemContainer.vue` synchronizes each real Highcharts series with the transformed factory data through `series.setData(..., updatePoints=false)` and performs one redraw.
 - A follow-up runtime reproduction showed that data synchronization alone was insufficient: Sensor charts combine a shared tooltip with the legacy `stickyTracking: false`, so a newly created Highcharts 12 point can miss the direct-touch tracker path. `SensorChartBase` now overrides `stickyTracking: true`, enabling series/KD-tree hover lookup for both existing and live points without changing non-Sensor chart families.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Sensor FFT Flag Click Fix (2026-08-18)
+- Highcharts 12 flags rendered outside the plot area already used the shared manual hover binding, but their configured point-click event could still be skipped by the container tracker.
+- `src/modules/charts_factory/classes/Chart.js` now forwards clicks on manually bound flag graphics through `Point.firePointEvent`, supplies the expected `event.point`, and stops propagation to prevent duplicate handling.
+- This restores the existing `openFFTCharts` event chain from `ChartItemContainer.vue` to `StatisticsPage.vue` without changing its payload contract.
+- An isolated Highcharts flags click assertion, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Highcharts Datetime X-Axis And Tooltip 24-Hour Format (2026-08-18)
+- `src/config/highcharts.js` now defines global datetime formats with explicit `%H` hours for time-level x-axis ticks and tooltips.
+- Highcharts axes display `13:00` instead of locale-derived `01:00 PM`; `flagsData` and other time-level datetime tooltips also use 24-hour time, for example `Tuesday, 18 Aug, 13:00`.
+- Day/month/year axis behavior and non-datetime axes remain unchanged. Isolated x-axis and Highstock flags-tooltip assertions, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## StatisticsPage Before-Mount Lifecycle Parity (2026-08-18)
+- `src/views/Sensors/StatisticsPage.vue` now restores the missing Vue 2 `beforeMount` initialization in addition to the already migrated `created` reset.
+- Initial statistics filters now enforce the legacy 30-day customer limit and process `source=report`, `dateStart`/`dateFinish`, and NCD `parameter` query values before sensor requests begin.
+- Initial route validation, compare/split sensor setup, RPM overlay loading, and navbar setup are restored; the existing route watcher remains responsible only for later route changes, preventing duplicate initial sensor requests.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## StatisticsPage Date-Only Query Boundaries (2026-08-18)
+- Date-only `dateStart` and `dateFinish` query values are now treated as local calendar dates instead of UTC-midnight JavaScript dates.
+- A date-only start receives `00:00:00` and a date-only finish receives `23:59:59`; query values that already contain time or timestamps retain the existing conversion path.
+- Direct boundary assertions, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
