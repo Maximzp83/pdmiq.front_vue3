@@ -17,6 +17,7 @@
 						<ItemForm
 							ref="itemFormRef"
 							:itemData="itemData"
+							:itemsName="itemsName"
 							:activeTab="activeTab"
 							:tabsList="tabsList"
 							@submit="handleSubmitForm"
@@ -31,6 +32,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
 
 import { hasAccessTo as hasAccessToUtil } from '@/utils/hasAccessTo';
@@ -48,6 +50,7 @@ defineOptions({
 
 const authStore = useAuthStore();
 const { authUser } = storeToRefs(authStore);
+const route = useRoute();
 
 const itemFormRef = ref(null);
 const activeTab = ref({ title: 'Personal', prop: 'mainTab' });
@@ -60,13 +63,15 @@ const {
 	itemsName,
 	handleSubmitForm,
 	handleCloseButton,
+	initialPageSetup,
 } = useItemPage({
 	// debug: true,
 	entityKey: 'Users',
 	itemFormRef,
 	goToListAfterSave: true,
 	successSubmitCallback: (answer) => {
-		if (answer?.data?.data?.id === authUser.value?.id) {
+		const savedUser = answer?.value || answer?.data?.data || answer?.data;
+		if (savedUser?.id === authUser.value?.id) {
 			authStore.get_auth_user();
 		}
 	},
@@ -110,5 +115,12 @@ watch(
 		}
 	},
 	{ immediate: true },
+);
+
+watch(
+	() => route.fullPath,
+	() => {
+		initialPageSetup(route);
+	},
 );
 </script>

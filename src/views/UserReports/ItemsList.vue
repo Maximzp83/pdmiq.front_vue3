@@ -50,6 +50,8 @@ import Filterbar from '@/components/common/Filterbar.vue';
 import CustomDataListTable from '@/components/table/CustomDataListTable.vue';
 import PaginationContainer from '@/components/common/PaginationContainer.vue';
 
+import { CaretRight } from '@element-plus/icons-vue';
+
 const { tt, translate } = Lang;
 
 defineOptions({
@@ -78,7 +80,7 @@ const itemsName = Object.freeze({
 	instanceName: 'users',
 });
 
-const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, refetchItemsList } = useItemsData({
+const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, deleteItem } = useItemsData({
 	apiRoute: `/users/${props.userId}/scheduled-reports`,
 	itemsName,
 	itemStore: usersStore,
@@ -89,24 +91,29 @@ const { itemsList, itemsLoading, meta, setFilters, createItem, editItem, refetch
 		tableRef: itemsTableRef,
 		editInModal: true,
 		formComponentFileLoader: () => import('./ItemForm.vue'),
+		successSubmitOptions: {
+			refetchItemsList: true,
+			closeModal: true,
+		},
 		additionalModalSettings: {
-			userId: props.userId,
-			isCSM: props.isCSM,
-			enableBaselineReport: props.enableBaselineReport,
-			sensorsListProps: props.sensorsListProps,
-			plantsListProps: props.plantsListProps,
-			sensorsLoadingProps: props.sensorsLoadingProps,
-			successSubmitCallback: () => {
-				refetchItemsList();
-				// globalStore.show_edit_modal({ show: false });
+			additionalSettings: {
+				userId: props.userId,
+				isCSM: props.isCSM,
+				enableBaselineReport: props.enableBaselineReport,
+				sensorsListProps: props.sensorsListProps,
+				plantsListProps: props.plantsListProps,
+				sensorsLoadingProps: props.sensorsLoadingProps,				
 			},
 		},
-		localDeleteItem: ({ ids }) =>
+		/*localhandleDeleteItems: ({ ids }) => {
+			console.log('localDeleteItem', row)
+
 			api_request
 				.delete(`/users/${props.userId}/scheduled-reports`, {
 					data: { id: ids?.[0] },
 				})
-				.then(() => refetchItemsList()),
+				.then(() => refetchItemsList())
+		}*/
 	},
 });
 
@@ -125,22 +132,27 @@ const manualStartReport = ({ row }) =>
 			cancelButtonText: tt('CANCEL'),
 			type: 'warning',
 		},
-	).then(() =>
+	).then(() => {
+		itemsLoading.value = true;
 		api_request.post(`/users/${props.userId}/scheduled-reports/${row?.id}/start`, {
 			notNotify: true,
-		}),
-	);
+		}).then(() => {
+			itemsLoading.value = false;
+			// refetchItemsList();
+		});
+	})
 
 const tableSettings = computed(() => {
 	const actions = [
 		{
 			name: 'manualStartReport',
 			type: 'success',
-			icon: 'el-icon-caret-right',
+			className: 'icon-play',
+			icon: CaretRight,
 			tooltip_text: 'phrases.Start_Report_manually',
 		},
 		standardTableOperations.edit,
-		standardTableOperations.delete,
+		{...standardTableOperations.delete, name: 'deleteItem' },
 	];
 
 	return Object.freeze({
@@ -166,12 +178,14 @@ const methodsMap = {
 	setFilters,
 	createItem,
 	editItem,
-	handleDeleteItems: ({ row }) =>
+	deleteItem,
+	/*handleDeleteItems: ({ row }) => {
+		console.log('handleDeleteItems', row)
 		api_request
-			.delete(`/users/${props.userId}/scheduled-reports`, {
-				data: { id: row?.id },
-			})
-			.then(() => refetchItemsList()),
+			.delete(`/users/${props.userId}/scheduled-reports/${row?.id}`).then(
+				() => refetchItemsList()
+			)
+	},*/
 	manualStartReport,
 };
 

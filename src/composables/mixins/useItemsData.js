@@ -488,13 +488,17 @@ export function useItemsData({
 	};
 
 	const deleteItem = (payload = {}, settings = {}) => {
+		// console.log('deleteItem', payload, settings);
+
 		payload = settings.payload || payload;
 		if (typeof localDeleteItem === 'function') {
 			return Promise.resolve(localDeleteItem(payload));
 		}
 
 		const ids = payload?.ids || [];
-		if (!ids.length) {
+		const id = payload?.row?.id || payload?.rowData?.id || null;
+
+		if (!ids.length && !id) {
 			return Promise.resolve(payload);
 		}
 
@@ -504,12 +508,14 @@ export function useItemsData({
 
 		const confirmButtonText = settings.confirmButtonText || tt('Delete');
 		// const methodName = settings.methodName || 'deleteItem';
-		const prop = ids.length > 1 ? 'mult' : 'one';
+		const nameKey = ids.length > 1 ? 'mult' : 'one';
+		const url = ids.length ? resolvedApiRoute : `${resolvedApiRoute}/${id}`;
+		const data = ids.length ? { ids } : null;
 
 		const confirmMessage =
 			settings.confirmMessage ||
 			`${tt('phrases.this_will_permanently_delete_selected')} ${
-				resolvedItemsName.value[prop]
+				resolvedItemsName.value[nameKey]
 			}. ${tt('Continue')}?`;
 
 		return ElMessageBox.confirm(
@@ -520,12 +526,13 @@ export function useItemsData({
 				cancelButtonText: tt('CANCEL') || 'Cancel',
 				type: 'warning',
 			},
-		).then(() =>
-			api_request.delete(resolvedApiRoute, {
-					data: { ids },
+		).then(() => {
+			// console.log('Deleting items with ids:', url, ids , id);
+			api_request.delete(url, {
+					data,
 					itemName: resolvedItemsName.value.one,
 				}).then(() => refetchItemsList())
-		)
+		})
 	};
 
 	// ========== Watchers ==========

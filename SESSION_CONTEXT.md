@@ -24,6 +24,11 @@
   - Shared legend styles were added under `.chart-container-wrapper`.
   - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
   - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- `src/views/Users/ItemPage.vue` was re-audited against Vue2 and completed:
+  - The shared page component now re-runs `initialPageSetup` when navigation reuses it across `/users/:id`, `/users/new`, and `/profile`.
+  - The post-save auth refresh reads the current `api_request` result from `answer.value`, with legacy response fallbacks.
+  - The original `itemsName` page/form prop contract is restored and declared by `Users/ItemForm.vue`.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - Latest one-file `vue2_project` MultiView threshold delta was migrated into its existing Vue3 counterpart without confirmation stops:
   - Compare thresholds now display and submit `acute_samples` and `stable_samples`.
   - `re_trigger_samples` remains hidden for Compare thresholds and is removed from their payload.
@@ -116,6 +121,13 @@
   - `SESSION_CONTEXT.md`, `docs/migration-progress.md`, `docs/migration-todos.md`, `docs/new-session-handoff.md`
   - The matching current user-authored delta under `vue2_project/`.
 - Do not revert the source delta under `vue2_project/`.
+- Current Users ItemPage parity fix:
+  - `src/views/Users/ItemPage.vue`
+  - `src/views/Users/ItemForm.vue`
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
 - Current MultiView threshold sync:
   - `src/views/Sensors/charts/MultiView/ThresholdItem.vue`
   - `SESSION_CONTEXT.md`
@@ -152,6 +164,7 @@
 - Runtime smoke-test Manual Route previous/next FFT navigation across metrics, one-point history series, and Manual Route/MultiView legend rendering with real API data when requested.
 - Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.
 - Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
+- Runtime smoke-test Users transitions between edit/create/profile and verify that saving the authenticated user refreshes auth state.
 
 ## EquipmentsLayout Parity Fix (2026-08-07)
 - Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.
@@ -283,3 +296,10 @@
 - Date-only `dateStart` and `dateFinish` query values are now treated as local calendar dates instead of UTC-midnight JavaScript dates.
 - A date-only start receives `00:00:00` and a date-only finish receives `23:59:59`; query values that already contain time or timestamps retain the existing conversion path.
 - Direct boundary assertions, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Users ItemPage Parity Fix (2026-08-20)
+- Restored route-driven page reinitialization when Vue Router reuses `src/views/Users/ItemPage.vue` between user edit, create, and profile routes.
+- Updated the successful-save callback to consume the current `api_request` `{ value }` result while retaining legacy response fallbacks, so editing the authenticated user refreshes `AuthStore` again.
+- Restored the legacy `itemsName` contract from the page to `src/views/Users/ItemForm.vue`; the form now explicitly declares the prop.
+- The legacy `apiTabVisible` watcher was intentionally not copied because its result was not consumed; the active computed tab visibility already preserves the actual behavior.
+- Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
