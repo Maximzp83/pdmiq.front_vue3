@@ -35,9 +35,9 @@ export function executeFormSubmit({
 
 	let method = itemId === 'new' ? 'post' : 'put';
 	const url = itemId === 'new' ? apiRoute : `${apiRoute}/${itemId}`;
-
 	if (debug && import.meta.env.DEV) {
 		if (payload) {
+			console.log(itemId, method, url);
 			console.log('options', options);
 			console.log('payload', method, url, payload);
 			return Promise.reject();

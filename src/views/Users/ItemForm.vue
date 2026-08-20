@@ -402,6 +402,7 @@ const props = defineProps(buildProps({
 	hideType: Boolean,
 	hidePlants: Boolean,
 	hideCompany: Boolean,
+	itemsName: { type: Object, default: () => ({}) },
 	activeTab: { type: Object, default: () => ({ prop: 'mainTab' }) },
 	tabsList: { type: Array, default: () => [] },
 }));

@@ -1,6 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
+- Users ItemPage parity is restored: route reuse reinitializes page data, authenticated-user saves refresh auth state from the current API response contract, and `itemsName` is forwarded to the form.
 - The latest one-file `vue2_project` MultiView threshold delta is fully synced into Vue3: Compare thresholds retain acute/stable samples and omit only re-trigger samples. Nothing was skipped.
 - Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
@@ -266,6 +267,7 @@ Primary rules source:
 - `src/views/Sensors/MultiViewStatisticsPage.vue`
 
 ## Recommended Next Focus
+- Runtime smoke-test `/users/:id`, `/users/new`, and `/profile` transitions without a hard reload, then save the authenticated user and confirm the navbar/auth state refreshes.
 - Runtime smoke-test Settings with authenticated real data, especially Back-End Register Writing, Custom Formulas save, Industrial Services image upload/delete, Banner V2 Subtypes IO parameters, and Faults/NCD Faults save flows.
 - Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
 - Smoke-test Assets list/create/edit/details with authenticated real data, especially machine/location binding, library uploads, create Work Order action, and reorder.
@@ -278,11 +280,13 @@ Primary rules source:
 
 ## Build Status
 - `npm run build` passes after follow-up compile fixes.
+- Latest Users ItemPage parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
 - Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest MultiView threshold sync passes targeted ESLint, migration-rule scan, targeted `git diff --check`, and production Vite build on Node 24.
 
 ## Files Already Modified In This Migration Batch
+- Latest Users ItemPage parity fix: `src/views/Users/ItemPage.vue` and `src/views/Users/ItemForm.vue`.
 - Latest MultiView threshold sync: `src/views/Sensors/charts/MultiView/ThresholdItem.vue`.
 - Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
 - `src/router/index.js`
@@ -501,3 +505,9 @@ Primary rules source:
 - `StatisticsPage.vue` now recognizes `YYYY-MM-DD` query values before passing them to JavaScript `Date`, avoiding the UTC-to-local `03:00:00` shift.
 - Date-only range starts use local `00:00:00` and finishes use local `23:59:59`; values with an explicit time or timestamp use the existing formatter.
 - Direct boundary assertions, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Users ItemPage Parity Fix (2026-08-20)
+- Restored the Vue2 route watcher behavior through `useItemPage().initialPageSetup`, covering reuse across user edit, create, and profile routes.
+- Corrected the successful-save auth refresh for the current `api_request` result shape and retained legacy fallbacks.
+- Restored and declared the `itemsName` prop passed from Users ItemPage to ItemForm; omitted only the original dead `apiTabVisible` watcher state.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.

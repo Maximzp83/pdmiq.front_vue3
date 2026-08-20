@@ -280,6 +280,7 @@ const preparePayload = (payload) => ({
 
 const { isMobile, validateForm } = useItemForm({
 	// debug: true,
+	apiRoute: `/users/${userId.value}/scheduled-reports`,
 	formData,
 	formRef: itemFormRef,
 	itemData: computed(() => props.itemData),

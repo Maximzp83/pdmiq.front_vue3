@@ -9,6 +9,7 @@
 
 ## Current Focus
 
+- `src/views/Users/ItemPage.vue` was completed against Vue2: it now reinitializes on reused user/profile routes, refreshes auth state from the current `api_request` result after saving the active user, and restores the `itemsName` form contract. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - Latest one-file MultiView threshold Vue2 delta is synced: Compare thresholds retain visible/submitted acute and stable sample counts while re-trigger samples remain excluded. Nothing was skipped; targeted ESLint, migration-rule scan, targeted `git diff --check`, and the Node 24 production build pass.
 - Machine and ROI One Pager FileUploadBlock refs now use `setSubItemRef` wherever those forms already use `useSubItemsList`; the project-wide scan confirms no old `ref="fileUploadBlockRef"` remains in such a component. This fixes the Machine submit-time `Instance.getFormData is not a function` error. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - `BrandModels` details stack is complete for the current Vue3 scope and should not be reopened unless a new issue is reported.
@@ -941,3 +942,7 @@ await fetchUsers({ page: 1 });
   - Prevented `YYYY-MM-DD` query values from being parsed as UTC midnight and shifted by the browser timezone
   - Mapped date-only starts to local `00:00:00` and finishes to local `23:59:59`, preserving the existing path for explicit times and timestamps
   - Direct boundary assertions, targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Users ItemPage parity fix (2026-08-20)
+  - Restored page reinitialization when Vue Router reuses the component across user edit, create, and profile routes
+  - Corrected authenticated-user refresh for the current `api_request` result and restored the `itemsName` page/form contract
+  - Omitted the unused legacy `apiTabVisible` watcher state; targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

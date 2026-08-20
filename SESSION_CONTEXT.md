@@ -16,6 +16,11 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- `src/views/Users/ItemPage.vue` was re-audited against Vue2 and completed:
+  - The shared page component now re-runs `initialPageSetup` when navigation reuses it across `/users/:id`, `/users/new`, and `/profile`.
+  - The post-save auth refresh reads the current `api_request` result from `answer.value`, with legacy response fallbacks.
+  - The original `itemsName` page/form prop contract is restored and declared by `Users/ItemForm.vue`.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - Latest one-file `vue2_project` MultiView threshold delta was migrated into its existing Vue3 counterpart without confirmation stops:
   - Compare thresholds now display and submit `acute_samples` and `stable_samples`.
   - `re_trigger_samples` remains hidden for Compare thresholds and is removed from their payload.
@@ -65,6 +70,13 @@
   - `git diff --check` for the touched files and `npm run build` pass.
 
 ## Files Already Modified
+- Current Users ItemPage parity fix:
+  - `src/views/Users/ItemPage.vue`
+  - `src/views/Users/ItemForm.vue`
+  - `SESSION_CONTEXT.md`
+  - `docs/migration-progress.md`
+  - `docs/migration-todos.md`
+  - `docs/new-session-handoff.md`
 - Current MultiView threshold sync:
   - `src/views/Sensors/charts/MultiView/ThresholdItem.vue`
   - `SESSION_CONTEXT.md`
@@ -98,7 +110,7 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
+- Runtime smoke-test Users transitions between edit/create/profile and verify that saving the authenticated user refreshes auth state.
 
 ## EquipmentsLayout Parity Fix (2026-08-07)
 - Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.
@@ -230,3 +242,10 @@
 - Date-only `dateStart` and `dateFinish` query values are now treated as local calendar dates instead of UTC-midnight JavaScript dates.
 - A date-only start receives `00:00:00` and a date-only finish receives `23:59:59`; query values that already contain time or timestamps retain the existing conversion path.
 - Direct boundary assertions, targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Users ItemPage Parity Fix (2026-08-20)
+- Restored route-driven page reinitialization when Vue Router reuses `src/views/Users/ItemPage.vue` between user edit, create, and profile routes.
+- Updated the successful-save callback to consume the current `api_request` `{ value }` result while retaining legacy response fallbacks, so editing the authenticated user refreshes `AuthStore` again.
+- Restored the legacy `itemsName` contract from the page to `src/views/Users/ItemForm.vue`; the form now explicitly declares the prop.
+- The legacy `apiTabVisible` watcher was intentionally not copied because its result was not consumed; the active computed tab visibility already preserves the actual behavior.
+- Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
