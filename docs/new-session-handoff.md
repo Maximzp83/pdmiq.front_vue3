@@ -2,6 +2,8 @@
 
 ## Current Objective
 - The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
+- Requisitions create-modal Cancel now closes through `DynamicFormContainer` without the stale `closeDialog` event warning, and its textarea row props satisfy Element Plus numeric typing.
+- Banner Statistics filter parity is restored: re-baseline is wired end to end, NCD OFF ALARM and Split visibility match Vue2, and closing the outer filter closes the nested charts popover.
 - Users ItemPage parity is restored: route reuse reinitializes page data, authenticated-user saves refresh auth state from the current API response contract, and `itemsName` is forwarded to the form.
 - The latest one-file `vue2_project` MultiView threshold delta is fully synced into Vue3: Compare thresholds retain acute/stable samples and omit only re-trigger samples. Nothing was skipped.
 - Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
@@ -268,6 +270,8 @@ Primary rules source:
 - `src/views/Sensors/MultiViewStatisticsPage.vue`
 
 ## Recommended Next Focus
+- Runtime smoke-test opening and cancelling the Requisitions create modal, confirming clean closure and no Element Plus rows warning.
+- Runtime smoke-test the Banner Statistics filter with real data: re-baseline enable/disable, NCD OFF ALARM visibility, Split visibility for supported sensor types, and nested popover closure.
 - Runtime smoke-test `/users/:id`, `/users/new`, and `/profile` transitions without a hard reload, then save the authenticated user and confirm the navbar/auth state refreshes.
 - Runtime smoke-test Settings with authenticated real data, especially Back-End Register Writing, Custom Formulas save, Industrial Services image upload/delete, Banner V2 Subtypes IO parameters, and Faults/NCD Faults save flows.
 - Runtime smoke-test Maintenance Work Orders/Logs, Work Order Requests, and StoreRooms with authenticated real data.
@@ -281,6 +285,8 @@ Primary rules source:
 
 ## Build Status
 - `npm run build` passes after follow-up compile fixes.
+- Latest Requisitions modal Cancel fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
+- Latest BannerFilterBlock parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest Users ItemPage parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Follow-up fixes touched Sidebar, Machines compile-only legacy files, chart factory API imports, and missing shared helper exports.
 - Latest Manual Route aggregate-page Vue2 sync passes targeted ESLint, `git diff --check`, and production Vite build on Node 24.
@@ -293,6 +299,8 @@ Primary rules source:
 - Latest MultiView threshold sync passes targeted ESLint, migration-rule scan, targeted `git diff --check`, and production Vite build on Node 24.
 
 ## Files Already Modified In This Migration Batch
+- Latest Requisitions modal Cancel fix: `src/views/Requisitions/ItemForm.vue`.
+- Latest BannerFilterBlock parity fix: `src/views/Sensors/FilterBlock/BannerFilterBlock.vue`, `src/views/Sensors/StatisticsPage.vue`, and `src/views/Sensors/charts/ChartsFilterBar.vue`.
 - Latest Users ItemPage parity fix: `src/views/Users/ItemPage.vue` and `src/views/Users/ItemForm.vue`.
 - Latest MultiView threshold sync: `src/views/Sensors/charts/MultiView/ThresholdItem.vue`.
 - Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.

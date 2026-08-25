@@ -104,9 +104,10 @@
 								:showHistory="showHistory"
 								:joinChartsBy="joinChartsBy"
 								:splitNCDCharts="splitNCDCharts"
-								:splitChartsButtonEnabled="splitChartsButtonEnabled"
+								:chartOperationsPopoverShow="showFilterbar"
 								:currentSensorType="currentSensorType"
 								:isCompare="isCompare"
+								:isNCDSensor="isNCDSensor"
 								:enableFFT="enableFFT"
 								:equipmentData="equipmentData"
 								:statsThresholdsActive="statsThresholdsActive"
@@ -510,7 +511,6 @@ const isNCDSensor = computed(() => {
 		type.isNCDEnv,
 	);
 });
-const splitChartsButtonEnabled = computed(() => isNCDSensor.value);
 const enableProblemsBlock = computed(() => Boolean(
 	sensorData.value &&
 	!isCompare.value &&

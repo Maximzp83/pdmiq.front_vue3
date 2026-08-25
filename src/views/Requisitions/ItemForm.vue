@@ -48,11 +48,11 @@
 				</el-form-item>
 
 				<el-form-item :label="`${tt('Equipment')} ${tt('Description')}`" prop="equipment_details">
-					<el-input v-model="formData.equipment_details" type="textarea" rows="5" />
+					<el-input v-model="formData.equipment_details" type="textarea" :rows="5" />
 				</el-form-item>
 
 				<el-form-item :label="tt('Details')" prop="requisition_details">
-					<el-input v-model="formData.requisition_details" type="textarea" rows="5" />
+					<el-input v-model="formData.requisition_details" type="textarea" :rows="5" />
 				</el-form-item>
 
 				<el-form-item :label="tt('phrases.See_Visit_Required')" prop="site_visit" class="content-row">
@@ -79,9 +79,9 @@
 					<el-form-item
 						:label="tt('Budget')"
 						prop="proposed_cost"
-						:class="['mcol-xs-5 inline-form-item', { 'inline-label': fromModal }]"
+						:class="['mcol-xs-5 inline-form-item']"
 					>
-						<CustomInput v-model="formData.proposed_cost" :placeholder="`${tt('input')} ${tt('cost')}`" />
+						<CustomInput  v-model="formData.proposed_cost" :placeholder="`${tt('input')} ${tt('cost')}`" />
 					</el-form-item>
 				</div>
 
@@ -271,7 +271,7 @@ const deleteRequisition = () => {
 		emit('event', 'handleDeleteRequisition', props.itemData.id);
 		return;
 	}
-	emit('event', 'closeDialog');
+	emit('event', { eventName: 'handleCloseEditModal' });
 	emit('onCancel');
 };
 

@@ -325,6 +325,7 @@ const createRequisition = () => {
 		editModalProp: 'editModalClassic',
 		formComponentFileLoader: () => import('./ItemForm.vue'),
 		itemName: itemsName.value.one,
+		hideSubmitButtons: true,
 		title: `${tt('Create')} ${tt('phrases.Requisition_Form')}`,
 		className: 'maintenance-modal',
 		modalClassName: 'fixed-header-footer small-header small-footer',

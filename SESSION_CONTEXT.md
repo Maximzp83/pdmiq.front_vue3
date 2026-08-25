@@ -24,6 +24,16 @@
   - Shared legend styles were added under `.chart-container-wrapper`.
   - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
   - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- Requisitions create-modal Cancel runtime fix completed on 2026-08-25:
+  - `src/views/Requisitions/ItemForm.vue` now passes numeric textarea row counts required by Element Plus.
+  - Create-form Cancel now emits the `handleCloseEditModal` event understood by `DynamicFormContainer`, removing the missing `closeDialog` handler warning and closing the modal through its owner.
+  - Existing user changes in Requisitions ItemForm/ItemsList and ROI Calculator were preserved.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
+- `src/views/Sensors/FilterBlock/BannerFilterBlock.vue` was completed against the Vue2 original on 2026-08-25:
+  - Restored the permission-gated re-baseline control, confirmation, enable/disable request, loading state, and `initSensors` refresh chain.
+  - Restored NCD OFF ALARM hiding and the exact legacy Split eligibility for NCD temperature/vibration, wired/current, and Banner Temp/Vibe V2 sensors.
+  - Closing the outer Statistics filter now also closes the nested `ChartsFilterBar` popover through an exposed child method.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - `src/views/Users/ItemPage.vue` was re-audited against Vue2 and completed:
   - The shared page component now re-runs `initialPageSetup` when navigation reuses it across `/users/:id`, `/users/new`, and `/profile`.
   - The post-save auth refresh reads the current `api_request` result from `answer.value`, with legacy response fallbacks.
@@ -165,6 +175,7 @@
 - Runtime smoke-test Machine image submission and ROI One Pager file-tab submission with real form data when requested.
 - Runtime smoke-test Compare threshold creation/editing and verify `acute_samples` / `stable_samples` in the API payload when requested.
 - Runtime smoke-test Users transitions between edit/create/profile and verify that saving the authenticated user refreshes auth state.
+- Runtime smoke-test Requisitions create modal: open the form, cancel it, and confirm that the modal closes without Element Plus prop or missing-handler warnings.
 
 ## EquipmentsLayout Parity Fix (2026-08-07)
 - Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.

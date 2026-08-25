@@ -15,69 +15,61 @@
 				<div class="mcol-xs-12">
 					<div class="mrow flex wrap">
 						<div class="mcol-xs-12 mcol-sm-3">
-							<div class="el-form-item">
-								<div class="label">{{ tt('phrases.Date_Selection') }}</div>
-								<div class="el-form-item__content">
-									<Datepicker
-										v-model="periodDateRange"
-										class="no-min-width"
-										:picker-options="pickerOptions"
-										type="daterange"
-									/>
-								</div>
+							<div class="label">{{ tt('phrases.Date_Selection') }}</div>
+							<div class="el-form-item__content">
+								<Datepicker
+									v-model="periodDateRange"
+									class="no-min-width"
+									:picker-options="pickerOptions"
+									type="daterange"
+								/>
 							</div>
 						</div>
 
 						<div class="mcol-xs-12 mcol-sm-3">
-							<div class="el-form-item">
-								<div class="label">{{ tt('Technicians') }}</div>
-								<div class="el-form-item__content">
-									<CustomSelectV2
-										v-model="formData.users_ids"
-										clearable
-										multiple
-										filterable
-										collapse-tags
-										:optionsLoading="usersLoading"
-										:optionsList="techniciansUsersList"
-										:placeholder="`${tt('Select')} ${tt('users')}`"
-										labelKey="full_name"
-									/>
-								</div>
+							<div class="label">{{ tt('Technicians') }}</div>
+							<div class="el-form-item__content">
+								<CustomSelectV2
+									v-model="formData.users_ids"
+									clearable
+									multiple
+									filterable
+									collapse-tags
+									:optionsLoading="usersLoading"
+									:optionsList="techniciansUsersList"
+									:placeholder="`${tt('Select')} ${tt('users')}`"
+									labelKey="full_name"
+								/>
 							</div>
 						</div>
 
 						<div class="mcol-xs-12 mcol-sm-3">
-							<div class="el-form-item">
-								<div class="label">{{ tt('WO') }}#</div>
-								<div class="el-form-item__content">
-									<CustomSelectV2
-										v-model="formData.work_order_id"
-										filterable
-										clearable
-										multiple
-										collapse-tags
-										:optionsLoading="workOrdersLoading"
-										:optionsList="workOrdersList"
-										:placeholder="`${tt('select')} ${tt('order')}`"
-										labelKey="id"
-									/>
-								</div>
+							<div class="label">{{ tt('WO') }}#</div>
+							<div class="el-form-item__content">
+								<CustomSelectV2
+									v-model="formData.work_order_id"
+									filterable
+									clearable
+									multiple
+									collapse-tags
+									:optionsLoading="workOrdersLoading"
+									:optionsList="workOrdersList"
+									:placeholder="`${tt('select')} ${tt('order')}`"
+									labelKey="id"
+								/>
 							</div>
 						</div>
 
 						<div class="mcol-xs-12 mcol-sm-3 self-end">
-							<div class="el-form-item">
-								<div class="el-form-item__content">
-									<el-button
-										type="success"
-										native-type="button"
-										class="item-action-button inverted"
-										@click="handleApply"
-									>
-										<span class="uppercase">{{ tt('APPLY') }}</span>
-									</el-button>
-								</div>
+							<div class="el-form-item__content">
+								<el-button
+									type="success"
+									native-type="button"
+									class="item-action-button inverted"
+									@click="handleApply"
+								>
+									<span class="uppercase">{{ tt('APPLY') }}</span>
+								</el-button>
 							</div>
 						</div>
 					</div>
@@ -116,35 +108,31 @@
 				<div class="mcol-xs-12">
 					<div class="mrow flex wrap bottom">
 						<div class="mcol-xs-12 mcol-sm-3">
-							<div class="el-form-item">
-								<div class="label">
-									{{ `${tt('phrases.Contractor_hourly_rate')} ($/${tt('hour')})` }}
-								</div>
-								<div class="flex">
-									<el-input-number
-										v-model.number="contractorHourlyRateInput"
-										:controls="false"
-										class="mcol-xs-6"
-										:min="0"
-									/>
-									<div class="mcol-xs-6 result-field">{{ contractorHourlyRateFinal }} $</div>
-								</div>
+							<div class="label">
+								{{ `${tt('phrases.Contractor_hourly_rate')} ($/${tt('hour')})` }}
+							</div>
+							<div class="flex">
+								<el-input-number
+									v-model.number="contractorHourlyRateInput"
+									:controls="false"
+									class="mcol-xs-6"
+									:min="0"
+								/>
+								<div class="mcol-xs-6 result-field">{{ contractorHourlyRateFinal }} $</div>
 							</div>
 						</div>
 
 						<div class="mcol-xs-12 mcol-sm-3">
-							<div class="el-form-item">
-								<div class="label">{{ tt('phrases.Contractor_Markup') }} (%)</div>
-								<div class="flex">
-									<el-input-number
-										v-model.number="contractorMarkupPercent"
-										:controls="false"
-										class="mcol-xs-6"
-										:min="0"
-										:max="100"
-									/>
-									<div class="mcol-xs-6 result-field">{{ contractorMarkupPercentFinal }} $</div>
-								</div>
+							<div class="label">{{ tt('phrases.Contractor_Markup') }} (%)</div>
+							<div class="flex">
+								<el-input-number
+									v-model.number="contractorMarkupPercent"
+									:controls="false"
+									class="mcol-xs-6"
+									:min="0"
+									:max="100"
+								/>
+								<div class="mcol-xs-6 result-field">{{ contractorMarkupPercentFinal }} $</div>
 							</div>
 						</div>
 
