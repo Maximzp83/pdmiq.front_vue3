@@ -946,3 +946,12 @@ await fetchUsers({ page: 1 });
   - Restored page reinitialization when Vue Router reuses the component across user edit, create, and profile routes
   - Corrected authenticated-user refresh for the current `api_request` result and restored the `itemsName` page/form contract
   - Omitted the unused legacy `apiTabVisible` watcher state; targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] BannerFilterBlock re-baseline and control parity fix (2026-08-25)
+  - Restored the permission-gated re-baseline button, confirmation, enable/disable API request, loading state, and Statistics sensor refresh
+  - Restored Vue2 NCD OFF ALARM hiding and exact Split-button eligibility, including Banner Temp/Vibe V2
+  - Closing the Statistics filter now also closes the nested ChartsFilterBar popover
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24; the unrelated dirty Requisitions ROI Calculator file was not changed
+- [x] Requisitions create-modal Cancel runtime fix (2026-08-25)
+  - Passed textarea row counts as numbers for the strict Element Plus `rows` prop
+  - Replaced the stale `closeDialog` event with the `DynamicFormContainer`-owned `handleCloseEditModal` contract
+  - Preserved existing user edits; targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

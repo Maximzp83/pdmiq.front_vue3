@@ -60,7 +60,7 @@
 
 		<div v-if="!isCompare && !isHumiditySensor && !isBannerV2_1" class="button-item">
 			<el-button
-				v-if="!hideOffAlarm"
+				v-if="!isNCDSensor"
 				type="primary"
 				native-type="button"
 				:disabled="sensorData.is_re_baseline_process"
@@ -117,9 +117,38 @@
 			class="button-item ChartsFilterBar"
 		>
 			<ChartsFilterBar
+				ref="chartsFilterBarRef"
 				:sensorParametersList="sensorParametersList[currentSensorType.isBannerCM1L ? 'banner_CM1L' : 'banner']"
 				:isLoading="itemsLoading"
 			/>
+		</div>
+
+		<div
+			v-if="!isNCDEnv && !isCompare && !isHumiditySensor && hasAccessToEditDashboard"
+			class="button-item"
+		>
+			<el-popover
+				placement="bottom"
+				popper-class="button-popover"
+				:title="tt('phrases.thresholds_re_baseline')"
+				:width="180"
+				trigger="hover"
+			>
+				<template #reference>
+					<el-button
+						type="primary"
+						native-type="button"
+						class="ml-auto inverted re-baseline-button"
+						:class="{ loading: rebaselineLoading }"
+						@click="clickReBaseline"
+					>
+						<div class="relative img-container">
+							<img :class="['suffix-icon', 'img rebase-wheel-img']" :src="rebase_wheel" />
+							<img :class="['suffix-icon', 'img rebase-lines-img']" :src="rebase_lines" />
+						</div>
+					</el-button>
+				</template>
+			</el-popover>
 		</div>
 
 		<div class="button-item chart-switcher text-right">
@@ -143,9 +172,10 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
+import { rebase_lines, rebase_wheel } from '@/constants/global';
 import { Lang } from '@/localization';
 import {
 	SENSOR_PARAMETERS_TYPES,
@@ -154,6 +184,8 @@ import {
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 import { useActionButtons } from '@/composables/mixins/useActionButtons';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useSensors } from '@/composables/useSensors';
+import { useAuthStore } from '@/stores/AuthStore';
 import { useSensorsStore } from '@/stores/SensorsStore';
 
 import ChartsFilterBar from '../charts/ChartsFilterBar.vue';
@@ -179,16 +211,20 @@ const props = defineProps({
 	v21ViewActive: Boolean,
 	levelZonesSaving: Boolean,
 	hasOffAlarm: Boolean,
-	hideOffAlarm: Boolean,
+	isNCDSensor: Boolean,
 	splitNCDCharts: Boolean,
-	splitChartsButtonEnabled: Boolean,
+	chartOperationsPopoverShow: Boolean,
 });
 
 const emit = defineEmits(['event']);
 const { confirmHelper } = useActionButtons({ emit });
+const authStore = useAuthStore();
 const sensorsStore = useSensorsStore();
+const { sensorRebaseLine } = useSensors();
 const { statistics_filters: filters } = storeToRefs(sensorsStore);
 const pdfAndFftRequestsBlockRef = ref(null);
+const chartsFilterBarRef = ref(null);
+const rebaselineLoading = ref(false);
 
 const metricSystemsList = computed(() => Object.freeze(getMetricSystemsList()));
 const sensorParametersList = computed(() =>
@@ -205,11 +241,13 @@ const isBannerV2_1 = computed(() => props.currentSensorType.isBannerV2_1);
 const isBannerM25 = computed(() => props.currentSensorType.isBannerM25);
 const isBannerExtraVibration = computed(() => props.currentSensorType.isBannerExtraVibration);
 const isNCDEnv = computed(() => props.currentSensorType.isNCDEnv);
-const isNCDSensor = computed(() =>
+const splitChartsButtonEnabled = computed(() =>
 	props.currentSensorType.isNCDTempVibe ||
 	props.currentSensorType.isNCDWiredTempVibe ||
-	props.currentSensorType.isNCDTempVibeCurr,
+	props.currentSensorType.isNCDTempVibeCurr ||
+	isBannerTempVibe2.value,
 );
+const hasAccessToEditDashboard = computed(() => authStore.hasAccessTo(['edit_dashboard']));
 const offAlarmParameterIds = Object.freeze([
 	SENSOR_PARAMETERS_TYPES.Z_AXIS_ACCELERATION,
 	SENSOR_PARAMETERS_TYPES.X_AXIS_ACCELERATION,
@@ -241,8 +279,43 @@ const toggleOffAlarm = () => {
 const handleUnlockFFT = (payload) => {
 	pdfAndFftRequestsBlockRef.value?.handleUnlockFFT?.(payload);
 };
+const submitReBaseline = () => {
+	const { id, is_re_baseline_process: isRebaseline } = props.sensorData;
+	if (!id) return Promise.resolve();
+
+	rebaselineLoading.value = true;
+	return sensorRebaseLine({
+		itemId: id,
+		data: { enable: isRebaseline ? 0 : 1 },
+		resultMessage: {
+			text: `${tt('re_baseline')} ${isRebaseline ? tt('disabled') : tt('performed')}`,
+		},
+	})
+		.then(() => event('initSensors'))
+		.finally(() => {
+			rebaselineLoading.value = false;
+		});
+};
+const clickReBaseline = () => {
+	const isRebaseline = props.sensorData.is_re_baseline_process;
+	return confirmHelper({
+		message: `${tt('phrases.Do_you_really_want_to')} <b>${
+			isRebaseline ? `${tt('disable')} ${tt('re_baseline')}` : tt('re_baseline')
+		}</b>? ${tt('Continue')}?`,
+		confirmButtonText: tt('Confirm'),
+	})
+		.then(submitReBaseline)
+		.catch(() => {});
+};
 
 const { handleEvent } = useEventHandler({}, emit);
+
+watch(
+	() => props.chartOperationsPopoverShow,
+	(isShow) => {
+		if (!isShow) chartsFilterBarRef.value?.closePopover?.();
+	},
+);
 
 defineExpose({
 	handleUnlockFFT,

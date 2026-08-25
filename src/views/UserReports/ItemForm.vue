@@ -60,7 +60,9 @@
 			<el-form-item :label="tt('time')" prop="launch_time" class="time-select">
 				<el-time-select
 					v-model="formData.launch_time"
-					:picker-options="{ start: '00:00', step: '00:15', end: '23:45' }"
+					start='00:00'
+					step='00:15'
+					end='23:45'
 					:placeholder="`${tt('select')} ${tt('time')}`"
 				/>
 			</el-form-item>

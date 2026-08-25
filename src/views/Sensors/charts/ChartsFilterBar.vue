@@ -147,4 +147,10 @@ const applyChartsFilters = () => {
 		});
 	}
 };
+
+const closePopover = () => {
+	chartFiltersPopoverShow.value = false;
+};
+
+defineExpose({ closePopover });
 </script>
