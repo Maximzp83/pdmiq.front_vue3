@@ -955,3 +955,13 @@ await fetchUsers({ page: 1 });
   - Passed textarea row counts as numbers for the strict Element Plus `rows` prop
   - Replaced the stale `closeDialog` event with the `DynamicFormContainer`-owned `handleCloseEditModal` contract
   - Preserved existing user edits; targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] BannerSensorsList full Vue2 parity fix (2026-08-25)
+  - Restored Controller-scoped modal Add/Edit, success refetch/close, embedded navbar protection, initial page reset, Plant/query cleanup, and the original table columns
+  - Restored re-baseline enable/disable confirmation, payload, notification, loading, and refresh behavior while preserving FFT and delete actions
+  - Repaired modal validator/save exposure, controller prefill, and asynchronously loaded Banner V2 subtype parameter preparation
+  - Follow-up separated the `itemsList` watcher from the Plant watcher, restoring observation of fetched array replacements
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Nested numeric condition validation runtime fix (2026-08-25)
+  - Preserved nonzero numeric values returned from nested condition paths instead of treating them as empty
+  - Restored Banner Sensors Asset action rendering for rows with `equipment.asset.id`
+  - Added a targeted regression assertion; targeted Vitest, ESLint, `git diff --check`, and the Node 24 production Vite build passed

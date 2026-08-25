@@ -16,6 +16,12 @@
 - User prefers no code/diff output unless requested.
 
 ## Current Task Status
+- `src/views/Sensors/BannerSensorsList.vue` full parity fix completed on 2026-08-25:
+  - Restored modal Add/Edit through `BannerSensorItemWrapper`, controller-scoped settings, success refetch/close, page reset, Plant/query cleanup, navbar protection for the embedded Controller tab, and the original table columns.
+  - Restored re-baseline confirmation plus enable/disable payload, result message, loading state, and list refresh.
+  - Repaired the dependent modal save chain: the wrapper invokes the exposed sensor-form validator, the form saves instead of returning early, controller id is prefilled, and asynchronously loaded Banner V2 subtypes drive customizable parameters.
+  - Follow-up: the `itemsList` observer is now a separate Vue watcher instead of invalid extra arguments on the Plant watcher, so list-reference replacements after fetch are observed.
+  - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite warnings remain.
 - Requisitions create-modal Cancel runtime fix completed on 2026-08-25:
   - `src/views/Requisitions/ItemForm.vue` now passes numeric textarea row counts required by Element Plus.
   - Create-form Cancel now emits the `handleCloseEditModal` event understood by `DynamicFormContainer`, removing the missing `closeDialog` handler warning and closing the modal through its owner.
@@ -120,7 +126,7 @@
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue` now restores the legacy DXM/lubrication flow through `useWebSocket`: it subscribes to the user channel before sending the command, tracks lube-shot data/id, handles controller/status-matched completion, updates charts, and closes the socket.
 
 ## Next Actionable Step
-- Runtime smoke-test Requisitions create modal: open the form, cancel it, and confirm that the modal closes without Element Plus prop or missing-handler warnings.
+- Runtime smoke-test the Controller Devices tab: list loading/pagination, Add/Edit modal save and close, controller prefill, Banner V2 subtype parameters, FFT request, re-baseline enable/disable, delete, and Plant change.
 
 ## EquipmentsLayout Parity Fix (2026-08-07)
 - Restored the separate Storeroom create flow in `src/views/Equipments/EquipmentsLayout.vue`; it opens the Equipment multiform and refetches/closes after successful save.
@@ -259,3 +265,8 @@
 - Restored the legacy `itemsName` contract from the page to `src/views/Users/ItemForm.vue`; the form now explicitly declares the prop.
 - The legacy `apiTabVisible` watcher was intentionally not copied because its result was not consumed; the active computed tab visibility already preserves the actual behavior.
 - Targeted ESLint, targeted `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Nested Numeric Condition Validation Fix (2026-08-25)
+- Fixed `src/utils/condition-validation.js` so nonzero numeric values at nested paths are not normalized to `null` by Lodash `isEmpty`.
+- This restores table actions guarded by numeric nested ids, including the Banner Sensors Asset link condition on `equipment.asset.id`.
+- Added a regression assertion for a nested numeric asset id; targeted Vitest, ESLint, `git diff --check`, and the Node 24 production Vite build pass.

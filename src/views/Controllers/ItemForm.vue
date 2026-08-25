@@ -242,6 +242,7 @@
 				>
 					<BannerSensorsList
 						insideOtherPage
+						preventSetNavbar
 						:propsFilters="sensorsListFilters"
 					/>
 				</div>

@@ -1,6 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
+- BannerSensorsList parity is restored end to end: Controller-scoped modal CRUD, modal validation/save/refetch/close, original list lifecycle/columns, FFT, re-baseline behavior, and the separate `itemsList` replacement watcher now work as intended.
 - Requisitions create-modal Cancel now closes through `DynamicFormContainer` without the stale `closeDialog` event warning, and its textarea row props satisfy Element Plus numeric typing.
 - Banner Statistics filter parity is restored: re-baseline is wired end to end, NCD OFF ALARM and Split visibility match Vue2, and closing the outer filter closes the nested charts popover.
 - Users ItemPage parity is restored: route reuse reinitializes page data, authenticated-user saves refresh auth state from the current API response contract, and `itemsName` is forwarded to the form.
@@ -269,6 +270,7 @@ Primary rules source:
 - `src/views/Sensors/MultiViewStatisticsPage.vue`
 
 ## Recommended Next Focus
+- Runtime smoke-test the Banner Controller Devices tab, especially Add/Edit modal save, controller prefill, Banner V2 subtype parameters, re-baseline enable/disable, FFT request, delete, pagination, and Plant changes.
 - Runtime smoke-test opening and cancelling the Requisitions create modal, confirming clean closure and no Element Plus rows warning.
 - Runtime smoke-test the Banner Statistics filter with real data: re-baseline enable/disable, NCD OFF ALARM visibility, Split visibility for supported sensor types, and nested popover closure.
 - Runtime smoke-test `/users/:id`, `/users/new`, and `/profile` transitions without a hard reload, then save the authenticated user and confirm the navbar/auth state refreshes.
@@ -284,6 +286,8 @@ Primary rules source:
 
 ## Build Status
 - `npm run build` passes after follow-up compile fixes.
+- Latest BannerSensorsList full-parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
+- Latest BannerSensorsList watcher follow-up also passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest Requisitions modal Cancel fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest BannerFilterBlock parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest Users ItemPage parity fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
@@ -292,6 +296,7 @@ Primary rules source:
 - Latest MultiView threshold sync passes targeted ESLint, migration-rule scan, targeted `git diff --check`, and production Vite build on Node 24.
 
 ## Files Already Modified In This Migration Batch
+- Latest BannerSensorsList parity fix: `src/views/Sensors/BannerSensorsList.vue`, `src/views/Controllers/ItemForm.vue`, `src/views/Sensors/sensorForm/BannerSensorItemWrapper.vue`, and `src/views/Sensors/sensorForm/ItemForm.vue`.
 - Latest Requisitions modal Cancel fix: `src/views/Requisitions/ItemForm.vue`.
 - Latest BannerFilterBlock parity fix: `src/views/Sensors/FilterBlock/BannerFilterBlock.vue`, `src/views/Sensors/StatisticsPage.vue`, and `src/views/Sensors/charts/ChartsFilterBar.vue`.
 - Latest Users ItemPage parity fix: `src/views/Users/ItemPage.vue` and `src/views/Users/ItemForm.vue`.
@@ -519,3 +524,8 @@ Primary rules source:
 - Corrected the successful-save auth refresh for the current `api_request` result shape and retained legacy fallbacks.
 - Restored and declared the `itemsName` prop passed from Users ItemPage to ItemForm; omitted only the original dead `apiTabVisible` watcher state.
 - Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Nested Numeric Condition Validation Fix (2026-08-25)
+- Nested nonzero numeric values now survive condition path resolution instead of being converted to `null` by Lodash `isEmpty`.
+- Banner Sensors Asset actions therefore render when `equipment.asset.id` is present, while existing null/empty, zero, and boolean handling remains intact.
+- A targeted condition-validation regression test, ESLint, `git diff --check`, and the Node 24 production Vite build pass.

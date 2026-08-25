@@ -16,6 +16,13 @@ describe('condition validation', () => {
 				conditions: [{ prop: 'role.type', control_value: 'admin' }],
 			}),
 		).toBe(true);
+
+		expect(
+			validateBySettings({
+				dataObj: { equipment: { asset: { id: 16397 } } },
+				conditions: [{ prop: 'equipment.asset.id', method: '!=', control_value: null }],
+			}),
+		).toBe(true);
 	});
 
 	it('supports array comparison and chained conditions', () => {
