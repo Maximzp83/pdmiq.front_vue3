@@ -179,12 +179,12 @@ const bannerRequestFmaxTypes = computed(() => {
 		list = list.filter((item) => item.id !== BANNER_REQUEST_FMAX_TYPES.HZ_10600);
 	}
 
-	if (props.rootFilters?.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
+	/*if (props.rootFilters?.measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 		return list.map((type) => ({
 			...type,
 			name: `${type.value * 60} CPM`,
 		}));
-	}
+	}*/
 
 	return list;
 });

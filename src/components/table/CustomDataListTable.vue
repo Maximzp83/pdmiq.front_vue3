@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 import { LANGUAGE_TYPES } from '@/localization/utils';
 import { Lang } from '@/localization';

@@ -6,13 +6,11 @@
 			<ItemForm
 				ref="itemFormComponentRef"
 				editInModal
-				ignoreLocalSubmit
 				:itemData="itemData"
 				:equipmentData="equipmentData"
 				:itemsName="itemsName"
 				:additionalSettings="additionalSettings"
 				@event="handleEvent"
-				@submit="emit('submit', $event)"
 			/>
 		</div>
 	</div>
@@ -39,7 +37,7 @@ const props = defineProps({
 	additionalSettings: { type: Object, default: () => ({}) },
 });
 
-const emit = defineEmits(['submit', 'event']);
+const emit = defineEmits(['event']);
 
 const itemFormComponentRef = ref(null);
 const equipmentData = shallowRef(null);

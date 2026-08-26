@@ -200,6 +200,7 @@
 						enableLoadmore
 						:settings="bannerSubtypesSelectSettings"
 						:placeholder="`${tt('select')} ${tt('subtype')}`"
+						@update:optionsList="bannerSubtypesListLocal = $event"
 					/>
 				</el-form-item>
 
@@ -577,6 +578,7 @@ const globalStore = useGlobalStore();
 const itemFormRef = ref(null);
 const refsMap = ref({});
 const formulasListLocal = ref([]);
+const bannerSubtypesListLocal = ref([]);
 const rpmSending = ref(false);
 const editAcute = ref(false);
 const initCrashIndicationThreshold = ref(5);
@@ -712,6 +714,9 @@ const gainUltrasoundSignalList = computed(() =>
 const finalFormulasList = computed(() =>
 	props.fromModal && props.formulasList.length ? props.formulasList : formulasListLocal.value,
 );
+const finalBannerSubtypesList = computed(() =>
+	props.bannerSubtypesList.length ? props.bannerSubtypesList : bannerSubtypesListLocal.value,
+);
 const isLubeMatrixV3 = computed(
 	() => formData.value.data_set === DATASET.LUBEMATRIX_V3 && !!formData.value.is_lube_mode,
 );
@@ -791,8 +796,8 @@ const formulaExpression = computed(() => {
 });
 const selectedSubtype = computed(() => {
 	const selectedId = formData.value.banner_v2_subtype_id;
-	if (!selectedId || !props.bannerSubtypesList.length) return null;
-	return findItemBy('id', selectedId, props.bannerSubtypesList);
+	if (!selectedId || !finalBannerSubtypesList.value.length) return null;
+	return findItemBy('id', selectedId, finalBannerSubtypesList.value);
 });
 const preparedSubtypeParametersList = computed(() => {
 	const parameters = selectedSubtype.value?.parameters || [];
@@ -954,6 +959,10 @@ const localSetupPageActions = (item) => {
 
 	if (props.equipmentData?.id) {
 		formData.value.equipment_id = props.equipmentData.id;
+	}
+
+	if (props.additionalSettings?.fromSensorsList && props.additionalSettings?.controllerId) {
+		formData.value.controller_id = props.additionalSettings.controllerId;
 	}
 
 	setTimeout(() => {
@@ -1255,6 +1264,7 @@ if (!props.fromModal || !props.formulasList.length) {
 }
 
 defineExpose({
+	validateForm: handleValidateSensorForm,
 	validateItemForm,
 	submitItemForm,
 	getFormData,

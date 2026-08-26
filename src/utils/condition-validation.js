@@ -11,7 +11,9 @@ const getObjectValue = (object, path = '') => {
 
 	for (let index = 1; index < parts.length; index++) {
 		value = value?.[parts[index]];
-		if (isEmpty(value) && value !== false && value !== 0) return null;
+		const isConditionPrimitive =
+			(typeof value === 'number' && !Number.isNaN(value)) || typeof value === 'boolean';
+		if (isEmpty(value) && !isConditionPrimitive) return null;
 	}
 
 	return value ?? (value === false || value === 0 ? value : null);
