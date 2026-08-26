@@ -139,7 +139,7 @@ const buildChartsSettings = computed(() => {
 		});
 	}
 
-	if (!props.splitCharts && props.activeAxis) {
+	if (!currentSensorType.value.isManualRoute && !props.splitCharts && props.activeAxis) {
 		if (props.sensorData.is_hidden_ncd_active_vertical_axis) {
 			settings.setupChartsConfigsListSettings.filterParamsBy.push({
 				prop: 'axis_id',

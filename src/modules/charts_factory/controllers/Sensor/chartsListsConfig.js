@@ -7,6 +7,7 @@ import {
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
 	BANNER_M25_PARAMETERS_TYPES,
 	sensorParametersList,
+	manualRouteSensorParametersList,
 	sensorParametersListNCD,
 	sensorUltraSoundParametersList,
 	sensorBannerUltraSoundParametersList,
@@ -2326,6 +2327,7 @@ const defaultSeriesConfig1 = {
 
 const getRequestList1 = ({parameter, sensor}) => {
 	const parameterItem = sensorParametersList(parameter) ||
+				manualRouteSensorParametersList(parameter) ||
 				sensorParametersListNCD(parameter) ||
 				sensorUltraSoundParametersList(parameter) ||
 				sensorBannerUltraSoundParametersList(parameter) ||

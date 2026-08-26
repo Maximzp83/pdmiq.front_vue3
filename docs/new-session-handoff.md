@@ -7,6 +7,7 @@
 - Users ItemPage parity is restored: route reuse reinitializes page data, authenticated-user saves refresh auth state from the current API response contract, and `itemsName` is forwarded to the form.
 - The latest one-file `vue2_project` MultiView threshold delta is fully synced into Vue3: Compare thresholds retain acute/stable samples and omit only re-trigger samples. Nothing was skipped.
 - Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
+- The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
@@ -54,6 +55,15 @@ Primary rules source:
   - Controllers create blank state was fixed: `ItemPage.vue` defaults `/controllers/new` without query type to PDM/Banner and `ItemForm.vue` gates formulas content by tab presence.
   - Controllers devices tab is wired in `src/views/Controllers/ItemForm.vue` and uses migrated `src/views/Sensors/BannerSensorsList.vue` with controller-scoped filters.
 - `Sensors` migration is complete for the current Vue3 scope:
+  - Latest Manual Route delta is synced: constants/dataset/class/localization, plant/metric helpers, chart parameters/configs, per-metric FFT flags, metadata/RPM rendering, Manual Route API operations, `src/views/Sensors/sensorForm/ItemFormManualRoute.vue`, Equipment form/card behavior, and Statistics/FFT/One Chart adaptations.
+  - Latest Manual Route FFT follow-up is synced: dev graph-points default endpoint, line-datetime spline history charts, FFT metadata tooltip in `AnalysisFFTContainer`, and shared tooltip styles.
+  - Latest Manual Route history follow-up is synced: velocity and high-frequency acceleration now share one spline chart with two configured Y axes, while base Sensor chart axis setup/limits support per-request data.
+  - Latest Manual Route aggregate-page follow-up is synced: equipment details now expose a dedicated Manual Route route/page with separate velocity and high-frequency charts, one series and FFT flags per Manual Route sensor, and Manual Route-aware card/PdM/Statistics/FFT navigation.
+  - Latest 2026-08-06 follow-up is synced: FFT neighbour requests preserve Manual Route `metric_type` and reload around the selected FFT; Manual Route/MultiView titles render color legends; one-point Manual Route series show markers; the obsolete static config is removed; and the FFT dev endpoint/shared legend styles are aligned.
+  - Manual Route runtime event warnings were fixed locally: page-level chart lifecycle events are consumed, Y-axis zoom is handled by the custom header, unrelated events still propagate, and statistics/FFT points are sorted chronologically to prevent Highcharts error #15.
+  - The same Vue2 delta also adds Multiview Alarms notification labels, restricts Banner M25 running thresholds to the supported pair (including loaded-data cleanup), and initializes Meeting Tracker PDF `plant_id` from props.
+  - Targeted ESLint, `git diff --check`, and production Vite build pass on Node 24; only existing mixed-import/chunk-size warnings remain.
+  - Targeted ESLint, targeted `git diff --check`, and the production Vite build pass on Node 24 for the Manual Route sync.
   - Added `src/composables/useSensors.js` for sensor-specific API requests.
   - Added Pinia filter/state actions to `src/stores/SensorsStore.js`.
   - Added generic `set_filters` support to `src/stores/mixins/commonStoreMixin.js`.
@@ -302,6 +312,9 @@ Primary rules source:
 - Latest Users ItemPage parity fix: `src/views/Users/ItemPage.vue` and `src/views/Users/ItemForm.vue`.
 - Latest MultiView threshold sync: `src/views/Sensors/charts/MultiView/ThresholdItem.vue`.
 - Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
+- Latest Manual Route aggregate-page Vue2 sync passes targeted ESLint, `git diff --check`, and production Vite build on Node 24.
+- Latest seven-file Sensor/chart Vue2 sync passes targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build on Node 24; only existing Vite warnings remain.
+- Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/composables/useSensors.js`
@@ -320,6 +333,8 @@ Primary rules source:
 - `src/views/Sensors/FilterBlock/UltrasoundFilterBlock.vue`
 - `src/views/Sensors/StatisticsPage.vue`
 - `src/views/Sensors/FFTStatisticsPage.vue`
+- `src/views/Sensors/ManualRouteStatisticsPage.vue`
+- `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`
 - `src/views/Sensors/MultiViewStatisticsPage.vue`
 - `src/views/Sensors/OneChartPage.vue`
 - `src/views/Sensors/ChartMessageForm.vue`

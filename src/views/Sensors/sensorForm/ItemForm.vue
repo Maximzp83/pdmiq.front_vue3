@@ -859,6 +859,10 @@ const runningThresholdParametersList = computed(() => {
 		const paramsList = [
 			BANNER_M25_PARAMETERS_TYPES.ULTRASOUND_RMS,
 			BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_RMS_ACCELERATION,
+			// BANNER_M25_PARAMETERS_TYPES.HFE_IMPACT_INDEX,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_PK_ACCELERATION,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_CREST_FACTOR,
+			// BANNER_M25_PARAMETERS_TYPES.HIGH_FREQ_KURTOSIS,
 		];
 		result = result.filter((item) => paramsList.some((paramId) => paramId === item.id));
 		resultWithThresholdsOnly = resultWithThresholdsOnly.filter((item) =>

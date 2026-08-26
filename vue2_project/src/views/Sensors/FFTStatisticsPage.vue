@@ -33,9 +33,12 @@
 
 							<div class="mcol-xs-12 flex">
 								<div class="card filled_4 request-type-block">
-									<span v-if="isUltrasoundFFT">Fmax = </span>
-									<span v-else>{{ requestType }} - </span>
-									<span class="no-margin">{{ requestFMax }}</span>
+									<span v-if="isManualRoute">{{ fftMetricName }}</span>
+									<template v-else>
+										<span v-if="isUltrasoundFFT">Fmax = </span>
+										<span v-else>{{ requestType }} - </span>
+										<span class="no-margin">{{ requestFMax }}</span>
+									</template>
 								</div>
 								
 							</div>
@@ -70,6 +73,7 @@
 								@event="handleEventNew"
 								:selectedChildComponentIds="selectedChildComponentIds"
 								:rootFilters="{ measurement }"
+								:metaDataEntries="metaDataEntries"
 							/>
 						</div>
 					</div>
@@ -78,6 +82,7 @@
 						class="section-row margin-top-row axis-selection-container flex justify-center"
 					>
 						<RadioButtonsBlock
+							v-if="!isManualRoute"
 							v-show="!splitCharts"
 							@onChange="val => (activeAxis = val)"
 							:settings="axisRadioBlockSettings"
@@ -109,6 +114,7 @@
 						>
 							<div class="button-item">
 								<el-button
+									v-if="!isManualRoute"
 									@click="handleSplitCharts"
 									type="primary"
 									native-type="button"
@@ -196,7 +202,10 @@ import {
 	getRoundedValue,
 	getItemValue
 } from '@/helpers';
-import { getSensorTitle } from '@/helpers/specialHelpers';
+import {
+	getSensorMetricSystemType,
+	getSensorTitle
+} from '@/helpers/specialHelpers';
 // import { timeZonesList } from '@/constants/date_time';
 
 import {
@@ -210,7 +219,8 @@ import {
 	metricSystemsList,
 	METRIC_SYSTEM_TYPES,
 	NCD_SENSOR_PARAMETERS_TYPES,
-	SENSOR_PARAMETERS_TYPES
+	SENSOR_PARAMETERS_TYPES,
+	manualRouteSensorParametersList
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { initPageDataMixin, sensorTypeMixin, fetchItemsHelper, eventHandler } from '@/mixins';
@@ -224,7 +234,7 @@ export default {
 		FFTChartsListWrapper: () => import('./charts/fft/FFTChartsListWrapper.vue'),
 		RadioButtonsBlock: () => import('@/components/form/RadioButtonsBlock.vue'),
 		EquipmentPictureBlock: () => import('./charts/EquipmentPictureBlock.vue'),
-		AnalysisFFTContainer: () => import('./AnalysisFFT/AnalysisFFTContainer.vue'),
+		AnalysisFFTContainer: () => import('./AnalysisFFT/AnalysisFFTContainer.vue')
 	},
 
 	data: () => ({
@@ -356,7 +366,10 @@ export default {
 		},
 
 		equipmentRPM() {
-			const { itemData, measurement } = this;
+			const { currentFFTItem, itemData, measurement } = this;
+			if (currentFFTItem && currentFFTItem.rpm_value != null) {
+				return `${currentFFTItem.rpm_value} RPM`;
+			}
 			if (itemData && itemData.equipment_rpm) {
 				if (measurement === METRIC_SYSTEM_TYPES.IMPERIAL) {
 					return `${itemData.equipment_rpm} CPM`;
@@ -368,8 +381,14 @@ export default {
 		},
 
 		isUltrasoundFFT: that => that.currentSensorType.isBannerM25,
+		isManualRoute: that => that.currentSensorType.isManualRoute,
 
 		getParamsByIds() {
+			if (this.isManualRoute && this.currentFFTItem) {
+				return this.currentFFTItem.metric_type
+					? [Number(this.currentFFTItem.metric_type)]
+					: [];
+			}
 			if(this.isUltrasoundFFT) {
 				return [
 					NCD_SENSOR_PARAMETERS_TYPES.X_WAVEFORM,
@@ -383,6 +402,30 @@ export default {
 					NCD_SENSOR_PARAMETERS_TYPES.Z_WAVEFORM,
 					SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY
 				]
+			}
+			return [];
+		},
+
+		fftMetricName() {
+			if (this.currentFFTItem) {
+				const parameter = manualRouteSensorParametersList(
+					this.currentFFTItem.metric_type
+				);
+				return parameter ? parameter.name : this.tt('constants.fft');
+			}
+			return '';
+		},
+
+		metaDataEntries() {
+			if (
+				this.currentFFTItem &&
+				this.currentFFTItem.meta_data &&
+				typeof this.currentFFTItem.meta_data === 'object'
+			) {
+				return Object.keys(this.currentFFTItem.meta_data).map(key => ({
+					key,
+					value: this.currentFFTItem.meta_data[key]
+				}));
 			}
 			return [];
 		},
@@ -416,7 +459,9 @@ export default {
 					boldLabels: true,
 					linkSettings: {
 						key: 'location_in_equipment',
-						to: `/equipments/${this.itemData.equipment_id}/details/pdm/${this.itemData.id}`
+						to: this.isManualRoute
+							? `/equipments/${this.itemData.equipment_id}/details/manual-route`
+							: `/equipments/${this.itemData.equipment_id}/details/pdm/${this.itemData.id}`
 					}
 				});
 			}
@@ -427,7 +472,8 @@ export default {
 			return {
 				selectedChildComponents: this.selectedChildComponents,
 				equipmentData: this.equipmentData,
-				isUltrasoundFFT: this.isUltrasoundFFT
+				isUltrasoundFFT: this.isUltrasoundFFT,
+				isManualRoute: this.isManualRoute
 			}
 		},
 
@@ -512,21 +558,56 @@ export default {
 			};
 			this.fftLoading = true;
 
-			this.fetch_ncd_fft(payload)
+			return this.fetch_ncd_fft(payload)
 				.then(({ value }) => {
 					this[FFTItemKey] = value;
 					this.fftLoading = false;
+					return value;
 				})
 				.catch(() => {
 					this[FFTItemKey] = null;
 					this.fftLoading = false;
 					this.fftReady = true;
+					return null;
 				});
+		},
+
+		getFFTNavigationUrl({ fftId, direction, max, fftItem = this.currentFFTItem }) {
+			const params = new URLSearchParams();
+			if (max != null) params.set('max', max);
+			if (this.isManualRoute && fftItem?.metric_type != null) {
+				params.set('metric_type', fftItem.metric_type);
+			}
+
+			const query = params.toString();
+			return `/${fftId}/${direction}${query ? `?${query}` : ''}`;
+		},
+
+		loadFFTNeighbours(fftItem, prevMax = 9) {
+			if (!fftItem) return;
+
+			this.fetchFFT({
+				FFTItemKey: 'prevFFTItems',
+				urlPostfix: this.getFFTNavigationUrl({
+					fftId: fftItem.id,
+					direction: 'prev',
+					max: prevMax,
+					fftItem,
+				}),
+			});
+			this.fetchFFT({
+				FFTItemKey: 'nextFFTItem',
+				urlPostfix: this.getFFTNavigationUrl({
+					fftId: fftItem.id,
+					direction: 'next',
+					fftItem,
+				}),
+			});
 		},
 
 		handleFFT({ prev, next }) {
 			// console.log(prev, next, this.$route)
-			const { currentFFTItem, prevFFTItem, nextFFTItem, itemData } = this;
+			const { prevFFTItem, nextFFTItem, itemData } = this;
 			const {isBannerTempVibe2, isBannerV2_1, isBannerV2Generic } = this.currentSensorType;
 			const url_type = (isBannerTempVibe2 || isBannerV2_1 || isBannerV2Generic) ? 'banner' : 'ncd';
 
@@ -534,28 +615,16 @@ export default {
 				if (prevFFTItem) {
 					this.fftReady = false;
 					this.$router.replace(`/${url_type}/${itemData.id}/fft/${prevFFTItem.id}`);
-					this.nextFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(prevFFTItem);
-					this.fetchFFT({
-						FFTItemKey: 'prevFFTItems',
-						urlPostfix: `/${prevFFTItem.id}/prev?max=9`
-					});
+					this.loadFFTNeighbours(this.currentFFTItem);
 				}
 			} else if (next) {
 				if (nextFFTItem) {
 					this.fftReady = false;
 
 					this.$router.replace(`/${url_type}/${itemData.id}/fft/${nextFFTItem.id}`);
-					// this.prevFFTItem = cloneDeep(currentFFTItem);
 					this.currentFFTItem = cloneDeep(nextFFTItem);
-					this.fetchFFT({
-						FFTItemKey: 'prevFFTItems',
-						urlPostfix: `/${nextFFTItem.id}/prev?max=11`
-					});
-					this.fetchFFT({
-						FFTItemKey: 'nextFFTItem',
-						urlPostfix: `/${nextFFTItem.id}/next`
-					});
+					this.loadFFTNeighbours(this.currentFFTItem, 11);
 				}
 			}
 		},
@@ -599,6 +668,12 @@ export default {
 	},
 
 	watch: {
+		equipmentData(equipment) {
+			if (equipment && this.itemData) {
+				this.measurement = getSensorMetricSystemType(this.itemData, equipment);
+			}
+		},
+
 		itemData(sensor) {
 			if (sensor) {
 				// console.log(sensor, this.itemData)
@@ -608,19 +683,9 @@ export default {
 				this.fetchFFT({
 					FFTItemKey: 'currentFFTItem',
 					urlPostfix: `/${this.fftId}`
-				});
-				this.fetchFFT({
-					FFTItemKey: 'prevFFTItems',
-					urlPostfix: `/${this.fftId}/prev?max=9`
-				});
-				this.fetchFFT({
-					FFTItemKey: 'nextFFTItem',
-					urlPostfix: `/${this.fftId}/next`
-				});
+				}).then(fftItem => this.loadFFTNeighbours(fftItem));
 
-				this.measurement = sensor.controller.plant
-					? sensor.controller.plant.metric_system_type
-					: sensor.controller.metric_system_type;
+				this.measurement = getSensorMetricSystemType(sensor, this.equipmentData);
 			}
 		},
 

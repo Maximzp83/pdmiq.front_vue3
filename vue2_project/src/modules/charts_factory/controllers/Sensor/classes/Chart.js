@@ -370,14 +370,16 @@ class SensorChartBase extends ChartBase {
 			const yAxisOptions = resources.chart_config.yAxisOptions || {};
 			const { customYAxisTickPositioner } = resources.chart_config;
 			// console.log('localSetupYAxis', requestsList[0])
-			const units = requestsList[0] && requestsList[0].units;
-			let unit_type_name = units || this.setupUnitTypeName({
-				parameterItem: requestsList[0],
-				measurement: this.measurement
-			});
 
 			this.options.yAxis = [];
-			YAxisList.forEach((axisSettings = {}) => {
+			YAxisList.forEach((axisSettings = {}, idx) => {
+				let requestItemIdx = axisSettings.requestItemIdx || idx;
+				const units = requestsList[requestItemIdx] && requestsList[requestItemIdx].units;
+				let unit_type_name = units || this.setupUnitTypeName({
+					parameterItem: requestsList[requestItemIdx],
+					measurement: this.measurement
+				});
+
 				let axis = {
 					max: -9999999,
 					min: 0,
@@ -423,6 +425,8 @@ class SensorChartBase extends ChartBase {
 					});
 				}
 
+				axis.customSettings = axisSettings || {};
+
 				if (this.localSetupYAxisHook) axis = this.localSetupYAxisHook(axis);
 				// console.log('1 axis', axis)
 				this.options.yAxis.push(axis);
@@ -436,6 +440,7 @@ class SensorChartBase extends ChartBase {
 		// console.log('assignDataToYAxis',resultData, resultData.chart_all_data_max_value)
 		try {
 			const {
+				statistics_result,
 				chart_all_data_max_value,
 				chart_all_data_min_value,
 				chart_points_max_value /*chart_points_min_value*/
@@ -443,53 +448,93 @@ class SensorChartBase extends ChartBase {
 			const {
 				withoutReserveForMax,
 				withoutReserveForMin,
-				yAxisOptions
+				yAxisOptions,
+				// yAxisList
 			} = this.resources.chart_config;
 			const { yAxisMax, yAxisSoftMax } = this.resources.payload_1;
-			let yAxis = cloneDeep(this.options.yAxis[0]);
+			let yAxisCopy = cloneDeep(this.options.yAxis);
 
-			// console.log('localSetupYAxis')
-			if (yAxisMax) {
-				yAxis.max = yAxisMax;
-				// yAxis.startOnTick = false;
-				yAxis.endOnTick = false;
-			} else {
-				yAxis.max = withoutReserveForMax
-					? chart_all_data_max_value
-					: chart_all_data_max_value + chart_all_data_max_value / 9;
-			}
+			yAxisCopy.forEach((yAxis, idx) => {
+			  const {requestItemId} = yAxis.customSettings;
+			  if (requestItemId) {
+					const parameterItemResultData = statistics_result[`parameter_${requestItemId}`];
+					if (parameterItemResultData) {
+						const {all_data_max_value, stat_max_value} = parameterItemResultData;
+						yAxis.max = withoutReserveForMax
+							? all_data_max_value
+							: all_data_max_value + all_data_max_value / 9;
 
-			if (yAxisSoftMax) {
-				yAxis.softMax = yAxisSoftMax;
-			} else {
-				yAxis.softMax = withoutReserveForMax
-				? chart_points_max_value
-				: chart_points_max_value + chart_points_max_value / 9;
-			}
-			
-			// yAxis.title.text = this.unit_type_name || '-';
-			// console.log('assignDataToYAxis', yAxis)
+						yAxis.softMax = withoutReserveForMax
+							? stat_max_value
+							: stat_max_value + stat_max_value / 9;
 
-			yAxis.max = yAxis.max || 0.1;
+					} else {
+						if (yAxisMax) {
+							yAxis.max = yAxisMax;
+							// yAxis.startOnTick = false;
+							yAxis.endOnTick = false;
+						} else {
+							yAxis.max = withoutReserveForMax
+								? chart_all_data_max_value
+								: chart_all_data_max_value + chart_all_data_max_value / 9;
+						}
 
-			if (!yAxisOptions || !yAxisOptions.min) {
-				yAxis.min =
-					chart_all_data_min_value < 0
-						? // ? chart_all_data_min_value + chart_all_data_min_value / 3
-						  -chart_all_data_max_value
-						: 0;
+						if (yAxisSoftMax) {
+							yAxis.softMax = yAxisSoftMax;
+						} else {
+							yAxis.softMax = withoutReserveForMax
+							? chart_points_max_value
+							: chart_points_max_value + chart_points_max_value / 9;
+						}
+					}
+			  } else {
+					if (yAxisMax) {
+						yAxis.max = yAxisMax;
+						// yAxis.startOnTick = false;
+						yAxis.endOnTick = false;
+					} else {
+						yAxis.max = withoutReserveForMax
+							? chart_all_data_max_value
+							: chart_all_data_max_value + chart_all_data_max_value / 9;
+					}
 
-				yAxis.softMin = withoutReserveForMin
-					? chart_all_data_min_value
-					: chart_all_data_min_value + chart_all_data_min_value / 3;
-				// yAxis.softMin = undefined
-			}
+					if (yAxisSoftMax) {
+						yAxis.softMax = yAxisSoftMax;
+					} else {
+						yAxis.softMax = withoutReserveForMax
+						? chart_points_max_value
+						: chart_points_max_value + chart_points_max_value / 9;
+					}
 
-			// console.log('assignDataToYAxis', yAxis, 	additionalProps)
-			/*if (this.chart_id == 'chart-97') {
-				debugger
-			}*/
-			this.options.yAxis[0] = { ...yAxis, ...additionalProps };
+			  }
+				// console.log('localSetupYAxis')
+				
+				// yAxis.title.text = this.unit_type_name || '-';
+				// console.log('assignDataToYAxis', yAxis)
+
+				yAxis.max = yAxis.max || 0.1;
+
+				if (!yAxisOptions || !yAxisOptions.min) {
+					yAxis.min =
+						chart_all_data_min_value < 0
+							? // ? chart_all_data_min_value + chart_all_data_min_value / 3
+							  -chart_all_data_max_value
+							: 0;
+
+					yAxis.softMin = withoutReserveForMin
+						? chart_all_data_min_value
+						: chart_all_data_min_value + chart_all_data_min_value / 3;
+					// yAxis.softMin = undefined
+				}
+
+				// console.log('assignDataToYAxis', yAxis, 	additionalProps)
+				/*if (this.chart_id == 'chart-97') {
+					debugger
+				}*/
+				this.options.yAxis[idx] = { ...yAxis, ...additionalProps };
+			})
+
+
 				// console.log('2 axis', this.chart_id, yAxis, this.options.yAxis[0], additionalProps)
 			if (this.isPlotLinesReady !== undefined) {
 				this.isPlotLinesReady = false;
@@ -498,7 +543,7 @@ class SensorChartBase extends ChartBase {
 
 			if (this.localAssignDataToYAxisCallback) this.localAssignDataToYAxisCallback();
 		} catch (e) {
-			console.warn(e);``
+			console.warn(e);
 		}
 	}
 
@@ -1007,7 +1052,8 @@ class SensorChart extends SensorChartBase {
 			/*setupAdditionalSeriesData: [
 				{ data_path: 'data_average_value', method: '', skipMaxValues:true }
 			],*/
-			includeProblems: true,
+			includeProblems:
+				this.transformator_settings.specification.includeProblems !== false,
 		};
 
 		if (this.generateSeriesByStatistics) {
@@ -2448,6 +2494,309 @@ class SensorOverlayChart extends SensorChartBase {
 	}
 }
 
+const manualRouteFFTIconPath =
+	'M15.9161 6.40263C14.3301 10.2711 12.951 12 11.4464 12C9.54046 12 8.42614 9.28105 7.24701 6.40263C6.75467 5.19316 6.23957 3.94737 5.71483 3.05763C5.26455 2.29658 4.86047 1.89474 4.54811 1.89474C4.2847 1.89474 3.29036 2.22 1.57683 6.40263C1.48356 6.63012 1.31518 6.80588 1.10872 6.89123C1.0065 6.9335 0.898003 6.95229 0.789433 6.94655C0.680863 6.94081 0.574344 6.91064 0.475958 6.85776C0.277259 6.75098 0.123748 6.5582 0.0491975 6.32183C-0.0253532 6.08546 -0.0148373 5.82486 0.0784317 5.59737C1.6644 1.72895 3.0435 0 4.54811 0C6.45403 0 7.56834 2.71895 8.74747 5.59737C9.24326 6.80684 9.75491 8.05658 10.2797 8.94237C10.7299 9.70342 11.134 10.1053 11.4519 10.1053C11.7153 10.1053 12.7096 9.78 14.4232 5.59737C14.5164 5.36988 14.6848 5.19412 14.8913 5.10877C15.0977 5.02341 15.3253 5.03545 15.524 5.14224C15.7227 5.24902 15.8763 5.4418 15.9508 5.67817C16.0254 5.91454 16.0148 6.17514 15.9216 6.40263H15.9161Z';
+
+const setupManualRouteFFTIconShape = color => {
+	const svg = `<svg width="16" height="12" viewBox="0 0 16 12" xmlns="http://www.w3.org/2000/svg"><path d="${manualRouteFFTIconPath}" fill="${color}"/></svg>`;
+
+	return `url(data:image/svg+xml,${encodeURIComponent(svg)})`;
+};
+
+// --------------------
+class ManualRouteChart extends ChartBase {
+	constructor(resources) {
+		super();
+
+		this.measurement = resources.filters.measurement;
+		this.chart_parameter_id = resources.chart_config.parameter_id;
+		this.options.chart_parameter_id = this.chart_parameter_id;
+
+		this.seriesConfig = {
+			pointsData: { seriesConfigsList: {} },
+			flagsData: { seriesConfigsList: {} }
+		};
+
+		this.transformator_settings = {
+			...this.transformator_settings,
+			name: 'sensorStatistics',
+			specification: {
+				getEdgeStatisticsItems: true,
+				includeProblems: false,
+				setupPointsData: {
+					method: 'line_charts_datetime',
+					enableZones: false
+				},
+				setupFlagsData: {
+					enable_notes: false,
+					enable_crashes: false,
+					enable_fft: true,
+					split_fft_by_sensor: true,
+					enable_runtime_tracker: false
+				}
+			}
+		};
+
+		this.injectProps('options', {
+			chart: { type: 'spline', zoomType: 'xy' },
+			boost: {
+				enabled: true,
+				useGPUTranslations: false
+			},
+			// legend: { enabled: true },
+			navigator: {
+				enabled: true,
+				series: { type: 'spline' }
+			},
+			tooltip: { split: false },
+			xAxis: [
+				{
+					type: 'datetime',
+					ordinal: false,
+					minRange: 60000,
+					plotBands: []
+				},
+				{
+					type: 'datetime',
+					opposite: true,
+					linkedTo: 0,
+					visible: false
+				}
+			],
+			yAxis: [],
+			plotOptions: {
+				series: { marker: { enabled: false } }
+			}
+		});
+		// console.log('final setup', resources)
+		this.finalSetup(resources);
+	}
+
+	handleChartInitiatedEvent({ target }) {
+		this.ChartAPI = target;
+		setTimeout(() => this.ChartAPI.redraw(false), 100);
+	}
+
+	setupChartTitle() {
+		try {
+			const { requestsList } = this;
+			let result = '';
+
+			if (requestsList && requestsList.length) {
+				requestsList.forEach((ri, idx) => {
+					const { name, sensor_location, sensor_color } = ri;
+
+					if (idx == 0) {
+						result += `${name} </br>`
+					}
+					// console.log('setupChartTitle', sensor_name, name)
+					result += `<span class="chart-header-legend-item" style="background-color: ${sensor_color}"></span><span>Location - ${sensor_location}</span>, </br>`;
+				});
+
+				result = result.slice(0, -7); // remove last comma
+			}
+			// console.log(result)
+			return result;
+		} catch (e) {
+			console.warn(e);
+		}
+	}
+
+	setupUnitTypeName(payload) {
+		return getUnitType(payload);
+	}
+
+	localSetupYAxis({ resources, requestsList }) {
+		const parameterItem = requestsList[0] || {};
+		const units = parameterItem.units;
+		const unitTypeName = units || this.setupUnitTypeName({
+			parameterItem,
+			measurement: this.measurement
+		});
+
+		this.options.yAxis = [{
+			max: -9999999,
+			min: 0,
+			softMax: 1,
+			title: { text: unitTypeName || '' },
+			startOnTick: true,
+			opposite: false,
+			customSettings: { parameterItem },
+			...(resources.chart_config.yAxisOptions || {})
+		}];
+	}
+
+	assignDataToYAxis(resultData, additionalProps = {}) {
+		try {
+			const {
+				chart_all_data_max_value: allDataMax,
+				chart_all_data_min_value: allDataMin,
+				chart_points_max_value: pointsMax
+			} = resultData;
+			const {
+				withoutReserveForMax,
+				withoutReserveForMin,
+				yAxisOptions
+			} = this.resources.chart_config;
+			const yAxis = this.options.yAxis[0];
+
+			if (!yAxis || !Number.isFinite(allDataMax)) return;
+
+			yAxis.max = withoutReserveForMax
+				? allDataMax
+				: allDataMax + allDataMax / 9;
+			yAxis.softMax = withoutReserveForMax || !Number.isFinite(pointsMax)
+				? yAxis.max
+				: pointsMax + pointsMax / 9;
+			yAxis.max = yAxis.max || 0.1;
+
+			if ((!yAxisOptions || yAxisOptions.min == null) && Number.isFinite(allDataMin)) {
+				yAxis.min = allDataMin < 0 ? -allDataMax : 0;
+				yAxis.softMin = withoutReserveForMin
+					? allDataMin
+					: allDataMin + allDataMin / 3;
+			}
+
+			this.options.yAxis[0] = { ...yAxis, ...additionalProps };
+		} catch (e) {
+			console.warn(e);
+		}
+	}
+
+	isUpdateSeries(resources) {
+		return this.measurement !== resources.filters.measurement;
+	}
+
+	modifySeriesConfig({ requestsList, resources, seriesConfig }) {
+		this.measurement = resources.filters.measurement;
+		seriesConfig.pointsData.seriesConfigsList = {};
+		seriesConfig.flagsData.seriesConfigsList = {};
+
+		requestsList.forEach((parameterItem, idx) => {
+			const { id, sensor_id, sensor_color, sensor_location } = parameterItem;
+			const responseDataKey = `sensor_${sensor_id}-parameter_${id}`;
+			const baseSerieId = `manual-route-serie-${sensor_id}-${id}`;
+			const unitTypeName = this.setupUnitTypeName({
+				parameterItem,
+				measurement: this.measurement
+			});
+
+			seriesConfig.pointsData.seriesConfigsList[idx] = [{
+				id: baseSerieId,
+				data_path: 'base',
+				template: 'fft.base',
+				responseDataKey,
+				inject: {
+					showInNavigator: true,
+					name: sensor_location,
+					color: sensor_color,
+					yAxis: 0,
+					tooltip: { valueSuffix: ` ${unitTypeName}` },
+					customSettings: { metric_type: id, sensor_id }
+				}
+			}];
+
+			seriesConfig.flagsData.seriesConfigsList[idx] = [{
+				id: `fft-${sensor_id}-${id}`,
+				data_path: 'fft_statistics',
+				template: 'sensor.ncd_fft_flag',
+				event_key: 'openFFTCharts',
+				responseDataKey,
+				inject: {
+					// onSeries: baseSerieId,
+					color: sensor_color,
+					shape: setupManualRouteFFTIconShape(sensor_color),
+					showInLegend: false,
+					showInNavigator: false,
+					customSettings: { metric_type: id, sensor_id }
+				}
+			}];
+		});
+
+		return seriesConfig;
+	}
+
+	checkIsHasStatistics() {
+		return Object.values(this.fetched_statistics_data).some(item =>
+			item.statistics && item.statistics.length
+		);
+	}
+
+	normalizeStatisticsResponse(response = {}) {
+		const normalizedResponse = {
+			statistics: [],
+			history: [],
+			lube: { history: [], lock_log: [] },
+			crashes: [],
+			fft: [],
+			fft_locks: [],
+			notes: [],
+			problems: [],
+			gainAdjustments: [],
+			runtimeTrackers: [],
+			...response
+		};
+
+		normalizedResponse.statistics = response.statistics || [];
+		normalizedResponse.history = response.history || [];
+		normalizedResponse.fft = response.fft || [];
+		normalizedResponse.fft_locks = response.fft_locks || [];
+
+		return normalizedResponse;
+	}
+
+	fetchChartDataAction() {
+		if (!this.requestsList.length) {
+			this.setValue('statisticsResponsesReady', true);
+			this.setValue('hasStatistics', false);
+			this.setValue('isLoading', false);
+			return;
+		}
+
+		this.requestsList.forEach(requestItem => {
+			const { id, sensor_id: sensorId } = requestItem;
+			const responseDataKey = `sensor_${sensorId}-parameter_${id}`;
+			const params = {
+				parameter: id,
+				...prepareFilters(this.resources.filters)
+			};
+
+			fetch_sensor_statistics({ sensorId, params })
+				.then(response => {
+					this.fetched_statistics_data[responseDataKey] = {
+						parameter_item: requestItem,
+						...this.normalizeStatisticsResponse(response)
+					};
+					this.checkStatisticsResponses();
+				})
+				.catch(e => {
+					console.warn(e);
+					this.fetched_statistics_data[responseDataKey] = {
+						parameter_item: requestItem,
+						...this.normalizeStatisticsResponse()
+					};
+					this.checkStatisticsResponses();
+				});
+		});
+	}
+
+	checkSeriesForOnePointData() {
+		this.options.series.forEach(serie => {
+			serie.marker = {enabled: serie.data.length && serie.data.length == 1}
+		})
+	}
+
+	localHandleStatisticsTransformUpdated(resultData) {
+		this.assignDataToYAxis(resultData);
+		this.assignDataToSeries(resultData);
+
+		this.checkSeriesForOnePointData();
+
+		this.emitChartOptionsReady();
+	}
+
+}
+
 // --------------------
 class MultiViewChart extends ChartBase {
 	constructor(resources) {
@@ -2558,10 +2907,13 @@ class MultiViewChart extends ChartBase {
 			let result = '';
 
 			if (requestsList && requestsList.length) {
-				requestsList.forEach(ri => {
+				requestsList.forEach((ri, idx) => {
 					const { sensor_name, name, sensor_location } = ri;
 					// console.log('setupChartTitle', sensor_name, name)
-					result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
+					result += `<span class="chart-header-legend-item" style="background-color: ${colorsList2[idx]}"></span>
+										 <span>Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </span>, </br>`;
+					
+					// result += `Sensor ${sensor_name}, ${sensor_location} - Metric ${name}, </br>`;					
 				});
 
 				result = result.slice(0, -7); // remove last comma
@@ -2903,6 +3255,8 @@ export const executeChartFactory = (name, resources) => {
 			return new SensorAlarmsChart(resources);
 		case 'SensorOverlayChart':
 			return new SensorOverlayChart(resources);
+		case 'ManualRouteChart':
+			return new ManualRouteChart(resources);
 		case 'MultiViewChart':
 			return new MultiViewChart(resources);
 		default:

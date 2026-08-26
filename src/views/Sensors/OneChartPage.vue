@@ -59,8 +59,10 @@ import { localeMonths, localeMonthsFull, weekdays } from '@/constants/date_time'
 import { ITEM_SPEED_OPTIONS, RPM_SOURCES_TYPES } from '@/constants/global';
 import {
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
+	manualRouteSensorParametersList,
 	sensorParametersListNCD,
 } from '@/modules/charts_factory/controllers/Sensor/enums';
+import { getSensorMetricSystemType } from '@/helpers/specialHelpers';
 
 import VueElementLoadingWrapper from '@/components/common/VueElementLoadingWrapper.vue';
 import ChartsListWrapper from './charts/ChartsListWrapper.vue';
@@ -371,7 +373,9 @@ const setupFiltersFromQuery = () => {
 	};
 
 	if (parameter) {
-		const parameterType = findItemBy('id', Number(parameter), sensorParametersListNCD());
+		const parameterType =
+			findItemBy('id', Number(parameter), sensorParametersListNCD()) ||
+			findItemBy('id', Number(parameter), manualRouteSensorParametersList());
 		if (parameterType) {
 			activeAxis.value = parameterType.axis_id || 1;
 		}
@@ -403,14 +407,10 @@ watch(sensorData, (data) => {
 		fetchEquipment(data.equipment_id);
 	}
 
-	if (data?.controller) {
-		const measurement = data.controller.plant
-			? data.controller.plant.metric_system_type
-			: data.controller.metric_system_type;
-
+	if (data) {
 		filters.value = {
 			...filters.value,
-			measurement,
+			measurement: getSensorMetricSystemType(data, equipmentData.value),
 		};
 
 		if (data.is_hidden_ncd_active_vertical_axis && data.ncd_active_vertical_axis === 1) {

@@ -1,7 +1,9 @@
 import {
 	sensorParametersListNCD,
+	manualRouteSensorParametersList,
 	NCD_SENSOR_PARAMETERS_TYPES,
-	SENSOR_PARAMETERS_TYPES
+	SENSOR_PARAMETERS_TYPES,
+	MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES
 } from './enums';
 import { cloneDeep } from '@/helpers';
 
@@ -87,6 +89,24 @@ const chartsListsConfig1 = {
 			seriesConfigIncludes: ['cursor_flag'],
 			requestsList: [
 				sensorParametersListNCD(SENSOR_PARAMETERS_TYPES.Z_AXIS_VELOCITY)
+			]
+		},
+		{
+			chart_id: `chart-${MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY}`,
+			seriesConfigIncludes: ['cursor_flag'],
+			requestsList: [
+				manualRouteSensorParametersList(
+					MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY
+				)
+			]
+		},
+		{
+			chart_id: `chart-${MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION}`,
+			seriesConfigIncludes: ['cursor_flag'],
+			requestsList: [
+				manualRouteSensorParametersList(
+					MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION
+				)
 			]
 		}
 	],

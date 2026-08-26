@@ -3908,6 +3908,25 @@
 	.el-icon-star-off {font-size: 18px;}
 }
 
+.meta-data-entries-tooltip {
+	.info-item {
+		font-size: 14px;
+
+		& + .info-item {margin-top: 5px;}
+	}
+}
+
+.chart-container-wrapper {
+	.chart-header-legend-item {
+		display: inline-block;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+
+		& + span { margin-left: 5px; }
+	}
+}
+
 @keyframes horizontal-move {
 	0% { transform: translateX(0px); }
 	100% { transform: translateX(34px); }

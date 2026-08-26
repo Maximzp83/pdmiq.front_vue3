@@ -45,7 +45,10 @@
 
 						<!-- v-if="currentSensorType.isBanner" -->
 						<div class="mcol-xs-auto legend-container"
-							v-if="!currentSensorType.isBannerV2Generic"
+							v-if="
+								!currentSensorType.isBannerV2Generic &&
+									!currentSensorType.isManualRoute
+							"
 						>
 							<div class="legend-list">
 								<div
@@ -78,6 +81,7 @@
 
 						<div class="button-item">
 							<el-button
+								v-if="!currentSensorType.isManualRoute"
 								type="primary"
 								native-type="button"
 								:class="[
@@ -347,7 +351,11 @@ import {
 } from '@/modules/charts_factory/controllers/Sensor/enums';
 
 import { LANGUAGE_TYPES } from '@/localization/utils';
-import { getSensorTitle } from '@/helpers/specialHelpers';
+import {
+	getSensorMetricSystemType,
+	getSensorPlant,
+	getSensorTitle
+} from '@/helpers/specialHelpers';
 
 // import isEmpty from 'lodash/isEmpty';
 
@@ -450,6 +458,7 @@ export default {
 			statsThresholdsActive: that.statsThresholdsActive,
 			accessToThresholds:
 				that.$hasAccessTo(['edit_dashboard']) &&
+				!that.currentSensorType.isManualRoute &&
 				!Object.values(that.joinChartsBy).some(val => !!val && val != 'split'),
 			higchartInstances: {
 				hcInstance: Highcharts,
@@ -510,11 +519,16 @@ export default {
 			if (this.isCompare) return false;
 			
 			const {enableAxisSelector, $hasAccessTo} = this;
-			const { isBannerV2_1, isBannerM25, isBannerV2Generic } = this.currentSensorType;
+			const {
+				isBannerV2_1,
+				isBannerM25,
+				isBannerV2Generic,
+				isManualRoute
+			} = this.currentSensorType;
 			const { bannerV2Subtype } = this.sensorData;
 			
 			if ($hasAccessTo(['view_dashboard'])) {
-				return enableAxisSelector || isBannerV2_1 || isBannerM25 ||
+				return enableAxisSelector || isBannerV2_1 || isBannerM25 || isManualRoute ||
 						(isBannerV2Generic && (bannerV2Subtype && bannerV2Subtype.is_fft_allowed));
 			}
 			return false;
@@ -547,7 +561,8 @@ export default {
 			that.sensorData &&
 			!that.isCompare &&
 			!that.currentSensorType.isSDTsensor &&
-			!that.currentSensorType.isHumiditySensor,
+			!that.currentSensorType.isHumiditySensor &&
+			!that.currentSensorType.isManualRoute,
 
 		enableAxisSelector() {
 			const { currentSensorType, isCompare } = this;
@@ -788,9 +803,10 @@ export default {
 
 			if (!this.isCompare) {
 				if (this.sensorData) {
-					settings.showPlantName = {
-						name: this.sensorData.controller.plant.name
-					};
+					const plant = getSensorPlant(this.sensorData, this.equipmentData);
+					if (plant) {
+						settings.showPlantName = { name: plant.name };
+					}
 				}
 			}
 
@@ -1010,6 +1026,18 @@ export default {
 			// console.log('fetchSensorsAction', ids, sensorIdx);
 			this.fetch_sensor({ itemId: ids[sensorIdx] })
 				.then(({ value }) => {
+					if (
+						!this.isCompare &&
+						value.data_set === DATASET.MANUAL_ROUTE_FFT &&
+						value.equipment_id
+					) {
+						this.sensorLoading = false;
+						this.$router.replace(
+							`/equipments/${value.equipment_id}/details/manual-route`
+						);
+						return;
+					}
+
 					const dashboardSensors = this.equipmentData
 						? this.equipmentData.dashboardSensors
 						: [];
@@ -1400,20 +1428,16 @@ export default {
 		},
 
 		sensorData(data) {
-			if (data && data.controller) {
+			if (data) {
 				this.setup_navbar(this.navbarSettings);
 
-				var newMetric = data.controller.plant
-						? data.controller.plant.metric_system_type
-						: data.controller.metric_system_type
+				const newMetric = getSensorMetricSystemType(data, this.equipmentData);
 
 				// console.log('watch sensorData', this.filters.metric, )
 				if (this.filters.measurement != newMetric) {
 					this.set_filters({
 						...this.filters,
-						measurement: data.controller.plant
-							? data.controller.plant.metric_system_type
-							: data.controller.metric_system_type
+						measurement: newMetric
 					});
 				}
 

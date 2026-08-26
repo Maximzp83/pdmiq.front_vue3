@@ -69,9 +69,14 @@ import { ITEM_SPEED_OPTIONS, RPM_SOURCES_TYPES } from '@/constants/global';
 import { localeMonths, localeMonthsFull, weekdays } from '@/constants/date_time';
 // import { getParamsFromUrl } from '@/services/api/api_helpers';
 import { LANGUAGE_TYPES } from '@/localization/utils';
+import { getSensorMetricSystemType } from '@/helpers/specialHelpers';
 
 // import { /*ncdAxisList,*/  } from '@/constants/global';
-import { sensorParametersListNCD, BANNER_V2_1_VIBRATION_PARAMETERS_TYPES } from '@/modules/charts_factory/controllers/Sensor/enums';
+import {
+	sensorParametersListNCD,
+	manualRouteSensorParametersList,
+	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES
+} from '@/modules/charts_factory/controllers/Sensor/enums';
 
 export default {
 	mixins: [
@@ -643,12 +648,10 @@ export default {
 					// this.equipmentData = data.equipment;
 				}
 			}
-			if (data && data.controller) {
+			if (data) {
 				this.filters = {
 					...this.filters,
-					measurement: data.controller.plant
-						? data.controller.plant.metric_system_type
-						: data.controller.metric_system_type
+					measurement: getSensorMetricSystemType(data, this.equipmentData)
 				};
 
 				if (data.is_hidden_ncd_active_vertical_axis) {
@@ -706,7 +709,9 @@ export default {
 			};
 
 			if (parameter) {
-				let parameterType = findItemBy('id', +parameter, sensorParametersListNCD());
+				let parameterType =
+					findItemBy('id', +parameter, sensorParametersListNCD()) ||
+					findItemBy('id', +parameter, manualRouteSensorParametersList());
 
 				if (parameterType) {
 					this.activeAxis = parameterType.axis_id || 1;

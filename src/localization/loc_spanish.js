@@ -1156,6 +1156,7 @@ export default {
 		confirm_phone_number: 'Confirmar número de teléfono',
 		fft_successfully_unlocked: 'FFT desbloqueado con éxito',
 		unlock_fft: 'Desbloquear FFT',
+		sample_metadata: 'Metadatos de la Muestra',
 		flat_data_anomaly: 'Anomalia de datos Plano',
 		open_in_new_window: 'Abrir en nueva ventana',
 		personal_favorite: 'Favorito Personal',
@@ -1226,6 +1227,9 @@ export default {
 
 		'humidity': 'Humedad',
 		'temperature': 'Temperatura',
+		'velocity': 'Velocidad',
+		'high_frequency_acceleration': 'Aceleración de Alta Frecuencia',
+		'fft': 'FFT',
 
 		'warning': 'Aviso',
 		'alarm': 'Alarma',
@@ -1650,7 +1654,7 @@ export default {
 		node_offline: 'Nodo fuera de línea',
 		unconfirmed_fft_request: 'Petición de FFT no confirmada',
 		usg: 'USg',
-		multiview_alarms: 'Alarmas multivista'
+		multiview_alarms: 'Alarmas multivista',
 	},
 
 	short_name: {
@@ -1706,5 +1710,6 @@ export default {
 		pressure: 'Presión',
 		ultrasound_vibration_temperature: 'Ultrasonido, Vibración, Temperatura',
 		uvt: 'UVT',
+		manual_route: 'Ruta Manual',
 	}
 };

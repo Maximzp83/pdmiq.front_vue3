@@ -22,6 +22,7 @@ export const executeChartFactoryContainer = (name, settings) => {
 			return executeOEEChartFactoryContainer(settings);
 		case 'MaintenanceChartFactoryContainer':
 			return executeMaintenanceChartFactoryContainer(name, settings);
+		case 'ManualRouteChartFactoryContainer':
 		case 'MultiViewChartFactoryContainer':
 			return executeSensorChartsFactoryConatiner(name, settings);
 		case '3DChartFactoryContainer':

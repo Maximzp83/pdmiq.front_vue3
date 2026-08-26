@@ -6,7 +6,9 @@ import {
 	SENSOR_COLORTECH_VFD_PRESSURE_RPM_AMPS_PARAMETERS_TYPES,
 	BANNER_V2_1_VIBRATION_PARAMETERS_TYPES,
 	BANNER_M25_PARAMETERS_TYPES,
+	// MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES,
 	sensorParametersList,
+	manualRouteSensorParametersList,
 	sensorParametersListNCD,
 	sensorUltraSoundParametersList,
 	sensorBannerUltraSoundParametersList,
@@ -586,6 +588,68 @@ const getSeriesConfigSettingsForBannerV2_1For = (parameter, settings={}) => {
 
 const chartsListsConfig1 = {
 	'banner': banner_configs,
+	/*'manual_route': [
+		{
+			chart_id: 'manual_route',
+			YAxisList: [
+				{
+					requestItemId: MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY,
+					skipPlotlines: true,
+					injectOptions: {
+						title: {
+							text: manualRouteSensorParametersList(
+								MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY
+							).name
+						}
+					}
+				},
+				{
+					requestItemId:
+						MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION,
+					skipPlotlines: true,
+					injectOptions: {
+						title: {
+							text: manualRouteSensorParametersList(
+								MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION
+							).name
+						},
+						opposite: true
+					}
+				}
+			],
+			// chart_title_postfix: ')',
+			inject_options: {
+				chart: { type: 'spline' },
+				navigator: { series: { type: 'spline' } },
+				tooltip: { split: false }
+			},
+			transformator_settings: {
+				specification: {
+					setupPlotlinesData: false,
+					includeProblems: false,
+					setupFlagsData: {
+						enable_notes: false,
+						enable_crashes: false,
+						enable_fft: true,
+						enable_runtime_tracker: false
+					},
+				}
+			},
+			seriesConfig: buildCustomSeriesConfig({
+				pointsData: {
+					seriesConfigsList: [
+						{ setName: 'standardLine2', param: MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY },
+						{ setName: 'standardLine3', param: MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION },
+					]
+				}
+			}),
+			seriesConfigIncludes: ['fft_flag'],
+			requestsList: [
+				manualRouteSensorParametersList(MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.VELOCITY),
+				manualRouteSensorParametersList(MANUAL_ROUTE_SENSOR_PARAMETERS_TYPES.HIGH_FREQUENCY_ACCELERATION),
+			]
+		},
+	],*/
 	'banner_CM1L': banner_configs.concat([
 		{
 			chart_id: `chart-${SENSOR_PARAMETERS_TYPES.AMPS}`,
@@ -2326,6 +2390,7 @@ const defaultSeriesConfig1 = {
 
 const getRequestList1 = ({parameter, sensor}) => {
 	const parameterItem = sensorParametersList(parameter) ||
+				manualRouteSensorParametersList(parameter) ||
 				sensorParametersListNCD(parameter) ||
 				sensorUltraSoundParametersList(parameter) ||
 				sensorBannerUltraSoundParametersList(parameter) ||

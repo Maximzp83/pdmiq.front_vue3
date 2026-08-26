@@ -129,6 +129,23 @@
 			/>
 		</div>
 
+		<div
+			v-if="activeTab.prop == tabsList[3].prop"
+			:key="tabsList[3].prop"
+			class="tab-container content-row"
+		>
+			<ItemFormManualRoute
+				:class="{ showJustInfo: !hasAccessToCreate }"
+				ref="ItemFormComponent"
+				@event="handleEvent"
+				:fromModal="fromModal"
+				:equipmentData="equipmentData"
+				:itemData="selectedSensorData"
+				:itemsName="itemsName"
+				:isNew="isNew"
+			/>
+		</div>
+
 		<!-- <div
 			v-if="activeTab.prop == tabsList[2].prop"
 			:key="tabsList[2].prop"
@@ -169,6 +186,7 @@ export default {
 		ItemForm: () => import('./ItemForm.vue'),
 		ItemFormUltraSound: () => import('./ItemFormUltraSound.vue'),
 		ItemFormNCD: () => import('./ItemFormNCD.vue'),
+		ItemFormManualRoute: () => import('./ItemFormManualRoute.vue'),
 		FetchByQuerySelect: () => import('@/components/form/FetchByQuerySelect.vue'),
 	},
 
@@ -260,7 +278,7 @@ export default {
 			if (isNew) {
 				return this.$t('New');
 			} else if (itemData) {
-				return itemData.asset_numbers || '';
+				return itemData.asset_numbers || itemData.location_in_equipment || '';
 			}
 
 			return '';
@@ -293,6 +311,11 @@ export default {
 					title: `NCD ${that.tt('Sensor')}`,
 					prop: 'NCDTab',
 					item_type: SENSOR_TYPES.NCD
+				},
+				{
+					title: that.tt('technology.manual_route'),
+					prop: 'manualRouteTab',
+					item_type: SENSOR_TYPES.MANUAL_ROUTE
 				}
 				/*{
 				title: 'whiteRiver',
@@ -325,7 +348,7 @@ export default {
 			const {data_set, device_address_id, controller, fft_sensor_id} = sensor;
 
 			if (data_set === DATASET.BANNER_TEMP_VIBE_V2 || data_set === DATASET.BANNER_V2_GENERIC) {
-				return `${controller.name}, D${device_address_id}, S${fft_sensor_id}`;
+				return `${controller ? controller.name : ''}, D${device_address_id}, S${fft_sensor_id}`;
 			} else {
 				return setupLabel(sensor, this.sensorLabelOptions);
 			}
@@ -375,7 +398,11 @@ export default {
 		},
 
 		removeItem() {
-			this.$emit('onRemove', { sensorId: this.itemData.id, isNew: this.isNew });
+			this.$emit('onRemove', {
+				sensorId: this.itemData.id,
+				sensorType: this.itemData.type,
+				isNew: this.isNew
+			});
 		},
 
 		toggleSaving(val) {

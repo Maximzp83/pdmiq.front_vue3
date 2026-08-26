@@ -310,7 +310,10 @@ export const CONTROLLER_TYPES = {
 	NCD: 5
 };
 
-export const SENSOR_TYPES = { ...CONTROLLER_TYPES };
+export const SENSOR_TYPES = {
+	...CONTROLLER_TYPES,
+	MANUAL_ROUTE: 6
+};
 
 const controllerTypesList1 = [
 	{ id: CONTROLLER_TYPES.BANNER, name: 'constants.banner', alt_name: 'PDM' },
@@ -361,6 +364,7 @@ export const DATASET = {
 	BANNER_TEMP_VIBE_V2_1: 24,
 	LUBE_MATRIX_SDT_FULL_SPECTRUM: 25, // lubematrix v3
 	BANNER_M25: 26,
+	MANUAL_ROUTE_FFT: 27,
 
 	LUBEMATRIX_V3: 999 // для работы в форме banner сенсора
 };
@@ -506,6 +510,11 @@ const dataSetsList1 = [
 		label: 'constants.sdt_sensor_full_spectrum',
 		// alt_label: 'constants.NCD_Custom_4_20',
 		isLubeV3: true,
+	},
+	{
+		id: DATASET.MANUAL_ROUTE_FFT,
+		label: 'constants.fft',
+		controller_type: SENSOR_TYPES.MANUAL_ROUTE
 	},
 ];
 
@@ -884,6 +893,17 @@ const sensorTypesList1 = {
 			},
 			filters_group: 'custom',
 			group_technology: 'constants.custom'
+		}
+	},
+	[SENSOR_TYPES.MANUAL_ROUTE]: {
+		[DATASET.MANUAL_ROUTE_FFT]: {
+			technology: 'technology.manual_route',
+			technology_abbr: 'technology.manual_route',
+			icons: ['vibration'],
+			isManualRoute: true,
+			chartSettingsKey: 'manual_route',
+			filters_group: 'vibration',
+			group_technology: 'technology.manual_route'
 		}
 	}
 };
@@ -1660,7 +1680,7 @@ const controllerTopicTypesList1 = [
 	{ id: CONTROLLER_TOPIC_TYPES.PDM_V2, name: 'PDM V2'},
 ];
 
-const SENSOR_CLASSES = {
+export const SENSOR_CLASSES = {
 	VIBRATION_TEMPERATURE: 1,
 	VIBRATION_TEMPERATURE_CURRENT: 2,
 	ULTRASOUND: 3,
@@ -1669,6 +1689,7 @@ const SENSOR_CLASSES = {
 	LUBE_MATRIX: 6,
 	HUMIDITY_TEMPERATURE_AIR_QUALITY: 7,
 	PRESSURE: 8,
+	MANUAL_ROUTE: 10,
 };
 
 export const sensorClassesList1 = [
@@ -1680,6 +1701,7 @@ export const sensorClassesList1 = [
 	{ id: SENSOR_CLASSES.LUBE_MATRIX, name: 'technology.lube_matrix' },
 	{ id: SENSOR_CLASSES.HUMIDITY_TEMPERATURE_AIR_QUALITY, name: 'technology.humidity_temperature_air_quality' },
 	{ id: SENSOR_CLASSES.PRESSURE, name: 'technology.pressure' },
+	{ id: SENSOR_CLASSES.MANUAL_ROUTE, name: 'technology.manual_route' },
 ];
 
 export const SENSOR_ALARM_TYPES = {

@@ -3,12 +3,42 @@ import ChartFactoryContainerBase from '../../../classes/ChartFactoryContainer';
 import { get_sensor_parameter_item } from '../methods';
 import { setupLabel } from '@/helpers';
 import { DATASET } from '@/constants/global';
+import { manualRouteSensorParametersList } from '../enums';
+import { colorsList2 } from '../../../enums';
 
 class ChartFactoryContainer extends ChartFactoryContainerBase {
 	constructor(resources) {
 		super();
 		// console.log('ChartFactoryContainer', resources)
 		this.useResources(resources);
+	}
+}
+
+class ManualRouteChartFactoryContainer extends ChartFactoryContainerBase {
+	constructor(resources) {
+		super();
+		this.useResources(resources);
+	}
+
+	setupChartConfig(settings = {}) {
+		const { metricId, sensors = [] } = settings;
+		const parameterItem = manualRouteSensorParametersList(metricId);
+		const manualRouteSensors = sensors.filter(
+			sensor => sensor.data_set === DATASET.MANUAL_ROUTE_FFT
+		);
+
+		return {
+			chart_id: `manual-route-chart-${metricId}`,
+			parameter_id: metricId,
+			requestsList: parameterItem
+				? manualRouteSensors.map((sensor, idx) => ({
+					...parameterItem,
+					sensor_id: sensor.id,
+					sensor_location: sensor.location_in_equipment,
+					sensor_color: colorsList2[idx % colorsList2.length]
+				}))
+				: []
+		};
 	}
 }
 
@@ -77,6 +107,8 @@ class MultiViewChartFactoryContainer extends ChartFactoryContainerBase {
 export const executeChartFactoryContainer = (name, settings) => {
 	// console.log('executeChartFactoryContainer', name, settings)
 	switch (name) {
+		case 'ManualRouteChartFactoryContainer':
+			return new ManualRouteChartFactoryContainer(settings);
 		case 'MultiViewChartFactoryContainer':
 			return new MultiViewChartFactoryContainer(settings);
 

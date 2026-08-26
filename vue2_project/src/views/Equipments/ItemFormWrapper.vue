@@ -104,6 +104,7 @@
 <script>
 import { mapActions } from 'vuex';
 import { prepareSubmitData } from '@/helpers';
+import { SENSOR_TYPES } from '@/constants/global';
 
 import {
 	eventHandler,
@@ -278,6 +279,7 @@ export default {
 			show_edit_modal: 'show_edit_modal',
 			set_global_state: 'set_global_state',
 			delete_sensor: 'sensors/delete_sensor',
+			delete_manual_route_sensor: 'sensors/delete_manual_route_sensor',
 			detach_sensor: 'sensors/detach_sensor',
 
 			set_assets: 'assets/set_assets',
@@ -418,11 +420,11 @@ export default {
 			}
 		},
 
-		removeSensorItem({ sensorId, isNew }) {
+		removeSensorItem({ sensorId, sensorType, isNew }) {
 			if (isNew) {
 				this.removeFormItem(sensorId, 'sensorFormsList');
 			} else {
-				this.handleDeleteSensor(sensorId);
+				this.handleDeleteSensor(sensorId, sensorType);
 			}
 		},
 
@@ -433,7 +435,7 @@ export default {
 			});
 		},
 
-		handleDeleteSensor(sensorId) {
+		handleDeleteSensor(sensorId, sensorType) {
 			const { tt } = this;
 			this.$confirm({
 				title: tt('Warning'),
@@ -445,9 +447,16 @@ export default {
 				type: 'warning'
 			})
 				.then(() => {
-					// this.delete_sensor({ data: { ids: [sensorId] } }).then(() => {
-					this.detach_sensor({ sensorId: sensorId })
-					.then(() => {
+					const deleteRequest =
+						sensorType === SENSOR_TYPES.MANUAL_ROUTE
+							? this.delete_manual_route_sensor({
+									data: { id: sensorId },
+									itemName: 'Sensor',
+									loading: true
+								})
+							: this.detach_sensor({ sensorId: sensorId });
+
+					deleteRequest.then(() => {
 						this.removeFormItem(sensorId, 'sensorFormsList');
 						this.set_global_state({
 							stateProp: 'updateItemsList',

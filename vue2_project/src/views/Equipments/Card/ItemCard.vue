@@ -328,16 +328,22 @@ export default {
 
 		equipmentStatusClass() {
 			const { dashboardSensors } = this;
-			if ( dashboardSensors.some(sensor => sensor.current_metric_issue_alerts.length) ) {
+			if (
+				dashboardSensors.some(
+					sensor =>
+						sensor.current_metric_issue_alerts &&
+						sensor.current_metric_issue_alerts.length
+				)
+			) {
 				const isAlarm = dashboardSensors.some(sensor => 
-					sensor.current_metric_issue_alerts.some(
+					(sensor.current_metric_issue_alerts || []).some(
 						ai => ai.alert_type === SENSOR_ALARM_TYPES.ALARM
 					)
 				);
 				if (isAlarm) return 'alarm';
 
 				const isWarning = dashboardSensors.some(sensor => 
-					sensor.current_metric_issue_alerts.some(
+					(sensor.current_metric_issue_alerts || []).some(
 						ai => ai.alert_type === SENSOR_ALARM_TYPES.WARNING
 					)
 				);

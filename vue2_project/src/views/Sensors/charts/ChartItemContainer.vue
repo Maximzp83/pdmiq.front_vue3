@@ -352,7 +352,8 @@ export default {
 		ChartAPI: that => (that.chartIsInit ? that.ChartInstance.ChartAPI : null),
 
 		parameterTypeItems: that => that.ChartInstance.requestsList,
-		controllerTimeZone: that => that.sensorData.controller.time_zone,
+		controllerTimeZone: that =>
+			that.sensorData.controller ? that.sensorData.controller.time_zone : null,
 		isBanner: that => that.currentSensorType.isBanner,
 		isUltrasound: that => that.currentSensorType.isUltrasound,
 		isSDTsensor: that => that.currentSensorType.isSDTsensor,
