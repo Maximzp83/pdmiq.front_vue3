@@ -506,7 +506,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch, defineAsyncComponent } from 'vue';
 import { ElMessageBox } from 'element-plus';
 
 import { api_request } from '@/api/request_provider';
@@ -542,7 +542,8 @@ import FetchByQuerySelect from '@/components/form/FetchByQuerySelect.vue';
 import FormOperationsButtons from '@/components/form/FormOperationsButtons.vue';
 import RunningThresholdItem from './RunningThresholdItem.vue';
 import SubTypeParameterItem from './SubTypeParameterItem.vue';
-import ItemFormUltraSound from './ItemFormUltraSound.vue';
+
+const ItemFormUltraSound = defineAsyncComponent(() => import('./ItemFormUltraSound.vue'));
 
 const { tt } = Lang;
 
@@ -723,7 +724,8 @@ const isLubeMatrixV3 = computed(
 const showLubeMatrixButton = computed(
 	() =>
 		formData.value.data_set === DATASET.BANNER_TEMP_VIBE_V2_1 ||
-		formData.value.data_set === DATASET.BANNER_M25,
+		formData.value.data_set === DATASET.BANNER_M25 ||
+		formData.value.data_set === DATASET.BANNER_V2_GENERIC,
 );
 const isLubeMatrixV4 = computed(() => showLubeMatrixButton.value && !!formData.value.is_lube_mode);
 const showPortNumber = computed(() => {

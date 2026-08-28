@@ -101,6 +101,112 @@ const apiInstance = axios.create({
 	},
 });
 
+let accountBlockHandlingPromise = null;
+
+const getRequestEmail = (config) => {
+	const { data } = config || {};
+	if (!data) return null;
+
+	if (typeof data === 'string') {
+		try {
+			return JSON.parse(data).email || null;
+		} catch {
+			return null;
+		}
+	}
+
+	return data.email || null;
+};
+
+const showBlockedAccountNotification = (message) => {
+	const { Notify } = useNotify();
+	Notify({
+		type: 'warning',
+		title: Lang.tt('phrases.forgot_password'),
+		message,
+		duration: 0,
+	});
+};
+
+const handleBlockedAccount = async (error) => {
+	// Mark every rejected request, including concurrent 423 responses, so the
+	// request provider does not show a second generic error notification.
+	error.accountBlockedHandled = true;
+	if (accountBlockHandlingPromise) return accountBlockHandlingPromise;
+
+	accountBlockHandlingPromise = (async () => {
+		const authStore = useAuthStore();
+		const email = authStore.authUser?.email || getRequestEmail(error.config);
+		const message =
+			error.response?.data?.message ||
+			'Your account is blocked. Reset your password to restore access.';
+		const recoveryPath = '/login/password/forgot';
+		const recoveryQuery = new URLSearchParams({
+			reason: 'account-blocked',
+			...(email ? { email } : {}),
+		});
+		let notificationShown = false;
+		const notifyOnce = () => {
+			if (notificationShown) return;
+			notificationShown = true;
+			showBlockedAccountNotification(message);
+		};
+
+		authStore.clear_auth();
+
+		try {
+			const { default: router } = await import('@/router');
+			const isBlockedRecoveryPage =
+				router.currentRoute.value.path === recoveryPath &&
+				router.currentRoute.value.query.reason === 'account-blocked';
+
+			if (!isBlockedRecoveryPage) {
+				notifyOnce();
+			}
+
+			if (
+				router.currentRoute.value.path !== recoveryPath ||
+				(email && router.currentRoute.value.query.email !== email)
+			) {
+				await router.replace({
+					path: recoveryPath,
+					query: {
+						reason: 'account-blocked',
+						...(email ? { email } : {}),
+					},
+				});
+			}
+
+			// Login and password recovery are sibling routes, so LoginWrapper does
+			// not remount after a failed login. Re-enable guest auth requests here.
+			if (router.currentRoute.value.path === recoveryPath) {
+				authStore.set_value('preventRequests', false);
+			} else {
+				window.location.href = `${recoveryPath}?${recoveryQuery}`;
+			}
+		} catch {
+			notifyOnce();
+			window.location.href = `${recoveryPath}?${recoveryQuery}`;
+		}
+	})();
+
+	try {
+		await accountBlockHandlingPromise;
+	} finally {
+		accountBlockHandlingPromise = null;
+	}
+};
+
+export const handleBlockedAccountError = async (error) => {
+	const isBlockedAccount =
+		error.response?.status === 423 && error.response?.data?.status === 'blocked';
+
+	if (!isBlockedAccount) return false;
+
+	await handleBlockedAccount(error);
+	return true;
+};
+
 /**
  * Request interceptor - add auth token
  */
@@ -128,7 +234,8 @@ apiInstance.interceptors.response.use(
 		return response;
 	},
 	async (error) => {
-		if (error.response?.status === 401) {
+		const accountBlocked = await handleBlockedAccountError(error);
+		if (!accountBlocked && error.response?.status === 401) {
 			
 			const authStore = useAuthStore();
 			authStore.clear_auth();

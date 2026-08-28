@@ -32,11 +32,13 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/AuthStore';
 import { Lang } from '@/localization';
 
 const authStore = useAuthStore();
+const route = useRoute();
 
 const { tt } = Lang;
 
@@ -46,6 +48,16 @@ const isLoading = ref(false);
 const formData = reactive({
 	email: ''
 });
+
+watch(
+	() => route.query.email,
+	(email) => {
+		if (typeof email === 'string') {
+			formData.email = email;
+		}
+	},
+	{ immediate: true },
+);
 
 // Methods
 const handleSubmit = () => {
