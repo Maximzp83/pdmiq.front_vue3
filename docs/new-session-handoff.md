@@ -544,3 +544,8 @@ Primary rules source:
 - Nested nonzero numeric values now survive condition path resolution instead of being converted to `null` by Lodash `isEmpty`.
 - Banner Sensors Asset actions therefore render when `equipment.asset.id` is present, while existing null/empty, zero, and boolean handling remains intact.
 - A targeted condition-validation regression test, ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Lube Unlock Visibility Parity Fix (2026-08-28)
+- `ChartItemContainer.vue` now checks blocked lube-cycle state separately from unsuccessful last-shot states, as in Vue2.
+- This restores the reset button for `lube_shot_status = UNKNOWN (8)` and the other configured unsuccessful statuses even when the cycle status is nonzero.
+- Targeted ESLint and the Node 24 production Vite build pass; existing Vite warnings remain.

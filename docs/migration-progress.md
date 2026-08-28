@@ -847,6 +847,10 @@ await fetchUsers({ page: 1 });
   - `re_trigger_samples` remains hidden and omitted for Compare thresholds
   - The only changed legacy file had an existing Vue3 counterpart; nothing was skipped
   - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24
+- [x] Lube unlock visibility parity fix (2026-08-28)
+  - Restored independent cycle-status and last-shot-status checks in the Sensor chart container
+  - Failed shot statuses, including `UNKNOWN (8)`, now expose the existing reset-cycle action regardless of another nonzero cycle status
+  - Targeted ESLint and production Vite build passed on Node 24
 - [x] EquipmentsLayout Vue2 parity follow-up (2026-08-07)
   - Restored Storeroom Equipment multiform creation and BrandModels child create/delete/refetch exposure
   - Migrated and connected `src/views/Equipments/SpecialFilterItem.vue` with predefined/raw option filtering and cleanup

@@ -313,3 +313,8 @@
 - This restores table actions guarded by numeric nested ids, including the Banner Sensors Asset link condition on `equipment.asset.id`.
 - Added a regression assertion for a nested numeric asset id; targeted Vitest, ESLint, `git diff --check`, and the Node 24 production Vite build pass.
 - Runtime smoke-test Manual Route previous/next FFT navigation across metrics, one-point history series, and Manual Route/MultiView legend rendering with real API data when requested.
+
+## Lube Unlock Visibility Parity Fix (2026-08-28)
+- Corrected `src/views/Sensors/charts/ChartItemContainer.vue` to evaluate the lube-cycle status and last-shot status independently, matching Vue2.
+- Failed shot statuses `2`, `3`, `4`, `6`, `7`, `8`, `9`, and `10` now expose the reset action even when `lube_cycle_status` contains another nonzero value.
+- Targeted ESLint and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
