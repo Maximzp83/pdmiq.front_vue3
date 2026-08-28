@@ -883,6 +883,10 @@ await fetchUsers({ page: 1 });
   - `re_trigger_samples` remains hidden and omitted for Compare thresholds
   - The only changed legacy file had an existing Vue3 counterpart; nothing was skipped
   - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24
+- [x] Lube unlock visibility parity fix (2026-08-28)
+  - Restored independent cycle-status and last-shot-status checks in the Sensor chart container
+  - Failed shot statuses, including `UNKNOWN (8)`, now expose the existing reset-cycle action regardless of another nonzero cycle status
+  - Targeted ESLint and production Vite build passed on Node 24
 - [x] EquipmentsLayout Vue2 parity follow-up (2026-08-07)
   - Restored Storeroom Equipment multiform creation and BrandModels child create/delete/refetch exposure
   - Migrated and connected `src/views/Equipments/SpecialFilterItem.vue` with predefined/raw option filtering and cleanup
@@ -1002,3 +1006,39 @@ await fetchUsers({ page: 1 });
   - Preserved nonzero numeric values returned from nested condition paths instead of treating them as empty
   - Restored Banner Sensors Asset action rendering for rows with `equipment.asset.id`
   - Added a targeted regression assertion; targeted Vitest, ESLint, `git diff --check`, and the Node 24 production Vite build passed
+- [x] Manual Route Sensors Vue2 delta sync
+  - Added Manual Route sensor constants, dataset/class metadata, localization, plant/metric helpers, chart parameters and units
+  - Added Manual Route list/get/save/delete API operations and a Vue3 `ItemFormManualRoute.vue` form tab
+  - Updated Equipment sensor removal/card handling for Manual Route
+  - Added statistics/FFT chart configs, per-metric FFT flag filtering, metadata/RPM display, and Manual Route-aware Statistics/FFT/One Chart behavior
+  - Vue2 API URL, Equipment alert guards, Requisition material prop optionality, and chart timezone safety needed no Vue3 code change because equivalent behavior was already present or not applicable
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route FFT Vue2 follow-up sync
+  - Changed the sensor statistics default graph-points endpoint to dev while retaining Vite env and production-origin overrides
+  - Changed Manual Route history charts to line-datetime spline rendering with spline navigator and series settings
+  - Moved FFT sample metadata from a separate page card into an Element Plus tooltip in `AnalysisFFTContainer`
+  - Added the corresponding shared tooltip styles
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route combined history chart Vue2 sync
+  - Consolidated the velocity and high-frequency acceleration histories into one spline chart with two configured Y axes, one shared tooltip, and combined series/requests
+  - Extended base Sensor chart Y-axis setup to resolve units and settings per request
+  - Extended Y-axis data assignment to use parameter-specific max/softMax values with the existing single-axis fallback
+  - Targeted ESLint, targeted `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route aggregate equipment page Vue2 sync
+  - Added the dedicated `/equipments/:id/details/manual-route` child route and Vue3 statistics page
+  - Added separate velocity/high-frequency charts with per-sensor series and per-sensor FFT flags, plus the custom chart header
+  - Updated Equipment card/details/PdM, Statistics, and FFT navigation for Manual Route sensors
+  - Added Multiview Alarms notifications/localization, Banner M25 threshold cleanup, and Meeting Tracker PDF plant initialization
+  - All changed Vue2 files were in migrated scope; none were skipped
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Manual Route chart event/sorting runtime follow-up
+  - Added local handling for chart lifecycle and Y-axis zoom events without changing shared `useEmitter.js`
+  - Preserved Equipment picture event propagation to the parent details page
+  - Sorted Manual Route statistics and FFT flags chronologically before Highcharts rendering
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24
+- [x] Sensor/chart seven-file Vue2 delta sync (2026-08-06)
+  - Preserved Manual Route `metric_type` in previous/next FFT requests and reloaded both neighbours around the selected FFT
+  - Generated Manual Route/MultiView HTML titles with sensor-color legends and enabled one-point series markers
+  - Removed the obsolete static Manual Route config and aligned the FFT dev endpoint/shared legend styles
+  - All changed legacy files had migrated Vue3 counterparts; none were skipped
+  - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24

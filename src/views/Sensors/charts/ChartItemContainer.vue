@@ -296,17 +296,19 @@ const enableZoomBlock = computed(() => !props.additionalProps.hideZoomBlock);
 const isLubeMatrixV3 = computed(() => props.sensorData?.lube_version === LUBE_VERSIONS.V3);
 const enableLubeUnlockBlock = computed(() =>
 	props.sensorData && (isUltrasound.value || isLubeMatrixV3.value) &&
-	[
-		LUBE_CYCLE_STATUSES.BLOCKED,
-		LUBE_PROCESSING_STATUSES.UNSUCCESSFUL,
-		LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT,
-		LUBE_PROCESSING_STATUSES.BLOCKED,
-		LUBE_PROCESSING_STATUSES.LOSS_CONNECTION,
-		LUBE_PROCESSING_STATUSES.NO_COMMAND_RESPONSE,
-		LUBE_PROCESSING_STATUSES.UNKNOWN,
-		LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE,
-		LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE,
-	].includes(props.sensorData.lube_cycle_status || props.sensorData.lube_shot_status),
+	(
+		props.sensorData.lube_cycle_status === LUBE_CYCLE_STATUSES.BLOCKED ||
+		[
+			LUBE_PROCESSING_STATUSES.UNSUCCESSFUL,
+			LUBE_PROCESSING_STATUSES.LUBRICANT_FULL_SPENT,
+			LUBE_PROCESSING_STATUSES.BLOCKED,
+			LUBE_PROCESSING_STATUSES.LOSS_CONNECTION,
+			LUBE_PROCESSING_STATUSES.NO_COMMAND_RESPONSE,
+			LUBE_PROCESSING_STATUSES.UNKNOWN,
+			LUBE_PROCESSING_STATUSES.NO_LUBRICATION_STATUS_RESPONSE,
+			LUBE_PROCESSING_STATUSES.NO_START_LUBRICATION_COMMAND_RESPONSE,
+		].includes(props.sensorData.lube_shot_status)
+	),
 );
 const enableFFTUnlockBlock = computed(() =>
 	props.sensorData?.last_fft_lock && props.sensorData.last_fft_lock.status !== FFT_LOCK_STATUSES.UNLOCKED,

@@ -626,7 +626,7 @@
 			<div class="content-row">
 				<b>{{ tt('Zones') }}</b>
 			</div>
-			<div class="form-section paint el-form-item content-row">
+			<div class="form-section paint content-row">
 				<div class="flex wrap mrow content-row">
 					<div class="mcol-xs-12 mcol-md-6">
 						<el-form-item :label="`${tt('constants.Alarm')} ${tt('zone')}`" prop="alarm_zone" required>

@@ -173,6 +173,13 @@ const handleError = (error, options = {}) => {
 		return;
 	}
 
+	if (error.accountBlockedHandled) {
+		if (reject) {
+			reject(error);
+		}
+		return;
+	}
+
 	const message = getResponseMessage(error.response, errorMessageSettings);
 
 	/*const message =
@@ -267,8 +274,7 @@ const api_request = (url, payload = {}) => {
 									concatData,
 									returnResponse,
 									returnResponseOnly,
-									incudeMeta,
-									itemName
+									incudeMeta
 								} = payload;
 								// console.log('response', response);
 								const value = returnResponseOnly

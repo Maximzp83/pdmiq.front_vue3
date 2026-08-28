@@ -8,6 +8,7 @@
 - Users ItemPage parity is restored: route reuse reinitializes page data, authenticated-user saves refresh auth state from the current API response contract, and `itemsName` is forwarded to the form.
 - The latest one-file `vue2_project` MultiView threshold delta is fully synced into Vue3: Compare thresholds retain acute/stable samples and omit only re-trigger samples. Nothing was skipped.
 - Machine and ROI One Pager FileUploadBlock instances now use `setSubItemRef` in their existing `useSubItemsList` flows. The project-wide scan found no remaining component that combines `setSubItemRef` with `ref="fileUploadBlockRef"`.
+- The current seven-file uncommitted `vue2_project` Sensor/chart delta has been fully synced into existing Vue3 counterparts. All changed legacy files were already migrated, so none was skipped.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Sensors` has been completed for the current compile/lint scope.
 - Current user instruction was to migrate the folder continuously, with `statistics` and `charts` last; that final stage has now been performed.
 - Vue2 -> Vue3 migration for `vue2_project/src/views/Machines` has been completed for the current compile/build scope.
@@ -299,16 +300,16 @@ Primary rules source:
 ## Files Already Modified In This Migration Batch
 - Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
 - Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
-- Latest FileUploadBlock template-ref fix passes targeted ESLint, targeted `git diff --check`, and production Vite build on Node 24.
 - Latest MultiView threshold sync passes targeted ESLint, migration-rule scan, targeted `git diff --check`, and production Vite build on Node 24.
-
-## Files Already Modified In This Migration Batch
 - Latest BannerSensorsList parity fix: `src/views/Sensors/BannerSensorsList.vue`, `src/views/Controllers/ItemForm.vue`, `src/views/Sensors/sensorForm/BannerSensorItemWrapper.vue`, and `src/views/Sensors/sensorForm/ItemForm.vue`.
 - Latest Requisitions modal Cancel fix: `src/views/Requisitions/ItemForm.vue`.
 - Latest BannerFilterBlock parity fix: `src/views/Sensors/FilterBlock/BannerFilterBlock.vue`, `src/views/Sensors/StatisticsPage.vue`, and `src/views/Sensors/charts/ChartsFilterBar.vue`.
 - Latest Users ItemPage parity fix: `src/views/Users/ItemPage.vue` and `src/views/Users/ItemForm.vue`.
 - Latest MultiView threshold sync: `src/views/Sensors/charts/MultiView/ThresholdItem.vue`.
 - Latest FileUploadBlock ref fix: `src/views/Machines/ItemForm.vue` and `src/views/SuccessDashboard/ROIOnePager/ItemForm.vue`.
+- Latest Manual Route aggregate-page Vue2 sync passes targeted ESLint, `git diff --check`, and production Vite build on Node 24.
+- Latest seven-file Sensor/chart Vue2 sync passes targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build on Node 24; only existing Vite warnings remain.
+- Current 2026-08-06 Sensor/chart sync files: `src/assets/sass/common/common-blocks.scss`, `src/modules/charts_factory/controllers/Sensor/api/index.js`, `src/modules/charts_factory/controllers/Sensor/chartsListsConfig.js`, `src/modules/charts_factory/controllers/Sensor/classes/Chart.js`, `src/modules/charts_factory/controllers/Sensor/classes/ChartFactoryContainer.js`, `src/views/Sensors/FFTStatisticsPage.vue`, and `src/views/Sensors/charts/ManualRoute/ManualRouteChartItemHeader.vue`.
 - `src/router/index.js`
 - `src/constants/menuItems.js`
 - `src/composables/useSensors.js`
@@ -538,3 +539,8 @@ Primary rules source:
 - Nested nonzero numeric values now survive condition path resolution instead of being converted to `null` by Lodash `isEmpty`.
 - Banner Sensors Asset actions therefore render when `equipment.asset.id` is present, while existing null/empty, zero, and boolean handling remains intact.
 - A targeted condition-validation regression test, ESLint, `git diff --check`, and the Node 24 production Vite build pass.
+
+## Latest Lube Unlock Visibility Parity Fix (2026-08-28)
+- `ChartItemContainer.vue` now checks blocked lube-cycle state separately from unsuccessful last-shot states, as in Vue2.
+- This restores the reset button for `lube_shot_status = UNKNOWN (8)` and the other configured unsuccessful statuses even when the cycle status is nonzero.
+- Targeted ESLint and the Node 24 production Vite build pass; existing Vite warnings remain.

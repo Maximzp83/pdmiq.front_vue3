@@ -35,6 +35,8 @@
  *     .listen('MessageSent', (data) => console.log(data));
  */
 
+import { handleBlockedAccountError } from '@/api';
+
 let channelAuthEndpoint = '';
 
 if (import.meta.env.VITE_API_BASE_URL) {
@@ -399,6 +401,16 @@ class WebSocketServiceClass {
 			headers,
 			body: formData.toString(),
 			keepalive,
+		}).then(async (response) => {
+			if (response.status === 423) {
+				const data = await response.clone().json().catch(() => null);
+				await handleBlockedAccountError({
+					response: { status: response.status, data },
+					config: {},
+				});
+			}
+
+			return response;
 		});
 	}
 
@@ -934,4 +946,3 @@ class PresenceChannel extends PrivateChannel {
 	module.exports = WebSocketService;
 }*/
 export const WebSocketService = (config) => new WebSocketServiceClass(config);
-
