@@ -31,7 +31,7 @@
 					</div>
 
 					<el-form-item prop="description" :label="tt('Description')" required>
-						<CustomInput v-model="formData.description" :placeholder="tt('text')" type="textarea" rows="5" />
+						<CustomInput v-model="formData.description" :placeholder="tt('text')" type="textarea" :rows="5" />
 					</el-form-item>
 
 					<el-form-item :label="tt('phrases.Assigned_to')" prop="request_recipient_id" required>

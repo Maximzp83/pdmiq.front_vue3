@@ -174,7 +174,7 @@
 					</a>
 				</el-form-item>
 
-				<div v-if="preparedVibrationAnalysisItems.length && formData.brand_model_id" class="el-form-item">
+				<div v-if="preparedVibrationAnalysisItems.length && formData.brand_model_id" class="mt-20">
 					<div class="content-row">
 						<b>{{ tt('Vibration_Analysis') }}:</b>
 					</div>

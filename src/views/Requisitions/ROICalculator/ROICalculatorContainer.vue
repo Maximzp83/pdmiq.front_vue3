@@ -71,6 +71,7 @@ const loadUsers = (plantId) => {
 
 const applyFilters = (filters) => {
 	appliedFilters.value = filters || {};
+	console.log(appliedFilters)
 	calculationsStepEnabled.value = true;
 };
 

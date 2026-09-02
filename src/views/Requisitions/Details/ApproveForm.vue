@@ -195,7 +195,7 @@
 								v-if="!showJustInfo"
 								v-model="formData.fab_shop_manager_notes"
 								type="textarea"
-								rows="5"
+								:rows="5"
 							/>
 							<div v-else class="semi-bold">
 								{{ itemData?.fab_shop_manager_notes || '-' }}

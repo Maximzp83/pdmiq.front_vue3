@@ -211,7 +211,7 @@ const dialogComponent = computed(() =>
 
 const reloadPage = () => emit('event', 'fetchPageData', props.itemData.id);
 const confirmAction = (message) =>
-	ElMessageBox.confirm(message, { confirmButtonText: tt('OK'), cancelButtonText: tt('CANCEL'), type: 'warning' });
+	ElMessageBox.confirm(message, { confirmButtonText: 'OK', cancelButtonText: tt('CANCEL'), type: 'warning' });
 const closeDetailsDialog = () => {
 	dialogSettings.value = {
 		show: false,

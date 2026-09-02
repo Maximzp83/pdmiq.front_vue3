@@ -43,6 +43,7 @@ const props = defineProps({
 	showStatisticsOutsideChart: Boolean,
 	rootFilters: { type: Object, default: () => ({}) },
 	allPlantsRoiStatistics: null,
+	prorateBillingCost: Boolean,
 });
 
 const emit = defineEmits(['event']);
@@ -71,6 +72,8 @@ const chartProps = computed(() => {
 		chartInstanceContainerPayload = {
 			fetch_action_url: props.plantItem ? `plants/${props.plantItem.id}/roi-cost` : null,
 			billing_plan_cost: props.plantItem.billing_plan_cost,
+			joined_at: props.plantItem.joined_at,
+			prorateBillingCost: props.prorateBillingCost,
 		};
 	}
 
@@ -101,7 +104,7 @@ const handleChartContainerReady = (data) => {
 
 		emit('event', {
 			eventName: 'plantRoiStatisticsReady',
-			data: statisticsData.value,
+			data: { ...statisticsData.value, plantId: props.plantItem?.id },
 			onward: true,
 		});
 	}

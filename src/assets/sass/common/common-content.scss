@@ -5745,6 +5745,22 @@ body {
 				box-sizing: border-box !important;
 				// padding: 0 20px !important;
 			}
+
+			// The dial is a fixed ~370px wide, but its container is far wider at
+			// 1-2 columns (PlantDetailsItem gives the ROI block mcol-lg-6 when
+			// columns <= 1, mcol-xs-12 otherwise). Unconstrained, space-between
+			// throws the two figures out to the container edges, leaving the
+			// right-hand green one detached from the gauge. Cap and centre the row
+			// so both stay over the dial. Zoomed-down 3-5 column cards are already
+			// narrow enough not to need it.
+			&.columnsNumber-1 .statistics-outside,
+			&.columnsNumber-2 .statistics-outside,
+			&.columnsNumber-undefined .statistics-outside {
+				left: 0;
+				right: 0;
+				margin: 0 auto;
+				max-width: 400px;
+			}
 		}
 
 		.columns-list {

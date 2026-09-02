@@ -112,6 +112,7 @@ import { storeToRefs } from 'pinia';
 
 import {
 	PLANT_WORK_ORDER_TYPES,
+	USER_ROLES_TYPES,
 	requisitionCategoriesList,
 	requisitionWorkTypesList,
 	siteVisitOptionsList,
@@ -121,7 +122,9 @@ import { createGetRequest } from '@/api/request_factories';
 import { ENTITIES } from '@/config/entities';
 import { Lang } from '@/localization';
 import { useAuthStore } from '@/stores/AuthStore';
+import { useGlobalStore } from '@/stores/GlobalStore';
 import { usePlantRequisitions } from '@/composables/usePlantRequisitions';
+import { useNotify } from '@/composables/useNotify';
 import { useItemForm, buildProps } from '@/composables/mixins/useItemForm';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useSubItemsList } from '@/composables/mixins/useSubItemsList';
@@ -144,7 +147,10 @@ const emit = defineEmits(['submit', 'onCancel', 'event']);
 
 const authStore = useAuthStore();
 const { authUser } = storeToRefs(authStore);
+const globalStore = useGlobalStore();
+const { globalFilters } = storeToRefs(globalStore);
 const { saveRequisition } = usePlantRequisitions();
+const { Notify } = useNotify();
 
 const itemFormRef = ref(null);
 const attachmentsUploadBlockRef = ref(null);
@@ -157,6 +163,7 @@ const refsMap = ref({
 });
 
 const initialFormData = {
+	requisition_plant_id: null,
 	fabrication_plant_id: null,
 	requisition_details: '',
 	complete_at: '',
@@ -182,6 +189,14 @@ const rules = {
 
 const requisitionCategoriesListOptions = computed(() => Object.freeze(requisitionCategoriesList()));
 const requisitionWorkTypesListOptions = computed(() => Object.freeze(requisitionWorkTypesList()));
+const isIndustrialMatrix = computed(
+	() => authStore.isIndustrialMatrix || authUser.value?.role?.type === USER_ROLES_TYPES.INDUSTRIAL_MATRIX,
+);
+const requisitionPlantId = computed(() =>
+	isIndustrialMatrix.value
+		? globalFilters.value?.plantId || null
+		: authUser.value?.plant_id || null,
+);
 const workTypeRadioOptions = Object.freeze({
 	className: 'radio-input',
 	inline: true,
@@ -227,10 +242,32 @@ const requestsToDoList = computed(() =>
 
 const itemData = computed(() => props.itemData);
 
+const resolveRequisitionPlantId = () =>
+	itemData.value?.id
+		? formData.value.requisition_plant_id || requisitionPlantId.value
+		: requisitionPlantId.value;
+
 const localSetupPage = (item) => {
+	formData.value.requisition_plant_id =
+		item?.requisition_plant_id || requisitionPlantId.value;
 	attachmentsList.value = item?.newOrderAttachments?.length
 		? item.newOrderAttachments.map((attachment) => ({ ...attachment }))
 		: [];
+};
+
+const localValidationHook = () => {
+	formData.value.requisition_plant_id = resolveRequisitionPlantId();
+
+	if (formData.value.requisition_plant_id) return true;
+
+	Notify({
+		type: 'warning',
+		title: tt('phrases.form_isnt_ready'),
+		message: isIndustrialMatrix.value
+			? tt('phrases.Select_Plant_first')
+			: tt('phrases.Please_check_fields_errors_first'),
+	});
+	return false;
 };
 
 const localSubmit = (data) => {
@@ -258,6 +295,7 @@ const { isMobile, validateForm } = useItemForm({
 	fromModal: props.fromModal,
 	editModal: props.editModal,
 	localSetupPage,
+	localValidationHook,
 	subItemsSettings,
 	validateSubItemsForm,
 	collectDataFromSubItems,

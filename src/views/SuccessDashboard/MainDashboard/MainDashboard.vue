@@ -9,7 +9,7 @@
 				<Datepicker
 					class="ml-auto"
 					setupDaterangeFilter
-					enableShortcuts
+					:pickerOptions="datepickerOptions"
 					:value="statisticsFilters.daterange"
 					type="daterange"
 					clearingTo="last_7_days"
@@ -90,6 +90,7 @@
 						:plantItem="plantItem"
 						:predefinedFilters="predefinedFilters"
 						:equipments_statistics_filters="statisticsFilters"
+						:prorateBillingCost="!!plantItem?.id"
 					/>
 				</div>
 			</div>
@@ -124,6 +125,7 @@
 <script setup>
 import { computed, onBeforeMount, ref, watch } from 'vue';
 import { getDateRange, prepareRangeParams } from '@/helpers';
+import { datePickerAllTimeShortcut, datePickerCorporateShortcuts } from '@/constants/date_time';
 import { MAINTENANCE_TYPES } from '@/constants/global';
 import { Lang } from '@/localization';
 import { useSuccessDashboard } from '@/composables/useSuccessDashboard';
@@ -153,6 +155,17 @@ const healthStatistics = ref([]);
 const meetingTrackerLoading = ref(false);
 const meetingTrackerLast = ref(null);
 const woDaterange = computed(() => ['2023-01-01', getDateRange('today', { getDateString: true })[1]]);
+// "All Time" starts when this plant joined, matching the corporate dashboard.
+const plantJoinedDate = computed(() => {
+	const date = props.plantItem?.joined_at && new Date(props.plantItem.joined_at);
+	return date instanceof Date && !isNaN(date.getTime()) ? date : null;
+});
+const datepickerOptions = computed(() => ({
+	shortcuts: [
+		...datePickerCorporateShortcuts(plantJoinedDate.value),
+		...(plantJoinedDate.value ? [datePickerAllTimeShortcut(plantJoinedDate.value)] : []),
+	],
+}));
 const predefinedFilters = computed(() =>
 	Object.freeze({
 		plantId: props.plantItem?.id,

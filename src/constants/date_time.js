@@ -1,5 +1,5 @@
 import { Lang } from '@/localization';
-import { getDateRange } from '@/helpers';
+import { getDateRange, getHistoricalQuarterRange } from '@/helpers';
 
 const datePickerShortcuts1 = [
 	{
@@ -121,6 +121,35 @@ const datePickerYearQuartersShortcuts1 = [
 	{
 		text: 'constants.fourth_quarter',
 		rangeName: 'fourth_quarter',
+		onClick(picker) {
+			picker.$emit('pick', getDateRange(this.rangeName));
+		}
+	}
+];
+
+// Q1-Q4 are historical shortcuts: a quarter that hasn't started yet this year
+// falls back to last year's version of it (see getHistoricalQuarterRange).
+const datePickerCorporateQuarterShortcuts1 = companyJoinedDate =>
+	[1, 2, 3, 4].map(quarterNumber => ({
+		text: `constants.q${quarterNumber}`,
+		rangeName: `q${quarterNumber}`,
+		onClick(picker) {
+			picker.$emit('pick', getHistoricalQuarterRange(quarterNumber, companyJoinedDate));
+		}
+	}));
+
+const datePickerCorporateShortcuts1 = companyJoinedDate => [
+	...datePickerCorporateQuarterShortcuts1(companyJoinedDate),
+	{
+		text: 'constants.this_year',
+		rangeName: 'this_year',
+		onClick(picker) {
+			picker.$emit('pick', getDateRange(this.rangeName));
+		}
+	},
+	{
+		text: 'constants.last_12_months',
+		rangeName: 'last_12_months',
 		onClick(picker) {
 			picker.$emit('pick', getDateRange(this.rangeName));
 		}
@@ -496,6 +525,16 @@ export const datePickerAdditionalShortcuts2 = () =>
 	Lang.translate(datePickerAdditionalShortcuts_2, { key: 'text' });
 export const datePickerYearQuartersShortcuts = () =>
 	Lang.translate(datePickerYearQuartersShortcuts1, { key: 'text' });
+export const datePickerCorporateShortcuts = companyJoinedDate =>
+	Lang.translate(datePickerCorporateShortcuts1(companyJoinedDate), { key: 'text' });
+// startDate: Date or 'YYYY-MM-DD' string marking when the company's subscription began.
+export const datePickerAllTimeShortcut = (startDate) => ({
+	text: Lang.tt('constants.all_time'),
+	rangeName: 'all_time',
+	onClick(picker) {
+		picker.$emit('pick', [startDate, new Date()]);
+	}
+});
 export const timeZonesList = () => timeZonesList1;
 export const localeMonths = translate =>
 	translate ? localeMonths1.map(wi => Lang.tt(wi)) : localeMonths1;

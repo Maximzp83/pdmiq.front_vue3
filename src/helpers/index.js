@@ -881,6 +881,37 @@ const getDateRange1 = (range_name, options = {}) => {
 	return [start, end];
 };
 
+// Q1-Q4 are historical: a quarter that hasn't started yet this year resolves to
+// last year's version of it, unless the company didn't exist yet back then -
+// in that case it falls back to this year's (in-progress/future) quarter.
+const getHistoricalQuarterRange1 = (quarterNumber, companyJoinedDate, options = {}) => {
+	const { getDateString } = options;
+	const now = new Date();
+	const startMonth = (quarterNumber - 1) * 3;
+
+	const buildRange = year => [
+		new Date(year, startMonth, 1, 0, 0, 0),
+		new Date(year, startMonth + 3, 0, 23, 59, 0)
+	];
+
+	const [thisYearStart, thisYearEnd] = buildRange(now.getFullYear());
+
+	let [start, end] = [thisYearStart, thisYearEnd];
+
+	if (thisYearStart > now) {
+		const [lastYearStart, lastYearEnd] = buildRange(now.getFullYear() - 1);
+
+		if (!companyJoinedDate || new Date(companyJoinedDate) <= lastYearEnd) {
+			[start, end] = [lastYearStart, lastYearEnd];
+		}
+	}
+
+	if (getDateString) {
+		return [getYmdDateString({ dateObj: start }), getYmdDateString({ dateObj: end })];
+	}
+	return [start, end];
+};
+
 const prepareRangeParams1 = (daterange, settings = {}) => {
 	let dateStartKey = settings.dateStartKey || 'dateStart';
 	let dateFinishKey = settings.dateFinishKey || 'dateFinish';
@@ -1432,6 +1463,8 @@ export const getYmdDateString = payload => getYmdDateString1(payload);
 export const cleanDateString = (str, options) => cleanDateString1(str, options);
 export const getDateRange = (range_name, options) =>
 	getDateRange1(range_name, options);
+export const getHistoricalQuarterRange = (quarterNumber, companyJoinedDate, options) =>
+	getHistoricalQuarterRange1(quarterNumber, companyJoinedDate, options);
 export const prepareRangeParams = (daterange, settings) =>
 	prepareRangeParams1(daterange, settings);
 export const updateDateRange = (daterange, settings) =>

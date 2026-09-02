@@ -164,7 +164,7 @@ const {
 	options: {
 		tableRef: itemsTableRef,
 		predefinedFilters: { daterange: [], technicians: [] },
-		localDeleteItems: (payload) => handleDeleteRequisition(payload?.row?.id),
+		// localDeleteItems: (payload) => handleDeleteRequisition(payload?.row?.id),
 	},
 });
 
@@ -345,7 +345,7 @@ const handleRadioFilters = (value) => {
 	setFilters({ status: value, onHold: null });
 };
 const confirmAction = (message) =>
-	ElMessageBox.confirm(message, { confirmButtonText: tt('OK'), cancelButtonText: tt('CANCEL'), type: 'warning' });
+	ElMessageBox.confirm(message, { confirmButtonText: 'OK', cancelButtonText: tt('CANCEL'), type: 'warning' });
 const handleUnapprove = ({ row }) =>
 	confirmAction(`${tt('Unapprove')} ${tt('phrases.this_order')}?`).then(() =>
 		unapproveRequisition({ itemId: row.id }).then(refetchItemsList),
@@ -354,10 +354,11 @@ const handleHoldOn = ({ row }) =>
 	confirmAction(`${row.is_on_hold ? tt('Off_Hold') : tt('On_Hold')} ${tt('phrases.this_order')}?`).then(() =>
 		holdOnRequisition({ itemId: row.id, data: { enable: !row.is_on_hold } }).then(refetchItemsList),
 	);
-const handleDeleteRequisition = (id) => {
-	if (!id) return handleDeleteItems();
+
+const handleDeleteRequisition = ({ row }) => {
+	if (!row.id) return handleDeleteItems();
 	return confirmAction(`${tt('phrases.Do_you_really_want_to')} ${tt('phrases.delete_this_requisition')}?`).then(() =>
-		deleteRequisition({ data: { ids: [id] } }).then(refetchItemsList),
+		deleteRequisition({ data: { ids: [row.id] } }).then(refetchItemsList),
 	);
 };
 const closeDialog = () => globalStore.show_edit_modal({ show: false, editModalProp: 'editModalClassic' });

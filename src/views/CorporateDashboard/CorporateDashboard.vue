@@ -11,6 +11,8 @@
 								:key="detailsComponentKey"
 								:companyData="selectedCompany"
 								:companyId="companyId"
+								:plantsList="plantsList"
+								:plantsLoading="plantsLoading"
 								preventSetNavbar
 								@event="handleEvent"
 							/>
@@ -27,7 +29,7 @@
 </template>
 
 <script setup>
-import { computed, onBeforeMount, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeMount, onBeforeUnmount, ref, watch } from 'vue';
 import Highcharts from '@/config/highcharts';
 import highchartsMore from 'highcharts/highcharts-more';
 import stockInit from 'highcharts/modules/stock';
@@ -35,7 +37,14 @@ import boost from 'highcharts/modules/boost';
 import annotations from 'highcharts/modules/annotations';
 import { storeToRefs } from 'pinia';
 
-import { localeMonths, localeMonthsFull, weekdays } from '@/constants/date_time';
+import { api_request } from '@/api/request_provider';
+import {
+	datePickerAllTimeShortcut,
+	datePickerCorporateShortcuts,
+	localeMonths,
+	localeMonthsFull,
+	weekdays,
+} from '@/constants/date_time';
 import { findItemBy } from '@/helpers';
 import { Lang } from '@/localization';
 import { LANGUAGE_TYPES } from '@/localization/utils';
@@ -60,11 +69,22 @@ const { authUser } = storeToRefs(authStore);
 const { globalCompaniesList, globalFilters } = storeToRefs(globalStore);
 
 const detailsComponentKey = ref(1);
+const plantsList = ref([]);
+const plantsLoading = ref(false);
 
 const companyId = computed(() => authUser.value?.company_id || globalFilters.value?.companyId || null);
 const selectedCompany = computed(() => {
 	if (!companyId.value || !globalCompaniesList.value) return null;
 	return findItemBy('id', companyId.value, globalCompaniesList.value);
+});
+
+// "All Time" starts at the earliest joined_at among the selected company's plants.
+const earliestPlantJoinedDate = computed(() => {
+	const dates = plantsList.value
+		.map((plant) => plant.joined_at && new Date(plant.joined_at))
+		.filter((date) => date instanceof Date && !isNaN(date.getTime()));
+
+	return dates.length ? new Date(Math.min(...dates)) : null;
 });
 
 const navbarSettings = computed(() => ({
@@ -74,6 +94,14 @@ const navbarSettings = computed(() => ({
 			storeSettings: {
 				storeName: 'PlantsStore',
 				stateKey: 'statistics_filters',
+			},
+			pickerOptions: {
+				shortcuts: [
+					...datePickerCorporateShortcuts(earliestPlantJoinedDate.value),
+					...(selectedCompany.value && earliestPlantJoinedDate.value
+						? [datePickerAllTimeShortcut(earliestPlantJoinedDate.value)]
+						: []),
+				],
 			},
 		},
 		printButtonSettings: {
@@ -101,12 +129,30 @@ const setGlobalFilters = ({ id, filterName }) => {
 	});
 };
 
+const fetchPlants = async (id) => {
+	plantsList.value = [];
+	if (!id) return;
+
+	plantsLoading.value = true;
+	try {
+		const { value } = await api_request.get('/plants', {
+			params: { max: -1, companyId: id },
+			notNotify: true,
+		});
+		plantsList.value = value || [];
+	} finally {
+		plantsLoading.value = false;
+	}
+};
+
 const { handleEvent } = useEventHandler({}, null);
 
 onBeforeMount(() => {
 	setupHighchartsLocale();
-	globalStore.setup_navbar(navbarSettings.value);
 });
+
+watch(navbarSettings, (settings) => globalStore.setup_navbar(settings), { immediate: true });
+watch(companyId, fetchPlants, { immediate: true });
 
 onBeforeUnmount(() => {
 	globalStore.setup_navbar({});
