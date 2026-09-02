@@ -1006,3 +1006,7 @@ await fetchUsers({ page: 1 });
   - Removed the obsolete static Manual Route config and aligned the FFT dev endpoint/shared legend styles
   - All changed legacy files had migrated Vue3 counterparts; none were skipped
   - Targeted ESLint, migration-rule scan, `git diff --check`, and production Vite build passed on Node 24
+- [x] Requisitions ROI ItemsList parity fix (2026-09-02)
+  - Reconnected the embedded work-orders list to the ROI calculator's applied filters and isolated it from persisted requisition list filters
+  - Restored all Vue2 columns, formatters, detail navigation, wrapper styling, no-pagination behavior, and navbar protection
+  - Targeted ESLint, `git diff --check`, and production Vite build passed on Node 24

@@ -549,3 +549,8 @@ Primary rules source:
 - `ChartItemContainer.vue` now checks blocked lube-cycle state separately from unsuccessful last-shot states, as in Vue2.
 - This restores the reset button for `lube_shot_status = UNKNOWN (8)` and the other configured unsuccessful statuses even when the cycle status is nonzero.
 - Targeted ESLint and the Node 24 production Vite build pass; existing Vite warnings remain.
+
+## Latest Requisitions ROI ItemsList Parity Fix (2026-09-02)
+- The ROI results list now consumes the calculator's applied filters directly and no longer fetches with unrelated persisted requisition filters.
+- Restored every Vue2 ROI result column, formatting rule, detail action, wrapper class, and the original no-pagination behavior.
+- The embedded list now respects `preventSetNavbar`, preserving the ROI page navbar; targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass.
