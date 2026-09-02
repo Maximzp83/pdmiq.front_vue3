@@ -80,7 +80,7 @@ const bindFlagsTooltip = chart => {
 	});
 };
 
-class SensorChartBase extends ChartBase {
+export class SensorChartBase extends ChartBase {
 	constructor() {
 		super();
 		this.generateSeriesByStatistics = false;
@@ -499,6 +499,8 @@ class SensorChartBase extends ChartBase {
 			const yAxisCopy = cloneDeep(this.options.yAxis);
 
 			yAxisCopy.forEach((yAxis, idx) => {
+				if (idx > 0 && yAxis.custom_id === 'overlay_chart_axis') return;
+
 				const { requestItemId } = yAxis.customSettings || {};
 				const parameterItemResultData =
 					requestItemId != null

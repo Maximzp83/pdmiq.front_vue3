@@ -21,7 +21,7 @@
 			<div class="flex mrow small-input-paddings">
 				<CustomInput
 					v-model="actualHours"
-					class="mcol-xs-4 mini"
+					class="mcol-xs-4 "
 					className="text-center"
 					placeholder="00"
 					:disabled="hideCreateButton"
@@ -30,7 +30,7 @@
 				<div>:</div>
 				<CustomInput
 					v-model="actualMinutes"
-					class="mcol-xs-4 mini"
+					class="mcol-xs-4 "
 					className="text-center"
 					placeholder="00"
 					:disabled="hideCreateButton"

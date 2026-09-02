@@ -863,6 +863,8 @@ class SuccessGaugeChart extends MaintenanceChartBase {
 		};
 
 		this.billing_plan_cost = resources.payload_1.billing_plan_cost;
+		this.joined_at = resources.payload_1.joined_at;
+		this.prorateBillingCost = !!resources.payload_1.prorateBillingCost;
 		// this.initialSetup(resources);
 		let options = {
 			chart: {
@@ -976,21 +978,84 @@ class SuccessGaugeChart extends MaintenanceChartBase {
 		}
 	}
 
+	// How many monthly bills the selected range covers, day-weighted: each
+	// calendar month contributes the share of its own days that the range
+	// touches. A partial month is a fraction rather than being dropped, so
+	// ranges shorter than a month still prorate to a real cost instead of 0.
+	getBillingMonthsInRange() {
+		const daterange = this.resources?.filters?.daterange;
+		if (!daterange || !daterange.length) return 12;
+
+		let rangeStart = new Date(daterange[0]);
+		let rangeEnd = new Date(daterange[1]);
+
+		if (this.joined_at) {
+			const joinedDate = new Date(this.joined_at);
+			if (joinedDate > rangeStart) rangeStart = joinedDate;
+		}
+
+		// Quarter shortcuts can end in the future (picking Q3 in August selects
+		// Jul 1 - Sep 30). Only time that has actually elapsed has been billed.
+		const today = new Date();
+		if (rangeEnd > today) rangeEnd = today;
+
+		if (isNaN(rangeStart.getTime()) || isNaN(rangeEnd.getTime()) || rangeEnd < rangeStart) {
+			return 0;
+		}
+
+		const endYear = rangeEnd.getUTCFullYear();
+		const endMonth = rangeEnd.getUTCMonth();
+
+		let months = 0;
+		let year = rangeStart.getUTCFullYear();
+		let month = rangeStart.getUTCMonth();
+		let firstDay = rangeStart.getUTCDate();
+
+		while (year < endYear || (year === endYear && month <= endMonth)) {
+			const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+			const lastDay =
+				year === endYear && month === endMonth ? rangeEnd.getUTCDate() : daysInMonth;
+
+			months += (lastDay - firstDay + 1) / daysInMonth;
+
+			firstDay = 1;
+			month += 1;
+			if (month > 11) {
+				month = 0;
+				year += 1;
+			}
+		}
+
+		return months;
+	}
+
 	setupResultData(data) {
 		try {
-			const { roi_cost, billing_plan_cost } = data;
+			const { roi_cost, billing_plan_cost } = data || {};
 			// const { billing_plan_cost } = this;
 			let billing_plan_cost_final = billing_plan_cost || this.billing_plan_cost;
 			// const { yMax, currentValue, redArea } = data;
 			let yMax = 500;
 			let currentValue = 0;
 			let redArea = 150;
+			// roi_cost already covers only the selected range (the roi-cost
+			// endpoint is called with dateStart/dateFinish), so it is never
+			// prorated - only the annual billing plan cost is. Coerced to a
+			// number because the endpoint can return a decimal string, null, or
+			// omit the key for a range with no ROI - a non-numeric value here
+			// turns yMax into NaN and collapses the green plot band.
+			const roi_cost_final = Number(roi_cost) || 0;
 
 			if (billing_plan_cost_final) {
-				yMax = billing_plan_cost_final * 4;
-				redArea = billing_plan_cost_final;
-				yMax = roi_cost > yMax ? roi_cost : yMax; //|| 500,
-				currentValue = roi_cost; // || 300
+				if (this.prorateBillingCost) {
+					redArea = Math.round(
+						(billing_plan_cost_final / 12) * this.getBillingMonthsInRange()
+					);
+				} else {
+					redArea = billing_plan_cost_final;
+				}
+				yMax = Math.max(redArea * 4, roi_cost_final) || 500;
+				currentValue = roi_cost_final; // || 300
 			}
 			// console.log(data, billing_plan_cost_final, currentValue)
 

@@ -1,5 +1,6 @@
 import { validateBySettings } from '@/helpers';
 import isEmpty from 'lodash/isEmpty';
+import { unref } from 'vue';
 
 let localIdCounter = 0;
 
@@ -259,7 +260,10 @@ export function useSubItemsList({ formData, refsMap, state } = {}) {
 		let refsList = refs[settingsItem.ref];
 		if (refsList) {
 			refsList = Array.isArray(refsList) ? refsList : [refsList];
-			refsList.filter(Boolean).forEach((Instance) => operation(Instance));
+			refsList
+				.map((instance) => unref(instance))
+				.filter(Boolean)
+				.forEach((instance) => operation(instance));
 		}
 	};
 

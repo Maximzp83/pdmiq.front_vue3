@@ -203,7 +203,7 @@
 							v-model="formData.description"
 							:placeholder="tt('text')"
 							type="textarea"
-							rows="5"
+							:rows="5"
 						/>
 					</el-form-item>
 				</div>

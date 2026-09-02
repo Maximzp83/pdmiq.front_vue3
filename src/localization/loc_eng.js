@@ -1152,6 +1152,7 @@ export default {
 		silence_mode_until: 'Silence Mode Until',
 		metric_to_imperial_formula: 'Metric to Imperial Formula',
 		imperial_to_metric_formula: 'Imperial to Metric Formula',
+		total_hours: 'Total Hours',
 	},
 
 	aliases: {
@@ -1467,6 +1468,12 @@ export default {
 		last_1_month: 'Last 1 Month',
 		last_6_months: 'Last 6 Months',
 		last_12_months: 'Last 12 Months',
+		q1: 'Q1',
+		q2: 'Q2',
+		q3: 'Q3',
+		q4: 'Q4',
+		this_year: 'This Year',
+		all_time: 'All Time',
 
 		'psig_0_50': 'PSIG 0-50',
 		'psig_0_150': 'PSIG 0-150',

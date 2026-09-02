@@ -1170,6 +1170,7 @@ export default {
 		silence_mode_until: 'Modo Silencio hasta',
 		metric_to_imperial_formula: 'Fórmula de métrica a imperiales',
 		imperial_to_metric_formula: 'Fórmula imperial a métrica',
+		total_hours: 'Horas Totales',
 	},
 
 	aliases: {
@@ -1464,6 +1465,12 @@ export default {
 		last_1_month: 'Último mes',
 		last_6_months: 'Últimos 6 meses',
 		last_12_months: 'Últimos 12 meses',
+		q1: 'T1',
+		q2: 'T2',
+		q3: 'T3',
+		q4: 'T4',
+		this_year: 'Este año',
+		all_time: 'Todo el tiempo',
 		// ------------new------------
 		'all_in_one_aa_battery': 'Todo en uno - Batería AA',
 		'all_in_one_c_battery': 'Todo en uno - Batería C',

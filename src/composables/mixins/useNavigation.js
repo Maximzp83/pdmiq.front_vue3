@@ -15,8 +15,10 @@ export function useNavigation() {
 
 		if (path === '/logout') {
 			set_redirect_to(currentPath);
-			router.push('/login');
-			sign_out(payload);
+			
+			sign_out(payload).then(() => {
+				router.push('/login');
+			});
 			return;
 		}
 

@@ -82,7 +82,8 @@
 						<Datepicker
 							class="div-block no-min-width"
 							setupDaterangeFilter
-							enableShortcuts
+							:enableShortcuts="!navbarSettings.datepickerSettings.pickerOptions"
+							:pickerOptions="navbarSettings.datepickerSettings.pickerOptions"
 							@input="handleDatepickerChange"
 							:value="datepickerFilters.daterange"
 							clearingTo="last_7_days"
@@ -792,9 +793,5 @@ onMounted(() => {
 			filterName: 'companyId',
 		});
 	}
-});
-
-onBeforeUnmount(() => {
-	globalStore.set_global_filters({ plantId: null, companyId: null });
 });
 </script>

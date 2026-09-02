@@ -350,3 +350,9 @@
 - Corrected `src/views/Sensors/charts/ChartItemContainer.vue` to evaluate the lube-cycle status and last-shot status independently, matching Vue2.
 - Failed shot statuses `2`, `3`, `4`, `6`, `7`, `8`, `9`, and `10` now expose the reset action even when `lube_cycle_status` contains another nonzero value.
 - Targeted ESLint and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.
+
+## Requisitions ROI ItemsList Parity Fix (2026-09-02)
+- Restored the Vue2 prop-driven ROI list flow in `src/views/Requisitions/ROICalculator/ItemsList.vue`; applied calculator filters now drive the work-orders request instead of the shared requisitions store filters.
+- Restored the original table structure, date/time formatting, detail action, wrapper class, and intentionally pagination-free `max: -1` presentation.
+- Forwarded `preventSetNavbar` into `useItemsData`, preventing the nested ROI list from replacing or clearing its parent page navbar.
+- Targeted ESLint, `git diff --check`, and the Node 24 production Vite build pass; existing Vite mixed-import/chunk-size warnings remain.

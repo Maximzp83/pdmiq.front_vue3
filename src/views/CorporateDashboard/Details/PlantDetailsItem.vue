@@ -35,11 +35,13 @@
 							:plantItem="plantItem"
 							:plantsList="plantsList"
 							:predefinedFilters="predefinedFilters"
+							:equipments_statistics_filters="{ daterange: filters.daterange }"
 							:switchTabTo="{ key: 'prop', value: 'plTab' }"
 							disableTabs
 							standardIconBlock
 							:selectedColumnsNumber="selectedColumnsNumber"
 							:allPlantsRoiStatistics="allPlantsRoiStatistics"
+							:prorateBillingCost="!!plantItem"
 							@event="handleEvent"
 						/>
 					</div>

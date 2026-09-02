@@ -69,7 +69,6 @@
 import { computed, nextTick, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 
-import { api_request } from '@/api/request_provider';
 import { main_logo } from '@/constants/global';
 import { Lang } from '@/localization';
 import { useGlobalStore } from '@/stores/GlobalStore';
@@ -85,6 +84,8 @@ defineOptions({ name: 'CorporateMain' });
 const props = defineProps({
 	companyId: { type: [Number, String], default: null },
 	companyData: { type: Object, required: true },
+	plantsList: { type: Array, default: () => [] },
+	plantsLoading: { type: Boolean, default: false },
 });
 
 const globalStore = useGlobalStore();
@@ -92,13 +93,17 @@ const plantsStore = usePlantsStore();
 const { printHTMLWindowIsOpen } = storeToRefs(globalStore);
 const { statistics_filters: filters } = storeToRefs(plantsStore);
 
-const plantsList = ref([]);
-const plantsLoading = ref(false);
 const columnsNumber = ref(1);
-const allPlantsRoiStatistics = ref({
-	currentValue: 0,
-	redArea: 0,
-});
+const plantRoiStatisticsMap = ref({});
+const allPlantsRoiStatistics = computed(() =>
+	Object.values(plantRoiStatisticsMap.value).reduce(
+		(acc, item) => ({
+			currentValue: acc.currentValue + (item.currentValue || 0),
+			redArea: acc.redArea + (item.redArea || 0),
+		}),
+		{ currentValue: 0, redArea: 0 },
+	),
+);
 
 const itemsName = computed(() =>
 	Object.freeze({
@@ -109,7 +114,7 @@ const itemsName = computed(() =>
 const predefinedFiltersForAllPlants = computed(() =>
 	Object.freeze({
 		plantId: null,
-		plantIds: plantsList.value.map((item) => item.id),
+		plantIds: props.plantsList.map((item) => item.id),
 		daterange: filters.value?.daterange,
 	}),
 );
@@ -125,22 +130,6 @@ const columnsNumberList = computed(() =>
 const selectedColumnsNumber = computed(
 	() => columnsNumberList.value.find((item) => item.id === columnsNumber.value) || columnsNumberList.value[0],
 );
-
-const fetchPlants = async (companyId) => {
-	plantsList.value = [];
-	if (!companyId) return;
-
-	plantsLoading.value = true;
-	try {
-		const { value } = await api_request.get('/plants', {
-			params: { max: -1, companyId },
-			notNotify: true,
-		});
-		plantsList.value = value || [];
-	} finally {
-		plantsLoading.value = false;
-	}
-};
 
 const setBreakPageFor = (idx, columnsNum) => {
 	if (columnsNum === 1) return idx % 2 === 0;
@@ -176,15 +165,21 @@ const handleLastItemMounted = () => {
 
 			const rowIdx = block.getAttribute('rowIdx');
 			const height = rowsHeight[rowIdx];
-			if (height) block.style.height = `${height}px`;
+			// minHeight, not height: the ROI list under the gauge is fetched
+			// asynchronously, so this runs before it arrives and the measured row
+			// height is too short for the final content. A hard height would clip
+			// the list; a floor still aligns the cards across the row.
+			if (height) block.style.minHeight = `${height}px`;
 		});
 	});
 };
 
 const plantRoiStatisticsReady = (data = {}) => {
-	allPlantsRoiStatistics.value = {
-		currentValue: allPlantsRoiStatistics.value.currentValue + (data.currentValue || 0),
-		redArea: allPlantsRoiStatistics.value.redArea + (data.redArea || 0),
+	if (data.plantId == null) return;
+
+	plantRoiStatisticsMap.value = {
+		...plantRoiStatisticsMap.value,
+		[data.plantId]: { currentValue: data.currentValue || 0, redArea: data.redArea || 0 },
 	};
 };
 
@@ -192,13 +187,8 @@ const { handleEvent } = useEventHandler({ plantRoiStatisticsReady });
 
 watch(
 	() => props.companyId,
-	(id) => {
-		allPlantsRoiStatistics.value = {
-			currentValue: 0,
-			redArea: 0,
-		};
-		fetchPlants(id);
+	() => {
+		plantRoiStatisticsMap.value = {};
 	},
-	{ immediate: true },
 );
 </script>

@@ -345,6 +345,7 @@ const activeFiltersCount = computed(() => {
 		'orderByColumn',
 		'orderByMethod',
 		'daterange_setted_at',
+		'scrollTo'
 	]);
 
 	return Object.entries(filters.value || {}).filter(([key, value]) => {
@@ -353,10 +354,12 @@ const activeFiltersCount = computed(() => {
 		return value !== null && value !== undefined && value !== false && value !== '';
 	}).length;
 });
+
 const propsFiltersRef = computed(() => ({
 	type: MAINTENANCE_TYPES.WORK_ORDER,
 	...props.propsFilters,
 }));
+
 const itemsNameRef = computed(() => {
 	const item = findItemBy('id', propsFiltersRef.value.type, maintenanceTypesList());
 	return Object.freeze({

@@ -32,7 +32,7 @@
 					</div>
 				</el-form-item>
 
-				<el-form-item :label="tt('Total Hours:')" class="showJustInfo">
+				<el-form-item :label="tt('phrases.Total_Hours')" class="showJustInfo">
 					<div class="el-form-item__content">
 						<b>{{ localExecutionTotalTime }}</b>
 					</div>
@@ -56,7 +56,7 @@
 					<el-input
 						v-model="formData.execution_report_details"
 						type="textarea"
-						rows="5"
+						:rows="5"
 						:disabled="showJustInfo"
 					/>
 				</el-form-item>
@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-import { computed, ref, shallowRef } from 'vue';
+import { computed, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 
 import { convertMsToHours, formatTime } from '@/helpers';
@@ -119,8 +119,8 @@ const attachmentsUploadBlockRef = ref(null);
 const refsMap = ref({
 	AttachmentsUploadBlock: [attachmentsUploadBlockRef],
 });
-const execTimesItemsList = shallowRef([]);
-const attachmentsList = shallowRef([]);
+const execTimesItemsList = ref([]);
+const attachmentsList = ref([]);
 const localExecutionTotalTime = ref('');
 const processing = ref(false);
 const formData = ref({
@@ -252,7 +252,7 @@ const { isMobile, validateForm, handleCancel } = useItemForm({
 
 const onSave = (keep) => {
 	ElMessageBox.confirm('Are You sure?', {
-		confirmButtonText: tt('OK'),
+		confirmButtonText: 'OK',
 		cancelButtonText: tt('CANCEL'),
 		type: 'warning',
 	}).then(() => validateForm({ keep }));
