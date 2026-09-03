@@ -199,7 +199,7 @@
 
 					<div
 						v-if="!formData.is_monitoring_all_notifiable_plants"
-						class="el-form-item"
+						class="mt-20"
 					>
 						<ProdlinesSelectItem
 							v-for="(plantId, idx) in selectedPlantIds"
@@ -213,6 +213,7 @@
 					</div>
 
 					<el-form-item
+						class="mt-20"
 						v-if="isTechnician"
 						:label="tt('phrases.hourly_rate')"
 						prop="hourly_rate"

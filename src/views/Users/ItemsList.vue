@@ -81,6 +81,7 @@ import { userRolesTypesList } from '@/constants/global';
 import { Lang } from '@/localization';
 import { useItemsData } from '@/composables/mixins/useItemsData';
 import { useEventHandler } from '@/composables/mixins/useEmitter';
+import { useNavigation } from '@/composables/mixins/useNavigation';
 import { useRequestsList } from '@/composables/mixins/useRequestsList';
 import { useUsersStore } from '@/stores/UsersStore';
 import { useAuthStore } from '@/stores/AuthStore';
@@ -103,6 +104,7 @@ const usersStore = useUsersStore();
 const { filters } = storeToRefs(usersStore);
 const authStore = useAuthStore();
 const { authUser } = storeToRefs(authStore);
+const { changeRoute } = useNavigation();
 
 const usersEntity = ENTITIES.Users;
 const userRolesEntity = ENTITIES.UserRoles;
@@ -122,33 +124,32 @@ const { itemsList, itemsLoading, itemsName, meta, setFilters, createItem, editIt
 const tableSettings = computed(() => {
 	const actions = [];
 
-	if (hasAccessToEdit.value) {
-		actions.push({
-			name: 'editItem',
-			type: 'success',
-			icon: 'icomoon icon-pencil',
-			tooltip_text: tt('Edit'),
-			conditionSettings: {
-				checkMethod: 'some',
-				conditions: [
-					{ data_value: authStore.isDeveloper, control_value: true },
-					{
-						data_value: hasAccessToEdit.value,
-						control_value: true,
-						checkMethod_next: 'some',
-						next_conditions: [
-							{ prop: 'role_id', method: '==', control_value: authUser.value?.role_id },
-							{
-								array_method: 'some',
-								prop: 'role_id',
-								control_value: authUser.value?.role?.child_role_ids || [],
-							},
-						],
-					},
-				],
-			},
-		});
-	}
+	actions.push({
+		name: 'handleEditUser',
+		type: 'success',
+		icon: 'icomoon icon-pencil',
+		tooltip_text: tt('Edit'),
+		conditionSettings: {
+			checkMethod: 'some',
+			conditions: [
+				{ data_value: authStore.isDeveloper, control_value: true },
+				{ prop: 'id', method: '==', control_value: authUser.value?.id },
+				{
+					data_value: hasAccessToEdit.value,
+					control_value: true,
+					checkMethod_next: 'some',
+					next_conditions: [
+						{ prop: 'role_id', method: '==', control_value: authUser.value?.role_id },
+						{
+							array_method: 'some',
+							prop: 'role_id',
+							control_value: authUser.value?.role?.child_role_ids || [],
+						},
+					],
+				},
+			],
+		},
+	});
 
 	if (hasAccessToDelete.value) {
 		actions.push({
@@ -208,11 +209,19 @@ const tableSettings = computed(() => {
 	});
 });
 
+const handleEditUser = ({ row }) => {
+	if (row?.id != null && String(row.id) === String(authUser.value?.id)) {
+		return changeRoute({ path: '/profile' });
+	}
+
+	return editItem({ row });
+};
+
 const methodsMap = {
 	fetch_user_roles: createGetRequest(userRolesEntity.apiBase),
 	setFilters,
 	createItem,
-	editItem,
+	handleEditUser,
 	handleDeleteItems,
 };
 

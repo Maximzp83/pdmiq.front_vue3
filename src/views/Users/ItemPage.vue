@@ -68,7 +68,7 @@ const {
 	// debug: true,
 	entityKey: 'Users',
 	itemFormRef,
-	goToListAfterSave: true,
+	goToListAfterSave: computed(() => route.path !== '/profile'),
 	successSubmitCallback: (answer) => {
 		const savedUser = answer?.value || answer?.data?.data || answer?.data;
 		if (savedUser?.id === authUser.value?.id) {

@@ -1,6 +1,7 @@
 # New Session Handoff
 
 ## Current Objective
+- Users self-service is restored: an authenticated user can open their own profile from the Users table without `edit_users`, and route-less `/profile` saves now use the form user id, remain on the profile, and preserve the saved phone/notification data. Access to other users remains permission and role scoped.
 - BannerSensorsList parity is restored end to end: Controller-scoped modal CRUD, modal validation/save/refetch/close, original list lifecycle/columns, FFT, re-baseline behavior, and the separate `itemsList` replacement watcher now work as intended.
 - Requisitions create-modal Cancel now closes through `DynamicFormContainer` without the stale `closeDialog` event warning, and its textarea row props satisfy Element Plus numeric typing.
 - Banner Statistics filter parity is restored: re-baseline is wired end to end, NCD OFF ALARM and Split visibility match Vue2, and closing the outer filter closes the nested charts popover.
