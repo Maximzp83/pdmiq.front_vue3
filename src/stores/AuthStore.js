@@ -218,8 +218,6 @@ export const useAuthStore = defineStore('authStore', {
 		sign_out(options = {}) {
 			const { message, type = 'success', duration } = options;
 			const { Notify } = useNotify();
-
-			this.clear_auth();
 			
 			const notifySettings = {
 				type,
@@ -230,12 +228,16 @@ export const useAuthStore = defineStore('authStore', {
 
 			// Call server-side logout in production
 			if (import.meta.env.PROD) {
-				return this.logout().then(() => {
-					Notify(notifySettings);
-				})
+				return Promise.resolve(this.logout())
+					.catch(() => undefined)
+					.then(() => {
+						this.clear_auth();
+						Notify(notifySettings);
+					});
 			}
 
 			// Show notification after a short delay
+			this.clear_auth();
 
 			return new Promise((resolve) => {
 				setTimeout(() => {

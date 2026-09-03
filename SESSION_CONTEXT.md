@@ -24,6 +24,11 @@
   - Shared legend styles were added under `.chart-container-wrapper`.
   - All seven changed legacy files have migrated Vue3 counterparts; none was skipped.
   - Targeted ESLint, migration-rule scan, `git diff --check`, and the Node 24 production Vite build pass; existing mixed-import/chunk-size warnings remain.
+- Users self-notification/profile access was fixed on 2026-09-03:
+  - The authenticated user's own row now exposes the green Edit action even without `edit_users`, and self-editing opens `/profile`; permissions and role hierarchy still govern editing other users.
+  - Profile submission now takes the user id from submitted form data, preventing `PUT /users/undefined` on the route without an `:id` parameter.
+  - Saving `/profile` keeps the user on the profile page and refreshes the saved page data; the existing phone verification and SMS-notification controls can therefore be saved normally.
+  - Targeted ESLint and the Node 24 production Vite build pass. The full Vitest run passed 11 tests but five suites still fail before collection on the existing Element Plus CSS loader configuration.
 - `src/views/Sensors/BannerSensorsList.vue` full parity fix completed on 2026-08-25:
   - Restored modal Add/Edit through `BannerSensorItemWrapper`, controller-scoped settings, success refetch/close, page reset, Plant/query cleanup, navbar protection for the embedded Controller tab, and the original table columns.
   - Restored re-baseline confirmation plus enable/disable payload, result message, loading state, and list refresh.

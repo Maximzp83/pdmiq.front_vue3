@@ -9,6 +9,7 @@
 
 ## Current Focus
 
+- Users self-notification/profile fix is complete: the own-row pencil is visible without `edit_users` and opens `/profile`; shared item-page submission prefers the submitted id so profile updates no longer target `/users/undefined`; profile saves stay on-page and preserve the returned data. Other-user visibility/edit rules were not broadened. Targeted ESLint and the Node 24 production Vite build pass; the full Vitest run remains partly blocked before collection by the existing Element Plus CSS loader issue (11 tests passed).
 - `src/views/Users/ItemPage.vue` was completed against Vue2: it now reinitializes on reused user/profile routes, refreshes auth state from the current `api_request` result after saving the active user, and restores the `itemsName` form contract. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.
 - Latest one-file MultiView threshold Vue2 delta is synced: Compare thresholds retain visible/submitted acute and stable sample counts while re-trigger samples remain excluded. Nothing was skipped; targeted ESLint, migration-rule scan, targeted `git diff --check`, and the Node 24 production build pass.
 - Machine and ROI One Pager FileUploadBlock refs now use `setSubItemRef` wherever those forms already use `useSubItemsList`; the project-wide scan confirms no old `ref="fileUploadBlockRef"` remains in such a component. This fixes the Machine submit-time `Instance.getFormData is not a function` error. Targeted ESLint, targeted `git diff --check`, and the Node 24 production build pass.

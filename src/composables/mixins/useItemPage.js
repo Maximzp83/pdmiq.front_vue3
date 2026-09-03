@@ -141,7 +141,7 @@ export function useItemPage({
 
 		executeFormSubmit({
 			itemSaving,
-			itemId: getRouteItemId(),
+			itemId: preparedData?.id ?? getRouteItemId(),
 			formData: preparedData,
 			itemName: resolvedItemsName.value.one || 'Item',
 			uploadSettings,
@@ -152,11 +152,14 @@ export function useItemPage({
 			propsSuccessSubmitCallback,
 			apiRoute: resolvedApiRoute
 		}).then((answer) => {
-			if (goToListAfterSave) {
+			if (resolve(goToListAfterSave)) {
 				const path = resolvedItemRoute ? resolvedItemRoute : {parent: true};
 				changeRoute({ path });				
 			} else if (!answer?.request_payload?.setToStore) {
-				_itemData.value = answer.data;
+				const savedItem = answer?.value ?? answer?.data?.data ?? answer?.data;
+				if (savedItem) {
+					_itemData.value = savedItem;
+				}
 			}
 		})
 	};
